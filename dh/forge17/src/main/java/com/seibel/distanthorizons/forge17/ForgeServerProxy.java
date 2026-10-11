@@ -157,6 +157,14 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
     @SubscribeEvent
 	public void clickBlockEvent(PlayerInteractEvent event)
     {
+		// this event also fires for the client world in singleplayer,
+		// and RIGHT_CLICK_AIR has no block position (x/z are always 0)
+		if (event.world.isRemote
+			|| event.action == PlayerInteractEvent.Action.RIGHT_CLICK_AIR)
+		{
+			return;
+		}
+
 		ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(event.world);
 		if (SharedApi.isChunkAtBlockPosAlreadyUpdating(wrappedLevel, event.x, event.z))
 	    {

@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 
 import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.util.IIcon;
 
@@ -15,6 +17,17 @@ import org.jetbrains.annotations.Nullable;
 
 public class GregTechAccessor implements IGregTechCommonAccessor
 {
+	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
+	
+	/** 
+	 * Looked up on {@link GTRenderedTexture} directly so subclasses still resolve, 
+	 * and cached since {@link #resolveIcon} is called for every block. <br>
+	 * Null if the field couldn't be found.
+	 */
+	@Nullable
+	private static final Field ICON_CONTAINER_FIELD = getIconContainerField();
+	
+	
 	
 	@Override 
 	public String getModName() { return "GregTech"; }
@@ -36,40 +49,48 @@ public class GregTechAccessor implements IGregTechCommonAccessor
 		
         ITexture[][] textures = blockWithTextures.getTextures(meta);
         if (textures == null 
-	        || textures[0] == null) 
+	        || textures.length == 0
+	        || textures[0] == null
+	        || textures[0].length == 0) 
 		{
 			return null;
 		}
 		
         ITexture firstTexture = textures[0][0];
-        if (!(firstTexture instanceof GTRenderedTexture)) 
+        if (!(firstTexture instanceof GTRenderedTexture)
+	        || ICON_CONTAINER_FIELD == null) 
 		{
            return null;
         }
-	    GTRenderedTexture renderedTexture = (GTRenderedTexture) firstTexture;
 	    
-	    IIconContainer container = (IIconContainer) this.getObjectByReflection(renderedTexture, "mIconContainer");
-	    if (container != null)
+	    try
 	    {
-		    return container.getIcon();
+		    IIconContainer container = (IIconContainer) ICON_CONTAINER_FIELD.get(firstTexture);
+		    if (container != null)
+		    {
+			    return container.getIcon();
+		    }
+	    }
+	    catch (IllegalAccessException e)
+	    {
+		    LOGGER.error("Unable to read GregTech icon container: [" + e.getMessage() + "].", e);
 	    }
 		
         return null;
     }
-	private Object getObjectByReflection(Object base, String name)
+	private static Field getIconContainerField()
 	{
 		try
 		{
-			Field field = base.getClass()
-				.getDeclaredField(name);
+			Field field = GTRenderedTexture.class.getDeclaredField("mIconContainer");
 			field.setAccessible(true);
-			return field.get(base);
+			return field;
 		}
-		catch (NoSuchFieldException | IllegalAccessException e)
+		catch (NoSuchFieldException | SecurityException e)
 		{
-			e.printStackTrace();
+			LOGGER.error("Unable to find GregTech's icon container field, GregTech block textures won't be resolved: [" + e.getMessage() + "].", e);
+			return null;
 		}
-		return null;
 	}
 	
 	

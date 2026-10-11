@@ -81,9 +81,11 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 	//region
 	
     @SubscribeEvent
-    public void clickBlockEvent(PlayerInteractEvent event) 
+    public void clickBlockEvent(PlayerInteractEvent event)
     {
-        if (MC.clientConnectedToDedicatedServer()) 
+        // RIGHT_CLICK_AIR has no block position (x/z are always 0)
+        if (MC.clientConnectedToDedicatedServer()
+	        && event.action != PlayerInteractEvent.Action.RIGHT_CLICK_AIR)
 		{
             ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(event.world);
             if (SharedApi.isChunkAtBlockPosAlreadyUpdating(wrappedLevel, event.x, event.z)) 

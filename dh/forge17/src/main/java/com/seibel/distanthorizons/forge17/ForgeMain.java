@@ -119,21 +119,22 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 				this.addModCompatAccessor(IRpleAccessor.class, () -> rpleAccessor);
 				this.addModCompatAccessor(IRpleCommonAccessor.class, () -> rpleAccessor);
 			}
-			
-			// Hodge Podge
-			if (Loader.isModLoaded("hodgepodge")
-				&& event.getSide() == Side.SERVER)
-			{
-				HodgePodgeAccessor hodgePodgeAccessor = new HodgePodgeAccessor();
-				this.addModCompatAccessor(IHodgePodgeAccessor.class, () -> hodgePodgeAccessor);
-				this.addModCompatAccessor(IHodgePodgeCommonAccessor.class, () -> hodgePodgeAccessor);
-			}
-        } 
-		else if (!DISABLE_SERVER_FOR_TESTING) 
+        }
+		else if (!DISABLE_SERVER_FOR_TESTING)
 		{
             this.onInitializeServer();
         }
-		
+
+		// Hodge Podge
+		// used by the server-side world generator, so it's needed on both
+		// the integrated server and dedicated servers
+		if (Loader.isModLoaded("hodgepodge"))
+		{
+			HodgePodgeAccessor hodgePodgeAccessor = new HodgePodgeAccessor();
+			this.addModCompatAccessor(IHodgePodgeAccessor.class, () -> hodgePodgeAccessor);
+			this.addModCompatAccessor(IHodgePodgeCommonAccessor.class, () -> hodgePodgeAccessor);
+		}
+
         ForgeChunkManager.setForcedChunkLoadingCallback(
             instance,
             (List<ForgeChunkManager.Ticket> tickets, World world) -> chunkLoadedCallback());
