@@ -42,8 +42,10 @@ public final class LWJGLServiceProvider
 		}
 		catch (ReflectiveOperationException e)
 		{
-			// shouldn't happen, but just in case
-			throw new AssertionError(e);
+			// rethrow the real cause (IE the GL context not existing yet)
+			// so crash reports show what actually went wrong
+			Throwable cause = (e.getCause() != null) ? e.getCause() : e;
+			throw new ExceptionInInitializerError(cause);
 		}
 	}
 	

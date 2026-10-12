@@ -152,7 +152,43 @@ public class RenderHelper
 	 * Unbinding is necessary to prevent 
 	 * a crash if DH is enabled while MC starts loading into the world 
 	 */
-    public static void UnbindAfterTesselatorDraw() { LWJGL.glBindBuffer(GL32.GL_ARRAY_BUFFER, 0); }
+    public static void UnbindAfterTesselatorDraw()
+	{
+		// touching LWJGL before the GL context exists would permanently break DH's LWJGL service,
+		// the Tessellator can draw before that point
+		if (!glContextReady)
+		{
+			if (!isGlContextReady())
+			{
+				return;
+			}
+			// once the context exists it stays, so skip the check from now on
+			glContextReady = true;
+		}
+
+		LWJGL.glBindBuffer(GL32.GL_ARRAY_BUFFER, 0);
+	}
+	private static volatile boolean glContextReady = false;
+
+	/** forge17 is compiled against LWJGL2, so LWJGL3 is checked reflectively */
+	private static boolean isGlContextReady()
+	{
+		try
+		{
+			Class<?> glClass = Class.forName("org.lwjgl.opengl.GL");
+			return glClass.getMethod("getCapabilities").invoke(null) != null;
+		}
+		catch (ClassNotFoundException e)
+		{
+			// LWJGL2, there's no org.lwjgl.opengl.GL class
+			return true;
+		}
+		catch (Throwable e)
+		{
+			// no context yet (getCapabilities throws)
+			return false;
+		}
+	}
 
 	
 	

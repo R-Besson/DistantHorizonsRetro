@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.APIUtil;
+import org.lwjgl.system.FunctionProvider;
 import org.lwjgl.system.JNI;
 import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.system.Pointer;
@@ -267,16 +268,20 @@ public class LWJGL3Service implements ILWJGLService
     private enum VertexAttribIMode { CORE, EXT, NONE }
 
 
-    // Cached function addresses for APPLE VAO extensions
-    private static final long glGenVertexArraysAPPLE = GL.getFunctionProvider().getFunctionAddress("glGenVertexArraysAPPLE");
-    private static final long glDeleteVertexArraysAPPLE = GL.getFunctionProvider().getFunctionAddress("glDeleteVertexArraysAPPLE");
-    private static final long glBindVertexArrayAPPLE = GL.getFunctionProvider().getFunctionAddress("glBindVertexArrayAPPLE");
+    // Cached function addresses for APPLE VAO extensions.
+    // Looked up in create() instead of during class init: lwjgl3ify sets OPENGL_EXPLICIT_INIT,
+    // so GL.getFunctionProvider() can be null until the GL context exists, and an exception
+    // during class init would permanently break this class.
+    private static long glGenVertexArraysAPPLE = 0;
+    private static long glDeleteVertexArraysAPPLE = 0;
+    private static long glBindVertexArrayAPPLE = 0;
 
 	
 	
     public static LWJGL3Service create() 
     {
         GLCapabilities caps = GL.getCapabilities();
+        resolveAppleVaoFunctions();
 
         VAOMode vaoMode;
 	    
@@ -340,6 +345,19 @@ public class LWJGL3Service implements ILWJGLService
 	    }
 
         return new LWJGL3Service(vaoMode, timerQueryMode, debugMode, vertexAttribIMode);
+    }
+    /** If no function provider is available the APPLE VAO path is treated as unsupported, it's only an old macOS fallback. */
+    private static void resolveAppleVaoFunctions()
+    {
+        FunctionProvider provider = GL.getFunctionProvider();
+        if (provider == null)
+        {
+            return;
+        }
+        
+        glGenVertexArraysAPPLE = provider.getFunctionAddress("glGenVertexArraysAPPLE");
+        glDeleteVertexArraysAPPLE = provider.getFunctionAddress("glDeleteVertexArraysAPPLE");
+        glBindVertexArrayAPPLE = provider.getFunctionAddress("glBindVertexArrayAPPLE");
     }
 
 	
