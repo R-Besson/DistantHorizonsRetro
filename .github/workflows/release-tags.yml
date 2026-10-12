@@ -9,6 +9,24 @@ permissions:
   contents: write
 
 jobs:
+  # The jar's own version (mcmod.info, F3 screen, logs) comes from dh/gradle.properties
+  # and ModInfo.java, not from the tag, so refuse to release if they don't match it.
+  check-version:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check the tag matches the mod version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          props_version="$(sed -n 's/^mod_version=//p' dh/gradle.properties | tr -d '\r')"
+          modinfo_version="$(sed -n 's/.*String VERSION = "\(.*\)";.*/\1/p' dh/coreSubProjects/api/src/main/java/com/seibel/distanthorizons/coreapi/ModInfo.java)"
+          echo "tag: $tag, gradle.properties: $props_version, ModInfo: $modinfo_version"
+          if [ "$tag" != "$props_version" ] || [ "$tag" != "$modinfo_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME doesn't match mod_version ($props_version) and ModInfo.VERSION ($modinfo_version). Bump both, commit, then tag that commit."
+            exit 1
+          fi
+
   release-tags:
+    needs: check-version
     uses: GTNewHorizons/GTNH-Actions-Workflows/.github/workflows/release-tags.yml@master
     secrets: inherit

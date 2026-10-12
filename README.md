@@ -48,6 +48,13 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 3. Add the new jars and the Distant Horizons Retro jar to your `mods` folder.
 4. Unzip `lwjgl3ify-*-multimc.zip` into your Prism Launcher instance. It should overwrite your `mmc-pack.json`.
 
+# Roadmap
+
+- [ ] Correct sky light and ceilings for modded dimensions (currently only the Nether is detected)
+- [ ] Better block colors for GregTech, Chisel and other mods with custom textures
+- [ ] Key bindings (toggle LODs, open config)
+- [ ] Faster world generation and lower memory use
+
 # Development
 
 ## Structure
