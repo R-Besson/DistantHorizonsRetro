@@ -402,17 +402,34 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		return blockColorCache.getColor((BiomeWrapper) biome, fullDataSource, blockWorldPos, allowApiOverride);
 	}
 	
+	/** 
+	 * The dirt color is the same for every call, but is requested for 
+	 * the side of every grass quad, so it's cached. <br>
+	 * {@link #DIRT_COLOR_NOT_SET} if it hasn't been calculated yet.
+	 */
+	private volatile long cachedDirtColor = DIRT_COLOR_NOT_SET;
+	private static final long DIRT_COLOR_NOT_SET = Long.MIN_VALUE;
+	
 	@Override
 	public int getDirtBlockColor()
 	{
+		long cachedColor = this.cachedDirtColor;
+		if (cachedColor != DIRT_COLOR_NOT_SET)
+		{
+			return (int) cachedColor;
+		}
+		
 		BlockStateWrapper dirtBlockWrapper = BlockStateWrapper.getDirtBlockStateWrapper(this);
-		return this.getBlockColor(DhBlockPos.ZERO, BiomeWrapper.EMPTY_WRAPPER, null, dirtBlockWrapper);
+		int color = this.getBlockColor(DhBlockPos.ZERO, BiomeWrapper.EMPTY_WRAPPER, null, dirtBlockWrapper);
+		this.cachedDirtColor = color;
+		return color;
 	}
 	
 	@Override 
 	public void clearBlockColorCache() 
 	{
 		this.blockColorCacheByBlockState.clear();
+		this.cachedDirtColor = DIRT_COLOR_NOT_SET;
 	}
 	
 	private IDimensionTypeWrapper dimensionTypeWrapper = null;

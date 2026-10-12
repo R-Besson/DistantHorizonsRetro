@@ -62,6 +62,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -109,6 +110,13 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	
 	#if MC_VER <= MC_1_7_10
 	public static final ConcurrentHashMap<Integer, BlockStateWrapper> WRAPPER_BY_BLOCK_ID_AND_META = new ConcurrentHashMap<>();
+	/** 
+	 * Flat lookup for vanilla-range block IDs (0-4095) and metas (0-15),
+	 * avoids boxing and hashing on the per-block hot path.
+	 * IDs outside that range (IE from extended ID mods) fall back to {@link #WRAPPER_BY_BLOCK_ID_AND_META}.
+	 */
+	private static final int FAST_CACHE_MAX_BLOCK_ID = 4096;
+	private static final AtomicReferenceArray<BlockStateWrapper> WRAPPER_BY_SMALL_BLOCK_ID_AND_META = new AtomicReferenceArray<>(FAST_CACHE_MAX_BLOCK_ID * 16);
 	#elif MC_VER <= MC_1_12_2
 	public static final ConcurrentHashMap<IBlockState, BlockStateWrapper> WRAPPER_BY_BLOCK_STATE = new ConcurrentHashMap<>();
 	#else
@@ -230,6 +238,20 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		
 		// guess block state
 		BlockStateWrapper wrapperGuess = (BlockStateWrapper) guess;
+		#if MC_VER <= MC_1_7_10
+		// compare the block/meta directly so we don't have to allocate any FakeBlockStates
+		if (block == null || block == Blocks.air)
+		{
+			return isAir(wrapperGuess.blockState) ? wrapperGuess : AIR;
+		}
+		else if (wrapperGuess.blockState != null
+			&& wrapperGuess.blockState.getBlock() == block
+			&& wrapperGuess.blockState.getMeta() == meta)
+		{
+			return wrapperGuess;
+		}
+		return fromBlockState(block, meta, levelWrapper);
+		#else
 		#if MC_VER <= MC_1_12_2
 		IBlockState guessBlockState;
 		#else
@@ -281,9 +303,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			return (BlockStateWrapper) guess;
 		}
 		
-		#if MC_VER <= MC_1_7_10
-		return fromBlockState(block, meta, levelWrapper);
-	    #else 
 		return fromBlockState(blockState, levelWrapper);
 		#endif
 	}
@@ -308,16 +327,28 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			return AIR;
 		}
 		
-		#if MC_VER <= MC_1_7_10
-		FakeBlockState blockState = new FakeBlockState(block, meta);
-		#endif
-		
 		// pooling wrappers significantly improves chunk->LOD processing speed
 		// and also reduces GC pressure
 		#if MC_VER <= MC_1_7_10
 		final int blockId = Block.getIdFromBlock(block);
+		final int fastCacheIndex = getFastCacheIndex(blockId, meta);
+		BlockStateWrapper existingWrapper;
+		if (fastCacheIndex != -1)
+		{
+			existingWrapper = WRAPPER_BY_SMALL_BLOCK_ID_AND_META.get(fastCacheIndex);
+			if (existingWrapper != null)
+			{
+				return existingWrapper;
+			}
+		}
+		
 		final Integer packedIdMeta = FakeBlockState.packIdAndMeta(blockId, meta);
-		BlockStateWrapper existingWrapper = WRAPPER_BY_BLOCK_ID_AND_META.get(packedIdMeta);
+		existingWrapper = WRAPPER_BY_BLOCK_ID_AND_META.get(packedIdMeta);
+		if (existingWrapper != null && fastCacheIndex != -1)
+		{
+			// can happen if the wrapper was created via deserialization
+			WRAPPER_BY_SMALL_BLOCK_ID_AND_META.compareAndSet(fastCacheIndex, null, existingWrapper);
+		}
 		#else
 		BlockStateWrapper existingWrapper = WRAPPER_BY_BLOCK_STATE.get(blockState);
 		#endif
@@ -346,6 +377,11 @@ public class BlockStateWrapper implements IBlockStateWrapper
 				return existingWrapper;
 			}
 			
+			#if MC_VER <= MC_1_7_10
+			// only allocated when a new wrapper is needed
+			FakeBlockState blockState = new FakeBlockState(block, meta, blockId);
+			#endif
+			
 			
 			// create a wrapper specifically for the API event to use
 			BlockStateWrapper apiWrapper = new BlockStateWrapper(blockState, levelWrapper, null);
@@ -357,6 +393,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 				// no API changes needed, use the existing object
 				#if MC_VER <= MC_1_7_10
 				WRAPPER_BY_BLOCK_ID_AND_META.putIfAbsent(packedIdMeta, apiWrapper);
+				if (fastCacheIndex != -1)
+				{
+					WRAPPER_BY_SMALL_BLOCK_ID_AND_META.compareAndSet(fastCacheIndex, null, apiWrapper);
+				}
 				#else
 				WRAPPER_BY_BLOCK_STATE.putIfAbsent(blockState, apiWrapper);
 				#endif
@@ -368,6 +408,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 				BlockStateWrapper returnWrapper = new BlockStateWrapper(blockState, levelWrapper, eventParam);
 				#if MC_VER <= MC_1_7_10
 				WRAPPER_BY_BLOCK_ID_AND_META.putIfAbsent(packedIdMeta, returnWrapper);
+				if (fastCacheIndex != -1)
+				{
+					WRAPPER_BY_SMALL_BLOCK_ID_AND_META.compareAndSet(fastCacheIndex, null, returnWrapper);
+				}
 				#else
 				WRAPPER_BY_BLOCK_STATE.putIfAbsent(blockState, returnWrapper);
 				#endif
@@ -376,6 +420,19 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		}
 	}
 
+	#if MC_VER <= MC_1_7_10
+	/** @return -1 if the ID/meta is outside the range of {@link #WRAPPER_BY_SMALL_BLOCK_ID_AND_META} */
+	private static int getFastCacheIndex(int blockId, int meta)
+	{
+		if (blockId < 0 || blockId >= FAST_CACHE_MAX_BLOCK_ID
+			|| meta < 0 || meta >= 16)
+		{
+			return -1;
+		}
+		return (blockId << 4) | meta;
+	}
+	#endif
+	
 	#if MC_VER <= MC_1_12_2
 	private BlockStateWrapper(@Nullable IBlockState blockState, ILevelWrapper levelWrapper, @Nullable DhApiBlockStateWrapperCreatedEvent.EventParam overrideEventParam)
 	#else

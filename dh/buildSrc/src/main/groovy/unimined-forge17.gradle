@@ -2,6 +2,9 @@ plugins {
     id 'dh-loader'
 }
 
+// extra mods for the Java 25 dev client (see forge17/build.gradle)
+configurations.maybeCreate("java25Mods")
+
 unimined.minecraft 
 {
     minecraftForge 
@@ -16,5 +19,6 @@ unimined.minecraft
     {
         //remap(configurations.modCompileOnly)
         remap(configurations.modRuntimeOnly)
+        remap(configurations.java25Mods)
     }
 }

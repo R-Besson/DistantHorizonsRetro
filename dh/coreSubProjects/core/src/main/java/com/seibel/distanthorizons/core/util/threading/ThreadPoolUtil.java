@@ -174,25 +174,29 @@ public class ThreadPoolUtil
 	 * @see LodUtil#ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC
 	 */
-	public static boolean worldGenThreadsCanRun()
+	public static boolean worldGenThreadsCanRun() { return getWorldGenPauseReason() == null; }
+	/** @return null if world gen can run, otherwise a short description of why it's paused */
+	@Nullable
+	public static String getWorldGenPauseReason()
 	{
 		if (cameraMovingFast())
 		{
-			return false;
+			return "camera moving fast";
 		}
 		
 		if (chunkBuilderOverloaded())
 		{
-			return false;
+			return "LOD builder overloaded";
 		}
 		
 		if (Config.Common.WorldGenerator.limitIfServerUnhealthy.get()
 			&& !MC_SHARED.isServerThreadHealthy())
 		{
-			return false;
+			String details = MC_SHARED.getServerHealthDetails();
+			return "server unhealthy" + (details != null ? " (" + details + ")" : "");
 		}
 		
-		return true;
+		return null;
 	}
 	
 	public static boolean updatePropagatorThreadsCanRun()

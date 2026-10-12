@@ -180,8 +180,9 @@ public class RenderHelper
 	public static void disableFogDuringRender(int cap)
 	{
 		// Cancel enabling fog if needed
-		if (MixinVanillaFogCommon.cancelFog()
-			&& cap == GL32.GL_FOG)
+		// check the cap first, since this is called for every glEnable and cancelFog() isn't free
+		if (cap == GL32.GL_FOG
+			&& MixinVanillaFogCommon.cancelFog())
 		{
 			return;
 		}

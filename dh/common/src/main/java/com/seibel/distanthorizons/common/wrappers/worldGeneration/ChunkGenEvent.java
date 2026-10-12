@@ -28,7 +28,7 @@ import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGeneratio
 #if MC_VER > MC_1_12_2
 import com.seibel.distanthorizons.common.wrappers.worldGeneration.params.ThreadWorldGenParams;
 #endif
-import com.seibel.distanthorizons.core.util.ExceptionUtil;
+import com.seibel.distanthorizons.core.util.ThreadUtil;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
@@ -90,6 +90,18 @@ public final class ChunkGenEvent
 	// start //
 	//=======//
 	
+	#if MC_VER <= MC_1_7_10
+	/**
+	 * On 1.7.10 all chunk generation happens on the server thread, so a world gen task
+	 * spends almost all of its time blocked waiting for server ticks.
+	 * The task is started on the world gen pool (so it still obeys its pause rules)
+	 * then handed off to these threads to wait, so it doesn't hold one of DH's
+	 * shared worker slots (also used for LOD building and loading) the whole time. <br>
+	 * The number of tasks in flight is limited by {@link DhChunkGenerator#getInProgressTasksPerThread()}.
+	 */
+	private static final ExecutorService SERVER_GEN_WAIT_POOL = ThreadUtil.makeThreadPool(32, "Server World Gen Waiter", Thread.NORM_PRIORITY, true);
+	#endif
+	
 	public static ChunkGenEvent start(
 		DhChunkPos minPos, int widthInChunks,
 		DhChunkGenerator genEnvironment,
@@ -102,36 +114,21 @@ public final class ChunkGenEvent
 		
 		try
 		{
+			#if MC_VER <= MC_1_7_10
 			worldGeneratorThreadPool.execute(() ->
 			{
 				try
 				{
-					if (genEvent.generatorMode == EDhApiDistantGeneratorMode.INTERNAL_SERVER)
-					{
-						genEnvironment.internalServerGenerator.generateChunksViaInternalServer(genEvent);
-						genEvent.future.complete(null);
-					}
-					else
-					{
-						try
-						{
-							genEnvironment.generateChunks(genEvent);
-						}
-						catch (Throwable throwable)
-						{
-							handleWorldGenThrowable(genEvent, throwable);
-						}
-						finally
-						{
-							genEvent.future.complete(null);
-						}
-					}
+					SERVER_GEN_WAIT_POOL.execute(() -> runGenEvent(genEvent, genEnvironment));
 				}
-				catch (Throwable initialThrowable)
+				catch (Throwable throwable)
 				{
-					handleWorldGenThrowable(genEvent, initialThrowable);
+					handleWorldGenThrowable(genEvent, throwable);
 				}
 			});
+			#else
+			worldGeneratorThreadPool.execute(() -> runGenEvent(genEvent, genEnvironment));
+			#endif
 		}
 		catch (RejectedExecutionException e)
 		{
@@ -139,6 +136,36 @@ public final class ChunkGenEvent
 		}
 		
 		return genEvent;
+	}
+	private static void runGenEvent(ChunkGenEvent genEvent, DhChunkGenerator genEnvironment)
+	{
+		try
+		{
+			if (genEvent.generatorMode == EDhApiDistantGeneratorMode.INTERNAL_SERVER)
+			{
+				genEnvironment.internalServerGenerator.generateChunksViaInternalServer(genEvent);
+				genEvent.future.complete(null);
+			}
+			else
+			{
+				try
+				{
+					genEnvironment.generateChunks(genEvent);
+				}
+				catch (Throwable throwable)
+				{
+					handleWorldGenThrowable(genEvent, throwable);
+				}
+				finally
+				{
+					genEvent.future.complete(null);
+				}
+			}
+		}
+		catch (Throwable initialThrowable)
+		{
+			handleWorldGenThrowable(genEvent, initialThrowable);
+		}
 	}
 	/** There's probably a better way to handle this, but it'll work for now */
 	private static void handleWorldGenThrowable(ChunkGenEvent generationEvent, Throwable initialThrowable)
@@ -149,20 +176,10 @@ public final class ChunkGenEvent
 			throwable = throwable.getCause();
 		}
 		
-		boolean isShutdownException = ExceptionUtil.isShutdownException(throwable);
-		if (isShutdownException)
-		{
-			// these exceptions can be ignored, generally they just mean
-			// the thread is busy so it'll need to try again later.
-			// FIXME this should cause the world gen task to be re-queued so we can try again later
-			//  however, currently it can cause large gaps in the world gen instead.
-			//  These gaps will generate correctly if the level is reloaded and the world gen is re-queued,
-			//  however this is makes it look like the generator isn't working or skipped something.
-		}
-		else
-		{
-			generationEvent.future.completeExceptionally(throwable);
-		}
+		// Shutdown exceptions (interrupts, rejections, cancellations) aren't logged as errors,
+		// but the future must still complete, otherwise the world gen queue keeps
+		// counting this task as in progress forever and eventually stops generating.
+		generationEvent.future.completeExceptionally(throwable);
 	}
 	
 	

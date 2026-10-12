@@ -293,6 +293,11 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 		#endif
 	}
 	
+	#if MC_VER <= MC_1_7_10
+	/** DhChunkPos is immutable so it can be safely shared */
+	private volatile DhChunkPos lastPlayerChunkPos = null;
+	#endif
+	
 	@Override
 	public DhChunkPos getPlayerChunkPos()
 	{
@@ -316,7 +321,18 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 		}
 		
 		#if MC_VER <= MC_1_7_10
-		return new DhChunkPos(player.chunkCoordX, player.chunkCoordZ);
+		// reuse the last position while the player stays in the same chunk,
+		// this is polled in a tight loop by the chunk update queue
+		DhChunkPos lastPos = this.lastPlayerChunkPos;
+		if (lastPos != null
+			&& lastPos.getX() == player.chunkCoordX
+			&& lastPos.getZ() == player.chunkCoordZ)
+		{
+			return lastPos;
+		}
+		lastPos = new DhChunkPos(player.chunkCoordX, player.chunkCoordZ);
+		this.lastPlayerChunkPos = lastPos;
+		return lastPos;
 		#elif MC_VER <= MC_1_12_2
 		ChunkPos playerPos = new ChunkPos(player.getPosition());
 		return new DhChunkPos(playerPos.x, playerPos.z);

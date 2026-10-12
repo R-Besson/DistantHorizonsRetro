@@ -142,6 +142,9 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	@Override
 	public void preGeneratorTaskStart() { this.chunkGenerator.updateAllFutures(); }
 	
+	/** @see IChunkGenerator#getInProgressTasksPerThread() */
+	public int getInProgressTasksPerThread() { return this.chunkGenerator.getInProgressTasksPerThread(); }
+	
 	@Override
 	public CompletableFuture<Void> generateLod(
 		int chunkPosMinX, int chunkPosMinZ,

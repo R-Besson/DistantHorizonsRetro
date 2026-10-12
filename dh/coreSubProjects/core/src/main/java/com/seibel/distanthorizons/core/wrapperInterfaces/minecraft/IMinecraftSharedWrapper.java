@@ -39,6 +39,8 @@ public interface IMinecraftSharedWrapper extends IBindable
 	
 	/** returns true if MC's server thread is running in an acceptable amount of time */
 	boolean isServerThreadHealthy();
+	/** @return the numbers {@link #isServerThreadHealthy()} is based on, for troubleshooting, or null if unavailable */
+	default String getServerHealthDetails() { return null; }
 	
 	/** returns true if this MC version supports surface world generation */
 	boolean supportsSurfaceGeneration();

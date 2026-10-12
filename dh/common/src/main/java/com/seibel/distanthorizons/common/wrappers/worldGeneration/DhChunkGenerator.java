@@ -141,6 +141,31 @@ public final class DhChunkGenerator implements IChunkGenerator
 	
 	public final DhInternalServerGenerator internalServerGenerator;
 	
+	/** 
+	 * On 1.7.10 world gen tasks wait on the server thread without holding a world gen thread
+	 * (see ChunkGenEvent's SERVER_GEN_WAIT_POOL), so more can be in flight to fill the server's world gen budget. <br>
+	 * Each task force-loads up to 36 chunks (4x4 + neighbors), and Forge silently un-forces the oldest chunks 
+	 * once the 1000 chunk ticket limit set in DhInternalServerGenerator is passed,
+	 * so the total number of tasks is capped to stay under that.
+	 */
+	@Override
+	public int getInProgressTasksPerThread()
+	{
+		#if MC_VER <= MC_1_7_10
+		// +1 since the queue allows one task over its limit
+		int maxTaskCount = (FORGE_TICKET_CHUNK_LIMIT / MAX_FORCED_CHUNKS_PER_TASK) - 1;
+		int threadCount = Math.max(Config.Common.MultiThreading.numberOfThreads.get(), 1);
+		return Math.max(1, Math.min(MAX_IN_PROGRESS_TASKS_PER_THREAD, maxTaskCount / threadCount));
+		#else
+		return 1;
+		#endif
+	}
+	#if MC_VER <= MC_1_7_10
+	private static final int MAX_IN_PROGRESS_TASKS_PER_THREAD = 3;
+	private static final int FORGE_TICKET_CHUNK_LIMIT = 1000;
+	private static final int MAX_FORCED_CHUNKS_PER_TASK = 6 * 6;
+	#endif
+	
 	#if MC_VER > MC_1_12_2
 	public final ChunkFileReader chunkFileReader;
 	#endif
@@ -312,6 +337,15 @@ public final class DhChunkGenerator implements IChunkGenerator
 					}
 					catch (Exception e)
 					{
+						// get() wraps the cause in an ExecutionException
+						if (ExceptionUtil.isShutdownException(e)
+							|| (e.getCause() != null && ExceptionUtil.isShutdownException(e.getCause())))
+						{
+							// expected when tasks are interrupted or cancelled, not a generator problem
+							iter.remove();
+							continue;
+						}
+						
 						this.unknownExceptionCount++;
 						this.lastExceptionTriggerTime = System.nanoTime();
 						LOGGER.error("Batching World Generator event ["+event+"] threw an exception: "+e.getMessage(), e);

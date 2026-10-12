@@ -21,7 +21,21 @@ public class Camera
 	
     private final Vector3d pos = new Vector3d();
 
-	public void update(EntityLivingBase entity, float partialTicks)
+	/** 
+	 * Synchronized and returns a copy since this is called from both the
+	 * render thread and DH's beacon culling thread.
+	 * If there's no camera entity (IE while leaving a world) the last position is returned.
+	 */
+	public synchronized Vector3d getUpdatedPos(EntityLivingBase entity, float partialTicks)
+	{
+		if (entity != null)
+		{
+			this.update(entity, partialTicks);
+		}
+		return new Vector3d(this.pos);
+	}
+	
+	private void update(EntityLivingBase entity, float partialTicks)
 	{
 		final Vector4f offset = new Vector4f(); // third person offset
 		final Matrix4f inverseModelView = ClientApi.RENDER_STATE.mcModelViewMatrix
@@ -35,7 +49,7 @@ public class Camera
 		this.pos.set(camX, camY, camZ);
 	}
 	
-	public Vector3d getPos() { return this.pos; }
+	public synchronized Vector3d getPos() { return new Vector3d(this.pos); }
 	
 	#endif
 }

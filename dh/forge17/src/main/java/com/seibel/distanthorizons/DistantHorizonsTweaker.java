@@ -1,26 +1,15 @@
 package com.seibel.distanthorizons;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
-import com.gtnewhorizon.gtnhmixins.builders.IMixins;
-import com.seibel.distanthorizons.forge17.Mixins;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 /**
- * Defines our mixins.
+ * Coremod entry point. <br>
+ * Our mixins are listed by {@link com.seibel.distanthorizons.forge17.DistantHorizonsMixinConfigPlugin}.
  */
-public class DistantHorizonsTweaker implements IEarlyMixinLoader, IFMLLoadingPlugin
+public class DistantHorizonsTweaker implements IFMLLoadingPlugin
 {
-	@Override
-	public String getMixinConfig() { return "DistantHorizons.forge.mixins.json"; }
-
-	@Override
-	public List<String> getMixins(Set<String> loadedCoreMods) { return IMixins.getEarlyMixins(Mixins.class, loadedCoreMods); }
-
 	@Override
 	public String[] getASMTransformerClass() { return new String[0]; }
 

@@ -279,8 +279,7 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 		
 		#if MC_VER <= MC_1_7_10
 			float frameTime = Minecraft.getMinecraft().timer.renderPartialTicks;
-			Camera.INSTANCE.update(MC.renderViewEntity, frameTime);
-			Vector3d projectedView = Camera.INSTANCE.getPos();
+			Vector3d projectedView = Camera.INSTANCE.getUpdatedPos(MC.renderViewEntity, frameTime);
 			return new DhVec3d(projectedView.x, projectedView.y, projectedView.z);
 		#elif MC_VER <= MC_1_12_2
 			RenderManager rm = MC.getRenderManager();

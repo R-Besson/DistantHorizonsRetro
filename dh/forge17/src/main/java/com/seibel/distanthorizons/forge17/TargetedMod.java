@@ -12,10 +12,12 @@ public enum TargetedMod implements ITargetMod
 
 	
 	
+    public final String coreModClass;
     private final TargetModBuilder builder;
 
     TargetedMod(String coreModClass, String modId) 
     {
+        this.coreModClass = coreModClass;
         this.builder = new TargetModBuilder().setCoreModClass(coreModClass)
             .setModId(modId);
     }

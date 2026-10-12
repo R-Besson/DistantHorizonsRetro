@@ -7,8 +7,11 @@ import org.spongepowered.asm.lib.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 
 public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 {
@@ -43,7 +46,25 @@ public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 	@Override
 	public List<String> getMixins()
 	{
-		return null;
+		// The config is registered by the jar's MixinConfigs manifest entry before GTNHMixins
+		// gets a chance to, so GTNHMixins' list would be dropped; supply it from here instead.
+		return IMixins.getEarlyMixins(Mixins.class, getLoadedTargetCoreMods());
+	}
+	
+	/** coremods are already on the classpath at this point, so checking for their class file is enough */
+	private static Set<String> getLoadedTargetCoreMods()
+	{
+		Set<String> loadedCoreMods = new HashSet<>();
+		ClassLoader classLoader = DistantHorizonsMixinConfigPlugin.class.getClassLoader();
+		for (TargetedMod targetedMod : TargetedMod.values())
+		{
+			String coreModClass = targetedMod.coreModClass;
+			if (classLoader.getResource(coreModClass.replace('.', '/') + ".class") != null)
+			{
+				loadedCoreMods.add(coreModClass);
+			}
+		}
+		return loadedCoreMods;
 	}
 	
 	@Override

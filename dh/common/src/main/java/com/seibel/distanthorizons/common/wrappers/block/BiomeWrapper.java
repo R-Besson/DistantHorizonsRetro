@@ -327,9 +327,11 @@ public class BiomeWrapper implements IBiomeWrapper
 			return EMPTY_WRAPPER;
 		}
 		
-		if (WRAPPER_BY_RESOURCE_LOCATION.containsKey(finalResourceStateString))
+		// single lookup, this is called for every biome read from the database
+		BiomeWrapper cachedWrapper = WRAPPER_BY_RESOURCE_LOCATION.get(finalResourceStateString);
+		if (cachedWrapper != null)
 		{
-			return WRAPPER_BY_RESOURCE_LOCATION.get(finalResourceStateString);
+			return cachedWrapper;
 		}
 		
 		

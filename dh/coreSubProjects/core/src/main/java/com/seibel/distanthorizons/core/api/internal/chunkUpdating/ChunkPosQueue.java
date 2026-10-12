@@ -81,12 +81,31 @@ public class ChunkPosQueue
 		this.center = newCenter;
 		
 		// rebuild the priority queues to match the new center
+		this.rebuildQueues();
+	}
+	
+	/** also drops any stale entries left behind by {@link #popClosest()} and {@link #popFurthest()} */
+	private void rebuildQueues()
+	{
 		this.closestQueue.clear();
 		this.furthestQueue.clear();
 		for (DhChunkPos pos : this.updateDataByChunkPos.keySet())
 		{
 			this.closestQueue.add(pos);
 			this.furthestQueue.add(pos);
+		}
+	}
+	
+	/** 
+	 * Rebuilds the queues once they're mostly stale entries 
+	 * so they don't grow forever when only one end is popped.
+	 */
+	private void compactIfTooStale()
+	{
+		int liveCount = this.updateDataByChunkPos.size();
+		if (Math.max(this.closestQueue.size(), this.furthestQueue.size()) > (liveCount * 2) + 64)
+		{
+			this.rebuildQueues();
 		}
 	}
 	
@@ -97,14 +116,23 @@ public class ChunkPosQueue
 			return null;
 		}
 		
-		DhChunkPos closest = this.closestQueue.poll();
-		if (closest == null)
+		// the furthest queue isn't updated here since removing from the middle of a
+		// PriorityBlockingQueue is O(n); stale entries are skipped when polled instead
+		DhChunkPos closest;
+		ChunkUpdateData updateData;
+		do
 		{
-			return null;
+			closest = this.closestQueue.poll();
+			if (closest == null)
+			{
+				return null;
+			}
+			updateData = this.updateDataByChunkPos.remove(closest);
 		}
+		while (updateData == null);
 		
-		this.furthestQueue.remove(closest);
-		return this.updateDataByChunkPos.remove(closest);
+		this.compactIfTooStale();
+		return updateData;
 	}
 	@Nullable
 	public ChunkUpdateData popFurthest()
@@ -114,14 +142,22 @@ public class ChunkPosQueue
 			return null;
 		}
 		
-		DhChunkPos furthest = this.furthestQueue.poll();
-		if (furthest == null)
+		// see popClosest() for why stale entries are skipped instead of removed
+		DhChunkPos furthest;
+		ChunkUpdateData updateData;
+		do
 		{
-			return null;
+			furthest = this.furthestQueue.poll();
+			if (furthest == null)
+			{
+				return null;
+			}
+			updateData = this.updateDataByChunkPos.remove(furthest);
 		}
+		while (updateData == null);
 		
-		this.closestQueue.remove(furthest);
-		return this.updateDataByChunkPos.remove(furthest);
+		this.compactIfTooStale();
+		return updateData;
 	}
 }
 		

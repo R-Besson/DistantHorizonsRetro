@@ -1,5 +1,6 @@
 package com.seibel.distanthorizons.common.wrappers.minecraft;
 
+import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSharedWrapper;
 import java.util.Arrays;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +33,12 @@ import net.minecraft.core.Registry;
 public abstract class AbstractMinecraftSharedWrapper implements IMinecraftSharedWrapper
 {
 	public static boolean supportsSurfaceGeneration = false;
-	
+
+	/** a tick slower than this is a lag spike, 50 ms is the standard tick rate */
+	private static final long SLOW_TICK_NANO = 50_000_000L;
+	/** out of the last 100 ticks */
+	private static final int MAX_SLOW_TICKS_1_7_10 = 5;
+
 	
 	
 	@Nullable
@@ -75,12 +81,59 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 	@Override
 	public boolean isServerThreadHealthy()
 	{
-		long[] nanoTicks = this.getServerTickTimesNano();
-		if (nanoTicks == null)
+		double[] avgAndP99Ms = this.getServerTickAvgAndP99Ms();
+		if (avgAndP99Ms == null)
 		{
 			// assume the server is healthy if
 			// we can't get the ticks
 			return true;
+		}
+		double avgMs = avgAndP99Ms[0];
+		double p99Ms = avgAndP99Ms[1];
+		
+		#if MC_VER <= MC_1_7_10
+		// DH's server thread work runs after Minecraft records its tick time,
+		// so add it back to get the real time used per tick.
+		// The server stays at 20 TPS as long as the total averages under 50 ms,
+		// 40 ms leaves a margin for spikes and work neither of us can measure.
+		// A single slow tick (chunk saving, a GC pause) doesn't lower TPS,
+		// 1.7.10's server loop catches up by running the missed ticks back to back,
+		// so only treat slow ticks as a problem when they keep happening.
+		// DH can't make a slow tick slower, its per-tick deadline has already passed by then.
+		double totalAvgMs = avgMs + ServerThreadTaskHandler.INSTANCE.getAverageDhMsPerTick();
+		int slowTickCount = (int) avgAndP99Ms[2];
+		return totalAvgMs < 40.0
+			&& slowTickCount < MAX_SLOW_TICKS_1_7_10;
+		#else
+		return avgMs < 25.0 // 50 ms is standard tick rate
+			&& p99Ms < 50.0;
+		#endif
+	}
+	@Override
+	public String getServerHealthDetails()
+	{
+		double[] avgAndP99Ms = this.getServerTickAvgAndP99Ms();
+		if (avgAndP99Ms == null)
+		{
+			return null;
+		}
+		
+		String details = "MC avg " + String.format("%.1f", avgAndP99Ms[0]) + " ms"
+			+ ", slowest " + String.format("%.1f", avgAndP99Ms[1]) + " ms"
+			+ ", " + (int) avgAndP99Ms[2] + " ticks over 50 ms";
+		#if MC_VER <= MC_1_7_10
+		details += ", DH avg " + String.format("%.1f", ServerThreadTaskHandler.INSTANCE.getAverageDhMsPerTick()) + " ms";
+		#endif
+		return details;
+	}
+	
+	/** @return null if tick times aren't available, otherwise {average ms, 99th percentile ms, number of ticks over 50 ms} */
+	private double @Nullable [] getServerTickAvgAndP99Ms()
+	{
+		long[] nanoTicks = this.getServerTickTimesNano();
+		if (nanoTicks == null)
+		{
+			return null;
 		}
 		
 		long[] sortedNanoTicks = nanoTicks.clone();
@@ -92,9 +145,15 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 		
 		double avgMs = Arrays.stream(sortedNanoTicks).average().orElse(0) * 1e-6; // convert from Nano to Milli
 		
-		return avgMs < 25.0 // 50 ms is standard tick rate
-			&& p99Ms < 50.0;
+		int slowTickCount = 0;
+		for (int i = sortedNanoTicks.length - 1; i >= 0 && sortedNanoTicks[i] > SLOW_TICK_NANO; i--)
+		{
+			slowTickCount++;
+		}
+		
+		return new double[] { avgMs, p99Ms, slowTickCount };
 	}
+	
 	private long @Nullable [] getServerTickTimesNano()
 	{
 		// currently this logic is only implemented for singleplayer servers (except 1.12.2 and lower)

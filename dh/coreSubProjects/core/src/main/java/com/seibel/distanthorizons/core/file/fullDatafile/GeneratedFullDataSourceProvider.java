@@ -330,6 +330,21 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 	}
 	
 	@Override
+	public boolean tryMakeRoomForRetrieval(long pos, DhBlockPos2D centerPos)
+	{
+		IFullDataSourceRetrievalQueue worldGenQueue = this.worldGenQueueRef.get();
+		if (worldGenQueue == null
+			// only make room when the waiting list is what's full,
+			// otherwise removing requests wouldn't let anything new be queued
+			|| worldGenQueue.getWaitingTaskCount() < getMaxRetrievalQueueCount())
+		{
+			return false;
+		}
+		
+		return worldGenQueue.removeFarthestRequestIfFartherThan(pos, centerPos);
+	}
+	
+	@Override
 	public void removeRetrievalRequestIf(DhSectionPos.IPrimitiveLongConsumer removeIf)
 	{
 		IFullDataSourceRetrievalQueue worldGenQueue = this.worldGenQueueRef.get();

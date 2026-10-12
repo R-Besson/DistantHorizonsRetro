@@ -79,6 +79,12 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	 * before checking again for new tasks.
 	 */
 	private static final long QUEUE_THREAD_IDLE_WAIT_MS = 100L;
+	/**
+	 * How often every loaded section is checked again for missing data. <br>
+	 * Sections are normally only checked once when they load, so anything that
+	 * didn't fully generate (IE a chunk that couldn't be loaded) would stay a hole until the level is reloaded.
+	 */
+	private static final long MISSING_DATA_RECHECK_INTERVAL_MS = 30_000L;
 	
 	
 	public final int blockRenderDistanceDiameter;
@@ -103,6 +109,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	
 	private final AtomicBoolean requeueAllRetrievalTasksRef = new AtomicBoolean(false);
 	private final AtomicBoolean queueThreadRunningRef = new AtomicBoolean(false);
+	private long lastMissingDataRecheckMs = System.currentTimeMillis();
 	
 	
 	/**
@@ -340,6 +347,14 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		// queue work //
 		//============//
 		//region
+		
+		long nowMs = System.currentTimeMillis();
+		if (nowMs - this.lastMissingDataRecheckMs >= MISSING_DATA_RECHECK_INTERVAL_MS
+			&& this.fullDataSourceProvider.getGeneratorPlan().generationEnabled)
+		{
+			this.lastMissingDataRecheckMs = nowMs;
+			this.requeueAllRetrievalTasksRef.set(true);
+		}
 		
 		if (this.requeueAllRetrievalTasksRef.getAndSet(false))
 		{
@@ -877,11 +892,6 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		
 		for (int i = 0; i < this.sortedMissingPosList.size(); i++)
 		{
-			if (!this.fullDataSourceProvider.canQueueRetrievalNow())
-			{
-				break;
-			}
-			
 			long missingPos = this.sortedMissingPosList.get(i);
 			
 			// is this position within acceptable generator range?
@@ -893,6 +903,18 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			if (!posInRange)
 			{
 				continue;
+			}
+			
+			if (!this.fullDataSourceProvider.canQueueRetrievalNow())
+			{
+				// The queue is full. Since this list is sorted nearest first, 
+				// replace a farther away request so holes near the player
+				// (failed tasks, newly loaded sections) are generated first.
+				if (!this.fullDataSourceProvider.tryMakeRoomForRetrieval(missingPos, playerPos)
+					|| !this.fullDataSourceProvider.canQueueRetrievalNow())
+				{
+					break;
+				}
 			}
 			
 			CompletableFuture<DataSourceRetrievalResult> genFuture = this.fullDataSourceProvider.queuePositionForRetrieval(missingPos);

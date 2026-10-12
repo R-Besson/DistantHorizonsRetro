@@ -29,7 +29,13 @@ public class ServerThreadTaskHandler
 	 * fired, and whatever runs after we hand the tick back (other mods' end-of-tick
 	 * handlers, world saving, the next tick's network drain).
 	 */
+	#if MC_VER <= MC_1_7_10
+	// slightly smaller since on 1.7.10 the server health check also counts DH's own time
+	// (see AbstractMinecraftSharedWrapper#isServerThreadHealthy), so DH backs off before ticks run long
+	private static final long TICK_RESERVE_NANO = 20_000_000L;
+	#else
 	private static final long TICK_RESERVE_NANO = 25_000_000L;
+	#endif
 	/**
 	 * Upper bound on a single tick's budget.
 	 */
@@ -51,6 +57,15 @@ public class ServerThreadTaskHandler
 	 * only run on the server thread; volatile so {@link #reset()} can clear it from elsewhere.
 	 */
 	private volatile long tickStartNano = TICK_START_NOT_SET;
+	
+	/** 
+	 * How long {@link #runTasks()} took for each of the last {@link #DH_TICK_HISTORY_LENGTH} ticks. <br>
+	 * This work runs after Minecraft records its tick time, so it has to be tracked separately
+	 * to know how much of each tick is actually used.
+	 */
+	private static final int DH_TICK_HISTORY_LENGTH = 100;
+	private final long[] dhNanosPerTick = new long[DH_TICK_HISTORY_LENGTH];
+	private int dhNanosPerTickIndex = 0;
 
 
 
@@ -106,6 +121,32 @@ public class ServerThreadTaskHandler
 	 * Runs queued tasks on the server thread using whatever time is left in the current tick.
 	 */
 	public void runTasks()
+	{
+		long startNano = System.nanoTime();
+		try
+		{
+			this.runTasksUntilDeadline();
+		}
+		finally
+		{
+			// only written from the server thread
+			this.dhNanosPerTick[this.dhNanosPerTickIndex] = System.nanoTime() - startNano;
+			this.dhNanosPerTickIndex = (this.dhNanosPerTickIndex + 1) % DH_TICK_HISTORY_LENGTH;
+		}
+	}
+	
+	/** @return the average time DH's queued server thread work has taken per tick recently */
+	public double getAverageDhMsPerTick()
+	{
+		long totalNano = 0;
+		for (long nano : this.dhNanosPerTick)
+		{
+			totalNano += nano;
+		}
+		return (totalNano / (double) DH_TICK_HISTORY_LENGTH) * 1e-6;
+	}
+	
+	private void runTasksUntilDeadline()
 	{
 		long deadlineNano = this.deadlineForTickNano(this.tickStartNano);
 		this.tickStartNano = TICK_START_NOT_SET;

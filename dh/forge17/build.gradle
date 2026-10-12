@@ -9,6 +9,14 @@ repositories {
         url "https://nexus.gtnewhorizons.com/repository/public/" // UniMixins
     }
     maven {
+        name = "Prism" // Java 9+ compatible log4j 2.0-beta9 build, same one Prism uses
+        url = "https://files.prismlauncher.org/maven/"
+        metadataSources { artifact() } // jars only, no POMs
+        content {
+            includeGroup "org.apache.logging.log4j"
+        }
+    }
+    maven {
         name = "mavenpattern"
         url = "https://mvn.falsepattern.com/releases" // RPLE
         content {
@@ -41,6 +49,139 @@ dependencies {
     
     modImplementation "io.github.legacymoddingmc:unimixins:0.2.1@jar"
 
+}
+
+// ==================== Java 25 Dev Client ====================
+// runClient runs on Java 25 the same way the GTNH/Prism setup does:
+// RetroFuturaBootstrap (from lwjgl3ify's forgePatches jar) replaces launchwrapper,
+// LWJGL 3 replaces LWJGL 2, and the lwjgl3ify mod bridges the two.
+// Pass -PdevJava8=true to get the old Java 8 + LWJGL 2 client back.
+
+def useJava25DevClient = !(project.findProperty("devJava8")?.toString()?.toBoolean() ?: false)
+def lwjgl3ifyVersion = "3.0.35"
+def lwjgl3Version = "3.4.2"
+def lwjgl3Modules = ["", "-freetype", "-jemalloc", "-nuklear", "-openal", "-opengl", "-sdl", "-shaderc", "-spng", "-spvc", "-stb", "-tinyfd", "-zstd"]
+def lwjgl3NativesClassifier = {
+    def os = System.getProperty("os.name").toLowerCase()
+    def arm = System.getProperty("os.arch").contains("aarch64")
+    if (os.contains("win")) return arm ? "natives-windows-arm64" : "natives-windows"
+    if (os.contains("mac")) return arm ? "natives-macos-arm64" : "natives-macos"
+    return arm ? "natives-linux-arm64" : "natives-linux"
+}()
+
+configurations {
+    // must be first on the classpath, contains RetroFuturaBootstrap
+    java25EarlyClasspath { transitive = false }
+    java25Libraries { transitive = false }
+    // java25Mods is created and remapped in unimined-forge17.gradle,
+    // since unimined can't be configured from here
+    java25Mods { transitive = false }
+}
+
+dependencies {
+    java25EarlyClasspath "com.github.GTNewHorizons:lwjgl3ify:${lwjgl3ifyVersion}:forgePatches"
+    java25Mods "com.github.GTNewHorizons:lwjgl3ify:${lwjgl3ifyVersion}@jar"
+
+    lwjgl3Modules.each { module ->
+        java25Libraries "org.lwjgl:lwjgl${module}:${lwjgl3Version}"
+        java25Libraries "org.lwjgl:lwjgl${module}:${lwjgl3Version}:${lwjgl3NativesClassifier}"
+    }
+    // Minecraft's versions of these don't work on Java 9+
+    java25Libraries "org.apache.logging.log4j:log4j-api:2.0-beta9-fixed"
+    java25Libraries "org.apache.logging.log4j:log4j-core:2.0-beta9-fixed"
+    java25Libraries "com.google.code.gson:gson:2.10.1"
+}
+
+// libraries that RetroFuturaBootstrap, LWJGL 3 or the fixed versions above replace
+def java25ReplacedLibraries = [
+    ~/^lwjgl-2\..*/, ~/^lwjgl_util-2\..*/, ~/^lwjgl-platform-2\..*/,
+    ~/^launchwrapper-.*/, ~/^asm-all-.*/,
+    ~/^log4j-(api|core)-2\.0-beta9\.jar$/, ~/^gson-2\.2\.4\.jar$/,
+]
+
+// JVM args from lwjgl3ify's forgePatches (same list Prism uses)
+def lwjgl3ifyJvmArgs = [
+    "-Dfile.encoding=UTF-8",
+    "-Djava.system.class.loader=com.gtnewhorizons.retrofuturabootstrap.RfbSystemClassLoader",
+    "--enable-native-access", "ALL-UNNAMED",
+] + [
+    "java.base/java.io", "java.base/java.lang.invoke", "java.base/java.lang.ref", "java.base/java.lang.reflect",
+    "java.base/java.lang", "java.base/java.net.spi", "java.base/java.net", "java.base/java.nio.channels",
+    "java.base/java.nio.charset", "java.base/java.nio.file", "java.base/java.nio", "java.base/java.text",
+    "java.base/java.time.chrono", "java.base/java.time.format", "java.base/java.time.temporal",
+    "java.base/java.time.zone", "java.base/java.time", "java.base/java.util.concurrent.atomic",
+    "java.base/java.util.concurrent.locks", "java.base/java.util.jar", "java.base/java.util.zip",
+    "java.base/java.util", "java.base/jdk.internal.loader", "java.base/jdk.internal.misc",
+    "java.base/jdk.internal.ref", "java.base/jdk.internal.reflect", "java.base/sun.nio.ch",
+    "java.desktop/com.sun.imageio.plugins.png", "java.desktop/sun.awt.image", "java.desktop/sun.awt",
+    "java.desktop/sun.lwawt.macosx", "java.sql.rowset/javax.sql.rowset.serial", "jdk.dynalink/jdk.dynalink.beans",
+].collectMany { ["--add-opens", "${it}=ALL-UNNAMED".toString()] } + [
+    "--add-opens", "jdk.naming.dns/com.sun.jndi.dns=ALL-UNNAMED,java.naming",
+]
+
+// -PdevProfile=true records a Java Flight Recorder profile of the whole session,
+// written to run/client/profiles/ when the game closes (open it with JDK Mission Control)
+def devProfile = project.findProperty("devProfile")?.toString()?.toBoolean() ?: false
+
+// registered after dh-loader's afterEvaluate, so this runs after its run task setup
+afterEvaluate {
+    tasks.named('runClient', JavaExec) { runTask ->
+        if (devProfile) {
+            def profileDir = rootProject.file("run/client/profiles")
+            doFirst { profileDir.mkdirs() }
+            runTask.jvmArgs("-XX:StartFlightRecording=settings=profile,dumponexit=true,filename=${profileDir.absolutePath}")
+        }
+
+        if (!useJava25DevClient) {
+            // lwjgl3ify left over from a Java 25 run would break the Java 8 client
+            doFirst {
+                rootProject.file("run/client/mods").listFiles()?.each { file ->
+                    if (file.name.startsWith("lwjgl3ify")) { file.delete() }
+                }
+            }
+            return
+        }
+
+        runTask.javaLauncher.set(javaToolchains.launcherFor {
+            languageVersion = JavaLanguageVersion.of(25)
+        })
+        runTask.mainClass.set("com.gtnewhorizons.retrofuturabootstrap.MainStartOnFirstThread")
+        runTask.classpath = configurations.java25EarlyClasspath +
+            configurations.java25Libraries +
+            runTask.classpath.filter { file -> !java25ReplacedLibraries.any { file.name ==~ it } }
+        
+        // these go in the mods folder rather than the classpath, the same way Prism loads them:
+        // FML only loads the @Mod half of a coremod jar (lwjgl3ify's text input handling lives there)
+        // when it's found in the mods folder
+        def java25ModFiles = configurations.java25Mods
+        def modsDir = rootProject.file("run/client/mods")
+        doFirst {
+            modsDir.mkdirs()
+            def names = java25ModFiles.files.collect { it.name }
+            modsDir.listFiles()?.each { file ->
+                if (file.name.startsWith("lwjgl3ify")) { file.delete() }
+            }
+            copy {
+                from java25ModFiles
+                into modsDir
+            }
+            logger.lifecycle("Copied Java 25 dev mods into ${modsDir}: ${names}")
+        }
+
+        // swap Minecraft's G1 tuning for ZGC
+        runTask.jvmArgs = runTask.jvmArgs.findAll { arg ->
+            !arg.startsWith("-XX:+UseG1GC")
+                && !arg.startsWith("-XX:G1")
+                && !arg.startsWith("-XX:MaxGCPauseMillis")
+                && arg != "-XX:+UnlockExperimentalVMOptions"
+        }
+        runTask.jvmArgs(lwjgl3ifyJvmArgs)
+        runTask.jvmArgs("-XX:+UseZGC", "-XX:+UseCompactObjectHeaders")
+        // ZGC grows the heap towards -Xmx whenever allocation is high, even though DH's live data
+        // is only a few hundred MB; keep it near 3 GB and return unused memory after 30s
+        // so a busy world gen session doesn't use up Windows' commit limit
+        runTask.jvmArgs("-XX:SoftMaxHeapSize=3G", "-XX:ZUncommitDelay=30")
+    }
 }
 
 // ==================== Tasks ====================

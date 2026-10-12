@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.core.generation.queues;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiGeneratorPlan;
 import com.seibel.distanthorizons.api.interfaces.override.worldGenerator.IDhApiWorldGenerator;
+import com.seibel.distanthorizons.core.generation.DhWorldGenerator;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGeneratorReturnType;
 import com.seibel.distanthorizons.api.objects.data.DhApiChunk;
 import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
@@ -188,6 +189,42 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	}
 	
 	@Override
+	public boolean removeFarthestRequestIfFartherThan(long pos, DhBlockPos2D centerPos)
+	{
+		int posDistance = DhSectionPos.getManhattanBlockDistance(pos, centerPos);
+		
+		long farthestPos = 0;
+		int farthestDistance = posDistance;
+		boolean fartherPosFound = false;
+		for (long waitingPos : this.waitingTaskByPos.keySet())
+		{
+			int distance = DhSectionPos.getManhattanBlockDistance(waitingPos, centerPos);
+			if (distance > farthestDistance)
+			{
+				farthestDistance = distance;
+				farthestPos = waitingPos;
+				fartherPosFound = true;
+			}
+		}
+		
+		if (!fartherPosFound)
+		{
+			return false;
+		}
+		
+		DataSourceRetrievalTask removedTask = this.waitingTaskByPos.remove(farthestPos);
+		if (removedTask == null)
+		{
+			// the task was started while we were looking
+			return false;
+		}
+		
+		// cancelling lets the requester queue this position again later
+		removedTask.future.cancel(true);
+		return true;
+	}
+	
+	@Override
 	public boolean requestPosExistsWhere(DhSectionPos.IPrimitiveLongConsumer returnTrueIf)
 	{
 		AtomicBoolean taskFound = new AtomicBoolean(false);
@@ -278,7 +315,10 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		
 		// queue more tasks if any of the threads are available
 		int worldGenThreadCount = Math.max(Config.Common.MultiThreading.numberOfThreads.get(), 1);
-		return this.inProgressGenTasksByLodPos.size() > worldGenThreadCount;
+		int tasksPerThread = (this.generator instanceof DhWorldGenerator)
+			? Math.max(((DhWorldGenerator) this.generator).getInProgressTasksPerThread(), 1)
+			: 1;
+		return this.inProgressGenTasksByLodPos.size() > worldGenThreadCount * tasksPerThread;
 	}
 	/**
 	 * @param targetPos the position to center the generation around
@@ -405,6 +445,10 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 					}
 					
 					LodUtil.assertTrue(fullDataSource == null);
+					
+					// free the slot, otherwise a failed or cancelled task holds it forever
+					// and the queue eventually stops starting new tasks
+					this.inProgressGenTasksByLodPos.remove(taskPos, worldGenTask);
 					worldGenTask.future.completeExceptionally(exception);
 				}
 				else

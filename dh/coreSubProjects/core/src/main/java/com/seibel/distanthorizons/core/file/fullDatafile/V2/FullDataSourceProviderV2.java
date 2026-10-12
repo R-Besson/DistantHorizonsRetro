@@ -32,6 +32,7 @@ import com.seibel.distanthorizons.core.level.IDhLevel;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.render.renderer.IDebugRenderable;
 import com.seibel.distanthorizons.core.sql.dto.FullDataSourceV2DTO;
@@ -415,6 +416,14 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	
 	/** does nothing if the given position isn't present in the queue */
 	public void removeRetrievalRequestIf(DhSectionPos.IPrimitiveLongConsumer removeIf) { }
+	
+	/**
+	 * If the retrieval queue is full, removes a queued request that's farther from 
+	 * the center than the given position so the given position can be queued instead.
+	 * 
+	 * @return true if room was made
+	 */
+	public boolean tryMakeRoomForRetrieval(long pos, DhBlockPos2D centerPos) { return false; }
 	
 	public void clearRetrievalQueue() { }
 	

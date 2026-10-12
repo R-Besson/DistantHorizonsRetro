@@ -139,6 +139,19 @@ public abstract class AbstractLodRequestState
 			}
 		}
 		
+		if (Config.Common.WorldGenerator.generationProgressIncludeChunksPerSecond.get())
+		{
+			// troubleshooting info for when generation slows down or stops
+			message += " [in progress: " + this.retrievalQueue.getInProgressTaskCount()
+				+ ", waiting: " + this.retrievalQueue.getWaitingTaskCount();
+			String pauseReason = ThreadPoolUtil.getWorldGenPauseReason();
+			if (pauseReason != null)
+			{
+				message += ", paused: " + pauseReason;
+			}
+			message += "]";
+		}
+		
 		// only log if there are chunks needing to be generated
 		if (remainingChunkCount != 0)
 		{

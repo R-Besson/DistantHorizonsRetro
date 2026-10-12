@@ -118,8 +118,6 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 			return;
 		}
 		
-		ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(level);
-		ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
 		if (!ChunkWrapper.canSaveChunk(chunk))
 		{
 			LOGGER.info(
@@ -127,6 +125,8 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 			return;
 		}
 		
+		ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(level);
+		ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
 		SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
 	}
 	

@@ -117,6 +117,15 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	 */
 	boolean requestPosExistsWhere(DhSectionPos.IPrimitiveLongConsumer returnTrueIf);
 	
+	/**
+	 * Cancels the waiting request farthest from the given center, 
+	 * but only if it's farther away than the given position. <br>
+	 * Used to let missing LODs near the player jump ahead when the queue is full.
+	 * 
+	 * @return true if a request was removed
+	 */
+	default boolean removeFarthestRequestIfFartherThan(long pos, DhBlockPos2D centerPos) { return false; }
+	
 	CompletableFuture<DataSourceRetrievalResult> submitRetrievalTask(long pos, byte requiredDataDetail);
 	
 	//endregion

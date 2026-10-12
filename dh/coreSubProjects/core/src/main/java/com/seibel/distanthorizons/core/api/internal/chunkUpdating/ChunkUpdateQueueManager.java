@@ -52,6 +52,8 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	
 	/** how long to wait between queue checks if the queue was empty */
 	private static final int PROCESS_QUEUE_DELAY_MS = 50;
+	/** how long to wait when the closest chunk update is still waiting on {@link #UPDATE_DEBOUNCE_NANOS} */
+	private static final int DEBOUNCE_WAIT_DELAY_MS = 5;
 	
 	
 	
@@ -233,6 +235,17 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	//===================//
 	//region
 	
+	/** 
+	 * Set when the LOD builder thread pool is missing or shut down,
+	 * so the queueing loop backs off instead of spinning on updates it can't dispatch.
+	 */
+	private boolean lodBuilderExecutorUnavailable = false;
+	/** 
+	 * Set when the closest update was put back because it's still debouncing,
+	 * so the queueing loop waits a moment instead of immediately re-polling the same update.
+	 */
+	private boolean waitingOnDebounce = false;
+	
 	private void runQueueingLoop()
 	{
 		while (!Thread.interrupted())
@@ -243,13 +256,18 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 				
 				// if the queue is empty, 
 				// reduce the rate that we check the queue again
-				if (this.updateQueue.isEmpty() 
-					&& this.preUpdateQueue.isEmpty())
+				if (this.lodBuilderExecutorUnavailable
+					|| (this.updateQueue.isEmpty() && this.preUpdateQueue.isEmpty()))
 				{
 					Thread.sleep(PROCESS_QUEUE_DELAY_MS);
 					
 					// clean up to fix expired chunks not being cleaned up if the queue is empty
 					this.queuedChunkWrapperByChunkPos.cleanUp();
+				}
+				else if (this.waitingOnDebounce
+					&& this.preUpdateQueue.isEmpty())
+				{
+					Thread.sleep(DEBOUNCE_WAIT_DELAY_MS);
 				}
 			}
 			catch (InterruptedException ignored)
@@ -333,6 +351,8 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	
 	private void tryDispatchReadyChunkUpdate()
 	{
+		this.waitingOnDebounce = false;
+		
 		ChunkUpdateData updateData = this.updateQueue.popClosest();
 		if (updateData == null)
 		{
@@ -345,11 +365,15 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 		if (updateWaitNanoTime < UPDATE_DEBOUNCE_NANOS)
 		{
 			this.updateQueue.addItem(updateData.chunkWrapper.getChunkPos(), updateData);
+			this.waitingOnDebounce = true;
 			return;
 		}
 		
 		AbstractExecutorService executor = ThreadPoolUtil.getChunkToLodBuilderExecutor();
-		if (executor == null)
+		// checked up front since execute() throws when the pool is shut down,
+		// and creating that exception every loop iteration is expensive
+		this.lodBuilderExecutorUnavailable = (executor == null || executor.isShutdown());
+		if (this.lodBuilderExecutorUnavailable)
 		{
 			this.updateQueue.addItem(updateData.chunkWrapper.getChunkPos(), updateData);
 			return;
