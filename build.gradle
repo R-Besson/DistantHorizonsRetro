@@ -54,6 +54,10 @@ tasks.named('jar') { enabled = false }
     }
 }
 
+// Modrinth and CurseForge upload these. ToolchainModule normally sets them, but it isn't applied here.
+ext.publishableObfJar = collectJars
+ext.publishableDevJar = collectDevJars
+
 gtnhGradle.applyModuleByName(project, 'PublishingModule')
 
 publishing.publications.named('maven') {
