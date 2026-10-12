@@ -14,6 +14,6 @@ jobs:
       # DH's runServer lives on the loader subprojects and needs a full MC install;
       # the wrapper only verifies that the mod compiles and jars.
       client-only: true
-      # No spotless in the wrapper, and dh/ is upstream code we must not reformat.
+      # No spotless in the wrapper, and dh/ keeps its own code style.
       disable-spotless-pr: true
     secrets: inherit

@@ -8,11 +8,10 @@ plugins {
 // Throw an error if the core sub-project wasn't cloned
 if (!file("./coreSubProjects/LICENSE.txt").exists()) {
     println('''
-It seems that the core sub project was not included...
- please make sure that when you were cloning the repo, you were using the `--recurse-submodules` flag on git.
- and if its too late now to re-clone the project, please grab the core sub project in whatever way you can from https://gitlab.com/jeseibel/distant-horizons-core.git
+It seems that the core sub project (dh/coreSubProjects) is missing...
+ it's part of the repo, so please re-clone https://github.com/R-Besson/DistantHorizonsRetro
 
-If you still need help with compiling, please read the Readme.md
+If you still need help with compiling, please read the README.md in the repo root
     ''')
     throw new GradleException("coreSubProject not found")
 }

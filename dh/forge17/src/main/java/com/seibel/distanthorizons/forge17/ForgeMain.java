@@ -51,7 +51,7 @@ import cpw.mods.fml.relauncher.Side;
  * If you are looking for the real start of the mod
  * check out the ClientProxy.
  */
-@Mod(modid = "distanthorizons", name = "DistantHorizons", dependencies = "after:angelica;", acceptableRemoteVersions = "*")
+@Mod(modid = "distanthorizons", name = "Distant Horizons Retro", dependencies = "after:angelica;", acceptableRemoteVersions = "*")
 public class ForgeMain extends AbstractModInitializer implements IForgeMain
 {
 
@@ -162,6 +162,7 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 	//=====================//
 	//region
 	
+	// ServerWorldLoadEvent
 	@Mod.EventHandler
 	public void onServerAboutToStart(FMLServerAboutToStartEvent event)
 	{
@@ -172,25 +173,17 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 
 		ServerThreadTaskHandler.INSTANCE.reset();
 		
+		// FML doesn't define an order between handlers of the same event,
+		// so config setup has to run in the same handler, before the DH world is created
 		if (this.eventHandlerStartServer != null)
 		{
 			this.eventHandlerStartServer.accept(event.getServer());
 		}
-	}
-	
-	// ServerWorldLoadEvent
-    @Mod.EventHandler
-    public void dedicatedWorldLoadEvent(FMLServerAboutToStartEvent event)
-    {
-	    if (DISABLE_SERVER_FOR_TESTING)
-	    {
-		    return;
-	    }
 		
-	    ServerApi.INSTANCE.serverLoadEvent(
-		    event.getServer()
-			    .isDedicatedServer());
-    }
+		ServerApi.INSTANCE.serverLoadEvent(
+			event.getServer()
+				.isDedicatedServer());
+	}
 	
     // ServerWorldUnloadEvent
     @Mod.EventHandler

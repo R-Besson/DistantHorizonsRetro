@@ -46,14 +46,15 @@ public abstract class MixinEntityRenderer
             ordinal = 1))
     private boolean disableFogDuringSetup(EventBus instance, Event event, @Local(argsOnly = true) int p_78468_1_)
     {
-	    // p_78468_1_ fogMode: -1 = sky fog pass, >=0 = terrain fog pass
-	    if (p_78468_1_ == -1)
-	    {
-		    return false;
-	    }
+	    // let other mods adjust the fog first, DH's override has to win
+	    boolean result = instance.post(event);
 		
-	    RenderHelper.disableFogDuringSetup();
-	    return false;
+	    // p_78468_1_ fogMode: -1 = sky fog pass, >=0 = terrain fog pass
+	    if (p_78468_1_ != -1)
+	    {
+		    RenderHelper.disableFogDuringSetup();
+	    }
+	    return result;
     }
 	
 	@Redirect(

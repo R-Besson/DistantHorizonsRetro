@@ -27,7 +27,6 @@ public enum Mixins implements IMixins
             "MixinActiveRenderInfo",
             "MixinChunk",
             "MixinEntityRenderer",
-            "MixinMinecraft",
             "MixinNetHandlerPlayClient",
             "MixinOptionsScreen",
             "MixinRenderGlobal",

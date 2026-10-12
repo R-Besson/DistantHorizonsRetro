@@ -23,7 +23,6 @@ import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
 import com.seibel.distanthorizons.core.jar.ModJarInfo;
-import com.seibel.distanthorizons.core.jar.updater.SelfUpdater;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.render.renderer.StubDebugWireframeRenderer;
@@ -174,9 +173,6 @@ public abstract class AbstractModInitializer
 			#else
 			this.commandInitializer.onServerReady();
 			#endif
-			
-			this.checkForUpdates();
-			
 			String serverFolderPath;
 			#if MC_VER <= MC_1_7_10
 			serverFolderPath = "."; // equivalent to new MC's "server.getDataDirectory()"
@@ -263,19 +259,6 @@ public abstract class AbstractModInitializer
 		DhLogger.runDelayedConfigSetup();
 	}
 	
-	private void checkForUpdates()
-	{
-		if (Config.Client.Advanced.AutoUpdater.enableAutoUpdater.get())
-		{
-			if (Config.Client.Advanced.AutoUpdater.enableSilentUpdates.get())
-			{
-				LOGGER.info("Silent updates are not allowed for dedicated servers; force disabling.");
-				Config.Client.Advanced.AutoUpdater.enableSilentUpdates.set(false);
-			}
-			
-			SelfUpdater.onStart();
-		}
-	}
 	
 	private void postInit()
 	{

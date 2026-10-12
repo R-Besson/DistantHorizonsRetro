@@ -18,12 +18,10 @@ import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftClientWrapp
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.ConfigHandler;
 import com.seibel.distanthorizons.core.config.types.*;
-import com.seibel.distanthorizons.common.wrappers.gui.updater.ChangelogScreen;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigCommentTextPosition;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigValidity;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
-import com.seibel.distanthorizons.core.jar.updater.SelfUpdater;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.AnnotationUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.config.IConfigGui;
@@ -97,10 +95,6 @@ class DhConfigScreen extends DhScreen
 	private static final String TRANSLATION_PREFIX = ModInfo.ID + ".config.";
 	
 	private static final MinecraftClientWrapper MC_CLIENT = MinecraftClientWrapper.INSTANCE;
-	
-	#if MC_VER <= MC_1_12_2
-	private static final int changelogButton_id = 101;
-	#endif
 	
 	#if MC_VER <= MC_1_12_2
 	private final GuiScreen parent;
@@ -196,54 +190,6 @@ class DhConfigScreen extends DhScreen
 			ConfigHandler.INSTANCE.configFileHandler.loadFromFile();
 		}
 		
-		// Changelog button
-		if (Config.Client.Advanced.AutoUpdater.enableAutoUpdater.get()
-			// we only have changelogs for stable builds		
-			&& !ModInfo.IS_DEV_BUILD)
-		{
-			this.addBtn(new TexturedButtonWidget(
-				#if MC_VER <= MC_1_12_2
-				changelogButton_id,
-				#endif
-				// Where the button is on the screen
-				this.width - 28, this.height - 28,
-				// Width and height of the button
-				20, 20,
-				// texture UV Offset
-				0, 0,
-				// Some texture stuff
-				0, 
-				#if MC_VER < MC_1_21_1
-				new ResourceLocation(ModInfo.ID, "textures/gui/changelog.png"),
-				#elif MC_VER <= MC_1_21_10
-				ResourceLocation.fromNamespaceAndPath(ModInfo.ID, "textures/gui/changelog.png"),
-				#else
-				Identifier.fromNamespaceAndPath(ModInfo.ID, "textures/gui/changelog.png"),
-				#endif
-				20, 20,
-				// Create the button and tell it where to go
-				#if MC_VER > MC_1_12_2
-				(buttonWidget) -> {
-					ChangelogScreen changelogScreen = new ChangelogScreen(this);
-					if (changelogScreen.usable)
-					{
-						DhScreenUtil.setScreen(changelogScreen);
-					}
-					else
-					{
-						LOGGER.warn("Changelog was not able to open");
-					}
-				},
-				#endif
-				
-				// Add a title to the button
-				#if MC_VER == MC_1_12_2
-				Translatable(ModInfo.ID + ".updater.title").getFormattedText()
-				#else
-				Translatable(ModInfo.ID + ".updater.title")
-				#endif
-			));
-		}
 		
 		
 		// back button
@@ -988,22 +934,6 @@ class DhConfigScreen extends DhScreen
 			#else
 			0xFFAAAAAA // ARGB white
 			#endif);
-		
-		// If the update is pending, display this message to inform the user that it will apply when the game restarts
-		if (SelfUpdater.deleteOldJarOnJvmShutdown)
-		{
-			this.DhDrawString(
-				#if MC_VER > MC_1_12_2	
-				matrices, this.font,
-				#endif
-				Translatable(ModInfo.ID + ".updater.waitingForClose"), 4, this.height - 42, 
-				#if MC_VER < MC_1_21_6
-				0xFFFFFF // RGB white
-				#else
-				0xFFFFFFFF // ARGB white
-				#endif);
-		}
-		
 		#if MC_VER <= MC_1_12_2
 		super.drawScreen(mouseX, mouseY, delta);
 		#elif MC_VER < MC_1_20_2
@@ -1116,24 +1046,6 @@ class DhConfigScreen extends DhScreen
 	}
 	
 	#if MC_VER <= MC_1_12_2
-	@Override
-	protected void actionPerformed(GuiButton button)
-	{
-		super.actionPerformed(button);
-		if(button.id == changelogButton_id)
-		{
-			ChangelogScreen changelogScreen = new ChangelogScreen(this);
-			if (changelogScreen.usable)
-			{
-				DhScreenUtil.setScreen(changelogScreen);
-			}
-			else
-			{
-				LOGGER.warn("Changelog was not able to open");
-			}
-		}
-	}
-	
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) 
 		#if MC_VER > MC_1_7_10 throws java.io.IOException #endif

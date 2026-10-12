@@ -600,7 +600,7 @@ if (isNotCommonProject) {
 
                     // Remove any stale DH jars before copying the fresh one
                     modsDir.listFiles()?.each({ file ->
-                        if (file.name.startsWith(rootProject.mod_name)) 
+                        if (file.name.startsWith(rootProject.mod_name) || file.name.startsWith("DistantHorizons-"))
                         {
                             file.delete()
                         }

@@ -1,11 +1,18 @@
-# This is my backport of Distant Horizons to 1.7.10 - see the [official Distant Horizons](https://gitlab.com/distant-horizons-team/distant-horizons).
+# Distant Horizons Retro
 
-# GTNH Distant Horizons wrapper
+A 1.7.10 / GTNH port of [Distant Horizons][dh], focused on performance, stability and new features.
 
-Staging repo for quick fixes to [Distant Horizons][dh] and [DH core][core] until they land
-upstream. It carries no code of its own: DH sits in `dh/` as a git subtree, DH core sits in
-`dh/coreSubProjects/` as a second subtree — exactly where DH's own build expects its submodule —
-and a thin Gradle wrapper drives that build so GTNH Actions can build it like any other repo.
+Distant Horizons Retro is a fork of [DistantHorizonsStandalone][standalone] by DarkShadow44, which
+brought Distant Horizons to 1.7.10. DistantHorizonsStandalone tracks upstream Distant Horizons
+updates. Distant Horizons Retro is **developed independently**. It doesn't sync with either project
+and has its own roadmap:
+
+- **Optimizations**: faster world generation and LOD building
+- **Bug fixes**: LOD holes, crashes, mod compatibility and server stability
+- **New features**: planned, specific to this fork
+
+Please report issues with this mod [here](https://github.com/R-Besson/DistantHorizonsRetro/issues),
+not to the Distant Horizons or DistantHorizonsStandalone teams.
 
 # What is Distant Horizons?
 
@@ -18,98 +25,75 @@ Below is a video demonstrating the system:
 
 # Installation
 
-- Download the latest version from [DistantHorizonsStandalone Releases](https://github.com/DarkShadow44/DistantHorizonsStandalone/releases) and put it into the mods folder
+Download the latest version from [Releases](https://github.com/R-Besson/DistantHorizonsRetro/releases) and put it into your `mods` folder.
 
-Make sure the latest versions of each of the dependencies are installed:
+> Remove any other Distant Horizons / DistantHorizonsStandalone jar first. They share the same mod ID and can't be installed together.
 
-- [lwjgl3ify](https://github.com/GTNewHorizons/lwjgl3ify) - Use 3.0.15 or higher
+Make sure the latest versions of each dependency are installed:
+
+- [lwjgl3ify](https://github.com/GTNewHorizons/lwjgl3ify): 3.0.15 or higher
 - [GTNHLib](https://github.com/GTNewHorizons/GTNHLib)
 - [UniMixins](https://github.com/LegacyModdingMC/UniMixins)
 
-Now supports shaders when used with Angelica 2.1.12 or higher. Tested with [Complementary 5.7.1](https://modrinth.com/shader/complementary-reimagined/version/r5.7.1) with [Euphoria patches 1.8.6](https://modrinth.com/mod/euphoria-patches/version/1.8.6-r5.7.1-forge1.7.10)
-If it works with modern DH+Iris, but not with latest Angelica + DH, this should be reported as bug.
+## Shaders
+
+Shaders are supported with [Angelica](https://github.com/GTNewHorizons/Angelica) 2.1.12 or higher.
+Tested with [Complementary 5.7.1](https://modrinth.com/shader/complementary-reimagined/version/r5.7.1) and [Euphoria Patches 1.8.6](https://modrinth.com/mod/euphoria-patches/version/1.8.6-r5.7.1-forge1.7.10).
+
+## GTNH
+
+Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too old. To upgrade them in Prism Launcher:
+
+1. Download the latest [Angelica](https://github.com/GTNewHorizons/Angelica/releases), [lwjgl3ify](https://github.com/GTNewHorizons/lwjgl3ify/releases) (both the `.jar` and the `-multimc.zip`) and [GTNHLib](https://github.com/GTNewHorizons/GTNHLib/releases).
+2. Delete the old `angelica-*.jar`, `lwjgl3ify-*.jar` and `gtnhlib-*.jar` from your `mods` folder.
+3. Add the new jars and the Distant Horizons Retro jar to your `mods` folder.
+4. Unzip `lwjgl3ify-*-multimc.zip` into your Prism Launcher instance. It should overwrite your `mmc-pack.json`.
 
 # Known Issues
 
 - Memory usage might creep up over time and crash the server
-- Server side not fully stable, use with caution
-- Sometimes LODs don't update properly, change rendering distance and then back to fix that (upstream issue)
-
-# GTNH 2.8.4
-
-Here detailed instructions how to get DH + latest Angelica working in GTNH 2.8.4 (you'll need to upgrade a few things) in Prism Launcher:
-
-Download the following mods:
-- Latest DH - tested with [alpha18](https://github.com/DarkShadow44/DistantHorizonsStandalone/releases/tag/alpha18) - get `distanthorizons-alpha18.jar`
-- Latest Angelica - tested with [2.1.16](https://github.com/GTNewHorizons/Angelica/releases/tag/2.1.16) - get `angelica-2.1.16.jar`
-- Latest lwjgl3ify - tested with [3.0.15](https://github.com/GTNewHorizons/lwjgl3ify/releases/tag/3.0.15) - get `lwjgl3ify-3.0.15.jar` and `lwjgl3ify-3.0.15-multimc.zip`
-- Latest GTNHLib - tested with [0.9.47](https://github.com/GTNewHorizons/GTNHLib/releases/tag/0.9.47) - get `gtnhlib-0.9.47.jar`
-
-From your mods folder delete
-- angelica-1.0.0-beta66b.jar
-- lwjgl3ify-2.1.16.jar
-- gtnhlib-0.7.10.jar
-
-Then add to your mods folder:
-- distanthorizons-alpha18.jar
-- angelica-2.1.16.jar
-- lwjgl3ify-3.0.15.jar
-- gtnhlib-0.9.47.jar
-
-Then unzip `lwjgl3ify-3.0.15-multimc.zip`, copy the contents into your Prism Launcher instance. You know you copy into the right folder when you overwrite your `mmc-pack.json`.
-
+- Server side is not fully stable, use with caution
+- Sometimes LODs don't update properly. Change the render distance and back to fix it
 
 # Development
 
 ## Structure
+
 ```
-gtnh-dh/
+DistantHorizonsRetro/
 ├── settings.gradle      # includeBuild('dh'), pins -PmcVer=1.7.10
-├── build.gradle         # runs the DH build, copies jars to build/libs
+├── build.gradle         # runs the mod build, copies jars to build/libs
 ├── .github/workflows/   # GTNH Actions
-└── dh/                  # subtree ← upstream DH
-    └── coreSubProjects/ # subtree ← upstream DH core
+└── dh/                  # the mod
+    ├── common/          # code shared between loaders
+    ├── forge17/         # 1.7.10 Forge loader code
+    └── coreSubProjects/ # core LOD engine
 ```
+
+The code in `dh/` was originally imported from Distant Horizons, but it is now maintained here.
+It is not synced from upstream.
 
 ## Build
 
 ```bash
-./gradlew build          # jars land in build/libs
+./gradlew assemble       # jars land in build/libs
+./gradlew :dh:forge17:runClient   # dev client (Java 25 + lwjgl3ify), -PdevJava8=true for Java 8
 ```
 
-## Working on a fix
+## Updates
 
-One commit touches exactly one area — the wrapper, `dh/` (excluding core), or
-`dh/coreSubProjects/`. Don't mix them - it makes generating patches for upstreaming easier.
+Distant Horizons' built-in auto-updater has been removed, since it downloaded from the official
+Distant Horizons Modrinth/GitLab and would have replaced this mod with upstream Distant Horizons.
+Get updates from this repo's [Releases](https://github.com/R-Besson/DistantHorizonsRetro/releases).
 
-## Sync from upstream
+# Credits
 
-Always sync DH first:
+- [Distant Horizons][dh] by James Seibel and the Distant Horizons team
+- [DistantHorizonsStandalone][standalone] by DarkShadow44, the original 1.7.10 port
 
-```bash
-git subtree pull --squash --prefix=dh dh <branch>
-```
+# License
 
-A DH update may also require a core update. A core update is never standalone: DH pins the
-compatible core commit, so first update DH and use the core SHA from that update.
-
-If the DH update bumped its core submodule, the DH pull conflicts at `dh/coreSubProjects`
-(their gitlink vs. our tree). Resolve it, then pull the pinned core commit:
-
-```bash
-git ls-files -u -- 'dh/coreSubProjects*' | awk '$3 == 3 { print $2 }' # note the new core SHA
-git update-index --force-remove dh/coreSubProjects~*                  # drop their gitlink
-rmdir dh/coreSubProjects~*                                            # remove the empty conflict directory
-git commit
-git subtree pull --squash --prefix=dh/coreSubProjects dh-core <core sha>
-```
-
-Never merge with githubs squash feature when you updated from upstream, this breaks the subtree merge!
-
-## Licensing
-
-The wrapper adds no code. `dh/` and `dh/coreSubProjects/` keep their upstream licenses (LGPL);
-see the `LICENSE*` files inside those directories.
+Distant Horizons Retro is licensed under the LGPL, like Distant Horizons. See the `LICENSE*` files in `dh/`.
 
 [dh]: https://gitlab.com/distant-horizons-team/distant-horizons
-[core]: https://gitlab.com/jeseibel/distant-horizons-core
+[standalone]: https://github.com/DarkShadow44/DistantHorizonsStandalone
