@@ -3,15 +3,25 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/R-Besson/DistantHorizonsRetro/releases/latest"><img src="https://img.shields.io/github/v/release/R-Besson/DistantHorizonsRetro?style=flat-square&color=ff6600&label=release" alt="Latest release"></a>
-  <a href="https://github.com/R-Besson/DistantHorizonsRetro/releases"><img src="https://img.shields.io/github/downloads/R-Besson/DistantHorizonsRetro/total?style=flat-square&color=ff0099" alt="Downloads"></a>
-  <img src="https://img.shields.io/badge/minecraft-1.7.10-6600ff?style=flat-square" alt="Minecraft 1.7.10">
-  <a href="./dh/LICENSE.LESSER.txt"><img src="https://img.shields.io/badge/license-LGPL--3.0-555555?style=flat-square" alt="License"></a>
+  A 1.7.10 / GTNH port of <a href="https://gitlab.com/distant-horizons-team/distant-horizons">Distant Horizons</a>, focused on optimized performance, stability and new features.
 </p>
 
 <p align="center">
-  A 1.7.10 / GTNH port of <a href="https://gitlab.com/distant-horizons-team/distant-horizons">Distant Horizons</a>, focused on optimized performance, stability and new features.
+  <a href="https://github.com/R-Besson/DistantHorizonsRetro/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/github_vector.svg" alt="Available on GitHub"></a>
+ <a href="https://www.curseforge.com/minecraft/mc-mods/distant-horizons-retro"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg" alt="Available on CurseForge"></a>
+  <img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/forge_vector.svg" alt="Supports Forge">
 </p>
+
+[//]: # (<a href="https://modrinth.com/mod/distant-horizons-retro"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg" alt="Available on Modrinth"></a>)
+
+# What is Distant Horizons Retro?
+
+Distant Horizons Retro is a mod which implements a [Level of Detail](https://en.wikipedia.org/wiki/Level_of_detail_(computer_graphics)) system to Minecraft 1.7.10.\
+This allows for far greater render distances without harming performance by gradually lowering the quality of distant terrain.
+
+![](./.github/assets/dhpreview.jpg)
+
+## Why Retro?
 
 Distant Horizons Retro is a fork of [DistantHorizonsStandalone][standalone] by DarkShadow44, which
 brought Distant Horizons to 1.7.10. DistantHorizonsStandalone tracks upstream Distant Horizons
@@ -23,13 +33,6 @@ and has its own roadmap:
 - **New features**: planned, specific to this fork
 
 Please report issues with this mod [here](https://github.com/R-Besson/DistantHorizonsRetro/issues), not to Distant Horizons or DistantHorizonsStandalone.
-
-# What is Distant Horizons Retro?
-
-Distant Horizons Retro is a mod which implements a [Level of Detail](https://en.wikipedia.org/wiki/Level_of_detail_(computer_graphics)) system to Minecraft 1.7.10.\
-This allows for far greater render distances without harming performance by gradually lowering the quality of distant terrain.
-
-![](./.github/assets/dhpreview.jpg)
 
 # Installation
 
