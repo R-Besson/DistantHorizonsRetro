@@ -284,9 +284,6 @@ public class LodQuadBuilder implements AutoCloseable
 				}
 			}
 		}
-		
-		//long postQuadsCount = this.getCurrentOpaqueQuadsCount() + this.getCurrentTransparentQuadsCount();
-		//LOGGER.trace("Merged "+mergeCount+"/"+preQuadsCount+"("+(mergeCount / (double) preQuadsCount)+") quads");
 	}
 	
 	/** Merges all of this builder's quads for the given directionIndex (up, down, left, etc.) in the given direction */
@@ -512,8 +509,8 @@ public class LodQuadBuilder implements AutoCloseable
 		bb.put(irisBlockMaterialId);
 		bb.put(normalIndex);
 		
-		// These two bytes were originally padding to keep the vertex a multiple of 4
-		// and are treated as padding by Iris's mirror of this format, 
+		// These two bytes keep the vertex a multiple of 4
+		// and are treated as padding by Iris's mirror of this format,
 		// so the tile id is invisible to shader packs.
 		bb.putShort(textureTileId);
 	}

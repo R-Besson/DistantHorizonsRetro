@@ -1,34 +1,23 @@
 plugins {
-    id 'root'
-    id 'io.github.pacifistmc.forgix' version '2.+'
+    id 'java'
 }
 
-forgix {
+// mod_version is set in version.gradle
+rootProject.ext.mod_version = gradle.ext.mod_version
 
-    // add the mod loaders to the end of the jar
-    // put together in the format: "a", "a-b", "a-b-c"
-    int loaderCount = 0;
-    String modLoaders = "";
-    ((String) gradle.builds_for)
-        .split(",")
-        .each
-            { loader ->
-                def loaderName = loader.trim()
-                if (modLoaders != "")
-                {
-                    modLoaders += "-";
-                }
+allprojects {
+    version = (it == rootProject ? "" : it.name + "-") + rootProject.mod_version + "-" + rootProject.minecraft_version
+    group = rootProject.maven_group
 
-                modLoaders += loaderName;
-
-                loaderCount++;
-            }
-
-    // run if there are multiple launchers that need merging
-    autoRun = (loaderCount > 1);
-
-    // merged jars are named in the format: 
-    // "DistantHorizons-3.0.1-b-dev-26.1-fabric-neoforge.jar"
-    archiveClassifier = modLoaders
+    // Custom javadoc tags for all subprojects
+    plugins.withType(JavaPlugin) {
+        javadoc {
+            options.tags(
+                'todo:X"',
+                'apiNote:a:API Note:',
+                'implSpec:a:Implementation Requirements:',
+                'implNote:a:Implementation Note:'
+            )
+        }
+    }
 }
-

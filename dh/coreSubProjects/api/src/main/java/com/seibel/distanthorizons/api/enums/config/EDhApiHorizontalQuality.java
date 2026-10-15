@@ -32,9 +32,8 @@ package com.seibel.distanthorizons.api.enums.config;
 public enum EDhApiHorizontalQuality
 {
 	// Note: any quadraticBase less than 2.0f has issues with DetailDistanceUtil, and will always return the lowest detail level.
-	//  So for now we are limiting the lowest value to 2.0
-	//  LOWEST was originally 1.0f and LOW was 1.5f
-	
+	//  So the lowest value is limited to 2.0
+
 	LOWEST(2.0f, 4),
 	LOW(2.0f, 8),
 	MEDIUM(2.0f, 12),

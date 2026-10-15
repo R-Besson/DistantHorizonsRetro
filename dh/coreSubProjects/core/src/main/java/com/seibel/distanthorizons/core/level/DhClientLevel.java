@@ -177,10 +177,9 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			}
 			
 			
-			// Check this before decoding data to prevent errors if multiple client levels 
-			// are receiving data at once (Immersive Portals compatibility).
+			// Check this before decoding data to prevent errors if multiple client levels
+			// are receiving data at once.
 			boolean isSameLevel = message.isSameLevelAs(this.levelWrapper);
-			//NETWORK_LOGGER.debug("Buffer ["+message.payload.dtoBufferId+"] isSameLevel: ["+isSameLevel+"]");
 			if (!isSameLevel)
 			{
 				return;

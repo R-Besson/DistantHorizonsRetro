@@ -78,13 +78,11 @@ void main()
     // format is: 0b00zzyyxx
     float mx = (mirco & 1u)!=0u ? uMircoOffset : 0.0;
     mx = (mirco & 2u)!=0u ? -mx : mx;
-    //float my = (mirco & 4u)!=0u ? uMircoOffset : 0.0;
-    //my = (mirco & 8u)!=0u ? -my : my;
+    // the y offset isn't applied
     float mz = (mirco & 16u)!=0u ? uMircoOffset : 0.0;
     mz = (mirco & 32u)!=0u ? -mz : mz;
-    
+
     vertexWorldPos.x += mx;
-    //vertexWorldPos.y += my;
     vertexWorldPos.z += mz;
     
     // apply the earth curvature if needed

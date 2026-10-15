@@ -374,8 +374,6 @@ public class PhantomArrayListPool
 		
 		SoftReference<PhantomArrayListCheckout> checkoutRef = checkout.ownerSoftReference;
 		this.pooledCheckoutsRefs.add(checkoutRef);
-		
-		//LOGGER.info("Returned ["+checkout.byteArrayLists.size()+"/"+this.pooledByteArrays.size()+"] bytes and ["+checkout.longArrayLists.size()+"/"+this.pooledLongArrays.size()+"] longs.");
 	}
 	
 	//endregion

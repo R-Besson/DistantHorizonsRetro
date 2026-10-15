@@ -10,8 +10,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class AngelicaVersionGuiException extends CustomModLoadingErrorDisplayException 
 {
-    //private static final long serialVersionUID = 1L;
-	
     private final String installedVersion;
     private final String requiredVersion;
 	

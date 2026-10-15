@@ -1,22 +1,17 @@
 package com.seibel.distanthorizons.common.backports;
 
-#if MC_VER <= MC_1_7_10
 import com.seibel.distanthorizons.core.api.internal.ClientApi;
 import net.minecraft.entity.EntityLivingBase;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector4f;
-#endif
 
 /**
- * Recreation of MC's 1.12+ camera object
- * so 1.7.10 can use similar code to 1.12.
+ * Recreation of MC's 1.12+ camera object.
  */
 public class Camera
 {
-	#if MC_VER <= MC_1_7_10
-	
 	public static final Camera INSTANCE = new Camera();
 	
     private final Vector3d pos = new Vector3d();
@@ -50,6 +45,4 @@ public class Camera
 	}
 	
 	public synchronized Vector3d getPos() { return new Vector3d(this.pos); }
-	
-	#endif
 }

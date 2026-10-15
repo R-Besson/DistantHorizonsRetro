@@ -28,14 +28,10 @@ public class ServerThreadTaskHandler
 	 * the window we can measure: whatever the server did before the tick-start event
 	 * fired, and whatever runs after we hand the tick back (other mods' end-of-tick
 	 * handlers, world saving, the next tick's network drain).
+	 * Kept small since the server health check also counts DH's own time
+	 * (see AbstractMinecraftSharedWrapper#isServerThreadHealthy), so DH backs off before ticks run long.
 	 */
-	#if MC_VER <= MC_1_7_10
-	// slightly smaller since on 1.7.10 the server health check also counts DH's own time
-	// (see AbstractMinecraftSharedWrapper#isServerThreadHealthy), so DH backs off before ticks run long
 	private static final long TICK_RESERVE_NANO = 20_000_000L;
-	#else
-	private static final long TICK_RESERVE_NANO = 25_000_000L;
-	#endif
 	/**
 	 * Upper bound on a single tick's budget.
 	 */

@@ -96,8 +96,7 @@ public class DhDataOutputStream extends DataOutputStream
 					return new XZOutputStream(stream, new LZMA2Options(3),
 							XZ.CHECK_CRC64, arrayCache);
 				
-				case Z_STD_STREAM: // deprecated, only used for legacy support
-					//return new ZstdOutputStream(stream, 3, true, true);
+				case Z_STD_STREAM: // only kept so existing data can be read
 					throw new UnsupportedOperationException("Z_STD_STREAM is deprecated and shouldn't be used for encoding. The faster block encoding format should be used instead.");
 					
 				default:

@@ -143,10 +143,6 @@ public class F3Screen
 			messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("Update Propagator", ThreadPoolUtil.getUpdatePropagatorExecutor()));
 			messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("LOD Builder", ThreadPoolUtil.getChunkToLodBuilderExecutor()));
 			messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("Networking", ThreadPoolUtil.getNetworkCompressionExecutor()));
-			//// single thread pools
-			//messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("Cleanup", ThreadPoolUtil.getCleanupExecutor()));
-			//messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("Beacon Culling", ThreadPoolUtil.getBeaconCullingExecutor()));
-			//messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("Migration", ThreadPoolUtil.getFullDataMigrationExecutor()));
 			messageList.add("");
 		}
 		

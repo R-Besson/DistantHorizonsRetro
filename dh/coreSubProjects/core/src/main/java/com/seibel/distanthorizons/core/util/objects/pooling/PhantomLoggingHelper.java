@@ -176,20 +176,8 @@ public class PhantomLoggingHelper
 							}
 							
 							PhantomLoggingHelper.putAndIncrementTrackingString(parentClassName, parentClassNameCountPairList);
-							//LOGGER.info("Phantom collected for class: [" + parentClassName + "]");
 						}
-							
-						
-						//if (LOG_PHANTOM_ALLOCATION_STACKS) // stack trace shouldn't be null, but just in case
-						//{
-						//	String stack = BUFFER_ID_TO_ALLOCATION_STRING.get(idRef);
-						//	if (stack != null)
-						//	{
-						//		PhantomLoggingHelper.putAndIncrementTrackingString(stack, allocationStackTraceCountPairList);
-						//	}
-						//}
-						
-						
+
 						collectedCount++;
 						phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 					}
@@ -204,12 +192,6 @@ public class PhantomLoggingHelper
 							LOGGER.warn("Phantoms collected: ["+ F3Screen.NUMBER_FORMAT.format(collectedCount)+"].");
 							
 							PhantomLoggingHelper.LogAllocationStackTracePairCounts(LOGGER, "Parent class", parentClassNameCountPairList);
-							
-							//// log stack traces if present
-							//if (LOG_PHANTOM_ALLOCATION_STACKS)
-							//{
-							//	PhantomLoggingHelper.LogAllocationStackTracePairCounts(LOGGER, allocationStackTraceCountPairList);
-							//}
 						}
 					}
 					

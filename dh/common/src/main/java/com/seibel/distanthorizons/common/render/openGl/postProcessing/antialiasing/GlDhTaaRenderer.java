@@ -137,7 +137,7 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 	@Override
 	public void render(RenderParams renderParams)
 	{
-		// GLState needed in MC 1.16.5 probably due to MC not manually setting each GL state they need before the next rendering step
+		// GLState restores the GL state afterwards, MC doesn't set every GL state it needs before the next rendering step
 		try (GLState state = new GLState())
 		{
 			this.init();

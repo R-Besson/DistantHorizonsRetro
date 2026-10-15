@@ -549,11 +549,9 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			boxVertexBuffer.unbind();
 			boxIndexBuffer.unbind();
 			
-			// Restore GL states that 1.12.2 vanilla expects
-			#if MC_VER <= MC_1_12_2
+			// Restore GL states that vanilla expects
 			GLMC.disableBlend();
 			GLMC.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
-			#endif
 		}
 	}
 	

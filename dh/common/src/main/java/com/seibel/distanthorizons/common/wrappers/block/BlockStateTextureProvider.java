@@ -52,7 +52,6 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 	public void clear() 
 	{
 		ClientBlockStateTextureCache.clearCache();
-		ClientBlockStateColorCache.clearCachedTints();
 	}
 	
 }

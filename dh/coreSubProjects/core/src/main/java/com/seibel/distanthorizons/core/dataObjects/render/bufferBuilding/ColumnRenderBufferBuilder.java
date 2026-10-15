@@ -218,8 +218,7 @@ public class ColumnRenderBufferBuilder
 							// get the adjacent views //
 							//========================//
 							
-							// the old logic handled additional cases, but they never appeared to fire,
-							// so just these two cases should be fine
+							// the adjacent detail level should always be the same or lower detail
 							boolean expectedDetailLevels = (adjDetailLevel == thisDetailLevel) || (adjDetailLevel > thisDetailLevel);
 							if (!expectedDetailLevels)
 							{

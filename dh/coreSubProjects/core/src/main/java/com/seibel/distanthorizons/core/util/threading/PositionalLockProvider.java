@@ -92,7 +92,6 @@ public class PositionalLockProvider
 						if (currentTime > lock.expirationTimeInMs)
 						{
 							this.lockByPos.remove(pos);
-							//LOGGER.info("removed lock: "+DhSectionPos.toString(pos));
 						}
 						lock.unlock();
 					}
@@ -108,7 +107,6 @@ public class PositionalLockProvider
 		finally
 		{
 			this.lockRemovalThreadRunning.set(false);
-			//LOGGER.info("update lock count: "+this.lockByPos.size());
 		}
 	}
 	

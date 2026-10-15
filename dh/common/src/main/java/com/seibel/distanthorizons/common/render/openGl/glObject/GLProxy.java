@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.common.render.openGl.glObject;
 
-import com.seibel.distanthorizons.api.enums.config.EDhApiGLErrorHandlingMode;
 import com.seibel.distanthorizons.api.enums.config.EDhApiGpuUploadMethod;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
 import com.seibel.distanthorizons.core.config.Config;
@@ -28,7 +27,6 @@ import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.jar.EPlatform;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.util.objects.GLMessages.*;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
@@ -36,16 +34,8 @@ import com.seibel.distanthorizons.coreapi.ModInfo;
 import com.seibel.distanthorizons.lwjgl.EGLExtension;
 import org.lwjgl.opengl.GL11;
 
-#if MC_VER > MC_1_12_2
-import org.lwjgl.opengl.GLUtil;
-#endif
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A singleton that holds references to different openGL contexts
@@ -81,15 +71,12 @@ public class GLProxy
 		}
 	}
 	
-	/** 
-	 * disabled for now since GL 3.3 may not appear in the capabilities
-	 * on older MC versions (James found this issue on 1.17 and 1.20.6 specifically),
-	 * but may still be accessible for our needs. 
+	/**
+	 * disabled since GL 3.3 may not appear in the capabilities
+	 * but may still be accessible for our needs.
 	 */
 	private static final boolean CHECK_GL_VERSION_ON_STARTUP = false;
-	
-	public static final Set<String> LOGGED_GL_MESSAGES = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-	
+
 	
 	
 	private static GLProxy instance = null;
@@ -102,30 +89,6 @@ public class GLProxy
 	public boolean vertexAttribDivisorSupported = false; // OpenGL 3.3 or newer
 	
 	private final EDhApiGpuUploadMethod preferredUploadMethod;
-	
-	public final GLMessageBuilder vanillaDebugMessageBuilder = 
-		new GLMessageBuilder(
-			(type) ->
-			{
-				if (type == EGLMessageType.POP_GROUP)
-					return false;
-				else if (type == EGLMessageType.PUSH_GROUP)
-					return false;
-				else if (type == EGLMessageType.MARKER)
-					return false;
-				else
-					return true;
-			},
-			(severity) ->
-			{
-				// notifications can generally be ignored (if they are logged at all)
-				if (severity == EGLMessageSeverity.NOTIFICATION)
-					return false;
-				else
-					return true;
-			},
-			null
-	);
 	
 	
 	
@@ -176,14 +139,7 @@ public class GLProxy
 			}
 		}
 	 	LOGGER.info("minecraftGlCapabilities:\n" + this.versionInfoToString());
-		
-		if (Config.Client.Advanced.Debugging.OpenGl.overrideVanillaGLLogger.get())
-		{
-			#if MC_VER > MC_1_12_2
-			GLUtil.setupDebugMessageCallback(new PrintStream(new GLMessageOutputStream(GLProxy::logMessage, this.vanillaDebugMessageBuilder), true));
-			#endif
-		}
-		
+
 		
 		
 		//======================//
@@ -268,98 +224,7 @@ public class GLProxy
 	
 	public static boolean runningOnRenderThread()
 	{
-		boolean isRenderThread;
-		
-		#if MC_VER <= MC_26_2_0
-		isRenderThread = LWJGL.isRunningOnRenderThread();
-		#else
-		Thread thread = Thread.currentThread();
-		isRenderThread = thread.getName().toLowerCase().contains("render thread");
-		#endif
-		
-		return isRenderThread;
-	}
-	
-	//endregion
-	
-	
-	
-	//=========//
-	// logging //
-	//=========//
-	//region
-	
-	/** this method is called on the render thread at the point of the GL Error */
-	private static void logMessage(GLMessage glMessage)
-	{
-		EDhApiGLErrorHandlingMode errorHandlingMode = Config.Client.Advanced.Debugging.OpenGl.glErrorHandlingMode.get();
-		if (errorHandlingMode == EDhApiGLErrorHandlingMode.IGNORE)
-		{
-			return;
-		}
-		
-		
-		
-		boolean onlyLogOnce = Config.Client.Advanced.Debugging.OpenGl.onlyLogGlErrorsOnce.get();
-		if (onlyLogOnce
-			&& !LOGGED_GL_MESSAGES.add(glMessage.message))
-		{
-			// this message has already been logged
-			return;
-		}
-		
-		String errorMessage = "GL ERROR [" + glMessage.id + "] from [" + glMessage.source + "]: [" + glMessage.message + "].";
-		if (onlyLogOnce)
-		{
-			errorMessage += " This message will only be logged once.";
-			errorMessage += " Note: Distant Horizons will catch and log OpenGL errors from other mods, not just DH itself; if everything is rendering correctly these errors can probably be ignored.";
-		}
-		
-		
-		
-		// create an exception so we get a stacktrace of where the message was triggered from
-		RuntimeException exception = new RuntimeException(errorMessage);
-		
-		if (glMessage.type == EGLMessageType.ERROR || glMessage.type == EGLMessageType.UNDEFINED_BEHAVIOR)
-		{
-			// critical error
-			
-			LOGGER.error(exception.getMessage(), exception);
-			
-			if (errorHandlingMode == EDhApiGLErrorHandlingMode.LOG_THROW)
-			{
-				// will probably crash the game,
-				// good for quickly checking if there's a problem while preventing log spam
-				throw exception;
-			}
-		}
-		else
-		{
-			// non-critical log
-			
-			EGLMessageSeverity severity = glMessage.severity;
-			if (severity == null)
-			{
-				// just in case the message was malformed
-				severity = EGLMessageSeverity.LOW;
-			}
-			
-			switch (severity)
-			{
-				case HIGH:
-					LOGGER.error(exception.getMessage(), exception);
-					break;
-				case MEDIUM:
-					LOGGER.warn(exception.getMessage(), exception);
-					break;
-				case LOW:
-					LOGGER.info(exception.getMessage(), exception);
-					break;
-				case NOTIFICATION:
-					LOGGER.debug(exception.getMessage(), exception);
-					break;
-			}
-		}
+		return LWJGL.isRunningOnRenderThread();
 	}
 	
 	//endregion

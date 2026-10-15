@@ -149,7 +149,6 @@ public class DhSectionPos
 		int x = getX(pos);
 		int z = getZ(pos);
 		
-		// logic originally taken from DhLodPos
 		if (newDetailLevel >= detailLevel)
 		{
 			x = Math.floorDiv(x, BitShiftUtil.powerOfTwo(newDetailLevel - detailLevel));

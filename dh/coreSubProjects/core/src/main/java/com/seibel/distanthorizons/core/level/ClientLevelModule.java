@@ -286,7 +286,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		@Override
 		public void close()
 		{
-			//LOGGER.info("Shutting down " + ClientRenderState.class.getSimpleName());
 			this.quadtree.close();
 		}
 		

@@ -419,10 +419,10 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	@Override
 	public void debugRender(AbstractDebugWireframeRenderer debugRenderer)
 	{
+		// only sections that aren't rendering yet are drawn
 		Color color = Color.red;
 		if (this.renderingEnabled)
 		{
-			//color = Color.green;
 			return;
 		}
 		else if (this.getAndBuildRenderDataFutureRef.get() != null)
@@ -431,7 +431,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 		}
 		else if (this.canRender())
 		{
-			//color = Color.cyan;
 			return;
 		}
 		

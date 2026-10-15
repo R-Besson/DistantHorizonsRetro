@@ -1217,8 +1217,6 @@ public class Config
 				
 				public static class PositionFinder
 				{
-					//public static ConfigUIComment positionFinderHeader = new ConfigUIComment.Builder().setParentConfigClass(ColumnBuilderDebugging.class).build();
-					
 					public static ConfigEntry<Boolean> positionFinderEnable = new ConfigEntry.Builder<Boolean>()
 						.set(false)
 						.build();
@@ -1594,7 +1592,7 @@ public class Config
 			
 			public static ConfigEntry<EDhApiDataCompressionMode> dataCompression = new ConfigEntry.Builder<EDhApiDataCompressionMode>()
 				.set(EDhApiDataCompressionMode.Z_STD_BLOCK)
-				// only visible via the API since there is no reason to use any compressor except ZStandard as of 2025-11-24
+				// only in the file since there is no reason to use any compressor except ZStandard
 				// Note: this may need to be re-visited since some people (android) have issues with ZStd
 				.setAppearance(EConfigEntryAppearance.ONLY_IN_FILE)
 				.build();
@@ -1647,16 +1645,6 @@ public class Config
 					+ "")
 				.build();
 			
-			//public static ConfigCategory experimental = new ConfigCategory.Builder().set(Experimental.class).build();
-			
-			
-			
-			//public static class Experimental
-			//{
-			//	public static ConfigUIComment experimentalHeader = new ConfigUIComment.Builder().setParentConfigClass(Experimental.class).build();
-			//	
-			//}
-			
 		}
 		
 		public static class MultiThreading
@@ -1698,18 +1686,7 @@ public class Config
 					+ "running C2ME and are seeing thread starvation in either C2ME or DH. \n"
 					+ "")
 				.build();
-			
-			//public static final ConfigEntry<Boolean> useC2meThreadCount = new ConfigEntry.Builder<Boolean>()
-			//	.set(true)
-			//	.comment(""
-			//		+ "If C2ME is present, set DH's thread count to match C2ME. \n"
-			//		+ "\n"
-			//		+ "This is necessary to prevent thread starvation issues when C2ME is present. \n"
-			//		+ "")
-			//	.build();
-			
-			
-			
+
 		}
 		
 		public static class Logging
@@ -1873,9 +1850,8 @@ public class Config
 						+ "")
 					.build();
 				
-				// as of 3.2.0 explicit GC shouldn't be needed since we pool our byte buffers
-				// but we'll keep this around (in a disabled form) for now in case we
-				// see problems that explicit GC solves
+				// explicit GC shouldn't be needed since we pool our byte buffers,
+				// so this is disabled by default
 				public static ConfigEntry<Boolean> logExplicitGcDisabledWarning = new ConfigEntry.Builder<Boolean>()
 					.set(false)
 					.setAppearance(EConfigEntryAppearance.ONLY_IN_FILE)

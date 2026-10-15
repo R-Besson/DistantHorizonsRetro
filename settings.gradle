@@ -1,7 +1,6 @@
 // Distant Horizons Retro build wrapper.
 //
-// The real build lives in dh/ and is included as a composite build, with the
-// core in dh/coreSubProjects where that build expects it. This wrapper only
+// The real build lives in dh/ and is included as a composite build. This wrapper only
 // drives it and copies the jars, so GTNH Actions can build it like any other repo.
 
 pluginManagement {
@@ -17,14 +16,7 @@ pluginManagement {
 
 rootProject.name = 'gtnh-dh'
 
-// DH selects its Minecraft target from -PmcVer and defaults to a modern version.
-// This wrapper only ever ships the GTNH target, so pin it unless asked otherwise.
-// It has to go on the start parameter: that is what included builds inherit, and
-// Settings' own copy of it is read-only, so mutate the one on `gradle`.
-def projectProps = new HashMap<String, String>(gradle.startParameter.projectProperties)
-if (!projectProps.containsKey('mcVer')) {
-    projectProps.put('mcVer', '1.7.10')
-    gradle.startParameter.setProjectProperties(projectProps)
-}
+// Sets mod_version for this build and dh/
+apply from: 'dh/version.gradle'
 
 includeBuild('dh')

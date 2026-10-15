@@ -113,15 +113,6 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 	{ 
 		if (CONFIG_NAME_CALLED_DEPRECATED_API.add(this.configBase.name))
 		{
-			// alternate method to show a stack trace snippet
-			//StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-			//StackTraceElement[] trimmedElements = Arrays.copyOfRange(stackTraceElements, 
-			//	// cut out this method and the getStackTrace()
-			//	2, 
-			//	// only go up an additional 3 stacks, that should be far enough
-			//	Math.min(5, stackTraceElements.length));
-			//String stackTraceString = StringUtil.join("\n", trimmedElements);
-			
 			String callerClass = this.getCallerClassName();
 			LOGGER.warn("Config ["+this.configBase.name+"] was set by ["+callerClass+"] via the deprecated API method that doesn't define the API caller. \n" +
 				"If you are a player this can be ignored. \n" +

@@ -19,21 +19,17 @@
 
 package com.seibel.distanthorizons.common.wrappers.modAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IRpleAccessor;
-#if MC_VER == MC_1_7_10
 import net.minecraft.block.Block;
-#endif
 
 /**
  * RPLE = Right Proper Lighting Engine <Br>
  * adds colored lighting to MC 1.7.10 <br><br>
- * 
+ *
  * The common Accessor allows for MC
- * version specific methods, vs the base accessor
+ * specific methods, vs the base accessor
  * which is for MC agnostic methods.
  */
 public interface IRpleCommonAccessor extends IRpleAccessor
 {
-	#if MC_VER == MC_1_7_10
 	int getColor(Block block, int meta);
-	#endif
 }

@@ -177,7 +177,6 @@ public class PriorityTaskPicker
 	{
 		Stream<Executor> stream = this.executors.stream();
 		// returns smaller numbers first
-		//stream = stream.sorted(Comparator.comparingLong((executor) -> executor.totalRuntimeNanos.get()));
 		stream = stream.sorted((Executor a, Executor b) ->
 		{
 			int priorityCompare = Integer.compare(b.priority, a.priority); // higher number first

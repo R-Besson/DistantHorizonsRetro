@@ -627,8 +627,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		// if we're about to remove the next node for iteration,
 		// then we need to continue iterating at the node after that.
 		// result will only be returned if fastPath is true,
-		// so the node after that is always the smaller one. that's why I don't need to do
-		// if (result == toRemove) result = fastPath ? this.getSmaller(result) : this.getBigger(result);
+		// so the node after that is always the smaller one.
 		if (result == toRemove) result = this.getSmaller(result);
 		
 		this.setMinY(toExtendDownwards, this.getMinY(toRemove));
@@ -636,14 +635,9 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		
 		this.remove(toRemove);
 		
-		// if we're NOT on the fast path, and we reach this line,
-		// then we have just modified the list in a way which may
-		// invalidate assumptions made by the step 1 loop.
-		// so, return smallest to signal that the loop should start over.
-		// starting over is not usually a big deal,
-		// because small nodes are usually merged quite quickly.
-		// in my testing, I didn't see the step 1 loop run more
-		// than twice as many times as the starting list size.
+		// off the fast path the list was just modified in a way that may invalidate
+		// the step 1 loop's assumptions, so return smallest to make it start over.
+		// That's cheap since small nodes are usually merged quickly.
 		return fastPath ? result : this.getSmallest();
 	}
 	

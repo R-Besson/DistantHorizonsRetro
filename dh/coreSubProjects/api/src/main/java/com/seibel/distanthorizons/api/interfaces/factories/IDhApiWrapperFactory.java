@@ -38,14 +38,9 @@ public interface IDhApiWrapperFactory
 	/**
 	 * Constructs a {@link IDhApiBiomeWrapper} for use by other DhApi methods.
 	 * 
-	 * @param objectArray Expects the following Minecraft objects (in order) for each MC version: <br>
-	 * <b>1.7</b> <br>
+	 * @param objectArray Expects the following Minecraft object: <br>
 	 * - [{@code net.minecraft.world.biome.BiomeGenBase}] <br>
-	 * <b>1.12</b>, <b>1.16</b>, and <b>1.17</b> <br>
-	 * - [{@code net.minecraft.world.level.biome.Biome}] <br>
-	 * <b>1.18</b> and <b>newer</b> <br>
-	 * - {@code [net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>] }<br>
-	 * 
+	 *
 	 * @param levelWrapper Expects a {@link IDhApiLevelWrapper} returned by one of DH's {@link DhApi.Delayed#worldProxy} methods. <br>
 	 *                      A custom implementation of {@link IDhApiLevelWrapper} will not be accepted.
 	 * 
@@ -59,13 +54,8 @@ public interface IDhApiWrapperFactory
 	/**
 	 * Constructs a {@link IDhApiBlockStateWrapper} for use by other DhApi methods.
 	 *
-	 * @param objectArray Expects the following Minecraft objects (in order) for each MC version: <br>
-	 * <b>1.7.10</b> <br>
+	 * @param objectArray Expects the following Minecraft objects (in order): <br>
 	 * - [{@code net.minecraft.block.Block} block, {@code Integer} metadata, {@code Integer} blockId]<br>
-	 * <b>1.12.2</b> <br>
-	 * - [{@code net.minecraft.block.state.IBlockState} blockState]<br>
-	 * <b>1.16</b> and <b>newer</b> <br>
-	 * - [{@code net.minecraft.world.level.block.state.BlockState} blockState]<br>
 	 *
 	 * @param levelWrapper Expects a {@link IDhApiBlockStateWrapper} returned by one of DH's {@link DhApi.Delayed#worldProxy} methods. <br>
 	 *                      A custom implementation of {@link IDhApiBlockStateWrapper} will not be accepted.

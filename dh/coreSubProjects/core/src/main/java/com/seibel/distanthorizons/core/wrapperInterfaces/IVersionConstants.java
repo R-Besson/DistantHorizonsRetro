@@ -23,9 +23,8 @@ import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 
 /**
- * A singleton that contains variables specific to each version of Minecraft
- * which can be used to change how DH-Core runs. For example: After MC 1.17
- * blocks can be negative, which changes how we generate LODs.
+ * A singleton that contains variables specific to the Minecraft version
+ * which can be used to change how DH-Core runs.
  *
  * @author James Seibel
  * @version 3-5-2022

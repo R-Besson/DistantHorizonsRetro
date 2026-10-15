@@ -241,12 +241,6 @@ float exponentialSquaredFog(
 /** 1 = full fog, 0 = no fog */
 float calculateHeightFogDepth(float worldYPos)
 {
-    // worldYPos -65 - 384
-
-
-    //worldYPos = worldYPos * -1; // negative, fog below height; positive, fog above height
-    //return worldYPos * uFogVerticalScale; // "* uFogVerticalScale" is done to convert world position to a percent of the world height;
-
     if (!uHeightFogEnabled)
     {
         // ignore the height

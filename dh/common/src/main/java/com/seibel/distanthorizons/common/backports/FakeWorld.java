@@ -1,7 +1,5 @@
 package com.seibel.distanthorizons.common.backports;
 
-#if MC_VER <= MC_1_7_10
-
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
@@ -132,5 +130,3 @@ public class FakeWorld implements IBlockAccess
 	
 	
 }
-
-#endif

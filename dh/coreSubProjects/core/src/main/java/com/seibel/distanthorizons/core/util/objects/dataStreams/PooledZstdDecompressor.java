@@ -54,7 +54,6 @@ public class PooledZstdDecompressor
 		int size = ctx.decompressByteArray(destination.elements(), 0, destination.size(), src, 0, srcSize);
 		if (size != originalSize)
 		{
-			//return Arrays.copyOfRange(destination.elements(), 0, size);
 			destination.size(size); // this assumes the size will only be smaller than the expected
 		}
 		

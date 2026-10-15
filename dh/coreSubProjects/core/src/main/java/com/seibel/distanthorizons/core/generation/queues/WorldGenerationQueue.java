@@ -414,12 +414,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	private void startWorldGenTaskGroup(DataSourceRetrievalTask worldGenTask)
 	{
 		long taskPos = worldGenTask.pos;
-		// commented out for the time being since detail level can change at any time
-		//LodUtil.assertTrue(
-		//	worldGenTask.requestDetailLevel >= this.highestDataDetail 
-		//	&& worldGenTask.requestDetailLevel <= this.lowestDataDetail,
-		//	"World gen task started that isn't within the range that the generator can create.");
-		
+
 		long generationStartMsTime = System.currentTimeMillis();
 		CompletableFuture<FullDataSourceV2> generationFuture = this.startGenerationEvent(worldGenTask);
 		

@@ -82,10 +82,7 @@ public interface IMinecraftClientWrapper extends IBindable
 	
 	void sendChatMessage(String string);
 	
-	/** 
-	 * Will default to sending a chat message if not supported by 
-	 * the current MC version (1.19.2 and older).
-	 */
+	/** Will default to sending a chat message if overlay messages aren't supported. */
 	void sendOverlayMessage(String string);
 	
 	
@@ -95,8 +92,6 @@ public interface IMinecraftClientWrapper extends IBindable
 	//==========================//
 	
 	void disableVanillaClouds();
-	void disableVanillaChunkFadeIn();
-	void disableFabulousTransparency();
 	
 	
 	
@@ -130,15 +125,7 @@ public interface IMinecraftClientWrapper extends IBindable
 	
 	void showDialog(String title, String message, String dialogType, String iconType);
 	boolean dialogNeedsAwtHeadless();
-	
-	
-	//=============//
-	// mod support //
-	//=============//
-	
-	/** used for Optifine */
-	Object getOptionsObject();
-	
-	
-	
+
+
+
 }

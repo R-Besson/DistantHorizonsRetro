@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.forge17;
 
-//import com.gtnewhorizons.retrofuturabootstrap.SharedConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.lib.tree.ClassNode;

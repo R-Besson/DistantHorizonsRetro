@@ -42,16 +42,9 @@ public class SqliteSetupTest
 		File dbFile = new File(databaseLocation);
 		Assert.assertTrue("Unable to delete test database.", dbFile.delete());
 	}
-	
-	//@Test
-	//public void testInMemorySqlite()
-	//{
-	//	String databaseLocation = ":memory:";
-	//	testSqliteDatabase(DATABASE_TYPE, databaseLocation);
-	//}
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//

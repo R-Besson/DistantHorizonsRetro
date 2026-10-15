@@ -1,0 +1,16 @@
+// Sets the mod_version project property from the latest git tag, e.g. "1.0.1" on a tagged
+// commit or "1.0.1-3-g990aa7f-dirty" after it. -Pmod_version=... or the VERSION environment
+// variable override it.
+def props = new HashMap<String, String>(gradle.startParameter.projectProperties)
+if (!props.containsKey('mod_version')) {
+    def version = System.getenv('VERSION')
+    if (!version) {
+        try {
+            version = ['git', 'describe', '--tags', '--dirty', '--always'].execute(null, settingsDir).text.trim()
+        } catch (Exception ignored) {
+        }
+    }
+    props.put('mod_version', (version ?: '0.0.0').replaceFirst(/^v/, ''))
+    gradle.startParameter.setProjectProperties(props)
+}
+gradle.ext.mod_version = gradle.startParameter.projectProperties.get('mod_version')

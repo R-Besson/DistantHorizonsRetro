@@ -163,7 +163,6 @@ public class GLBuffer implements AutoCloseable
 		{
 			final int oldId = this.id;
 			this.id = GLMC.glGenBuffers();
-			//LOGGER.info("created [" + newId + "].");
 			
 			// destroy the old buffer
 			// after the new one has been created 
@@ -217,7 +216,6 @@ public class GLBuffer implements AutoCloseable
 			this.id = 0;
 			this.size = 0;
 			
-			//LOGGER.info("async destroy [" + idToDelete + "].");
 			RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer destroyAsync", () -> { destroyBufferIdNow(idToDelete, "destroyAsync"); });
 		}
 		finally
@@ -300,9 +298,8 @@ public class GLBuffer implements AutoCloseable
 		
 		
 		
-		// re-binding the old buffers is necessary for old MC versions for the following reasons:
-		// for 16.5 and older the screen may be black when on the home menu
-		// and for 1.19.2 - 1.21.4 the inventory/UI will render without a background
+		// the previously bound buffers are re-bound afterwards,
+		// otherwise MC's own rendering (IE the main menu and UI) can break
 		int vao = LWJGL.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING);
 		int vbo = LWJGL.glGetInteger(GL15.GL_ARRAY_BUFFER_BINDING);
 		int ebo = LWJGL.glGetInteger(GL15.GL_ELEMENT_ARRAY_BUFFER_BINDING);
@@ -583,8 +580,7 @@ public class GLBuffer implements AutoCloseable
 						BUFFER_ID_TO_PHANTOM.remove(idRef);
 						final int id = idRef;
 						RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer phantom destroy", () -> { destroyBufferIdNow(id, "runPhantomReferenceCleanupLoop"); });
-						//LOGGER.info("Buffer Phantom collected, ID: ["+id+"]");
-						
+							
 						if (LOG_PHANTOM_ALLOCATION_STACKS) // stack trace shouldn't be null, but just in case
 						{
 							String stack = BUFFER_ID_TO_ALLOCATION_STRING.get(idRef);

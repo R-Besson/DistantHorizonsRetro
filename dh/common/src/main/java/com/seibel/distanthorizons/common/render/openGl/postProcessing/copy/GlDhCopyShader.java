@@ -112,12 +112,7 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 			// Note: this prevents the sun/moon and stars from rendering through transparent LODs,
 			// however this also fixes transparent LODs from glowing when rendered against the sky during the day
 			GLMC.disableBlend();
-			
-			// old blending logic in case it's ever needed:
-			//GLMC.enableBlend();
-			//GL33.glBlendEquation(GL33.GL_FUNC_ADD);
-			//GLMC.glBlendFunc(GL33.GL_ONE, GL33.GL_ONE_MINUS_SRC_ALPHA);
-			
+
 			GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 			GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveColorTextureId());
 			LWJGL.glUniform1i(this.uCopyTexture, 0);

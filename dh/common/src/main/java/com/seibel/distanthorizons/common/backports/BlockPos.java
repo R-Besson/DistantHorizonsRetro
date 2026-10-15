@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.common.backports;
 
-#if MC_VER <= MC_1_7_10
 import net.minecraft.world.ChunkPosition;
 import org.joml.Vector3i;
 
@@ -38,4 +37,3 @@ public class BlockPos extends Vector3i
 	}
 	
 }
-#endif

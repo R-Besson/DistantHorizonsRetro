@@ -221,10 +221,9 @@ public class JarMain
 			return;
 		}
 		
-		// In order to finish this, we'd need a way to create datasources (specifically data mappings) without a MC level object to deserialize with.
-		// Granted it would be possible to just export the mapping data as the raw string data it's stored as.
-		//dto.createPooledDataSource();
-		
+		// TODO finishing this needs a way to create datasources (specifically data mappings) without a MC level object to deserialize with,
+		//  or exporting the mapping data as the raw string data it's stored as.
+
 	}
 	private static void exportAllAtDetailLevel(FullDataSourceV2Repo repo, File exportFile, byte detailLevel)
 	{

@@ -43,8 +43,8 @@ public final class ModInfo
 	public static final String NAME = "DistantHorizons";
 	/** Human-readable version of NAME */
 	public static final String READABLE_NAME = "Distant Horizons Retro";
-	/** Keep in sync with mod_version in dh/gradle.properties, the release workflow checks both against the tag */
-	public static final String VERSION = "1.0.1";
+	/** Comes from the git tag, see dh/version.gradle */
+	public static final String VERSION = ModVersion.VERSION;
 	/** Returns true if the current build is an unstable developer build, false otherwise. */
 	public static final boolean IS_DEV_BUILD = VERSION.toLowerCase().contains("dev");
 	

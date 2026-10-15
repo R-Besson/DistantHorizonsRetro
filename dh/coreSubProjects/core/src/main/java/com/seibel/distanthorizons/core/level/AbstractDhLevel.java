@@ -312,10 +312,7 @@ public abstract class AbstractDhLevel implements IDhLevel
 			return;
 		}
 		
-		
-		//LOGGER.info("beacons ["+activeBeamList.size()+"] at x["+minBlockX+"]-["+maxBlockX+"] z["+minBlockZ+"]-["+maxBlockZ+"].");
-		
-		
+
 		// locked to prevent two threads from updating the same position at the same time
 		ReentrantLock lock = this.beaconUpdateLockContainer.getLockForPos(sectionPosForLock);
 		try
@@ -364,31 +361,17 @@ public abstract class AbstractDhLevel implements IDhLevel
 					{
 						// new beam found, add to DB
 						this.beaconBeamRepo.save(activeBeam);
-						
-						//LOGGER.info("new beacon ["+activeBeam+"].");
 					}
-					else
+					else if (!existingBeam.color.equals(activeBeam.color))
 					{
-						// beam still exists in chunk
-						if (!existingBeam.color.equals(activeBeam.color))
-						{
-							// beam colors were changed
-							this.beaconBeamRepo.save(activeBeam);
-							
-							//LOGGER.info("change beacon ["+existingBeam+"] -> ["+activeBeam+"].");
-						}
-						else
-						{
-							//LOGGER.info("existing beacon ["+existingBeam+"].");
-						}
+						// beam still exists in chunk, but its color changed
+						this.beaconBeamRepo.save(activeBeam);
 					}
 				}
 				else if (existingBeam != null)
 				{
 					// beam no longer exists at position, remove from DB
 					this.beaconBeamRepo.deleteWithKey(beaconPos);
-					
-					//LOGGER.info("remove beacon ["+existingBeam+"].");
 				}
 			}
 		}

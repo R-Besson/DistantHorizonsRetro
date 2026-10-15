@@ -74,13 +74,13 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 
 ```
 DistantHorizonsRetro/
-├── settings.gradle      # includeBuild('dh'), pins -PmcVer=1.7.10
+├── settings.gradle      # includeBuild('dh'), reads the version from git
 ├── build.gradle         # runs the mod build, copies jars to build/libs
 ├── .github/workflows/   # GTNH Actions
 └── dh/                  # the mod
-    ├── common/          # code shared between loaders
-    ├── forge17/         # 1.7.10 Forge loader code
-    └── coreSubProjects/ # core LOD engine
+    ├── common/          # Minecraft-facing code (wrappers, rendering)
+    ├── forge17/         # Forge entrypoint and mixins
+    └── coreSubProjects/ # core LOD engine and API
 ```
 
 The code in `dh/` was originally imported from Distant Horizons, but it is now maintained here.
@@ -97,8 +97,20 @@ It is not synced from upstream.
 ./gradlew :dh:forge17:runClient # Run dev client (Java 25)
 ```
 
+The dev client comes with [Angelica](https://github.com/GTNewHorizons/Angelica), Complementary Unbound
+with [Euphoria Patches](https://modrinth.com/mod/euphoria-patches) (select it in the shader pack menu)
+and [Twilight Forest](https://github.com/GTNewHorizons/twilightforest) for testing a modded dimension.
+Gradle downloads them, no manual setup needed.
+
 > [!TIP]
-> Run with `-PdevProfile=true` for performance profiling and `-PdevJava8=true` for Java 8
+> Run with `-PdevProfile=true` for performance profiling, `-PdevJava8=true` for Java 8
+> and `-PdevMods=false` to leave out the test mods
+
+## Versioning
+
+The mod version comes from the latest git tag (`dh/version.gradle`), there's nothing to edit.
+To release, add `.changelogs/<version>.md`, tag the commit (no `v` prefix) and push the tag.
+Builds of untagged commits get versions like `1.0.1-3-g990aa7f`.
 
 # Credits
 

@@ -22,22 +22,18 @@ package com.seibel.distanthorizons.common.wrappers.modAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IGregTechAccessor;
 import org.jetbrains.annotations.Nullable;
 
-#if MC_VER <= MC_1_7_10
 import com.seibel.distanthorizons.common.backports.IBlockState;
 import net.minecraft.util.IIcon;
-#endif
 
 /**
  * The common Accessor allows for MC
- * version specific methods, vs the base accessor
+ * specific methods, vs the base accessor
  * which is for MC agnostic methods.
  */
 public interface IGregTechCommonAccessor extends IGregTechAccessor
 {
-	
-	#if MC_VER <= MC_1_7_10
+
 	@Nullable
 	IIcon resolveIcon(IBlockState blockState);
-	#endif
-	
+
 }

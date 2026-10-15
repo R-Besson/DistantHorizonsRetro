@@ -18,8 +18,6 @@ import java.util.Set;
  */
 public class AutoClosableTrackingWrapper implements InvocationHandler
 {
-	//private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	/** 
 	 * should be enabled during development to
 	 * notify if any resources are being leaked.

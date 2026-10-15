@@ -22,34 +22,22 @@ package com.seibel.distanthorizons.common.util;
 import com.seibel.distanthorizons.common.wrappers.world.ClientLevelWrapper;
 import com.seibel.distanthorizons.common.wrappers.world.ServerLevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
-#if MC_VER <= MC_1_12_2
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-#else
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.LevelAccessor;
-#endif
 public class ProxyUtil
 {
-	
-	public static ILevelWrapper getLevelWrapper(
-		#if MC_VER <= MC_1_12_2 World #else LevelAccessor #endif level
-		)
+
+	public static ILevelWrapper getLevelWrapper(World level)
 	{
 		ILevelWrapper levelWrapper;
-		if (level instanceof #if MC_VER <= MC_1_12_2 WorldServer #else ServerLevel #endif)
+		if (level instanceof WorldServer)
 		{
-			levelWrapper = ServerLevelWrapper.getWrapper(
-				#if MC_VER <= MC_1_12_2 (WorldServer) #else (ServerLevel) #endif level
-			);
+			levelWrapper = ServerLevelWrapper.getWrapper((WorldServer) level);
 		}
 		else
 		{
-			levelWrapper = ClientLevelWrapper.getWrapper(
-				#if MC_VER <= MC_1_12_2 (WorldClient) #else (ClientLevel) #endif level
-			);
+			levelWrapper = ClientLevelWrapper.getWrapper((WorldClient) level);
 		}
 		
 		return levelWrapper;

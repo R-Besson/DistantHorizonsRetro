@@ -502,17 +502,9 @@ public class DhLightingEngine
 							}
 							else
 							{
-								// handle down propagation here. sort of.
-								// down propagation is also handled partially elsewhere.
-								// basically if the data point above is transparent,
-								// we copy its light level.
-								// otherwise, if the data point above is opaque,
-								// then no light can propagate downwards from it.
-								// therefore, this data point should be light level 0*
-								// and no more propagation needs to be performed for this column.
-								//
-								// *unless light propagates into it horizontally,
-								// but that is handled separately.
+								// partial down propagation: copy the light level of a transparent data point above,
+								// an opaque one above means no light reaches this column from the top
+								// (horizontal propagation is handled separately)
 								long above = dataPoints.getLong(index - 1);
 								if (airIDs.get(FullDataPointUtil.getId(above)))
 								{
@@ -866,7 +858,6 @@ public class DhLightingEngine
 		//===============//
 		
 		public boolean isLightLevelEmpty(int lightLevel) { return this.indexByLightLevel[lightLevel] == -1; }
-		//public int size() { return this.index+1; }
 		
 		public void push(int blockX, int blockY, int blockZ, int lightLevel)
 		{

@@ -54,12 +54,7 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 	
 	public EDhApiDepthRange getDepthRange()
 	{
-		#if MC_VER <= MC_26_1_2
 		return EDhApiDepthRange.NEG_ONE_TO_POS_ONE;
-		#else
-		// probably caused due to the starting changes to Vulkan
-		return EDhApiDepthRange.ZERO_TO_POS_ONE;
-		#endif
 	}
 	
 	public EDhApiRenderingApi getRenderApi() { return EDhApiRenderingApi.OPEN_GL; }

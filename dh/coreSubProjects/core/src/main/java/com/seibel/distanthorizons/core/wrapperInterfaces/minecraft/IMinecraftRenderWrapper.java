@@ -103,12 +103,6 @@ public interface IMinecraftRenderWrapper extends IBindable
 	int getTargetFramebufferViewportWidth();
 	int getTargetFramebufferViewportHeight();
 	
-	/** 
-	 * generally shouldn't be needed, the frame buffer should generally stay the same 
-	 * but in case something goes wrong this allows for re-getting the buffer ID.
-	 */
-	void clearTargetFrameBuffer();
-	
 	/** Can return null if the given level hasn't had a light map assigned to it */
 	@Nullable
 	ILightMapWrapper getLightmapWrapper(@NotNull ILevelWrapper level);

@@ -1,7 +1,5 @@
 package com.seibel.distanthorizons.common.backports;
 
-#if MC_VER <= MC_1_7_10
-
 import java.util.Objects;
 
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
@@ -102,5 +100,3 @@ public class FakeBlockState implements IBlockState
 	
 	
 }
-
-#endif

@@ -77,9 +77,7 @@ public class DelayedSaveCacheTest
 		//==============================//
 		// single item and manual flush //
 		//==============================//
-		
-		//LOGGER.info("============ Single item - manual flush ============");
-		
+
 		PhantomArrayListCheckout initialCheckout;
 		try (FullDataSourceV2 initialSource = FullDataSourceV2.createEmpty(DhSectionPos.encode((byte)6, 0, 0)))
 		{
@@ -99,9 +97,7 @@ public class DelayedSaveCacheTest
 		//======================//
 		// quick group position //
 		//======================//
-		
-		//LOGGER.info("============ quick group - auto flush ============");
-		
+
 		// write multiple items for the same position
 		for (int i = 0; i < 4; i++)
 		{
@@ -127,9 +123,7 @@ public class DelayedSaveCacheTest
 		//=====================//
 		// slow group position //
 		//=====================//
-		
-		//LOGGER.info("============ slow group - auto flush ============");
-		
+
 		// write multiple items for the same position
 		for (int i = 0; i < 4; i++)
 		{

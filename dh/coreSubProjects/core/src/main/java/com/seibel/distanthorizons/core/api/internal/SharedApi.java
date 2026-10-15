@@ -114,12 +114,7 @@ public class SharedApi
 				// delayed get because SharedApi will be created before the singleton has been bound 
 				AbstractDebugWireframeRenderer debugWireframeRenderer = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
 				debugWireframeRenderer.clearRenderables();
-				
-				if (MC_RENDER != null)
-				{
-					MC_RENDER.clearTargetFrameBuffer();
-				}
-				
+
 				// shouldn't be necessary, but if we missed closing one of the connections this should make sure they're all closed
 				AbstractDhRepo.closeAllConnections();
 				// needs to be closed on world shutdown to clear out un-processed chunks

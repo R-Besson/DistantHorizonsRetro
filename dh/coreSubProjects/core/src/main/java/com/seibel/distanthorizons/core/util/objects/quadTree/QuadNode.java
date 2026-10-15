@@ -237,8 +237,6 @@ public class QuadNode<T>
 			// this node is a parent to the position requested,
 			// recurse to the next node
 
-//			LOGGER.info((replaceValue ? "set " : "get ")+inputSectionPos+" center block: "+inputSectionPos.getCenter().getCornerBlockPos()+", this pos: "+this.sectionPos+" this center block: "+this.sectionPos.getCenter().getCornerBlockPos());
-			
 			long nwPos = DhSectionPos.getChildByIndex(this.sectionPos, 0);
 			long swPos = DhSectionPos.getChildByIndex(this.sectionPos, 1);
 			long nePos = DhSectionPos.getChildByIndex(this.sectionPos, 2);

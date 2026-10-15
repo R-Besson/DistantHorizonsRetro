@@ -106,13 +106,9 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 		IDhApiOverrideable existingOverride = overrideContainer.getOverrideWithPriority(dependencyImplementation.getPriority());
 		if (existingOverride != null)
 		{
-			// Iris + Immersive Portals causes this to happen a bunch due to Iris trying to un-bind the wrong objects.
-			// I don't really want to change this API behavior (silently overriding old dependencies), 
-			// but for Iris + Immersive Portals to work properly this path should run.
+			// duplicate bindings silently replace the old override,
+			// Iris can try to un-bind the wrong objects otherwise
 			overrideContainer.removeOverride(existingOverride);
-			
-			// can be un-commented if we want to go back to throwing exceptions for duplicate bindings
-			//throw new IllegalStateException("An override for ["+dependencyInterface.getSimpleName()+"] already exists with the priority [" + dependencyImplementation.getPriority() + "].");
 		}
 		
 		

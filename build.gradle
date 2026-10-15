@@ -3,16 +3,13 @@ plugins {
 }
 
 def dhBuild = gradle.includedBuild('dh')
-def dhProps = new Properties()
-file('dh/gradle.properties').withInputStream { dhProps.load(it) }
 
-gtnhGradle.applyModuleByName(project, 'GitVersionModule')
-
+// mod_version comes from the git tag, see dh/version.gradle
 group = modGroup
-version = version.toString().replaceFirst(/^v/, '')
-ext.modVersion = version.toString()
+version = gradle.ext.mod_version
+ext.modVersion = version
 
-def sourceName = "${modName}-${dhLoader}-${dhProps.mod_version}-${minecraftVersion}"
+def sourceName = "${modName}-${dhLoader}-${version}-${minecraftVersion}"
 
 // The publishers want TaskProvider<Jar>, but the jars are DH's -- clear Jar's own
 // packaging action and copy them byte-for-byte instead.

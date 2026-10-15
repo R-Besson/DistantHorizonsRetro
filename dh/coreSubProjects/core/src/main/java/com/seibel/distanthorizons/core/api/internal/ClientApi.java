@@ -44,7 +44,6 @@ import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 import com.seibel.distanthorizons.core.world.IDhClientWorld;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IVersionConstants;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IImmersivePortalsAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhVanillaFadeRenderer;
@@ -92,7 +91,6 @@ public class ClientApi
 	/** Delayed accessing is necessary since this object will be created before the mod accessors are bound. */
 	private static class DelayedAccessors 
 	{
-		public static final IImmersivePortalsAccessor IMMERSIVE_PORTALS = ModAccessorInjector.INSTANCE.get(IImmersivePortalsAccessor.class);
 		public static final IIrisAccessor IRIS = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	}
 	
@@ -355,26 +353,6 @@ public class ClientApi
 			
 			
 			
-			//===========//
-			// debugging //
-			//===========//
-			//region
-			
-			// only run these tasks once per frame
-			if (!renderingDeferredLayer)
-			{
-				//DhApiTerrainDataRepo.asyncDebugMethod(
-				//	RENDER_STATE.clientLevelWrapper,
-				//	MC_CLIENT.getPlayerBlockPos().getX(),
-				//	MC_CLIENT.getPlayerBlockPos().getY(),
-				//	MC_CLIENT.getPlayerBlockPos().getZ()
-				//);
-			}
-			
-			//endregion
-			
-			
-			
 			//=====================//
 			// render thread tasks //
 			//=====================//
@@ -418,10 +396,7 @@ public class ClientApi
 					//region
 					
 					long nowMs = System.currentTimeMillis();
-					if (this.msSinceLastSpeedCheck + MIN_MS_BETWEEN_SPEED_CHECKS < nowMs 
-						// don't track camera speed for dimensions the player isn't in
-						&& (DelayedAccessors.IMMERSIVE_PORTALS == null 
-							|| !DelayedAccessors.IMMERSIVE_PORTALS.isRenderingPortal()))
+					if (this.msSinceLastSpeedCheck + MIN_MS_BETWEEN_SPEED_CHECKS < nowMs)
 					{
 						// calc time since last check
 						double secSinceLastCheck = (nowMs - this.msSinceLastSpeedCheck) / 1_000.0;
@@ -481,21 +456,7 @@ public class ClientApi
 					}
 					
 					//endregion
-					
-					
-					
-					//===============================//
-					// Immersive Portals Mixin Check //
-					//===============================//
-					//region
-					
-					if (DelayedAccessors.IMMERSIVE_PORTALS != null)
-					{
-						DelayedAccessors.IMMERSIVE_PORTALS.logWarningIfMixinNotRunRecently();
-					}
-					
-					//endregion
-					
+
 				}
 			}
 			
@@ -734,20 +695,8 @@ public class ClientApi
 	private static boolean shouldRenderFade()
 	{
 		// don't fade when Iris shaders are active, otherwise the rendering can get weird
-		if (DelayedAccessors.IRIS != null
-			&& DelayedAccessors.IRIS.isShaderPackInUse())
-		{
-			return false;
-		}
-		
-		// Don't render fade through immersive portals, this causes the fade to apply incorrectly
-		if (DelayedAccessors.IMMERSIVE_PORTALS != null 
-			&& DelayedAccessors.IMMERSIVE_PORTALS.isRenderingPortal())
-		{
-			return false;
-		}
-		
-		return true;
+		return DelayedAccessors.IRIS == null
+			|| !DelayedAccessors.IRIS.isShaderPackInUse();
 	}
 	
 	//endregion

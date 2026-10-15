@@ -1,15 +1,10 @@
 package com.seibel.distanthorizons.common.backports;
 
-#if MC_VER <= MC_1_7_10
-import com.seibel.distanthorizons.common.backports.BlockPos;
-
 /**
- * Recreation of MC's 1.12+ ChunkPos object
- * so 1.7.10 can use similar code to 1.12.
+ * Recreation of MC's 1.12+ ChunkPos object.
  */
-public class ChunkPos 
+public class ChunkPos
 {
-	#if MC_VER <= MC_1_7_10
     private static final long INT_MASK = (1L << Integer.SIZE) - 1;
 	
     public final int x;
@@ -92,9 +87,7 @@ public class ChunkPos
 	}
 	
 	//endregion
-	
-	
-	
-    #endif
+
+
+
 }
-#endif

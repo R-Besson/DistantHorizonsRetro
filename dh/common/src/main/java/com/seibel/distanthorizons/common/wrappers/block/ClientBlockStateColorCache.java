@@ -26,12 +26,7 @@ import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPosMutable;
-import com.seibel.distanthorizons.common.wrappers.McObjectConverter;
-import com.seibel.distanthorizons.core.enums.EDhDirection;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-#if MC_VER <= MC_1_7_10
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockFlower;
@@ -44,40 +39,11 @@ import net.minecraftforge.common.util.ForgeDirection;
 import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import com.seibel.distanthorizons.common.backports.FakeWorld;
-#elif MC_VER <= MC_1_12_2
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.block.BlockRotatedPillar;
-import net.minecraft.block.*;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.util.math.BlockPos;
-#else
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.SlabType;
-#endif
 import com.seibel.distanthorizons.core.logging.DhLogger;
-#if MC_VER > MC_1_7_10
-import org.jetbrains.annotations.Nullable;
-#endif
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-#if MC_VER <= MC_1_7_10
-#elif MC_VER < MC_1_21_5
-import net.minecraft.client.renderer.block.model.BakedQuad;
-#elif MC_VER <= MC_1_21_11
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-#else
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.core.BlockPos;
-import net.minecraft.client.color.block.BlockTintSource;
-#endif
 
 /**
  * This stores and calculates the colors
@@ -89,88 +55,41 @@ import net.minecraft.client.color.block.BlockTintSource;
 public class ClientBlockStateColorCache
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	#if MC_VER <= MC_1_12_2
-	private static final Minecraft MC = Minecraft.getMinecraft();
-	#else
-	private static final Minecraft MC = Minecraft.getInstance();
-	#endif
-	
-	
-	#if MC_VER <= MC_1_12_2
-	#else
-	private static final HashSet<BlockState> BLOCK_STATES_THAT_NEED_LEVEL = new HashSet<>();
-	#endif
 
-	#if MC_VER <= MC_1_12_2
 	private static final HashSet<IBlockState> BROKEN_BLOCK_STATES = new HashSet<>();
-	#else
-	private static final HashSet<BlockState> BROKEN_BLOCK_STATES = new HashSet<>();
-	#endif
-	
-	/** 
-	 * Methods using MC's "RandomSource" object aren't thread safe <br>
-	 * so we need to put locks around that logic. <br>
-	 * specifically:
-	 * <code>
-	 * getBlockModel(this.blockState).getQuads(this.blockState, direction, RANDOM)
-	 * </code>
-	 */
+
+	/** Mod icon lookups aren't guaranteed to be thread safe, so color resolving is done in this lock. */
 	private static final ReentrantLock RESOLVE_LOCK = new ReentrantLock();
-	
+
 	public static final int INVALID_COLOR = -1;
-	
-	
-	/** This is the order each direction on a block is processed when attempting to get the texture/color */
-	#if MC_VER <= MC_1_7_10
-	// 1.7.10 doesn't use quads/directions; texture is fetched via IIcon directly
-	#else
-	private static final @Nullable EDhDirection[] COLOR_RESOLUTION_DIRECTION_ORDER =
-		{
-			EDhDirection.UP,
-			null, // null represents "unculled" faces, IE the top of farmland
-			EDhDirection.NORTH,
-			EDhDirection.EAST,
-			EDhDirection.WEST,
-			EDhDirection.SOUTH,
-			EDhDirection.DOWN
-		};
-	#endif
-	
+
 	private static final int FLOWER_COLOR_SCALE = 5;
-	
-	
-	
-	#if MC_VER <= MC_1_7_10
+
+
+
 	private static final ThreadLocal<FakeWorld> FAKE_WORLD_REF = ThreadLocal.withInitial(FakeWorld::new);
-	#endif
 
 	private final IClientLevelWrapper clientLevelWrapper;
-	#if MC_VER <= MC_1_12_2
 	private final IBlockState blockState;
-	#else
-	private final BlockState blockState;
-	#endif
 	private final BlockStateWrapper blockStateWrapper;
-	
+
 	private boolean isColorResolved = false;
 	private int baseColor = 0;
 	private boolean needPostTinting = false;
-	private int tintIndex = 0;
-	
-	
-	
+
+
+
 	//===========//
 	// constants //
 	//===========//
 	//region
-	
+
 	private static final int MIN_SRGB_BITS = 0x39000000; // 2^(-13)
 	private static final int MAX_SRGB_BITS = 0x3f7fffff; // 1.0 - f32::EPSILON
 	private static final float MIN_SRGB_BOUND = Float.intBitsToFloat(MIN_SRGB_BITS);
 	private static final float MAX_SRGB_BOUND = Float.intBitsToFloat(MAX_SRGB_BITS);
-	
-	private static final int[] linearToSrgbTable = new int[] 
+
+	private static final int[] linearToSrgbTable = new int[]
 		{
 			//region
 			0x0073000d, 0x007a000d, 0x0080000d, 0x0087000d, 0x008d000d, 0x0094000d, 0x009a000d, 0x00a1000d,
@@ -188,8 +107,8 @@ public class ClientBlockStateColorCache
 			0x5e0c0a23, 0x631c0980, 0x67db08f6, 0x6c55087f, 0x70940818, 0x74a007bd, 0x787d076c, 0x7c330723,
 			//endregion
 		};
-	
-	private static final float[] srgbToLinearTable = new float[] 
+
+	private static final float[] srgbToLinearTable = new float[]
 		{
 			//region
 			0.0f, 0.000303527f, 0.000607054f, 0.00091058103f, 0.001214108f, 0.001517635f, 0.0018211621f, 0.002124689f,
@@ -226,29 +145,19 @@ public class ClientBlockStateColorCache
 			0.93011117f, 0.9386859f, 0.9473069f, 0.9559735f, 0.9646866f, 0.9734455f, 0.98225087f, 0.9911022f, 1.0f
 			//endregion
 		};
-	
-	// these are threadlocals since AbstractDhTintGetter use local variables to handle color queries
-	#if MC_VER > MC_1_12_2
-	private static final ThreadLocal<TintWithoutLevelOverrider> TINT_WITHOUT_LEVEL_OVERRIDE_THREAD_LOCAL = ThreadLocal.withInitial(TintWithoutLevelOverrider::new);
-	private static final ThreadLocal<TintGetterOverride> TINT_OVERRIDE_THREAD_LOCAL = ThreadLocal.withInitial(TintGetterOverride::new);
-	#endif
-	
+
 	private static final ThreadLocal<DhApiBlockColorOverrideEvent.EventParam> COLOR_OVERRIDE_EVENT_PARAM_THREAD_LOCAL = ThreadLocal.withInitial(DhApiBlockColorOverrideEvent.EventParam::new);
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	#if MC_VER <= MC_1_12_2
+
 	public ClientBlockStateColorCache(IBlockState blockState, IClientLevelWrapper clientLevelWrapper)
-	#else
-	public ClientBlockStateColorCache(BlockState blockState, IClientLevelWrapper clientLevelWrapper)
-	#endif
 	{
 		this.blockState = blockState;
 		this.blockStateWrapper = BlockStateWrapper.fromBlockState(blockState, clientLevelWrapper);
@@ -256,16 +165,16 @@ public class ClientBlockStateColorCache
 
 		this.resolveColors();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===================//
 	// color calculation //
 	//===================//
 	//region
-	
+
 	private void resolveColors()
 	{
 		if (this.isColorResolved)
@@ -273,11 +182,10 @@ public class ClientBlockStateColorCache
 			return;
 		}
 
-		#if MC_VER <= MC_1_7_10
 		try
 		{
 			RESOLVE_LOCK.lock();
-			FakeBlockState blockState = (FakeBlockState)this.blockState; 
+			FakeBlockState blockState = (FakeBlockState)this.blockState;
 
 			TextureAtlasSprite sprite = TextureAtlasSpriteWrapper.resolveFaceSprite(
 				blockState, ForgeDirection.UP.ordinal());
@@ -297,27 +205,25 @@ public class ClientBlockStateColorCache
 			// Backup tinting heuristics
 			// (aka guess that the block should be tinted if it's entirely white)
 			this.needPostTinting = blockState.block.getBlockColor() != 0xFFFFFF; // white
-			
+
 			if (blockState.block instanceof BlockGrass
 				|| blockState.block instanceof BlockLeavesBase
 				|| blockState.block instanceof BlockBush)
 			{
 				this.needPostTinting = true;
 			}
-			
-			if (blockState.block == Blocks.water 
+
+			if (blockState.block == Blocks.water
 				|| blockState.block == Blocks.flowing_water)
 			{
 				this.needPostTinting = true;
 			}
-			
+
 			// Necessary for the Lord of the Rings (LOTR) mod
 			if (blockState.block instanceof IShearable)
 			{
 				this.needPostTinting = true;
 			}
-			
-			this.tintIndex = 0;
 
 			this.isColorResolved = true;
 		}
@@ -325,234 +231,9 @@ public class ClientBlockStateColorCache
 		{
 			RESOLVE_LOCK.unlock();
 		}
-		
-		#else
-		
-		try
-		{
-			// getQuads() isn't thread safe so we need to put this logic in a lock
-			RESOLVE_LOCK.lock();
 
-			#if MC_VER <= MC_1_12_2
-			if (this.blockState.getRenderType() == EnumBlockRenderType.ENTITYBLOCK_ANIMATED)
-			{
-				this.needPostTinting = false;
-				this.tintIndex = 0;
-				this.baseColor = ColorUtil.argbToInt(255,
-					this.blockStateWrapper.getMapColor().getRed(),
-					this.blockStateWrapper.getMapColor().getGreen(),
-					this.blockStateWrapper.getMapColor().getBlue());
-				this.isColorResolved = true;
-				return;
-			}
-			#endif
-			
-			if (!this.blockStateWrapper.isLiquid())
-			{
-				// look for the first non-empty direction
-				List<BakedQuad> quads = null;
-				
-				EDhDirection direction;
-				
-				for (int i = 0; i < COLOR_RESOLUTION_DIRECTION_ORDER.length; i++)
-				{
-					direction = COLOR_RESOLUTION_DIRECTION_ORDER[i];
-					try
-					{
-						quads = this.getQuadsForDirection(direction);
-					}
-					catch (Exception ignore)
-					{
-						// failing to get quads can happen in the block is invalid
-						// (i.e. AIR is somehow passed in)
-					}
-					
-					// return for the first valid direction we find
-					if (quads != null 
-						&& !quads.isEmpty()
-						// for rotated blocks (ie logs) we want the side instead of the top,
-						// so logs use their bark side instead of their cut/inner side
-						&& !(
-							#if MC_VER <= MC_1_12_2
-							this.blockState.getBlock() instanceof BlockRotatedPillar
-							#else
-							this.blockState.getBlock() instanceof RotatedPillarBlock
-							#endif
-							&& direction == EDhDirection.UP
-							)
-						)
-					{
-						break;
-					}
-				}
-				
-				if (quads == null || quads.isEmpty())
-				{
-					try
-					{
-						quads = this.getUnculledQuads();
-					}
-					catch (Exception ignore)
-					{
-						// failing to get quads can happen in the block is invalid
-						// (i.e. AIR is somehow passed in)
-					}
-				}
-				
-				if (quads != null 
-					&& !quads.isEmpty() 
-					&& quads.get(0) != null)
-				{
-					try
-					{
-						BakedQuad firstQuad = quads.get(0);
-						
-						#if MC_VER <= MC_1_12_2
-						this.needPostTinting = firstQuad.hasTintIndex();						
-						#elif MC_VER <= MC_1_21_11
-						this.needPostTinting = firstQuad.isTinted();
-						#else
-						this.needPostTinting = firstQuad.materialInfo().isTinted();
-						#endif
-					
-						#if MC_VER <= MC_1_21_4
-						this.tintIndex = firstQuad.getTintIndex();
-						#elif MC_VER <= MC_1_21_11
-						this.tintIndex = firstQuad.tintIndex();
-						#else
-						this.tintIndex = firstQuad.materialInfo().tintIndex();
-						#endif
-						
-						#if MC_VER < MC_1_17_1 && MC_VER > MC_1_12_2
-						this.baseColor = calculateColorFromTexture(
-	                        firstQuad.sprite,
-							EColorMode.getColorMode(this.blockState.getBlock()));
-						#elif MC_VER < MC_1_21_5
-						this.baseColor = calculateColorFromTexture(
-	                        firstQuad.getSprite(),
-							EColorMode.getColorMode(this.blockState.getBlock()));
-						#elif MC_VER <= MC_1_21_11
-						this.baseColor = calculateColorFromTexture(
-							firstQuad.sprite(),
-							EColorMode.getColorMode(this.blockState.getBlock()));
-						#else
-						this.baseColor = calculateColorFromTexture(
-							firstQuad.materialInfo().sprite(),
-							EColorMode.getColorMode(this.blockState.getBlock()));
-						#endif
-					}
-					catch (Exception e)
-					{
-						// Shouldn't normally happen, but there was at least 
-						// one report of MC's texture being un-loaded
-						// which prevented us from getting the texture.
-						// So we should have some basic backup logic.
-						
-						LOGGER.warn("Failed to get texture color for block ["+this.blockStateWrapper.getSerialString()+"] due to: ["+e.getMessage()+"], falling back to particle color.");
-						
-						this.needPostTinting = false;
-						this.tintIndex = 0;
-						this.baseColor = this.getParticleIconColor();
-					}
-				}
-				else
-				{
-					// Backup method.
-					this.needPostTinting = false;
-					this.tintIndex = 0;
-					this.baseColor = this.getParticleIconColor();
-				}
-			}
-			else
-			{
-				// Liquid Block
-				this.needPostTinting = true;
-				this.tintIndex = 0;
-				this.baseColor = this.getParticleIconColor();
-			}
-			
-			
-			this.isColorResolved = true;
-		}
-		catch (Exception resolveError)
-		{
-			LOGGER.warn("Failed to get color for block ["+this.blockStateWrapper.getSerialString()+"], error: ["+resolveError.getMessage()+"]. Attempting to use particle icon color...", resolveError);
-			
-			this.needPostTinting = true;
-			this.tintIndex = 0;
-			
-			try
-			{
-				this.baseColor = this.getParticleIconColor();
-			}
-			catch (Exception getParticleIconError)
-			{
-				LOGGER.warn("Failed to get particle icon color for block ["+this.blockStateWrapper.getSerialString()+"], error: ["+getParticleIconError.getMessage()+"], block will render as hot pink.", getParticleIconError);
-				this.baseColor = ColorUtil.HOT_PINK;
-			}
-		}
-		finally
-		{
-			RESOLVE_LOCK.unlock();
-		}
-		#endif
 	}
 
-	#if MC_VER > MC_1_7_10
-	@Nullable
-	private List<BakedQuad> getUnculledQuads() throws Exception { return this.getQuadsForDirection(null); }
-	@Nullable
-	private List<BakedQuad> getQuadsForDirection(@Nullable EDhDirection direction) throws Exception
-	{
-		//=========================//
-		// specific state handling //
-		//=========================//
-		//region
-		
-		#if MC_VER <= MC_1_12_2
-		IBlockState effectiveBlockState = this.blockState;
-		#else
-		BlockState effectiveBlockState = this.blockState;
-		#endif
-		
-		// if this block is a slab, use it's double variant so we can get the top face,
-		// otherwise the color will use the side, which isn't as accurate
-		#if MC_VER <= MC_1_12_2
-		if (this.blockState.getBlock() instanceof BlockSlab && !((BlockSlab) this.blockState.getBlock()).isDouble())
-		{
-			effectiveBlockState = this.blockState.withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.TOP);
-		}
-		#else
-		if (this.blockState.getBlock() instanceof SlabBlock)
-		{
-			effectiveBlockState = this.blockState.setValue( SlabBlock.TYPE, SlabType.DOUBLE );
-		}
-		#endif
-		
-		// huge mushroom block sides will show the inner color,
-		// which isn't what you want to see at a distance,
-		// you want to see the primary color (ie red for red mushrooms)
-		// which is shown on all sides for the default state
-		#if MC_VER <= MC_1_12_2
-		if (this.blockState.getBlock() instanceof BlockHugeMushroom)
-		{
-			effectiveBlockState = this.blockState.getBlock().getDefaultState(); 
-		}
-		#else
-		if (this.blockState.getBlock() instanceof HugeMushroomBlock)
-		{
-			effectiveBlockState = this.blockState.getBlock().defaultBlockState(); 
-		}
-		#endif
-		
-		//endregion
-		
-		
-		
-		List<BakedQuad> quads = QuadWrapper.getQuadsForDirection(effectiveBlockState, direction);
-		return quads;
-	}
-	#endif
 
 	/** if multiple frames are present, just the first one will be used */
 	public static int calculateColorFromTexture(TextureAtlasSprite texture, EColorMode colorMode)
@@ -563,7 +244,7 @@ public class ClientBlockStateColorCache
 		double green = 0;
 		double blue = 0;
 		int tempColor;
-		
+
 		// don't render Chiseled blocks.
 		// Since EColorMode is set per block, you only need to check this once.
 		if (colorMode != EColorMode.Chisel)
@@ -575,12 +256,12 @@ public class ClientBlockStateColorCache
 				for (int u = 0; u < textureWidth; u++)
 				{
 					tempColor = TextureAtlasSpriteWrapper.getPixelARGB(texture, 0, u, v);
-					
+
 					int r = ColorUtil.getRed(tempColor);
 					int g = ColorUtil.getGreen(tempColor);
 					int b = ColorUtil.getBlue(tempColor);
 					int a = ColorUtil.getAlpha(tempColor);
-					
+
 					int scale = 1;
 					if (colorMode == EColorMode.Leaves)
 					{
@@ -611,7 +292,7 @@ public class ClientBlockStateColorCache
 				}
 			}
 		}
-		
+
 		if (count == 0)
 		{
 			// this block is entirely transparent
@@ -626,7 +307,7 @@ public class ClientBlockStateColorCache
 					linearToSrgb((float) (green / (double) alpha)),
 					linearToSrgb((float) (blue / (double) alpha)));
 		}
-		
+
 		//check if not missing texture
 		if (tempColor == ColorUtil.argbToInt(255, 182, 0, 182))
 		{
@@ -636,70 +317,47 @@ public class ClientBlockStateColorCache
 		return tempColor;
 	}
 	/**
-	 * This method was suggested by IMS from the Iris/Sodium team. 
+	 * This method was suggested by IMS from the Iris/Sodium team.
 	 * That's where the numbers and code are based.
 	 */
 	private static int linearToSrgb(float color)
 	{
-		if (!(color > MIN_SRGB_BOUND)) 
+		if (!(color > MIN_SRGB_BOUND))
 		{
 			color = MIN_SRGB_BOUND;
 		}
-		
-		if (color > MAX_SRGB_BOUND) 
+
+		if (color > MAX_SRGB_BOUND)
 		{
 			color = MAX_SRGB_BOUND;
 		}
 		int inputBits = Float.floatToRawIntBits(color);
 		int entry = linearToSrgbTable[((inputBits - MIN_SRGB_BITS) >> 20)];
-		
+
 		int bias = (entry >>> 16) << 9;
 		int scale = entry & 0xffff;
 		int t = (inputBits >>> 12) & 0xff;
-		
+
 		return (bias + (scale * t)) >>> 16;
 	}
-	
-	#if MC_VER > MC_1_7_10
-	private int getParticleIconColor()
-	{
-		// Air can be null which will cause issues below,
-		// just use a static color, it shouldn't be rendered anyway.
-		// This is just to capture a rare bug state where we attempt
-		// to get air's color.
-		if (BlockStateWrapper.isAir(this.blockState))
-		{
-			return ColorUtil.INVISIBLE;
-		}
 
-		return calculateColorFromTexture(
-			#if MC_VER <= MC_1_12_2
-			Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getTexture(this.blockState),
-			#elif MC_VER <= MC_1_21_11
-			Minecraft.getInstance().getModelManager().getBlockModelShaper().getParticleIcon(this.blockState),
-			#else
-			Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(this.blockState).particleMaterial().sprite(),
-			#endif
-				EColorMode.getColorMode(this.blockState.getBlock()));
-	}
-	#endif
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// public getter //
 	//===============//
 	//region
-	
+
 	public int getColor(
 		BiomeWrapper biomeWrapper, FullDataSourceV2 fullDataSource, DhBlockPos blockPos,
 		boolean allowApiOverride)
 	{
 		// only get the tint if the block needs to be tinted
 		int tintColor = ClientBlockStateColorCache.INVALID_COLOR;
-		
+
 		if (this.needPostTinting)
 		{
 			// don't try tinting blocks that don't support our method of tint getting
@@ -707,143 +365,20 @@ public class ClientBlockStateColorCache
 			{
 				return this.baseColor;
 			}
-			
-			
+
+
 			// attempt to get the tint
 			try
 			{
-				#if MC_VER <= MC_1_7_10
-				// 1.7.10: route through FakeWorld + Block.colorMultiplier so block-tint logic
+				// route through FakeWorld + Block.colorMultiplier so block-tint logic
 				// (grass/foliage/water/etc.) gets a usable IBlockAccess + biome lookup
 				IBlockAccess realLevel = (IBlockAccess) this.clientLevelWrapper.getWrappedMcObject();
 				FakeBlockState fakeBlockState = (FakeBlockState)this.blockState;
-				
+
 				FakeWorld fakeWorld = FAKE_WORLD_REF.get();
 				fakeWorld.update(realLevel, biomeWrapper.biome, blockPos.getX(), blockPos.getY(), blockPos.getZ(), fakeBlockState);
-				
+
 				tintColor = fakeBlockState.block.colorMultiplier(fakeWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ());
-				#elif MC_VER <= MC_1_12_2
-				// 1.12.2 doesn't have BlockAndTintGetter -> get tintColor from biome
-				WorldClient world = (WorldClient) this.clientLevelWrapper.getWrappedMcObject();
-				BlockPos mcPos = new BlockPos(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-
-				Block block = this.blockState.getBlock();
-				if (block instanceof BlockGrass
-					|| block instanceof BlockBush)
-				{
-					tintColor = biomeWrapper.biome.getGrassColorAtPos(mcPos);
-				}
-				else if (block instanceof BlockLeaves)
-				{
-					tintColor = biomeWrapper.biome.getFoliageColorAtPos(mcPos);
-				}
-				else if (block instanceof BlockLiquid) // We don't want lava to fall into the else block
-				{
-					if(block == Blocks.WATER 
-						|| block == Blocks.FLOWING_WATER)
-					{
-						tintColor = biomeWrapper.biome.getWaterColor();
-					}
-				}
-				else
-				{
-					BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
-					tintColor = blockColors.colorMultiplier(blockState, world, mcPos, this.tintIndex);
-
-					if (tintColor == ClientBlockStateColorCache.INVALID_COLOR)
-					{
-						tintColor = blockColors.getColor(blockState, world, mcPos);
-					}
-				}
-				#else
-				// try to use the fast tint getter logic first
-				if (!BLOCK_STATES_THAT_NEED_LEVEL.contains(this.blockState))
-				{
-					try
-					{					
-						TintWithoutLevelOverrider tintOverride = TINT_WITHOUT_LEVEL_OVERRIDE_THREAD_LOCAL.get();
-						tintOverride.update(biomeWrapper, this.blockStateWrapper, fullDataSource, this.clientLevelWrapper);
-						
-						// try using DH's cached tint values first if possible
-						tintColor = tintOverride.tryGetBlockTint(new DhBlockPosMutable(blockPos));
-						if (tintColor == ClientBlockStateColorCache.INVALID_COLOR)
-						{
-							// one or more tint values weren't calculated,
-							// we need MC's color resolver
-							#if MC_VER <= MC_1_21_11
-							tintColor = Minecraft.getInstance()
-								.getBlockColors()
-								.getColor(this.blockState,
-										tintOverride, // tintOverride will save the result of this query to speed up future queries
-										McObjectConverter.convert(blockPos),
-										this.tintIndex);
-							#else
-							BlockTintSource tintSource = Minecraft.getInstance()
-								.getBlockColors()
-								.getTintSource(this.blockState, this.tintIndex);
-							// a tint source may be null for blocks that don't actually need tinting
-							// in that case the base color should be sufficient
-							// Example: cherry blossom leaves
-							if (tintSource != null)
-							{
-								BlockPos mcPos = McObjectConverter.convert(blockPos);
-								tintColor = tintSource.colorInWorld(this.blockState, tintOverride, mcPos);
-								if (tintColor == ClientBlockStateColorCache.INVALID_COLOR)
-								{
-									tintColor = tintSource.colorAsTerrainParticle(this.blockState, tintOverride, mcPos);
-								}
-							}
-							
-							// save this color to speed up future queries
-							TintWithoutLevelOverrider.setStaticColor(this.blockStateWrapper, biomeWrapper, tintColor);
-							// try to get the blended color with this new information
-							tintColor = tintOverride.tryGetBlockTint(new DhBlockPosMutable(blockPos));
-						#endif
-						}
-					}
-					catch (Exception e)
-					{
-						#if MC_VER <= MC_1_21_11
-						// this exception generally occurs if the tint requires other blocks besides itself
-						LOGGER.debug("Unable to use ["+ TintWithoutLevelOverrider.class.getSimpleName()+"] to get the block tint for block: [" + this.blockState + "] and biome: [" + biomeWrapper + "] at pos: " + blockPos + ". Error: [" + e.getMessage() + "]. Attempting to use backup method...", e);
-						BLOCK_STATES_THAT_NEED_LEVEL.add(this.blockState);
-						#else
-						// only display the error once per block/biome type to reduce log spam
-						if (!BROKEN_BLOCK_STATES.contains(this.blockState))
-						{
-							LOGGER.warn("Failed to get block color for block: [" + this.blockState + "] and biome: [" + biomeWrapper + "] at pos: " + blockPos + ". Error: [" + e.getMessage() + "]. Note: future errors for this block/biome will be ignored.", e);
-							BROKEN_BLOCK_STATES.add(this.blockState);
-						}
-						#endif
-					}
-				}
-				#endif
-				
-				
-				// level-specific logic is only needed for MC 1.21.11 and older
-				#if MC_VER <= MC_1_21_11 && MC_VER > MC_1_12_2
-				// use the level logic only if requested
-				if (BLOCK_STATES_THAT_NEED_LEVEL.contains(this.blockState))
-				{
-					// the level shouldn't be used all the time due to it breaking some blocks tinting
-					// specifically oceans don't render correctly
-					
-					TintGetterOverride tintOverride = TINT_OVERRIDE_THREAD_LOCAL.get();
-					tintOverride.update(biomeWrapper, this.blockStateWrapper, fullDataSource, this.clientLevelWrapper);
-					
-					tintColor = tintOverride.tryGetBlockTint(new DhBlockPosMutable(blockPos));
-					if (tintColor == ClientBlockStateColorCache.INVALID_COLOR)
-					{
-						tintColor = Minecraft.getInstance()
-								.getBlockColors()
-								.getColor(this.blockState,
-										tintOverride,
-										McObjectConverter.convert(blockPos),
-										this.tintIndex);
-					}
-				}
-				#endif
-				
 			}
 			catch (Exception e)
 			{
@@ -855,8 +390,8 @@ public class ClientBlockStateColorCache
 				}
 			}
 		}
-		
-		
+
+
 		int returnColor;
 		if (tintColor != ClientBlockStateColorCache.INVALID_COLOR)
 		{
@@ -867,8 +402,8 @@ public class ClientBlockStateColorCache
 			// unable to get the tinted color, use the base color instead
 			returnColor = this.baseColor;
 		}
-		
-		
+
+
 		// only fire the API event if allowed
 		// (done to prevent infinite loops if called during by another color resolution event)
 		if (allowApiOverride
@@ -883,40 +418,23 @@ public class ClientBlockStateColorCache
 				blockPos.getX(), blockPos.getY(), blockPos.getZ()
 			);
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiBlockColorOverrideEvent.class, eventParam);
-			
+
 			// let the API user override this color
 			returnColor = eventParam.getColorAsInt();
 		}
-		
+
 		return returnColor;
 	}
-	
+
 	//endregion
-	
-	
-	
-	//=========//
-	// cleanup //
-	//=========//
-	//region
-	
-	public static void clearCachedTints() 
-	{
-		#if MC_VER <= MC_1_12_2
-		#else
-		AbstractDhTintGetter.clear(); 
-		#endif
-	}
-	
-	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	public enum EColorMode
 	{
 		Default,
@@ -924,59 +442,19 @@ public class ClientBlockStateColorCache
 		Leaves,
 		Chisel,
 		Glass;
-		
+
 		static EColorMode getColorMode(Block block)
 		{
-			
-			
-			
-			//========//
-			// leaves //
-			//========//
-			//region
-			
-			boolean isLeavesBlock;
-			#if MC_VER <= MC_1_7_10
-			isLeavesBlock = block instanceof BlockLeavesBase;
-			#elif MC_VER <= MC_1_12_2
-			isLeavesBlock = block instanceof BlockLeaves;
-	        #else
-			isLeavesBlock = block instanceof LeavesBlock;
-	        #endif
-			if (isLeavesBlock)
+			if (block instanceof BlockLeavesBase)
 			{
 				return Leaves;
 			}
-			
-			//endregion
 
-
-
-			//========//
-			// flower //
-			//========//
-			//region
-			
-			boolean isFlowerBlock;
-			#if MC_VER <= MC_1_12_2
-			isFlowerBlock = block instanceof BlockFlower;
-			#else
-			isFlowerBlock = block instanceof FlowerBlock;
-			#endif
-			if (isFlowerBlock)
+			if (block instanceof BlockFlower)
 			{
 				return Flower;
 			}
 
-			//endregion
-			
-			
-			
-			//=============//
-			// misc/simple //
-			//=============//
-			//region
-			
 			if (block.toString().toLowerCase().contains("glass"))
 			{
 				return Glass;
@@ -985,17 +463,13 @@ public class ClientBlockStateColorCache
 			{
 				return Chisel;
 			}
-			
-			//endregion
-			
-			
-			
+
 			return Default;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

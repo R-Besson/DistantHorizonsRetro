@@ -1,18 +1,11 @@
 package com.seibel.distanthorizons.common.wrappers.level;
 
 import com.seibel.distanthorizons.common.wrappers.world.ClientLevelWrapper;
-#if MC_VER <= MC_1_7_10
 import com.seibel.distanthorizons.common.wrappers.world.LegacyDimensionInfo;
-#endif
 import com.seibel.distanthorizons.core.level.IServerKeyedClientLevel;
 import com.seibel.distanthorizons.core.level.IKeyedClientLevelManager;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
-#if MC_VER <= MC_1_12_2
 import net.minecraft.client.multiplayer.WorldClient;
-#else
-import net.minecraft.client.multiplayer.ClientLevel;
-#endif
-import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -26,7 +19,7 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 	private final Map<String, KeyInfo> keysByDimensionName = new ConcurrentHashMap<>();
 	
 	/** Cache for already keyed level wrappers to maintain object identity. */
-	private final Map<#if MC_VER > MC_1_12_2 ClientLevel #else WorldClient #endif, IServerKeyedClientLevel> 
+	private final Map<WorldClient, IServerKeyedClientLevel>
 		keyedLevelsCache = Collections.synchronizedMap(new WeakHashMap<>());
 	
 	/** Allows to keep level manager enabled between loading different keyed levels */
@@ -52,11 +45,7 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 		// This prevents multiple threads from creating duplicate wrappers for the same level.
 		synchronized (this.keyedLevelsCache)
 		{
-			#if MC_VER <= MC_1_12_2
-			WorldClient level = (WorldClient) levelWrapper.getWrappedMcObject(); 
-			#else
-			ClientLevel level = (ClientLevel) levelWrapper.getWrappedMcObject();
-			#endif
+			WorldClient level = (WorldClient) levelWrapper.getWrappedMcObject();
 			
 			// Check the cache first
 			IServerKeyedClientLevel cached = this.keyedLevelsCache.get(level);
@@ -97,16 +86,8 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 		{
 			this.keyedLevelsCache.keySet().removeIf(level -> 
 			{
-	            #if MC_VER <= MC_1_7_10
 				String levelDim = LegacyDimensionInfo.fullName(level.provider.dimensionId);
-	            #elif MC_VER <= MC_1_12_2
-	            String levelDim = level.provider.getDimensionType().getName() + ":" + level.provider.getDimension();
-	            #elif MC_VER <= MC_1_21_10
-				String levelDim = level.dimension().location().toString();
-	            #else
-	            String levelDim = level.dimension().identifier().toString();
-	            #endif
-				
+
 				return levelDim.equals(dimensionResource);
 			});
 		}

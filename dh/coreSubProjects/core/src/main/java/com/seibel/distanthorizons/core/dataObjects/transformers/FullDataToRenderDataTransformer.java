@@ -389,19 +389,6 @@ public class FullDataToRenderDataTransformer
 				continue;
 			}
 			
-			// can be un-commented for testing floating islands
-			// it's recommended to place a single netherrack block as a marker 
-			// and a glowstone block to trigger an LOD update
-			//if (DhSectionPos.encode((byte)6, -8, 2) == fullDataSource.getPos()
-			//	//&& block.getMaterialId() == EDhApiBlockMaterial.NETHER_STONE.index
-			//	&& block.getSerialString().contains("glowstone")
-			//)
-			//{
-			//	int k = 0;
-			//}
-			
-			
-			
 			//==================//
 			// special case:    // 
 			// air gap leak fix //

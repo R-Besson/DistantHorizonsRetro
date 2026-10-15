@@ -179,8 +179,7 @@ public class DataSourceUpdateSpeedTest
 			{
 				long startNano = System.nanoTime();
 				
-				boolean updated = parentDataSource.updateFromDataSource(childDataSource);
-				//Assert.assertTrue(updated);
+				parentDataSource.updateFromDataSource(childDataSource);
 				
 				long updateTimeNano = System.nanoTime() - startNano;
 				totalNano += updateTimeNano;

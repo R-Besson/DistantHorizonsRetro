@@ -247,8 +247,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 			{
 				if (!dependency.getDelayedSetupComplete() && !allowIncompleteDependencies)
 				{
-					// a warning can be used here instead if desired
-					//this.logger.warn("Got dependency of type [" + interfaceClass.getSimpleName() + "], but the dependency's delayed setup hasn't been run!");
 					throw new IllegalStateException("Got dependency of type [" + interfaceClass.getSimpleName() + "], but the dependency's delayed setup hasn't been run!");
 				}
 			}

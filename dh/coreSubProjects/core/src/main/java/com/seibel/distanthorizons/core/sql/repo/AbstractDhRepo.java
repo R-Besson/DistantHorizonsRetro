@@ -240,14 +240,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 		catch (SQLException | IOException e)
 		{
-			if (e instanceof SQLException 
-				&& DbConnectionClosedException.isClosedException((SQLException)e))
+			// a closed repo is expected during shutdown, so it isn't logged
+			if (!(e instanceof SQLException
+				&& DbConnectionClosedException.isClosedException((SQLException)e)))
 			{
-				//LOGGER.warn("Attempted to get ["+this.dtoClass.getSimpleName()+"] with primary key ["+primaryKey+"] on closed repo ["+this.connectionString+"].");	
-			}
-			else
-			{
-				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with primary key ["+primaryKey+"]. Error: ["+e.getMessage()+"].", e);	
+				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with primary key ["+primaryKey+"]. Error: ["+e.getMessage()+"].", e);
 			}
 			return null;
 		}
@@ -262,7 +259,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 		catch (DbConnectionClosedException ignored)
 		{
-			//LOGGER.warn("Attempted to insert ["+this.dtoClass.getSimpleName()+"] with primary key ["+(dto != null ? dto.getKeyDisplayString() : "NULL")+"] on closed repo ["+this.connectionString+"].");
+			// expected during shutdown
 		}
 		catch (SQLException e)
 		{
@@ -285,10 +282,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			throw new RuntimeException(e);
 		}
-		//finally
-		//{
-		//	this.tryTriggerWalFlush();
-		//}
 	}
 	
 	/** With great power comes great responsibility... */

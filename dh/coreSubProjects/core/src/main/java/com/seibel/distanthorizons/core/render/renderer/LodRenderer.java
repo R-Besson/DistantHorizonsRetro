@@ -172,8 +172,6 @@ public class LodRenderer
 					LOGGER.info("Overriding vanilla MC settings to better fit Distant Horizons... This behavior can be disabled in the Distant Horizons config.");
 					
 					MC.disableVanillaClouds();
-					MC.disableVanillaChunkFadeIn();
-					MC.disableFabulousTransparency();
 				}
 				
 				this.vanillaSettingsOverridden = true;

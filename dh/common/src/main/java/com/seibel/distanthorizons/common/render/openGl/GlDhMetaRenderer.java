@@ -24,7 +24,6 @@ import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.ILightMapWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IOptifineAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
@@ -55,7 +54,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 	
-	private static final IOptifineAccessor OPTIFINE_ACCESSOR = ModAccessorInjector.INSTANCE.get(IOptifineAccessor.class);
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	
 	
@@ -68,22 +66,14 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	
 	// framebuffer and texture ID's for this renderer
 	private IDhApiFramebuffer framebuffer;
-	/** will be null if MC's framebuffer is being used since MC already has a color texture */
-	@Nullable
-	private GlDhColorTexture nullableColorTexture;
+	private GlDhColorTexture colorTexture;
 	private GlDhDepthTexture depthTexture;
-	/**
-	 * If true the {@link GlDhMetaRenderer#framebuffer} is the same as MC's.
-	 * This should only be true in the case of Optifine so LODs won't be overwritten when shaders are enabled.
-	 */
-	private boolean usingMcFramebuffer = false;
-	
+
 	private boolean renderObjectsCreated = false;
 	/** used in case there's an API override */
 	public IDhApiShaderProgram shaderProgramForThisFrame;
 	
-	/** Older MC versions assume GL state is unchanged, so we must restore it after DH rendering */
-	#if MC_VER <= MC_1_12_2
+	/** MC assumes GL state is unchanged, so we must restore it after DH rendering */
 	private int previousBoundTextureId;
 	private int previousDepthFunc;
 	private final float[] previousClearDepth = new float[1];
@@ -93,7 +83,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	private int previousBlendSrcAlpha;
 	private int previousBlendDstAlpha;
 	private boolean previousDepthMask;
-	#endif
 	
 	
 	
@@ -147,8 +136,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		//=================//
 		// local var setup //
 		//=================//
-		
-		#if MC_VER <= MC_1_12_2
+
 		this.previousBoundTextureId = GLMC.getActiveTexture();
 		this.previousDepthFunc = GLMC.getActiveDepthFunc();
 		LWJGL.glGetFloatv(GL11.GL_DEPTH_CLEAR_VALUE, this.previousClearDepth);
@@ -158,7 +146,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		this.previousBlendSrcAlpha = LWJGL.glGetInteger(GL14.GL_BLEND_SRC_ALPHA);
 		this.previousBlendDstAlpha = LWJGL.glGetInteger(GL14.GL_BLEND_DST_ALPHA);
 		this.previousDepthMask = LWJGL.glGetBoolean(GL11.GL_DEPTH_WRITEMASK);
-		#endif
 		
 		// view sizes are used in a few places and
 		// should be used instead of the instance variables
@@ -215,9 +202,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		if (IRIS_ACCESSOR == null
 			|| !IRIS_ACCESSOR.isRenderingShadowPass())
 		{
-			// This is required for MC versions 1.21.5+
-			// due to MC updating the lightmap by changing the viewport size
-			// and some camera mods that change the viewport size 
+			// This is required since some camera mods change the viewport size
 			GLMC.glViewport(0, 0, viewportWidth, viewportHeight);
 		}
 		
@@ -247,28 +232,15 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		if (viewportWidth != this.textureWidth
 			|| viewportHeight != this.textureHeight)
 		{
-			// just resizing the textures doesn't work when Optifine is present,
-			// so recreate the textures with the new size instead
+			// recreate the textures with the new size
 			this.createAndBindTextures();
 		}
-		
-		
+
+
 		// set the active textures
-		int depthTextureId = this.depthTexture.getTextureId();
-		this.setActiveDepthTextureId(depthTextureId);
-		
-		if (this.nullableColorTexture != null)
-		{
-			int colorTextureId = this.nullableColorTexture.getTextureId();
-			this.setActiveColorTextureId(colorTextureId);
-		}
-		else
-		{
-			// get MC's color texture 
-			int colorTextureId = LWJGL.glGetFramebufferAttachmentParameteri(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
-			this.setActiveColorTextureId(colorTextureId);
-		}
-		
+		this.setActiveDepthTextureId(this.depthTexture.getTextureId());
+		this.setActiveColorTextureId(this.colorTexture.getTextureId());
+
 		
 		// needs to be fired after all the textures have been created/bound
 		boolean clearTextures = !ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeTextureClearEvent.class, renderEventParam);
@@ -280,18 +252,8 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 			float[] clearColorValues = new float[4];
 			LWJGL.glGetFloatv(GL11.GL_COLOR_CLEAR_VALUE, clearColorValues);
 			LWJGL.glClearColor(clearColorValues[0], clearColorValues[1], clearColorValues[2], 1.0f);
-			
-			if (this.usingMcFramebuffer && framebufferOverride == null)
-			{
-				// Due to using MC/Optifine's framebuffer we need to re-bind the depth texture,
-				// otherwise we'll be writing to MC/Optifine's depth texture which causes rendering issues
-				framebuffer.addDepthAttachment(this.depthTexture.getTextureId(), EGlDhDepthBufferFormat.DEPTH32F.isCombinedStencil());
-				
-				
-				// don't clear the color texture, that removes the sky 
-				LWJGL.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-			}
-			else if (firstPass)
+
+			if (firstPass)
 			{
 				LWJGL.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 			}
@@ -314,21 +276,8 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		LOGGER.info("Setting up renderer");
 		
 		
-		// create or get the frame buffer
-		if (OPTIFINE_ACCESSOR != null)
-		{
-			// use MC/Optifine's default Framebuffer so shaders won't remove the LODs
-			int currentFramebufferId = MC_RENDER.getTargetFramebuffer();
-			this.framebuffer = new GlDhFramebuffer(currentFramebufferId);
-			this.usingMcFramebuffer = true;
-		}
-		else
-		{
-			// normal use case
-			this.framebuffer = new GlDhFramebuffer();
-			this.usingMcFramebuffer = false;
-		}
-		
+		this.framebuffer = new GlDhFramebuffer();
+
 		// create and bind the necessary textures
 		this.createAndBindTextures();
 		
@@ -385,32 +334,24 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		}
 		
 		
-		// if we are using MC's frame buffer, a color texture is already present and shouldn't need to be bound
-		if (!this.usingMcFramebuffer)
+		if (this.colorTexture != null)
 		{
-			if (this.nullableColorTexture != null)
-			{
-				this.nullableColorTexture.destroy();
-			}
-			
-			this.nullableColorTexture = GlDhColorTexture.builder()
-				.setDimensions(this.textureWidth, this.textureHeight)
-				.setInternalFormat(EGlDhInternalTextureFormat.RGBA8)
-				.setPixelType(EGlDhPixelType.UNSIGNED_BYTE)
-				.setPixelFormat(EGlDhPixelFormat.RGBA)
-				.build();
-			
-			this.framebuffer.addColorAttachment(0, this.nullableColorTexture.getTextureId());
-			if (framebufferOverride != null)
-			{
-				framebufferOverride.addColorAttachment(0, this.nullableColorTexture.getTextureId());
-			}
+			this.colorTexture.destroy();
 		}
-		else
+
+		this.colorTexture = GlDhColorTexture.builder()
+			.setDimensions(this.textureWidth, this.textureHeight)
+			.setInternalFormat(EGlDhInternalTextureFormat.RGBA8)
+			.setPixelType(EGlDhPixelType.UNSIGNED_BYTE)
+			.setPixelFormat(EGlDhPixelFormat.RGBA)
+			.build();
+
+		this.framebuffer.addColorAttachment(0, this.colorTexture.getTextureId());
+		if (framebufferOverride != null)
 		{
-			this.nullableColorTexture = null;
+			framebufferOverride.addColorAttachment(0, this.colorTexture.getTextureId());
 		}
-		
+
 		
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiAfterColorDepthTextureCreatedEvent.class, textureCreatedParam);
 	}
@@ -427,23 +368,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	@Override
 	public void runRenderPassCleanup(RenderParams renderParams)
 	{
-		boolean runningDeferredPass = (renderParams.renderPass == EDhApiRenderPass.TRANSPARENT);
-		if (!runningDeferredPass)
-		{
-			//===================//
-			// optifine clean up //
-			//===================//
-			
-			if (this.usingMcFramebuffer)
-			{
-				// If MC's framebuffer is being used the depth needs to be cleared to prevent rendering on top of MC.
-				// This should only happen when Optifine shaders are being used.
-				LWJGL.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-			}
-		}
-		
-		// Restore GL states that 1.12.2 vanilla expects
-		#if MC_VER <= MC_1_12_2
+		// Restore GL states that vanilla expects
 		GLMC.glDepthFunc(previousDepthFunc);
 		LWJGL.glClearDepth(this.previousClearDepth[0]);
 		GLMC.glBlendFuncSeparate(this.previousBlendSrcRgb, this.previousBlendDstRgb, this.previousBlendSrcAlpha, this.previousBlendDstAlpha);
@@ -463,7 +388,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		{
 			GLMC.disableDepthMask();
 		}
-		#endif
 		this.unbindLightmap();
 		if (Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get())
 		{
@@ -485,10 +409,8 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	//region
 	
 	@Override
-	public void clearDhDepthAndColorTextures(RenderParams renderParams) 
+	public void clearDhDepthAndColorTextures(RenderParams renderParams)
 	{
-		IDhApiFramebuffer framebufferOverride = OverrideInjector.INSTANCE.get(IDhApiFramebuffer.class);
-		
 		boolean firstPass =
 			(renderParams.renderPass == EDhApiRenderPass.OPAQUE
 			|| renderParams.renderPass == EDhApiRenderPass.OPAQUE_AND_TRANSPARENT);
@@ -503,19 +425,8 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		// alpha of 0 done as a check to make sure DH is only applied to MC's framebuffer
 		// where DH pixels were drawn
 		LWJGL.glClearColor(clearColorValues[0], clearColorValues[1], clearColorValues[2], 0.0f);
-		
-		if (this.usingMcFramebuffer 
-			&& framebufferOverride == null)
-		{
-			//// Due to using MC/Optifine's framebuffer we need to re-bind the depth texture,
-			//// otherwise we'll be writing to MC/Optifine's depth texture which causes rendering issues
-			//this.framebuffer.addDepthAttachment(this.depthTexture.getTextureId(), EDhDepthBufferFormat.DEPTH32F.isCombinedStencil());
-			
-			
-			// don't clear the color texture, that removes the sky 
-			LWJGL.glClear(GL11.GL_DEPTH_BUFFER_BIT);
-		}
-		else if (firstPass)
+
+		if (firstPass)
 		{
 			LWJGL.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		}
@@ -568,12 +479,8 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	
 	public void unbindLightmap() 
 	{
-		// strange that we don't call "glActiveTexture" here but since it's working James isn't going to change it right now (2026-03-10)
-		#if MC_VER <= MC_1_12_2
+		// "glActiveTexture" isn't called here, binding to the active unit works
 		GLMC.glBindTexture(previousBoundTextureId);
-		#else
-		GLMC.glBindTexture(0);
-		#endif
 	}
 	
 	private boolean irisShadersInactive()

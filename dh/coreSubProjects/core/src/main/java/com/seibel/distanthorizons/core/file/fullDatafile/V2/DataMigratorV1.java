@@ -331,10 +331,7 @@ public class DataMigratorV1 implements AutoCloseable
 	//===========//
 	
 	@Override
-	public void close()
-	{
-		//LOGGER.info("Closing [" + this.getClass().getSimpleName() + "] for level: [" + this.levelId + "].");
-	}
+	public void close() { }
 	
 	
 	

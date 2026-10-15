@@ -251,7 +251,7 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 		GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId());
 		LWJGL.glUniform1i(this.uDhDepthTexture, 0);
 		
-		// this is necessary for MC 1.16 (IE Legacy OpenGL)
+		// this is necessary for legacy OpenGL,
 		// otherwise the framebuffer isn't cleared correctly and the fog smears across the screen
 		if (MC_RENDER.runningLegacyOpenGL())
 		{

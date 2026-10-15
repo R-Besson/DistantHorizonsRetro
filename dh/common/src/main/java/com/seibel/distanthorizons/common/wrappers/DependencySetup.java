@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.common.wrappers;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderObjectFactory;
-import com.seibel.distanthorizons.common.render.blaze.BlazeDhRenderApiDefinition;
 import com.seibel.distanthorizons.common.render.openGl.GlDhRenderApiDefinition;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
@@ -118,13 +117,8 @@ public class DependencySetup
 		}
 		else if (renderingApiEnum == EDhApiRenderingEngine.BLAZE_3D)
 		{
-			#if MC_VER <= MC_1_21_10
 			validApi = false;
 			renderDefinition = null;
-			#else
-			validApi = true;
-			renderDefinition = new BlazeDhRenderApiDefinition();
-			#endif
 		}
 		else
 		{

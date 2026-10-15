@@ -193,14 +193,6 @@ public class RenderDataPointUtil
 		return out;
 	}
 	
-	//public static long shiftHeightAndDepth(long dataPoint, short offset)
-	//{
-	//	long maxY = (dataPoint + ((long) offset << MAX_Y_SHIFT)) & MAX_Y_SHIFTED_MASK;
-	//	long minY = (dataPoint + (offset << MIN_Y_SHIFT)) & MIN_Y_SHIFTED_MASK;
-	//	
-	//	return dataPoint & ~(MAX_Y_SHIFTED_MASK | MIN_Y_SHIFTED_MASK) | maxY | minY;
-	//}
-	
 	/** AKA the ending/top/highest Y value above {@link ILevelWrapper#getMinHeight()} ()} */
 	public static short getYMax(long dataPoint) { return (short) ((dataPoint >>> MAX_Y_SHIFT) & MAX_Y_MASK); }
 	/** AKA the starting/bottom/lowest Y value above {@link ILevelWrapper#getMinHeight()} */

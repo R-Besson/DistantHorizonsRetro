@@ -352,8 +352,6 @@ public class DhSectionPosTest
 		Assert.assertEquals(new DhBlockPos2D(0, 0), DhSectionPos.getCenterBlockPos(originSectionPos));
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, (byte) 1);
 		Assert.assertEquals(new DhBlockPos2D(-10000, 5000), DhSectionPos.getCenterBlockPos(sectionPos));
-		//sectionPos = DhSectionPos.encode((byte) 1, 2303, 0);
-		//Assert.assertEquals(new DhBlockPos2D(4606, 0), DhSectionPos.getCenterBlockPos(sectionPos));
 		
 		
 		// 4x4 blocks

@@ -245,7 +245,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 		{
 			if (provider.generationStepsAreFullyGenerated(fullDataSource.columnGenerationSteps))
 			{
-				//LOGGER.info("sending - complete [" + DhSectionPos.toString(pos) + "]");
 				requestGroup.fullDataSource = fullDataSource;
 				return;
 			}
@@ -260,14 +259,11 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 				this.requestGroupsByPos.remove(pos);
 				if (!requestGroup.tryClose())
 				{
-					//LOGGER.info("closing [" + DhSectionPos.toString(pos) + "]");
 					return;
 				}
-				
+
 				for (DataSourceRequestGroup.RequestData requestData : requestGroup.requestMessages.values())
 				{
-					//LOGGER.info("sending [" + DhSectionPos.toString(pos) + "] - ["+DhSectionPos.toString(requestData.sectionPos())+"]");
-					
 					this.requestGroupsByFutureId.remove(requestData.futureId());
 					requestData.rateLimiterSet.generationRequestRateLimiter.release();
 					requestData.message.sendResponse(new SectionRequiresSplittingException());
@@ -275,12 +271,10 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 			}
 			else if (requestGroup.isWorldGenTaskComplete())
 			{
-				//LOGGER.info("sending - retry [" + DhSectionPos.toString(pos) + "]");
 				this.tryFulfillDataSourceRequestGroup(requestGroup, pos);
 			}
 			else
 			{
-				//LOGGER.info("queueing incomplete world gen [" + DhSectionPos.toString(pos) + "]");
 				this.fullDataSourceProvider().queuePositionForRetrieval(pos);
 			}
 		});

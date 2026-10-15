@@ -25,9 +25,6 @@ import java.util.function.Consumer;
 
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGenerationStep;
-#if MC_VER > MC_1_12_2
-import com.seibel.distanthorizons.common.wrappers.worldGeneration.params.ThreadWorldGenParams;
-#endif
 import com.seibel.distanthorizons.core.util.ThreadUtil;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
@@ -44,11 +41,7 @@ public final class ChunkGenEvent
 	
 	/** can be used for troubleshooting */
 	public final int id;
-	
-	#if MC_VER > MC_1_12_2
-	public final ThreadWorldGenParams threadedParam;
-	#endif
-	
+
 	public final DhChunkPos minChunkPos;
 	public final int widthInChunks;
 	public final EDhApiWorldGenerationStep targetGenerationStep;
@@ -75,11 +68,7 @@ public final class ChunkGenEvent
 		this.targetGenerationStep = targetGenerationStep;
 		this.generatorMode = generatorMode;
 		this.loadChunksFromDisk = loadChunksFromDisk;
-		
-		#if MC_VER > MC_1_12_2
-		this.threadedParam = ThreadWorldGenParams.getOrMake(generationGroup.globalParams);
-		#endif
-		
+
 		this.future = new CompletableFuture<>();
 		this.resultConsumer = resultConsumer;
 	}
@@ -90,9 +79,8 @@ public final class ChunkGenEvent
 	// start //
 	//=======//
 	
-	#if MC_VER <= MC_1_7_10
 	/**
-	 * On 1.7.10 all chunk generation happens on the server thread, so a world gen task
+	 * All chunk generation happens on the server thread, so a world gen task
 	 * spends almost all of its time blocked waiting for server ticks.
 	 * The task is started on the world gen pool (so it still obeys its pause rules)
 	 * then handed off to these threads to wait, so it doesn't hold one of DH's
@@ -100,7 +88,6 @@ public final class ChunkGenEvent
 	 * The number of tasks in flight is limited by {@link DhChunkGenerator#getInProgressTasksPerThread()}.
 	 */
 	private static final ExecutorService SERVER_GEN_WAIT_POOL = ThreadUtil.makeThreadPool(32, "Server World Gen Waiter", Thread.NORM_PRIORITY, true);
-	#endif
 	
 	public static ChunkGenEvent start(
 		DhChunkPos minPos, int widthInChunks,
@@ -114,7 +101,6 @@ public final class ChunkGenEvent
 		
 		try
 		{
-			#if MC_VER <= MC_1_7_10
 			worldGeneratorThreadPool.execute(() ->
 			{
 				try
@@ -126,9 +112,6 @@ public final class ChunkGenEvent
 					handleWorldGenThrowable(genEvent, throwable);
 				}
 			});
-			#else
-			worldGeneratorThreadPool.execute(() -> runGenEvent(genEvent, genEnvironment));
-			#endif
 		}
 		catch (RejectedExecutionException e)
 		{

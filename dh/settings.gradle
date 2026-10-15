@@ -5,55 +5,7 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
 
-// Throw an error if the core sub-project wasn't cloned
-if (!file("./coreSubProjects/LICENSE.txt").exists()) {
-    println('''
-It seems that the core sub project (dh/coreSubProjects) is missing...
- it's part of the repo, so please re-clone https://github.com/R-Besson/DistantHorizonsRetro
-
-If you still need help with compiling, please read the README.md in the repo root
-    ''')
-    throw new GradleException("coreSubProject not found")
-}
-
-
-def loadVersionProperties() {
-    def mcVers = fileTree("versionProperties").files.collect { it.name.replaceAll("\\.properties", "") }
-        .sort { a, b ->
-            def aParts = a.tokenize('.'); def bParts = b.tokenize('.')
-            for (int i = 0; i < Math.min(aParts.size(), bParts.size()); i++) {
-                def aNum = aParts[i].isInteger() ? aParts[i].toInteger() : aParts[i]
-                def bNum = bParts[i].isInteger() ? bParts[i].toInteger() : bParts[i]
-                def compare = aNum <=> bNum
-                if (compare != 0) return compare
-            }
-            return aParts.size() <=> bParts.size()
-        }
-
-    def mcVersion = hasProperty("mcVer") ? mcVer : ""
-    def mcIndex = mcVers.indexOf(mcVersion)
-
-    if (mcIndex == -1) {
-        def defaultVersion = "1.20.1"
-        println "No mcVer set or invalid. Defaulting to ${defaultVersion}."
-        println "Tip: Use -PmcVer=\"${defaultVersion}\" to set the MC version."
-        mcVersion = defaultVersion
-        mcIndex = mcVers.indexOf(defaultVersion)
-        assert mcIndex != -1 : "Default MC version ${defaultVersion} not found in ${mcVers}"
-    }
-
-    println "Available MC versions: ${mcVers}"
-    println "Loading properties file: ${mcVersion}.properties"
-
-    def props = new Properties()
-    props.load(new FileInputStream("$rootDir/versionProperties/${mcVersion}.properties"))
-
-    props.each { key, value -> gradle.ext.set(key, value) }
-    gradle.ext.mcVers = mcVers
-    gradle.ext.mcIndex = mcIndex
-}
-loadVersionProperties()
-
+apply from: 'version.gradle'
 
 // Minecraft-independent sub-projects
 include("core")
@@ -63,11 +15,6 @@ project(":api").projectDir = file('coreSubProjects/api')
 
 // Minecraft-dependent sub-projects
 include("common")
-((String) gradle.builds_for).split(",").each { loader ->
-    def loaderName = loader.trim()
-    println "Adding loader: ${loaderName}"
-    include(loaderName)
-}
-
+include("forge17")
 
 rootProject.name = "DistantHorizons"

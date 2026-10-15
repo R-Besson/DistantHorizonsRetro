@@ -452,14 +452,8 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				continue; 
 			}
 			
-			// we have conflicting desires for running this method.
-			// 1. running on the render thread to prevent closing data sources that are actively being rendered.
-			// 2. closing nodes that were queued due to zoom, but are no longer needed.
-			// If we run this on the render thread we lag the render thread and end up queueing a lot
-			// of unnecessary work.
-			// However, running this on this thread prevents infinitely growing lod-loading tasks.
-			// Due to the problems with infinitely growing tasks, we're going to run this method
-			// here instead of the render thread.
+			// This runs here instead of on the render thread, which would lag it
+			// and let LOD-loading tasks for nodes that are no longer needed grow without limit.
 			node.deleteAllChildren((childRenderSection) ->
 			{
 				if (childRenderSection != null)
@@ -1425,8 +1419,6 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	@Override
 	public void close()
 	{
-		//LOGGER.info("Shutting down LodQuadTree...");
-		
 		DEBUG_RENDERER.unregister(this, Config.Client.Advanced.Debugging.DebugWireframe.showQuadTreeRenderStatus);
 		Config.Common.WorldGenerator.generatorPlan.removeListener(this);
 		
@@ -1459,9 +1451,6 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				this.treeTickLock.unlock();
 			}
 		});
-		
-		
-		//LOGGER.info("Finished shutting down LodQuadTree");
 	}
 	
 	//endregion base methods

@@ -237,7 +237,6 @@ public class RaycastingTest
 		// move the cube to (1,-2) - (2,-1)
 		squareMinY = -2;
 		
-		//xDir = 4;
 		yDir = -3;
 		
 		// ray origin bottom left of square
@@ -263,11 +262,9 @@ public class RaycastingTest
 		// ray points down left - direction <-4,-3> (a slope of 3/4) //
 		
 		// move the cube to (-2,-2) - (-1,-1)
-		//squareMinY = -2;
 		squareMinX = -2;
-		
+
 		xDir = -4;
-		//yDir = -3;
 		
 		// ray origin bottom left of square
 		rayX = 0;

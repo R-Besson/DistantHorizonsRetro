@@ -229,11 +229,7 @@ public class RenderableBoxGroup
 			return;
 		}
 		this.altVertexBufferContainer.setState(IDhGenericObjectVertexBufferContainer.EState.UPDATING_DATA);
-		
-		
-		
-		//this.altInstancedVbos.tryRunRenderThreadSetup();
-		
+
 		// copy over the box list so we can upload without concurrent modification issues
 		this.uploadBoxList.clear();
 		synchronized (this.uploadBoxList)

@@ -262,10 +262,8 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		statement.setInt(i++, DhSectionPos.getX(dto.pos));
 		statement.setInt(i++, DhSectionPos.getZ(dto.pos));
 		
-		statement.setInt(i++, 0); // deprecated MinY column
-		// MinY is deprecated due to a bug introduced sometime before 2.3.6 where was always set to "0"
-		// and due to being unused wasn't noticed until 2.3.7-dev (2025-11-15)
-		
+		statement.setInt(i++, 0); // unused MinY column
+
 		statement.setInt(i++, dto.dataChecksum);
 		
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedDataByteArray.elements()), dto.compressedDataByteArray.size());
@@ -368,12 +366,9 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 		catch (SQLException | IOException e)
 		{
-			if (e instanceof SQLException
-					&& DbConnectionClosedException.isClosedException((SQLException)e))
-			{
-				//LOGGER.warn("Attempted to get ["+this.dtoClass.getSimpleName()+"] with primary key ["+primaryKey+"] on closed repo ["+this.connectionString+"].");	
-			}
-			else
+			// a closed repo is expected during shutdown, so it isn't logged
+			if (!(e instanceof SQLException
+					&& DbConnectionClosedException.isClosedException((SQLException)e)))
 			{
 				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with pos ["+DhSectionPos.toString(pos)+"] and direction ["+direction+"]. Error: ["+e.getMessage()+"].", e);
 			}
