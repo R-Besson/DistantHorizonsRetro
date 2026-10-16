@@ -109,7 +109,6 @@ Gradle downloads them, no manual setup needed.
 ## Versioning
 
 The mod version comes from the latest git tag (`dh/version.gradle`), there's nothing to edit.
-To release, add `.changelogs/<version>.md`, tag the commit (no `v` prefix) and push the tag.
 Builds of untagged commits get versions like `1.0.1-3-g990aa7f`.
 
 # Credits
