@@ -32,6 +32,8 @@ import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockLeavesBase;
+import net.minecraft.block.BlockPane;
+import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.IShearable;
@@ -40,6 +42,8 @@ import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import com.seibel.distanthorizons.common.backports.FakeWorld;
 import com.seibel.distanthorizons.core.logging.DhLogger;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -64,6 +68,11 @@ public class ClientBlockStateColorCache
 	public static final int INVALID_COLOR = -1;
 
 	private static final int FLOWER_COLOR_SCALE = 5;
+
+	private static final ForgeDirection[] FACE_SAMPLE_ORDER = {
+		ForgeDirection.UP,
+		ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST,
+		ForgeDirection.DOWN };
 
 
 
@@ -187,13 +196,20 @@ public class ClientBlockStateColorCache
 			RESOLVE_LOCK.lock();
 			FakeBlockState blockState = (FakeBlockState)this.blockState;
 
-			TextureAtlasSprite sprite = TextureAtlasSpriteWrapper.resolveFaceSprite(
-				blockState, ForgeDirection.UP.ordinal());
-			if (sprite != null)
+			// user overrides are final colors, so they skip tinting
+			Integer overrideColor = BlockColorOverrides.get(blockState.block, blockState.meta);
+			if (overrideColor != null)
 			{
-				this.baseColor = calculateColorFromTexture(
-					sprite,
-					EColorMode.getColorMode(blockState.block));
+				this.baseColor = overrideColor;
+				this.needPostTinting = false;
+				this.isColorResolved = true;
+				return;
+			}
+
+			Integer faceColor = calculateColorFromFaces(blockState);
+			if (faceColor != null)
+			{
+				this.baseColor = faceColor;
 			}
 			else
 			{
@@ -235,6 +251,39 @@ public class ClientBlockStateColorCache
 	}
 
 
+	/**
+	 * Uses the top face, unless it has no texture or is fully transparent
+	 * (IE missing textures or mods that only texture the sides), then tries the sides and bottom.
+	 *
+	 * @return null if no face has an atlas sprite
+	 */
+	@Nullable
+	private static Integer calculateColorFromFaces(FakeBlockState blockState)
+	{
+		EColorMode colorMode = EColorMode.getColorMode(blockState.block);
+		Integer transparentColor = null;
+		TextureAtlasSprite lastSprite = null;
+		for (ForgeDirection face : FACE_SAMPLE_ORDER)
+		{
+			TextureAtlasSprite sprite = TextureAtlasSpriteWrapper.resolveFaceSprite(blockState, face.ordinal());
+			if (sprite == null || sprite == lastSprite)
+			{
+				// GregTech and most blocks use one sprite for every face, no need to average it again
+				continue;
+			}
+			lastSprite = sprite;
+
+			int color = calculateColorFromTexture(sprite, colorMode);
+			if (ColorUtil.getAlpha(color) != 0)
+			{
+				return color;
+			}
+			transparentColor = color;
+		}
+
+		return transparentColor;
+	}
+
 	/** if multiple frames are present, just the first one will be used */
 	public static int calculateColorFromTexture(TextureAtlasSprite texture, EColorMode colorMode)
 	{
@@ -245,51 +294,46 @@ public class ClientBlockStateColorCache
 		double blue = 0;
 		int tempColor;
 
-		// don't render Chiseled blocks.
-		// Since EColorMode is set per block, you only need to check this once.
-		if (colorMode != EColorMode.Chisel)
+		int textureHeight = TextureAtlasSpriteWrapper.getHeight(texture);
+		int textureWidth = TextureAtlasSpriteWrapper.getWidth(texture);
+		for (int v = 0; v < textureHeight; v++)
 		{
-			int textureHeight = TextureAtlasSpriteWrapper.getHeight(texture);
-			int textureWidth = TextureAtlasSpriteWrapper.getWidth(texture);
-			for (int v = 0; v < textureHeight; v++)
+			for (int u = 0; u < textureWidth; u++)
 			{
-				for (int u = 0; u < textureWidth; u++)
+				tempColor = TextureAtlasSpriteWrapper.getPixelARGB(texture, 0, u, v);
+
+				int r = ColorUtil.getRed(tempColor);
+				int g = ColorUtil.getGreen(tempColor);
+				int b = ColorUtil.getBlue(tempColor);
+				int a = ColorUtil.getAlpha(tempColor);
+
+				int scale = 1;
+				if (colorMode == EColorMode.Leaves)
 				{
-					tempColor = TextureAtlasSpriteWrapper.getPixelARGB(texture, 0, u, v);
-
-					int r = ColorUtil.getRed(tempColor);
-					int g = ColorUtil.getGreen(tempColor);
-					int b = ColorUtil.getBlue(tempColor);
-					int a = ColorUtil.getAlpha(tempColor);
-
-					int scale = 1;
-					if (colorMode == EColorMode.Leaves)
+					if (a == 0)
 					{
-						if (a == 0)
-						{
-							continue; //same long grass
-						}
-						else
-						{
-							a = 255; //just in case there are semi transparent pixels
-						}
+						continue; //same long grass
 					}
-					else if (a == 0 && colorMode != EColorMode.Glass)
+					else
 					{
-						continue;
+						a = 255; //just in case there are semi transparent pixels
 					}
-					else if (colorMode == EColorMode.Flower && (g + 25 < b || g + 25 < r))
-					{
-						scale = FLOWER_COLOR_SCALE;
-					}
-					count += scale;
-					//apparently alpha is linear
-					alpha += a * scale;
-					//gamma correction is complicated
-					red += srgbToLinearTable[r] * a * scale;
-					green += srgbToLinearTable[g] * a * scale;
-					blue += srgbToLinearTable[b] * a * scale;
 				}
+				else if (a == 0 && colorMode != EColorMode.Glass)
+				{
+					continue;
+				}
+				else if (colorMode == EColorMode.Flower && (g + 25 < b || g + 25 < r))
+				{
+					scale = FLOWER_COLOR_SCALE;
+				}
+				count += scale;
+				//apparently alpha is linear
+				alpha += a * scale;
+				//gamma correction is complicated
+				red += srgbToLinearTable[r] * a * scale;
+				green += srgbToLinearTable[g] * a * scale;
+				blue += srgbToLinearTable[b] * a * scale;
 			}
 		}
 
@@ -440,7 +484,6 @@ public class ClientBlockStateColorCache
 		Default,
 		Flower,
 		Leaves,
-		Chisel,
 		Glass;
 
 		static EColorMode getColorMode(Block block)
@@ -455,13 +498,11 @@ public class ClientBlockStateColorCache
 				return Flower;
 			}
 
-			if (block.toString().toLowerCase().contains("glass"))
+			// panes also cover iron bars, which are see-through too
+			if (block.getMaterial() == Material.glass
+				|| block instanceof BlockPane)
 			{
 				return Glass;
-			}
-			if (block.toString().equals("Block{chiselsandbits:chiseled}"))
-			{
-				return Chisel;
 			}
 
 			return Default;

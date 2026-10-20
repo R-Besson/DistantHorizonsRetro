@@ -17,6 +17,7 @@ package com.seibel.distanthorizons.forge17;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.world.World;
@@ -27,6 +28,8 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import com.seibel.distanthorizons.common.AbstractModInitializer;
 import com.seibel.distanthorizons.common.util.ProxyUtil;
+import com.seibel.distanthorizons.api.DhApi;
+import com.seibel.distanthorizons.common.wrappers.block.BlockColorOverrides;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
 import com.seibel.distanthorizons.common.wrappers.gui.DhScreenUtil;
 import com.seibel.distanthorizons.common.wrappers.gui.GetConfigScreen;
@@ -79,6 +82,16 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 
 		ClientRegistry.registerKeyBinding(TOGGLE_RENDERING_KEY);
 		ClientRegistry.registerKeyBinding(OPEN_CONFIG_KEY);
+
+		// F3+T and resource pack changes: re-read the color overrides and recolor the LODs with the new textures
+		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener((resourceManager) ->
+		{
+			BlockColorOverrides.reload();
+			if (DhApi.Delayed.renderProxy != null)
+			{
+				DhApi.Delayed.renderProxy.clearRenderDataCache();
+			}
+		});
 
         ForgePluginPacketSender.setPacketHandler((player, message) -> 
         {

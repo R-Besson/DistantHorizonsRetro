@@ -52,6 +52,18 @@ Download the latest version from [Releases](https://github.com/R-Besson/DistantH
 Shaders are supported with [Angelica](https://github.com/GTNewHorizons/Angelica) 2.1.12 or higher.
 Tested with [Complementary Shaders](https://modrinth.com/shader/complementary-reimagined) and [Euphoria Patches](https://modrinth.com/mod/euphoria-patches).
 
+## Block colors
+
+LOD colors are averaged from each block's texture. If a block looks wrong in the distance, set its color in
+`config/DistantHorizonsBlockColors.cfg` (created on first launch), then press F3+T to reload:
+
+```
+# modid:block=RRGGBB applies to every meta, modid:block:meta=RRGGBB to one
+minecraft:wool:14=A12722
+# AARRGGBB also sets the alpha, 00 hides the block in LODs
+minecraft:tallgrass=00000000
+```
+
 ## GTNH
 
 Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too old. To upgrade them in Prism Launcher:
