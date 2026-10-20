@@ -16,6 +16,8 @@
 package com.seibel.distanthorizons.forge17;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -26,20 +28,26 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import com.seibel.distanthorizons.common.AbstractModInitializer;
 import com.seibel.distanthorizons.common.util.ProxyUtil;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
+import com.seibel.distanthorizons.common.wrappers.gui.DhScreenUtil;
+import com.seibel.distanthorizons.common.wrappers.gui.GetConfigScreen;
 import com.seibel.distanthorizons.core.api.internal.ClientApi;
 import com.seibel.distanthorizons.core.api.internal.ServerApi;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
+import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.f3.F3Screen;
+import com.seibel.distanthorizons.core.util.KeyCodesUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import org.lwjgl.input.Keyboard;
 
 /**
  * This handles all events sent to the client.
@@ -49,7 +57,12 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 
     private static final IMinecraftClientWrapper MC = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
     private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
+	// unbound by default, modpacks like GTNH already use most keys
+	private static final String KEY_CATEGORY = "distanthorizons.key.category";
+	private static final KeyBinding TOGGLE_RENDERING_KEY = new KeyBinding("distanthorizons.key.toggleRendering", Keyboard.KEY_NONE, KEY_CATEGORY);
+	private static final KeyBinding OPEN_CONFIG_KEY = new KeyBinding("distanthorizons.key.openConfig", Keyboard.KEY_NONE, KEY_CATEGORY);
+
 	
 	//=======//
 	// setup //
@@ -63,7 +76,10 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
         FMLCommonHandler.instance()
             .bus()
             .register(this);
-		
+
+		ClientRegistry.registerKeyBinding(TOGGLE_RENDERING_KEY);
+		ClientRegistry.registerKeyBinding(OPEN_CONFIG_KEY);
+
         ForgePluginPacketSender.setPacketHandler((player, message) -> 
         {
             ClientApi.INSTANCE.pluginMessageReceived(message);
@@ -140,20 +156,39 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 	//region
 
     @SubscribeEvent
-    public void registerKeyBindings(InputEvent.KeyInputEvent event) 
+    public void onKeyInput(InputEvent.KeyInputEvent event)
     {
-        if (Minecraft.getMinecraft().thePlayer == null) 
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.thePlayer == null || mc.currentScreen != null)
 		{
             return;
         }
-        /*
-         * TODO if (event.getAction() != GLFW.GLFW_PRESS)
-         * {
-         * return;
-         * }
-         */
 
-        // TODO ClientApi.INSTANCE.keyPressedEvent(event.getKey());
+		// isPressed() consumes one press each call, so a held key only triggers once
+		while (TOGGLE_RENDERING_KEY.isPressed())
+		{
+			boolean enabled = !Config.Client.quickEnableRendering.get();
+			Config.Client.quickEnableRendering.set(enabled);
+			MC.sendOverlayMessage(I18n.format(enabled
+				? "distanthorizons.key.toggleRendering.enabled"
+				: "distanthorizons.key.toggleRendering.disabled"));
+		}
+
+		while (OPEN_CONFIG_KEY.isPressed())
+		{
+			DhScreenUtil.setScreen(GetConfigScreen.getScreen(null));
+		}
+
+		// the core's debug keys (F6-F8) use GLFW key codes
+		if (Keyboard.getEventKeyState())
+		{
+			switch (Keyboard.getEventKey())
+			{
+				case Keyboard.KEY_F6: ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F6); break;
+				case Keyboard.KEY_F7: ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F7); break;
+				case Keyboard.KEY_F8: ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F8); break;
+			}
+		}
     }
 	
 	//endregion

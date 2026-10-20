@@ -2,6 +2,17 @@
   "distanthorizons.title":
 	"Distant Horizons",
 
+  "distanthorizons.key.category":
+    "Distant Horizons",
+  "distanthorizons.key.toggleRendering":
+    "Toggle LOD Rendering",
+  "distanthorizons.key.toggleRendering.enabled":
+    "Distant Horizons rendering enabled",
+  "distanthorizons.key.toggleRendering.disabled":
+    "Distant Horizons rendering disabled",
+  "distanthorizons.key.openConfig":
+    "Open Config",
+
 
     
   "distanthorizons.general.true":

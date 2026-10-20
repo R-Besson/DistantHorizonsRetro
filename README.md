@@ -63,9 +63,9 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 
 # Roadmap
 
-- [ ] Correct sky light and ceilings for modded dimensions (currently only the Nether is detected)
+- [x] Key bindings (toggle LODs, open config)
+- [ ] Correct ceilings for modded dimensions (currently only the Nether is detected)
 - [ ] Better block colors for GregTech, Chisel and other mods with custom textures
-- [ ] Key bindings (toggle LODs, open config)
 - [ ] Faster world generation and lower memory use
 
 # Development

@@ -258,7 +258,8 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 			return;
 		}
 
-		player.addChatMessage(new ChatComponentText(string));
+		// shown above the hotbar, where 1.7.10 shows the record playing message
+		Minecraft.getMinecraft().ingameGUI.setRecordPlaying(string, false);
 	}
 
 	//endregion
