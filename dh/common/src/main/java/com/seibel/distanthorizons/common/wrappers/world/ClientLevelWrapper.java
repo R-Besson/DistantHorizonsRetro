@@ -411,7 +411,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	@Override
 	public boolean hasCeiling()
 	{
-		return this.level.provider.isHellWorld;
+		return CeilingDetection.hasCeiling(this.level.provider);
 	}
 
 	@Override

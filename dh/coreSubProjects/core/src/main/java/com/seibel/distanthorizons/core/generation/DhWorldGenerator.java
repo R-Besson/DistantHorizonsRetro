@@ -261,10 +261,13 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 				}
 			});
 		
-		// separate future necessary to make sure the chunks 
+		// separate future necessary to make sure the chunks
 		// are processed before this event is
-		// marked as completed, recycling the data source
-		return genFuture.handle((voidObj, throwable) ->
+		// marked as completed, recycling the data source.
+		// Async so building LODs from the chunks (and the lighting chained after this)
+		// runs on the world gen threads, which follow DH's thread count, instead of
+		// the server world gen waiter thread that completed the generation
+		return genFuture.handleAsync((voidObj, throwable) ->
 			{
 				for (int i = 0; i < chunkList.size(); i++)
 				{
@@ -281,7 +284,7 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 				resultConsumer.accept(pooledFullDataSource);
 				
 				return null; // result ignored
-			});
+			}, worldGeneratorThreadPool);
 	}
 	
 	//endregion

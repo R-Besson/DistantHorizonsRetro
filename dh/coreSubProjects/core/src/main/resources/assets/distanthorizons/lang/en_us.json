@@ -394,6 +394,14 @@
     "Cave Culling Height",
   "distanthorizons.config.client.advanced.graphics.culling.caveCullingHeight.@tooltip":
     "At what Y value should cave culling start?",
+  "distanthorizons.config.client.advanced.graphics.culling.ceilingDimensionCsv":
+    "Dimensions With A Ceiling",
+  "distanthorizons.config.client.advanced.graphics.culling.ceilingDimensionCsv.@tooltip":
+    "Comma separated dimensions that have a ceiling (IE cave dimensions), cave culling is off in these. \nDimensions without sky light are detected automatically, except the End. \nUse the name:ID from the F3 screen or just the ID. Example: \"DIM7:7,-100\"",
+  "distanthorizons.config.client.advanced.graphics.culling.noCeilingDimensionCsv":
+    "Dimensions Without A Ceiling",
+  "distanthorizons.config.client.advanced.graphics.culling.noCeilingDimensionCsv.@tooltip":
+    "Comma separated dimensions without sky light that don't have a ceiling, \nfor when the automatic detection is wrong. Same format as above.",
   "distanthorizons.config.client.advanced.graphics.culling.disableBeaconDistanceCulling":
     "Enable Beacon Distance Culling",
   "distanthorizons.config.client.advanced.graphics.culling.disableBeaconDistanceCulling.@tooltip":

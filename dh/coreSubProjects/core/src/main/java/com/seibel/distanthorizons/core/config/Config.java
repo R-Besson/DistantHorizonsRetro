@@ -801,7 +801,28 @@ public class Config
 							+ "Lower this value if you get walls for areas with 0 light.")
 						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
 						.build();
-					
+
+					public static ConfigEntry<String> ceilingDimensionCsv = new ConfigEntry.Builder<String>()
+						.set("")
+						.comment(""
+							+ "A comma separated list of dimensions that have a ceiling, IE cave dimensions. \n"
+							+ "Cave culling is off in these, otherwise the whole dimension gets culled. \n"
+							+ "\n"
+							+ "Dimensions without sky light are detected automatically (except the End), \n"
+							+ "this is only needed when the detection is wrong. \n"
+							+ "Use the name:ID shown in yellow on the F3 screen or just the ID. Example: \"DIM7:7,-100\"")
+						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
+						.build();
+
+					public static ConfigEntry<String> noCeilingDimensionCsv = new ConfigEntry.Builder<String>()
+						.set("")
+						.comment(""
+							+ "A comma separated list of dimensions that don't have a ceiling, \n"
+							+ "for dimensions without sky light that are detected as having one by mistake. \n"
+							+ "Same format as ceilingDimensionCsv.")
+						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
+						.build();
+
 					public static ConfigUISpacer caveCullingSpacer = new ConfigUISpacer.Builder().build();
 					
 					public static ConfigEntry<Boolean> disableBeaconDistanceCulling = new ConfigEntry.Builder<Boolean>()

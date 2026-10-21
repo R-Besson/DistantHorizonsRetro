@@ -81,7 +81,7 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 
 - [x] Key bindings (toggle LODs, open config)
 - [x] Faster LOD building, loading and saving
-- [ ] Correct ceilings for modded dimensions (currently only the Nether is detected)
+- [x] Correct ceilings for modded dimensions
 - [ ] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
 - [ ] Faster world generation and lower memory use
 

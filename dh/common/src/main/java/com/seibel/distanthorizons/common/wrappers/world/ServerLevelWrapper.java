@@ -200,9 +200,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	{
 		// Casting to World is necessary to fix a reobfuscation issue.
 		// otherwise it sometimes fails to obfuscate `provider` properly.
-		return ((World) this.level).provider
-			// WorldProvider has no isNether(), isHellWorld is its equivalent
-			.isHellWorld;
+		return CeilingDetection.hasCeiling(((World) this.level).provider);
 	}
 
 	@Override
