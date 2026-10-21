@@ -20,9 +20,12 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.shader.Framebuffer;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
@@ -104,11 +107,51 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 	
 	
 	
+    //===============//
+    // entity events //
+    //===============//
+	//region
+
+	/**
+	 * LODs aren't in MC's depth buffer, so mobs outside the vanilla render distance
+	 * would be drawn on top of them, IE bats in caves or mobs behind hills. <br>
+	 * Vanilla hides them with fog, which DH turns off.
+	 */
+	@SubscribeEvent
+	public void hideEntitiesBeyondRenderDistance(RenderLivingEvent.Pre event)
+	{
+		if (!Config.Client.Advanced.Graphics.Culling.hideEntitiesBeyondRenderDistance.get()
+			|| !Config.Client.quickEnableRendering.get())
+		{
+			return;
+		}
+
+		Minecraft mc = Minecraft.getMinecraft();
+		EntityLivingBase camera = mc.renderViewEntity;
+		if (camera == null)
+		{
+			return;
+		}
+
+		int renderDistance = mc.gameSettings.renderDistanceChunks;
+		int chunkDistanceX = Math.abs((MathHelper.floor_double(event.entity.posX) >> 4) - (MathHelper.floor_double(camera.posX) >> 4));
+		int chunkDistanceZ = Math.abs((MathHelper.floor_double(event.entity.posZ) >> 4) - (MathHelper.floor_double(camera.posZ) >> 4));
+		if (chunkDistanceX > renderDistance
+			|| chunkDistanceZ > renderDistance)
+		{
+			event.setCanceled(true);
+		}
+	}
+
+	//endregion
+
+
+
     //==============//
     // chunk events //
     //==============//
 	//region
-	
+
     @SubscribeEvent
     public void clickBlockEvent(PlayerInteractEvent event)
     {

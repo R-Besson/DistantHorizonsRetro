@@ -477,7 +477,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			}
 			else
 			{
-				this.isSolid = this.blockState.getMaterial().isSolid();
+				// snow layers use the non-solid snow material, so thick snow (4+ layers) would be skipped like grass.
+				// 1-3 layers are still flattened onto the block below by the LOD builder
+				this.isSolid = this.blockState.getMaterial().isSolid()
+					|| this.blockState.getBlock() == Blocks.snow_layer;
 			}
 		}
 
