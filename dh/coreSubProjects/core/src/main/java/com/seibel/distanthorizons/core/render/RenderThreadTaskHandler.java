@@ -40,6 +40,8 @@ public class RenderThreadTaskHandler
 	private static final NumberFormat DECIMAL_NUMBER_FORMAT = NumberFormat.getNumberInstance();
 	private static final NumberFormat INT_NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 	private static final boolean LOG_SLOW_TASKS = false;
+	/** 3 ms */
+	private static final long MIN_TASK_NANO_PER_FRAME = 3_000_000L;
 	
 	private static final Timer TIMER = TimerUtil.CreateTimer("Cleanup timer");
 	private static final long MS_BETWEEN_CLEANUP_TICKS = 1_000L;
@@ -137,9 +139,10 @@ public class RenderThreadTaskHandler
 		}
 		
 		
-		int msPerFrame = 1000 / frameLimit;
-		long nanoPerFrame = msPerFrame * 1_000_000L;
+		long nanoPerFrame = 1_000_000_000L / frameLimit;
 		nanoPerFrame /= 2; // divide the time in half so we can only impact half of the framerate at worst
+		// at high framerates half a frame is only 1-2 ms, which is too little to upload LODs at a decent pace
+		nanoPerFrame = Math.max(nanoPerFrame, MIN_TASK_NANO_PER_FRAME);
 		this.runRenderThreadTasks(nanoPerFrame);
 	}
 	private void runRenderThreadTasks(long nanoMaxRunTime)

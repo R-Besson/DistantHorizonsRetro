@@ -62,19 +62,27 @@ public class DhDataInputStream extends DataInputStream
 		if (compressionMode == EDhApiDataCompressionMode.Z_STD_BLOCK)
 		{
 			ByteArrayList pooledByteArrayList = PooledZstdDecompressor.decompressFrame(byteArray, checkout);
-			byteArrayInputStream = new ByteArrayInputStream(pooledByteArrayList.elements(), 0, pooledByteArrayList.size());
+			byteArrayInputStream = new UnsynchronizedByteArrayInputStream(pooledByteArrayList.elements(), 0, pooledByteArrayList.size());
 		}
 		else
 		{
-			byteArrayInputStream = new ByteArrayInputStream(byteArray);
+			byteArrayInputStream = new UnsynchronizedByteArrayInputStream(byteArray);
 		}
-		
+
 		return new DhDataInputStream(byteArrayInputStream, compressionMode);
 	}
 	private DhDataInputStream(ByteArrayInputStream stream, EDhApiDataCompressionMode compressionMode) throws IOException
-	{ 
-		super(warpStream(stream, compressionMode)); 
+	{
+		super(warpStream(stream, compressionMode));
+		this.readsByteArrayDirectly = (this.in == stream);
 	}
+
+	/**
+	 * True when there's no decompressor between this and the byte array. <br>
+	 * Only then are bulk reads safe, the LZ4 and XZ decompressors throw at the end
+	 * of the stream instead of returning -1 (see {@link #read()}), which would lose the bytes of that read.
+	 */
+	public final boolean readsByteArrayDirectly;
 	@SuppressWarnings("deprecation")
 	private static InputStream warpStream(ByteArrayInputStream stream, EDhApiDataCompressionMode compressionMode) throws IOException
 	{

@@ -65,7 +65,12 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	 * Nothing is saved to the disk (duh).
 	 */
 	private static final boolean USE_MEMORY_DATABASE = false;
-	
+
+	/** SQLite's default is 2 MiB per connection */
+	private static final int SQLITE_CACHE_SIZE_KIB = 8 * 1024;
+	/** address space only, the memory is the OS's page cache */
+	private static final long SQLITE_MMAP_SIZE_BYTES = 256L * 1024 * 1024;
+
 	
 	
 	private final String connectionString;
@@ -554,6 +559,12 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					// the synchronization mode must be set for each connection
 					int syncMode = Config.Common.LodBuilding.databaseSyncMode.get().value;
 					statement.execute("PRAGMA synchronous = "+syncMode+";");
+
+					// there's one connection per thread and repo, so the per-connection page cache stays small.
+					// mmap is shared between all connections to the same file through the OS page cache instead.
+					statement.execute("PRAGMA cache_size = -"+SQLITE_CACHE_SIZE_KIB+";");
+					statement.execute("PRAGMA mmap_size = "+SQLITE_MMAP_SIZE_BYTES+";");
+					statement.execute("PRAGMA temp_store = MEMORY;");
 				}
 				
 				return connection;

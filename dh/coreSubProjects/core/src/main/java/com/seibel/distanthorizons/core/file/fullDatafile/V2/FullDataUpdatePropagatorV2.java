@@ -42,6 +42,14 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	protected static final int PROPAGATE_QUEUE_THREAD_DELAY_IN_MS = 250;
 	
 	public static final int NUMBER_OF_PARENT_UPDATE_TASKS_PER_THREAD = 10;
+	/**
+	 * Child positions read per parent update query, per queued task. <br>
+	 * Reading more than can be queued groups more siblings into each parent update,
+	 * the ones that don't fit are read again next tick.
+	 */
+	private static final int PARENT_UPDATE_CHILDREN_READ_MULTIPLIER = 4;
+	/** 8 ticks of {@link #PROPAGATE_QUEUE_THREAD_DELAY_IN_MS}, 2 seconds */
+	private static final int MAX_IDLE_BACKOFF_TICKS = 8;
 	
 	/**
 	 * Don't downsample extremely large LODs
@@ -56,6 +64,9 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	
 	private final ExecutorService regenQueueingThread;
 	private boolean generationQueueRunning = false;
+	/** only used by the update queue thread */
+	private int idleBackoffTicks = 0;
+	private int idleTicksToSkip = 0;
 	
 	
 	
@@ -133,10 +144,27 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 					targetBlockPos = MC_CLIENT.getPlayerBlockPos();
 				}
 				
-				this.runParentUpdates(executor, targetBlockPos);
-				
-				this.runChildUpdates(executor, targetBlockPos);
-				
+				// the update queries sort the whole table by distance,
+				// so they back off while there's nothing to propagate (IE once world gen is done)
+				if (this.idleTicksToSkip > 0)
+				{
+					this.idleTicksToSkip--;
+				}
+				else
+				{
+					boolean foundParentUpdates = this.runParentUpdates(executor, targetBlockPos);
+					boolean foundChildUpdates = this.runChildUpdates(executor, targetBlockPos);
+					if (foundParentUpdates || foundChildUpdates)
+					{
+						this.idleBackoffTicks = 0;
+					}
+					else
+					{
+						this.idleBackoffTicks = Math.min(MAX_IDLE_BACKOFF_TICKS, Math.max(1, this.idleBackoffTicks * 2));
+						this.idleTicksToSkip = this.idleBackoffTicks;
+					}
+				}
+
 				this.tryQueueRegeneration(targetBlockPos);
 			}
 			catch (InterruptedException ignored)
@@ -157,21 +185,28 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	//================//
 	//region
 	
-	/** apply update bottom -> up, from child to parent */
-	private void runParentUpdates(PriorityTaskPicker.Executor executor, DhBlockPos targetBlockPos)
+	/**
+	 * apply update bottom -> up, from child to parent
+	 * @return false if nothing needed to be applied to its parent, true if there was work or the queue was full
+	 */
+	private boolean runParentUpdates(PriorityTaskPicker.Executor executor, DhBlockPos targetBlockPos)
 	{
 		int maxUpdateTaskCount = getMaxPropagateTaskCount();
-		
+
 		// queue parent updates
 		if (executor.getQueueSize() > maxUpdateTaskCount
 			|| this.updatingPosSet.size() > maxUpdateTaskCount)
 		{
-			return;
+			return true;
 		}
-		
-		
+
+
 		// get the positions that need to be applied to their parents
-		LongArrayList outputChildPosList = this.provider.repo.getParentPositionsToUpdate(targetBlockPos.getX(), targetBlockPos.getZ(), maxUpdateTaskCount);
+		LongArrayList outputChildPosList = this.provider.repo.getParentPositionsToUpdate(targetBlockPos.getX(), targetBlockPos.getZ(), maxUpdateTaskCount * PARENT_UPDATE_CHILDREN_READ_MULTIPLIER);
+		if (outputChildPosList.isEmpty())
+		{
+			return false;
+		}
 		
 		// combine updates together based on their parent
 		HashMap<Long, HashSet<Long>> outputChildPosByInputParentPos = new HashMap<>();
@@ -306,29 +341,38 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 				throw e;
 			}
 		}
+
+		return true;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// child updates //
 	//===============//
 	//region
 	
-	/** apply update top -> down, from parent to child */
-	private void runChildUpdates(PriorityTaskPicker.Executor executor, DhBlockPos targetBlockPos)
+	/**
+	 * apply update top -> down, from parent to child
+	 * @return false if nothing needed to be applied to its children, true if there was work or the queue was full
+	 */
+	private boolean runChildUpdates(PriorityTaskPicker.Executor executor, DhBlockPos targetBlockPos)
 	{
 		int maxUpdateTaskCount = getMaxPropagateTaskCount();
-		
+
 		// queue child updates
 		if (executor.getQueueSize() < maxUpdateTaskCount
 			&& this.updatingPosSet.size() < maxUpdateTaskCount)
 		{
 			// get the positions that need to be applied to their children
 			LongArrayList outputParentPosList = this.provider.repo.getChildPositionsToUpdate(targetBlockPos.getX(), targetBlockPos.getZ(), maxUpdateTaskCount);
-			
+			if (outputParentPosList.isEmpty())
+			{
+				return false;
+			}
+
 			// queue the updates
 			for (long parentOutputPos : outputParentPosList)
 			{
@@ -470,6 +514,8 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 				}
 			}
 		}
+
+		return true;
 	}
 	
 	//endregion

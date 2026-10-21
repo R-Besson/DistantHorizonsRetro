@@ -99,6 +99,8 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	 * This is a {@link ConcurrentLinkedQueue} because new sections can be added to this list via the world generator threads.
 	 */
 	private final ConcurrentLinkedQueue<Long> sectionsToReload = new ConcurrentLinkedQueue<>();
+	/** reload requests wait here until world gen stops updating them, see {@link SectionReloadBatcher} */
+	private final SectionReloadBatcher reloadBatcher = new SectionReloadBatcher();
 	private final IDhClientLevel level;
 	/** 
 	 * Note: this doesn't lock all operations as some other threads/operations
@@ -796,6 +798,8 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	
 	private void reloadQueuedSections()
 	{
+		this.reloadBatcher.releaseReady(this.sectionsToReload::add);
+
 		Long pos;
 		HashSet<Long> positionsToRequeue = new HashSet<>();
 		while ((pos = this.sectionsToReload.poll()) != null)
@@ -1341,16 +1345,16 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		// only queue each section for reloading
 		// after the cache has been cleared,
 		// this is done to prevent accidentally using old cached data
-		
-		this.sectionsToReload.add(pos);
-		
+
+		this.reloadBatcher.request(pos);
+
 		// the adjacent locations also need to be updated to make sure lighting
 		// and water updates correctly, otherwise oceans may have walls
 		// and lights may not show up over LOD borders
 		for (EDhDirection direction : EDhDirection.CARDINAL_COMPASS)
 		{
 			long adjacentPos = DhSectionPos.getAdjacentPos(pos, direction);
-			this.sectionsToReload.add(adjacentPos);
+			this.reloadBatcher.request(adjacentPos);
 		}
 	}
 	

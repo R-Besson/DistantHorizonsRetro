@@ -99,7 +99,12 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	
 	@Override
 	public boolean shouldDoWorldGen()
-	{ return Config.Common.WorldGenerator.generatorPlan.get().generationEnabled; }
+	{
+		return Config.Common.WorldGenerator.generatorPlan.get().generationEnabled
+			// without players generation would center on 0,0 for nobody,
+			// IE GTNH dimensions that are only kept loaded by chunk loaders
+			&& !this.worldGenPlayerCenteringQueue.isEmpty();
+	}
 	
 	@Override
 	public DhBlockPos2D getTargetPosForGeneration()

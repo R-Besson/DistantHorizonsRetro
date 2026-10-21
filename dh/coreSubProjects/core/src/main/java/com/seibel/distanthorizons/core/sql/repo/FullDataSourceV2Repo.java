@@ -57,8 +57,83 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	public FullDataSourceV2Repo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, FullDataSourceV2DTO.class);
+		this.lookupCache = new FullDataLookupCache();
 	}
-	
+
+	/**
+	 * Null while the parent constructor runs the database update scripts. <br>
+	 * Every write in this repo goes through {@link #save}, {@link #deleteWithKey} or {@link #deleteAll},
+	 * the flag updates don't change what the cache holds.
+	 */
+	@Nullable
+	private final FullDataLookupCache lookupCache;
+
+	//endregion
+
+
+
+	//====================//
+	// cache invalidation //
+	//====================//
+	//region
+
+	@Override
+	public void save(FullDataSourceV2DTO dto)
+	{
+		super.save(dto);
+		if (this.lookupCache != null)
+		{
+			this.lookupCache.invalidate(dto.getKey());
+		}
+	}
+
+	@Override
+	public void deleteWithKey(Long pos)
+	{
+		super.deleteWithKey(pos);
+		if (this.lookupCache != null)
+		{
+			this.lookupCache.invalidate(pos);
+		}
+	}
+
+	@Override
+	public void deleteAll()
+	{
+		super.deleteAll();
+		if (this.lookupCache != null)
+		{
+			this.lookupCache.invalidateAll();
+		}
+	}
+
+	@Override
+	public boolean existsWithKey(Long pos)
+	{
+		if (this.lookupCache == null)
+		{
+			return super.existsWithKey(pos);
+		}
+
+		Boolean cachedExists = this.lookupCache.exists(pos);
+		if (cachedExists != null)
+		{
+			return cachedExists;
+		}
+
+		long writeCount = this.lookupCache.writeCount(pos);
+		boolean exists = super.existsWithKey(pos);
+		if (exists)
+		{
+			this.lookupCache.putExists(pos, writeCount);
+		}
+		else
+		{
+			this.lookupCache.putMissing(pos, writeCount);
+		}
+		return exists;
+	}
+
 	//endregion
 	
 	
@@ -336,6 +411,15 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			default:
 				throw new IllegalArgumentException();
 		}
+
+		// only missing positions are cached here, the returned DTO uses pooled arrays its caller closes
+		if (this.lookupCache != null
+			&& Boolean.FALSE.equals(this.lookupCache.exists(pos)))
+		{
+			return null;
+		}
+		long writeCount = (this.lookupCache != null) ? this.lookupCache.writeCount(pos) : 0;
+
 		try(PreparedStatement statement = this.createPreparedStatement(sql))
 		{
 			if (statement == null)
@@ -353,13 +437,20 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			
 			try(ResultSet resultSet = this.query(statement))
 			{
-				if (resultSet != null
-					&& resultSet.next())
+				if (resultSet == null)
+				{
+					return null;
+				}
+				else if (resultSet.next())
 				{
 					return this.convertResultSetToAdjDto(pos, resultSet);
 				}
 				else
 				{
+					if (this.lookupCache != null)
+					{
+						this.lookupCache.putMissing(pos, writeCount);
+					}
 					return null;
 				}
 			}
@@ -572,6 +663,13 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	/** @return null if nothing exists for this position */
 	public void getColumnGenerationStepForPos(long pos, ByteArrayList outputByteArray)
 	{
+		if (this.lookupCache != null
+			&& this.lookupCache.getGenerationSteps(pos, outputByteArray))
+		{
+			return;
+		}
+		long writeCount = (this.lookupCache != null) ? this.lookupCache.writeCount(pos) : 0;
+
 		try (PreparedStatement statement = this.createPreparedStatement(this.getColumnGenerationStepSql))
 		{
 			if (statement == null)
@@ -592,8 +690,16 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			
 			try (ResultSet result = this.query(statement))
 			{
-				if (result == null || !result.next())
+				if (result == null)
 				{
+					return;
+				}
+				if (!result.next())
+				{
+					if (this.lookupCache != null)
+					{
+						this.lookupCache.putMissing(pos, writeCount);
+					}
 					return;
 				}
 				
@@ -610,6 +716,11 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 						DhDataInputStream compressedIn = DhDataInputStream.create(byteArrayList, compressionModeEnum, checkout))
 					{
 						putAllBytes(compressedIn, outputByteArray);
+					}
+
+					if (this.lookupCache != null)
+					{
+						this.lookupCache.putGenerationSteps(pos, outputByteArray, writeCount);
 					}
 				}
 				catch (IOException e)
@@ -923,7 +1034,26 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		
 		try
 		{
-			if (inputStream != null)
+			if (inputStream == null)
+			{
+				return existingArrayList;
+			}
+
+			// SQLite's blob streams and uncompressed/ZStd data are plain byte arrays,
+			// LZ4 and XZ have to be read a byte at a time, see DhDataInputStream.readsByteArrayDirectly
+			boolean canBulkRead = (inputStream instanceof ByteArrayInputStream)
+				|| (inputStream instanceof DhDataInputStream && ((DhDataInputStream) inputStream).readsByteArrayDirectly);
+			if (canBulkRead)
+			{
+				byte[] buffer = BULK_READ_BUFFER.get();
+				int readCount = inputStream.read(buffer, 0, buffer.length);
+				while (readCount != -1)
+				{
+					existingArrayList.addElements(existingArrayList.size(), buffer, 0, readCount);
+					readCount = inputStream.read(buffer, 0, buffer.length);
+				}
+			}
+			else
 			{
 				int nextByte = inputStream.read();
 				while (nextByte != -1)
@@ -934,9 +1064,10 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			}
 		}
 		catch (EOFException ignore) { /* shouldn't happen, but just in case */ }
-		
+
 		return existingArrayList;
 	}
+	private static final ThreadLocal<byte[]> BULK_READ_BUFFER = ThreadLocal.withInitial(() -> new byte[8 * 1024]);
 	
 	//endregion
 	
