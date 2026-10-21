@@ -47,7 +47,13 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	int getLightEmission();
 	
 	byte getMaterialId();
-	
+
+	/**
+	 * What shape 1 block wide LODs should draw this block with.
+	 * @see com.seibel.distanthorizons.core.util.RenderDataPointUtil#SHAPE_NONE
+	 */
+	default byte getLodShape() { return 0; }
+
 	boolean isBeaconBlock();
 	/** IE a glass block that can affect the beacon beam color */
 	boolean isBeaconTintBlock();

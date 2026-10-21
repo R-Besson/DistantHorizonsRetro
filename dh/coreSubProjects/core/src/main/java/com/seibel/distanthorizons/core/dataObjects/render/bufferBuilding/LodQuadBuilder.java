@@ -30,6 +30,7 @@ import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.ByteBufferCheckoutWrapper;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
@@ -125,6 +126,12 @@ public class LodQuadBuilder implements AutoCloseable
 	private boolean doTransparency;
 	private IClientLevelWrapper clientLevelWrapper;
 	private boolean noSkyLight;
+	
+	/** 
+	 * {@link RenderDataPointUtil#SHAPE_NONE} etc. applied to every quad added until it's changed, 
+	 * set by {@link ColumnBox} for each LOD box.
+	 */
+	public byte shapeForNewQuads = RenderDataPointUtil.SHAPE_NONE;
 
 	private EDhApiDebugRendering debugRenderingMode;
 	private EDhApiGrassSideRendering grassSideRenderingMode;
@@ -201,6 +208,7 @@ public class LodQuadBuilder implements AutoCloseable
 		
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(x, y, z, width, height, color, faceTextureId, irisBlockMaterialId, skyLight, blockLight, dir);
+		quad.shape = this.shapeForNewQuads;
 		if (!quadList.isEmpty()
 			&& (
 				quadList.get(quadList.size() - 1).tryMerge(quad, BufferMergeDirectionEnum.EastWest)
@@ -229,6 +237,7 @@ public class LodQuadBuilder implements AutoCloseable
 		
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(minX, maxY, minZ, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.UP);
+		quad.shape = this.shapeForNewQuads;
 		quadList.add(quad);
 	}
 	
@@ -245,6 +254,7 @@ public class LodQuadBuilder implements AutoCloseable
 		
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(x, y, z, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.DOWN);
+		quad.shape = this.shapeForNewQuads;
 		quadArray.add(quad);
 	}
 	
@@ -464,6 +474,7 @@ public class LodQuadBuilder implements AutoCloseable
 					quad.hasError ? 15 : (this.noSkyLight ? 0 : quad.skyLight),
 					quad.hasError ? 15 : quad.blockLight,
 					quad.hasError ? 0 : quad.textureTileId,
+					quad.hasError ? RenderDataPointUtil.SHAPE_NONE : quad.shape,
 					mx, my, mz);
 		}
 	}
@@ -474,6 +485,7 @@ public class LodQuadBuilder implements AutoCloseable
 		byte normalIndex, byte irisBlockMaterialId, 
 		byte skylight, byte blocklight,
 		short textureTileId, 
+		byte shape,
 		int mx, int my, int mz)
 	{
 		bb.putShort(x);
@@ -496,6 +508,10 @@ public class LodQuadBuilder implements AutoCloseable
 			if (my != 0) { mircoOffset |= (byte) (my > 0 ? 0b0100 : 0b1100); }
 			if (mz != 0) { mircoOffset |= (byte) (mz > 0 ? 0b010000 : 0b110000); }
 			meta |= (short) (mircoOffset << 8);
+			
+			// the shape uses the 2 unused bits above the micro offset (0bss00_0000_0000_0000),
+			// DH's vertex shader insets the vertex based on it and shader packs ignore it
+			meta |= (short) ((shape & 0b11) << 14);
 		}
 		bb.putShort(meta);
 		

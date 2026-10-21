@@ -57,12 +57,39 @@ public class ColumnBox
 	//=========//
 	//region
 	
+	/** @param shape only used when the blockWidth is 1, see {@link RenderDataPointUtil#SHAPE_NONE} */
 	public static void addBoxQuadsToBuilder(
 		LodQuadBuilder builder, PhantomArrayListCheckout phantomArrayCheckout, IClientLevelWrapper clientLevelWrapper,
 		short blockWidth, short yHeight,
 		short minX, short minY, short minZ,
-		int color, byte irisBlockMaterialId, byte skyLight, byte blockLight,
-		long topData, long bottomData, 
+		int color, byte irisBlockMaterialId, byte skyLight, byte blockLight, byte shape,
+		long topData, long bottomData,
+		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
+		short @Nullable [] faceTileIdsByDirectionOrdinal)
+	{
+		builder.shapeForNewQuads = shape;
+		try
+		{
+			addBoxQuads(
+				builder, phantomArrayCheckout, clientLevelWrapper,
+				blockWidth, yHeight,
+				minX, minY, minZ,
+				color, irisBlockMaterialId, skyLight, blockLight, shape,
+				topData, bottomData,
+				adjData, isAdjDataSameDetailLevel,
+				faceTileIdsByDirectionOrdinal);
+		}
+		finally
+		{
+			builder.shapeForNewQuads = RenderDataPointUtil.SHAPE_NONE;
+		}
+	}
+	private static void addBoxQuads(
+		LodQuadBuilder builder, PhantomArrayListCheckout phantomArrayCheckout, IClientLevelWrapper clientLevelWrapper,
+		short blockWidth, short yHeight,
+		short minX, short minY, short minZ,
+		int color, byte irisBlockMaterialId, byte skyLight, byte blockLight, byte shape,
+		long topData, long bottomData,
 		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
 		short @Nullable [] faceTileIdsByDirectionOrdinal)
 	{
@@ -115,9 +142,13 @@ public class ColumnBox
 		
 		// top face
 		{
+			// a bottom half's top is below the block above it,
+			// and a post above only covers part of this top
 			boolean skipTop = RenderDataPointUtil.doesDataPointExist(topData)
 					&& (RenderDataPointUtil.getYMin(topData) == maxY)
-					&& !isTopTransparent;
+					&& !isTopTransparent
+					&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF
+					&& !isPost(getShape(topData, blockWidth));
 			
 			if (!skipTop)
 			{
@@ -132,9 +163,11 @@ public class ColumnBox
 		
 		// bottom face 
 		{
+			// shaped blocks below don't reach or don't cover this bottom
 			boolean skipBottom = RenderDataPointUtil.doesDataPointExist(bottomData)
 					&& (RenderDataPointUtil.getYMax(bottomData) == minY)
-					&& !isBottomTransparent;
+					&& !isBottomTransparent
+					&& getShape(bottomData, blockWidth) == RenderDataPointUtil.SHAPE_NONE;
 			if (!skipBottom)
 			{
 				builder.addQuadDown(
@@ -151,6 +184,24 @@ public class ColumnBox
 		//========================================//
 		// add North, south, east, and west faces //
 		//========================================//
+		
+		if (isPost(shape))
+		{
+			// posts are thinner than the neighbors that would cover them, so their sides are always drawn,
+			// lit by the air around them
+			for (EDhDirection direction : EDhDirection.CARDINAL_COMPASS)
+			{
+				short faceX = (direction == EDhDirection.EAST) ? maxX : minX;
+				short faceZ = (direction == EDhDirection.SOUTH) ? maxZ : minZ;
+				builder.addQuadAdj(
+					direction,
+					faceX, minY, faceZ,
+					blockWidth, yHeight,
+					ColorUtil.applyShade(color, clientLevelWrapper.getShade(direction)), tryGetTextureId(faceTileIdsByDirectionOrdinal, direction),
+					irisBlockMaterialId, skyLight, blockLight);
+			}
+			return;
+		}
 		
 		// NORTH face
 		{
@@ -367,7 +418,18 @@ public class ColumnBox
 			byte lightToApply;
 			byte blockLightToApply;
 			
-			if (!adjTransparent)
+			// shaped neighbors don't fill their block, so they don't hide this face
+			boolean adjShaped = adjacentIsSameDetailLevel
+				&& getShape(adjPoint, horizontalBlockWidth) != RenderDataPointUtil.SHAPE_NONE;
+			boolean adjCoversFace = !adjShaped;
+			
+			if (adjShaped)
+			{
+				// lit by the air next to the neighbor
+				lightToApply = adjSkyLight;
+				blockLightToApply = adjBlockLight;
+			}
+			else if (!adjTransparent)
 			{
 				// Adjacent is opaque
 				
@@ -409,7 +471,7 @@ public class ColumnBox
 
 
 			// Apply light to the range [adjMinY, adjMaxY)
-			applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMinY, adjMaxY, lightToApply, blockLightToApply, true);
+			applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMinY, adjMaxY, lightToApply, blockLightToApply, adjCoversFace);
 			{
 				// swap references so we can use the newly populated segments
 				LongArrayList temp = segments;
@@ -576,6 +638,20 @@ public class ColumnBox
 	// helper methods //
 	//================//
 	//region
+	
+	/** shapes are only drawn by 1 block wide LODs */
+	private static byte getShape(long dataPoint, short blockWidth)
+	{
+		return (blockWidth == 1 && RenderDataPointUtil.doesDataPointExist(dataPoint))
+			? RenderDataPointUtil.getShape(dataPoint)
+			: RenderDataPointUtil.SHAPE_NONE;
+	}
+	
+	private static boolean isPost(byte shape)
+	{
+		return shape == RenderDataPointUtil.SHAPE_THIN_POST
+			|| shape == RenderDataPointUtil.SHAPE_THICK_POST;
+	}
 	
 	private static short tryGetTextureId(short @Nullable [] faceTileIdsByDirectionOrdinal, EDhDirection direction)
 	{

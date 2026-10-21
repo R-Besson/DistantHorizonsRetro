@@ -60,22 +60,60 @@ vec2 TAAJitter(vec2 coord, float w)
 void main()
 {
     vPos = vPosition; // This is so it can be passed to the fragment shader
-    
-    vBlockPos = vec3(vPosition.xyz);
+
     vNormalIndex = irisData.y;
     vTextureTileId = irisData.z | (irisData.w << 8u);
-    
-    vertexWorldPos = vPosition.xyz + uModelOffset;
-    
-    vertexYPos = vPosition.y + uWorldYOffset;
-    
+
     uint meta = vPosition.a;
-    
-    uint mirco = (meta & 0xFF00u) >> 8u; // mirco offset which is a xyz 2bit value
+
+    uint mirco = (meta & 0x3F00u) >> 8u; // mirco offset which is a xyz 2bit value
     // 0b00 = no offset
     // 0b01 = positive offset
     // 0b11 = negative offset
     // format is: 0b00zzyyxx
+
+    // LOD shape, moves the vertex in from the edge of its block (see RenderDataPointUtil.SHAPE_NONE)
+    vec3 shapeOffset = vec3(0.0);
+    uint shape = (meta >> 14u) & 3u;
+    if (shape != 0u)
+    {
+        // which edge of the block this vertex is on, -1 = min, 1 = max.
+        // the micro offset gives the edges along the face, the normal gives the face's own edge
+        vec3 edge = vec3(
+            (mirco & 1u) != 0u ? ((mirco & 2u) != 0u ? -1.0 : 1.0) : 0.0,
+            (mirco & 4u) != 0u ? ((mirco & 8u) != 0u ? -1.0 : 1.0) : 0.0,
+            (mirco & 16u) != 0u ? ((mirco & 32u) != 0u ? -1.0 : 1.0) : 0.0);
+        // 0 down, 1 up, 2 north, 3 south, 4 west, 5 east
+        if (vNormalIndex == 0u) { edge.y = -1.0; }
+        else if (vNormalIndex == 1u) { edge.y = 1.0; }
+        else if (vNormalIndex == 2u) { edge.z = -1.0; }
+        else if (vNormalIndex == 3u) { edge.z = 1.0; }
+        else if (vNormalIndex == 4u) { edge.x = -1.0; }
+        else { edge.x = 1.0; }
+
+        if (shape == 1u)
+        {
+            // thin post (fences), 4/16 wide
+            shapeOffset.xz = -edge.xz * (6.0 / 16.0);
+        }
+        else if (shape == 2u)
+        {
+            // thick post (walls), 8/16 wide
+            shapeOffset.xz = -edge.xz * (4.0 / 16.0);
+        }
+        else if (edge.y > 0.0)
+        {
+            // bottom half (slabs), only the top moves down
+            shapeOffset.y = -0.5;
+        }
+    }
+
+    vPos.xyz += shapeOffset;
+    vBlockPos = vec3(vPosition.xyz) + shapeOffset;
+
+    vertexWorldPos = vPosition.xyz + uModelOffset + shapeOffset;
+
+    vertexYPos = vPosition.y + uWorldYOffset + shapeOffset.y;
     float mx = (mirco & 1u)!=0u ? uMircoOffset : 0.0;
     mx = (mirco & 2u)!=0u ? -mx : mx;
     // the y offset isn't applied

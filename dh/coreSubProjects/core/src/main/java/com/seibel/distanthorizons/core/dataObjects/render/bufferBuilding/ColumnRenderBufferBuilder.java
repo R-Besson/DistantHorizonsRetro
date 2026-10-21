@@ -426,6 +426,8 @@ public class ColumnRenderBufferBuilder
 			blockMaterialId,
 			RenderDataPointUtil.getLightSky(renderData),
 			fullBright ? LodUtil.MAX_MC_LIGHT : RenderDataPointUtil.getLightBlock(renderData),
+			// shapes are only drawn by 1 block wide LODs
+			(blockWidth == 1) ? RenderDataPointUtil.getShape(renderData) : RenderDataPointUtil.SHAPE_NONE,
 			topRenderData, bottomRenderData, adjColumnViews, isSameDetailLevel,
 			faceTileIdsByDirectionOrdinal);
 	}

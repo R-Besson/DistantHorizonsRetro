@@ -42,6 +42,7 @@ import com.seibel.distanthorizons.coreapi.util.ColorUtil;
  * B: color blue <br>
  * H: column max Y <br>
  * D: column min Y (what Y value the column starts at) <br>
+ * S: shape, see {@link #SHAPE_NONE} <br>
  * BL: block light <br>
  * SL: sky light <br>
  *
@@ -51,8 +52,8 @@ import com.seibel.distanthorizons.coreapi.util.ColorUtil;
  * G  G  G  G  G  G  G  G  |	<br>
  * B  B  B  B  B  B  B  B  |	<br><br>
  *
- * H  H  H  H  H  H  H  H  |	<br>
- * H  H  H  H  D  D  D  D  |	<br>
+ * S  S  S  S  H  H  H  H  |	<br>
+ * H  H  H  H  H  H  D  D  |	<br>
  * D  D  D  D  D  D  D  D  |	<br>
  * BL BL BL BL SL SL SL SL |	<br>
  * </code>
@@ -75,6 +76,11 @@ public class RenderDataPointUtil
 	// the maximum valid Y value is the maximum min y + world height.
 	// min y is [-2032, 2031], height is < 4064.
 	public final static int MAX_WORLD_Y_SIZE = 2031 + 4064;
+	/** 
+	 * Render datapoints only have 10 bits for each Y value. 
+	 * That's 4x the 1.7.10 world height, the rest is used for {@link #SHAPE_SHIFT}.
+	 */
+	public final static int MAX_RENDER_Y_SIZE = 1024;
 	
 	public final static int ALPHA_DOWNSIZE_SHIFT = 4;
 	
@@ -87,7 +93,8 @@ public class RenderDataPointUtil
 	public final static int RED_SHIFT = GREEN_SHIFT + 8;
 	public final static int ALPHA_SHIFT = RED_SHIFT + 8;
 	
-	public final static int MAX_Y_SHIFT = 20;
+	public final static int SHAPE_SHIFT = 28;
+	public final static int MAX_Y_SHIFT = 18;
 	public final static int MIN_Y_SHIFT = 8;
 	public final static int BLOCK_LIGHT_SHIFT = 4;
 	public final static int SKY_LIGHT_SHIFT = 0;
@@ -97,9 +104,10 @@ public class RenderDataPointUtil
 	public final static long GREEN_MASK = 0xFF;
 	public final static long BLUE_MASK = 0xFF;
 	public final static long COLOR_MASK = 0xFFFFFF;
-	public final static long MAX_Y_MASK = 0xFFF;
-	public final static long MIN_Y_MASK = 0xFFF;
-	public final static long MIN_MAX_Y_MASK = 0xFFFFFF;
+	public final static long MAX_Y_MASK = 0x3FF;
+	public final static long MIN_Y_MASK = 0x3FF;
+	public final static long MIN_MAX_Y_MASK = 0xFFFFF;
+	public final static long SHAPE_MASK = 0xF;
 	public final static long BLOCK_LIGHT_MASK = 0xF;
 	public final static long SKY_LIGHT_MASK = 0xF;
 	public final static long IRIS_BLOCK_MATERIAL_ID_MASK = 0xF;
@@ -112,18 +120,40 @@ public class RenderDataPointUtil
 	
 	
 	
+	//========//
+	// shapes //
+	//========//
+	
+	// Shapes are only drawn by 1 block wide LODs, wider LODs are always full boxes.
+	// They're applied by DH's vertex shader as an inset from the block's edges (see LodQuadBuilder),
+	// shader packs don't know about the inset and draw full boxes instead.
+	
+	/** a full box */
+	public final static byte SHAPE_NONE = 0;
+	/** a 4/16 wide post, IE fences */
+	public final static byte SHAPE_THIN_POST = 1;
+	/** an 8/16 wide post, IE walls */
+	public final static byte SHAPE_THICK_POST = 2;
+	/** the bottom half of a block, IE bottom slabs */
+	public final static byte SHAPE_BOTTOM_HALF = 3;
+	
+	
+	
 	//========================//
 	// datapoint manipulation //
 	//========================//
 	
 	public static long createDataPoint(int maxY, int minY, int color, int lightSky, int lightBlock, int irisBlockMaterialId)
+	{ return createDataPoint(maxY, minY, color, lightSky, lightBlock, irisBlockMaterialId, SHAPE_NONE); }
+	
+	public static long createDataPoint(int maxY, int minY, int color, int lightSky, int lightBlock, int irisBlockMaterialId, byte shape)
 	{
-		return createDataPoint(
+		return setShape(createDataPoint(
 				ColorUtil.getAlpha(color),
 				ColorUtil.getRed(color),
 				ColorUtil.getGreen(color),
 				ColorUtil.getBlue(color),
-				maxY, minY, lightSky, lightBlock, irisBlockMaterialId);
+				maxY, minY, lightSky, lightBlock, irisBlockMaterialId), shape);
 	}
 	
 	public static long createDataPoint(int alpha, int red, int green, int blue, int maxY, int minY, int lightSky, int lightBlock, int irisBlockMaterialId)
@@ -131,11 +161,11 @@ public class RenderDataPointUtil
 		if (RUN_VALIDATION)
 		{
 			// assertions are inside if-blocks to prevent unnecessary string concatenations
-			if (maxY < 0 || maxY >= MAX_WORLD_Y_SIZE)
+			if (maxY < 0 || maxY >= MAX_RENDER_Y_SIZE)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with max Y [" + maxY + "] out of range!");
 			}
-			if (minY < 0 || minY >= MAX_WORLD_Y_SIZE)
+			if (minY < 0 || minY >= MAX_RENDER_Y_SIZE)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with min Y [" + minY + "] out of range!");
 			}
@@ -209,6 +239,9 @@ public class RenderDataPointUtil
 	
 	public static byte getBlockMaterialId(long dataPoint) { return (byte) ((dataPoint >>> IRIS_BLOCK_MATERIAL_ID_SHIFT) & IRIS_BLOCK_MATERIAL_ID_MASK); }
 	
+	public static byte getShape(long dataPoint) { return (byte) ((dataPoint >>> SHAPE_SHIFT) & SHAPE_MASK); }
+	public static long setShape(long dataPoint, byte shape) { return (dataPoint & ~(SHAPE_MASK << SHAPE_SHIFT)) | ((shape & SHAPE_MASK) << SHAPE_SHIFT); }
+	
 	
 	public static boolean hasZeroHeight(long dataPoint) { return (((dataPoint >>> MIN_Y_SHIFT) & MIN_MAX_Y_MASK) == 0); }
 	
@@ -242,7 +275,8 @@ public class RenderDataPointUtil
 					" argb:" + getAlpha(dataPoint) + "," + getRed(dataPoint) + "," + getGreen(dataPoint) + "," + getBlue(dataPoint) +
 					" BL:" + getLightBlock(dataPoint) +
 					" SL:" + getLightSky(dataPoint) +
-					" MAT:" + getBlockMaterialId(dataPoint) + "["+ EDhApiBlockMaterial.getFromIndex(getBlockMaterialId(dataPoint))+"]";
+					" MAT:" + getBlockMaterialId(dataPoint) + "["+ EDhApiBlockMaterial.getFromIndex(getBlockMaterialId(dataPoint))+"]" +
+					" SHAPE:" + getShape(dataPoint);
 		}
 	}
 	

@@ -340,6 +340,7 @@ public class FullDataToRenderDataTransformer
 		int lastColor = 0;
 		int lastBottom = -10_000;
 		IBlockStateWrapper lastBlock = null;
+		byte lastShape = RenderDataPointUtil.SHAPE_NONE;
 		
 		// there are several instances where we'll want
 		// to copy the top datapoint down and override the one below it
@@ -398,6 +399,15 @@ public class FullDataToRenderDataTransformer
 				
 				// don't render broken data
 				continue;
+			}
+			
+			// taken before any overrides, IE a slab with a snow layer on it is still a slab
+			byte shape = block.getLodShape();
+			if (shape == RenderDataPointUtil.SHAPE_BOTTOM_HALF
+				&& blockHeight != 1)
+			{
+				// the half is only applied to the top, a stack of slabs would look 1.5 blocks tall
+				shape = RenderDataPointUtil.SHAPE_NONE;
 			}
 			
 			//==================//
@@ -708,9 +718,12 @@ public class FullDataToRenderDataTransformer
 			//=============================//
 			
 			// check if they share a top-bottom face and if they have same color
+			// (shapes are only merged when they stay the same shape, a half block on a half block isn't a half block)
 			if (color == lastColor 
 				&& bottomY + blockHeight == lastBottom  
-				&& renderDataIndex > 0)
+				&& renderDataIndex > 0
+				&& shape == lastShape
+				&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF)
 			{
 				//replace the previous block with new bottom
 				long columnData = renderColumnData.get(renderDataIndex - 1);
@@ -721,13 +734,14 @@ public class FullDataToRenderDataTransformer
 			{
 				// add the block
 				isColumnVoid = false;
-				long columnData = RenderDataPointUtil.createDataPoint(bottomY + blockHeight, bottomY, color, skyLight, blockLight, block.getMaterialId());
+				long columnData = RenderDataPointUtil.createDataPoint(bottomY + blockHeight, bottomY, color, skyLight, blockLight, block.getMaterialId(), shape);
 				renderColumnData.set(renderDataIndex, columnData);
 				renderDataIndex++;
 			}
 			lastBottom = bottomY;
 			lastColor = color;
 			lastBlock = block;
+			lastShape = shape;
 		}
 		
 		

@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.util.LodUtil;
+import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 
 /** Represents a render-able quad. */
 public final class BufferQuad
@@ -58,6 +59,8 @@ public final class BufferQuad
 	public byte skyLight;
 	public byte blockLight;
 	public EDhDirection direction;
+	/** {@link RenderDataPointUtil#SHAPE_NONE} etc. */
+	public byte shape;
 	
 	public boolean hasError = false;
 	
@@ -101,6 +104,7 @@ public final class BufferQuad
 		this.skyLight = skylight;
 		this.blockLight = blockLight;
 		this.direction = direction;
+		this.shape = RenderDataPointUtil.SHAPE_NONE;
 		this.sortKeyEastWest = computeSortKey(direction, true);
 		this.sortKeyNorthSouth = computeSortKey(direction, false);
 	}
@@ -152,6 +156,14 @@ public final class BufferQuad
 	public boolean tryMerge(BufferQuad quad, BufferMergeDirectionEnum mergeDirection)
 	{
 		if (quad.hasError || this.hasError)
+		{
+			return false;
+		}
+		
+		// the shape inset is applied to each vertex, so a merged quad would only be inset at its ends.
+		// IE a row of fence posts would turn into a wall
+		if (this.shape != RenderDataPointUtil.SHAPE_NONE
+			|| quad.shape != RenderDataPointUtil.SHAPE_NONE)
 		{
 			return false;
 		}

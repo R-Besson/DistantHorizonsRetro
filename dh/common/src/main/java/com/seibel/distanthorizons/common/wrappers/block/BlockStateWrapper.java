@@ -27,6 +27,7 @@ import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.core.util.LodUtil;
+import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
@@ -116,6 +117,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	private final int opacity;
 	/** used by the Iris shader mod to determine how each LOD should be rendered */
 	private byte blockMaterialId = 0;
+	/** {@link RenderDataPointUtil#SHAPE_NONE} etc. */
+	private final byte lodShape;
 
 	private final boolean isBeaconBlock;
 	private final boolean isBeaconBaseBlock;
@@ -316,6 +319,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			{
 				this.opacity = calculateOpacity(this.blockState, isAir(this.blockState), this.isLiquid);
 			}
+			
+			this.lodShape = calculateLodShape(this.blockState);
 
 			// allow overriding if present
 			if (overrideEventParam != null
@@ -713,6 +718,39 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		return opacity;
 	}
 
+	private static byte calculateLodShape(@Nullable IBlockState blockState)
+	{
+		if (blockState == null)
+		{
+			return RenderDataPointUtil.SHAPE_NONE;
+		}
+		
+		Block block = blockState.getBlock();
+		if (block instanceof BlockFence)
+		{
+			return RenderDataPointUtil.SHAPE_THIN_POST;
+		}
+		else if (block instanceof BlockWall)
+		{
+			return RenderDataPointUtil.SHAPE_THICK_POST;
+		}
+		else if (block instanceof BlockSlab)
+		{
+			// double slabs are opaque cubes, the 8 bit is set for top slabs
+			boolean bottomSlab = !block.isOpaqueCube() && (blockState.getMeta() & 8) == 0;
+			return bottomSlab ? RenderDataPointUtil.SHAPE_BOTTOM_HALF : RenderDataPointUtil.SHAPE_NONE;
+		}
+		else if (block == Blocks.snow_layer)
+		{
+			// the meta is the layer count minus one.
+			// 1-3 layers are flattened onto the block below by the LOD builder, 6-8 are closer to a full block
+			int layers = (blockState.getMeta() & 7) + 1;
+			return (layers == 4 || layers == 5) ? RenderDataPointUtil.SHAPE_BOTTOM_HALF : RenderDataPointUtil.SHAPE_NONE;
+		}
+		
+		return RenderDataPointUtil.SHAPE_NONE;
+	}
+	
 	private static boolean getCanOcclude(@Nullable IBlockState blockState)
 	{
 		// defaults to the value used by air
@@ -1013,6 +1051,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 	@Override
 	public int getOpacity() { return this.opacity; }
+	@Override
+	public byte getLodShape() { return this.lodShape; }
 
 	@Override
 	public int getLightEmission() { return getLightEmission(this.blockState); }
