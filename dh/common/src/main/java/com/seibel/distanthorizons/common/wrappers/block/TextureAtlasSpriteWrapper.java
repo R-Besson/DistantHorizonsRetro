@@ -27,7 +27,10 @@ import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IconFlipped;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
@@ -153,7 +156,29 @@ public class TextureAtlasSpriteWrapper
 			icon = unwrapIcon(icon, "mappedTexture");
 		}
 
+		// other wrapped or copied icons (IE AE2's FlippableIcon, MalisisDoors' ClippedIcon) don't have pixel data,
+		// the atlas sprite registered under the same name does
+		if (icon != null && !hasSpriteData(icon))
+		{
+			ITextureObject blockAtlas = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture);
+			if (blockAtlas instanceof TextureMap)
+			{
+				// unknown names return the missing sprite, which has no sprite data
+				TextureAtlasSprite atlasSprite = ((TextureMap) blockAtlas).getAtlasSprite(icon.getIconName());
+				if (hasSpriteData(atlasSprite))
+				{
+					icon = atlasSprite;
+				}
+			}
+		}
+
 		return (icon instanceof TextureAtlasSprite) ? (TextureAtlasSprite) icon : null;
+	}
+
+	private static boolean hasSpriteData(@Nullable IIcon icon)
+	{
+		return icon instanceof TextureAtlasSprite
+			&& ((IMixinTextureAtlasSprite) icon).distanthorizons$getSpriteData() != null;
 	}
 
 	/**

@@ -716,7 +716,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		boolean canOcclude = false;
 		if (blockState != null)
 		{
-			canOcclude = blockState.getMaterial().isSolid();
+			// material.isSolid() is true for glass, fences and other blocks light and vision can pass through
+			canOcclude = blockState.getBlock().isOpaqueCube();
 		}
 
 		return canOcclude;

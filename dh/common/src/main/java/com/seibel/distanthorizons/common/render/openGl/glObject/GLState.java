@@ -130,7 +130,13 @@ public class GLState implements AutoCloseable
 		LWJGL.glGetIntegerv(GL11.GL_VIEWPORT, this.view);
 		this.cull = LWJGL.glIsEnabled(GL11.GL_CULL_FACE);
 		this.cullMode = LWJGL.glGetInteger(GL11.GL_CULL_FACE_MODE);
-		this.polyMode = LWJGL.glGetInteger(GL11.GL_POLYGON_MODE);
+
+		// GL_POLYGON_MODE returns two values (front, back) in a compatibility context,
+		// which overflows glGetInteger's one-int buffer on LWJGL3 (IE with lwjgl3ify) on macOS.
+		// both values should be the same, so only the first one is used
+		int[] polyModes = new int[2];
+		LWJGL.glGetIntegerv(GL11.GL_POLYGON_MODE, polyModes);
+		this.polyMode = polyModes[0];
 	}
 	
 	@Override 

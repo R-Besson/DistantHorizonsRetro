@@ -200,6 +200,10 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 	@Override
 	public synchronized void close()
 	{
+		// needed to close player event handlers.
+		// super.close() isn't called since it would close every level a second time
+		this.getServerPlayerStateManager().close();
+		
 		ArrayList<CompletableFuture<Void>> closeFutures = new ArrayList<>();
 		
 		synchronized (this.clientLevelWrapperSetByDhLevel)

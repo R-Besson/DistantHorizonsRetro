@@ -126,7 +126,7 @@ public class BiomeWrapper implements IBiomeWrapper
 			return EMPTY_BIOME_STRING;
 		}
 
-		return this.biome.biomeName;
+		return getSerialName(this.biome);
 	}
 
 	@Override
@@ -176,10 +176,17 @@ public class BiomeWrapper implements IBiomeWrapper
 
 		// generate the serial string //
 
-		this.serialString = "biome:" + this.biome.biomeName;
+		this.serialString = "biome:" + getSerialName(this.biome);
 
 		return this.serialString;
 	}
+
+	/**
+	 * Some mods never call setBiomeName (IE Arcana RPG's BiomeSunset),
+	 * so nameless biomes are keyed by their ID instead.
+	 */
+	public static String getSerialName(BiomeGenBase biome)
+	{ return (biome.biomeName != null) ? biome.biomeName : ("#" + biome.biomeID); }
 
 	public static IBiomeWrapper deserialize(String resourceLocationString, ILevelWrapper levelWrapper) throws IOException
 	{

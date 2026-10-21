@@ -32,6 +32,11 @@ public class ServerPlayerWrapper implements IServerPlayerWrapper
 	public static ServerPlayerWrapper getWrapper(EntityPlayerMP serverPlayer)
 	{
 		NetHandlerPlayServer netHandler = serverPlayer.playerNetServerHandler;
+		if (netHandler == null)
+		{
+			// FML fires the logout event with a null net handler if the player was rejected during the mod list handshake
+			return null;
+		}
 		return serverPlayerWrapperMap.computeIfAbsent(netHandler, ignored -> new ServerPlayerWrapper(netHandler));
 	}
 

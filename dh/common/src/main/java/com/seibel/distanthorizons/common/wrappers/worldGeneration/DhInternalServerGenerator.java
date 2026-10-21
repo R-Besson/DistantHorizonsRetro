@@ -176,7 +176,7 @@ public class DhInternalServerGenerator
 	{
 		this.runValidation();
 
-		ArrayList<CompletableFuture<Chunk>> getChunkFutureList = new ArrayList<>();
+		ArrayList<CompletableFuture<ChunkWrapper>> getChunkFutureList = new ArrayList<>();
 
 		try
 		{
@@ -189,7 +189,7 @@ public class DhInternalServerGenerator
 			{
 				ChunkPos chunkPos = requestPosIterator.next();
 
-				CompletableFuture<Chunk> requestChunkFuture =
+				CompletableFuture<ChunkWrapper> requestChunkFuture =
 					this.requestChunkFromServerAsync(chunkPos)
 						// log errors if necessary
 						.whenCompleteAsync(
@@ -235,10 +235,9 @@ public class DhInternalServerGenerator
 			ArrayList<IChunkWrapper> chunkWrappers = new ArrayList<>();
 			for (int i = 0; i < getChunkFutureList.size(); i++)
 			{
-				Chunk chunk = getChunkFutureList.get(i).join();
-				if (chunk != null)
+				ChunkWrapper chunkWrapper = getChunkFutureList.get(i).join();
+				if (chunkWrapper != null)
 				{
-					ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, this.dhServerLevel.getLevelWrapper());
 					chunkWrapper.createDhHeightMaps();
 					chunkWrappers.add(chunkWrapper);
 				}
@@ -371,7 +370,7 @@ public class DhInternalServerGenerator
 		}, MS_TO_IGNORE_CHUNK_AFTER_COMPLETION);
 	}
 
-	private CompletableFuture<Chunk> requestChunkFromServerAsync(ChunkPos chunkPos)
+	private CompletableFuture<ChunkWrapper> requestChunkFromServerAsync(ChunkPos chunkPos)
 	{
 		WorldServer level = this.params.mcServerLevel;
 
@@ -427,8 +426,10 @@ public class DhInternalServerGenerator
 				}
 			}
 
-			// load the target chunk itself, at the requested generation step
-			return provider.loadChunk(chunkPos.x, chunkPos.z);
+			// load the target chunk itself.
+			// the wrapper is created here since it reads the chunk's biomes, which must happen on the server thread
+			Chunk chunk = provider.loadChunk(chunkPos.x, chunkPos.z);
+			return (chunk != null) ? new ChunkWrapper(chunk, this.dhServerLevel.getLevelWrapper()) : null;
 		});
 	}
 	/**

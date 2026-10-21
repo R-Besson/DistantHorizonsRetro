@@ -132,6 +132,9 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 	@Override
 	public void close()
 	{
+		// needed to close player event handlers
+		this.serverPlayerStateManager.close();
+		
 		ArrayList<CompletableFuture<Void>> closeFutures = new ArrayList<>();
 		for (TDhServerLevel level : this.dhLevelByLevelWrapper.values())
 		{

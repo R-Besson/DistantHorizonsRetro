@@ -45,6 +45,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRen
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
+import com.seibel.distanthorizons.coreapi.DependencyInjection.WorldGeneratorInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
@@ -119,6 +120,8 @@ public class SharedApi
 				AbstractDhRepo.closeAllConnections();
 				// needs to be closed on world shutdown to clear out un-processed chunks
 				WORLD_CHUNK_UPDATE_MANAGER.clear();
+				// generators are bound per level, none of the old world's levels exist anymore
+				WorldGeneratorInjector.INSTANCE.clear();
 				
 				RenderThreadTaskHandler.INSTANCE.clearDebugStats();
 				BlockTextureRegistry.INSTANCE.clear();

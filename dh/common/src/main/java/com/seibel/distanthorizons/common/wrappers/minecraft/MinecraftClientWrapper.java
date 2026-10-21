@@ -22,6 +22,8 @@ package com.seibel.distanthorizons.common.wrappers.minecraft;
 import java.io.File;
 
 import com.seibel.distanthorizons.common.wrappers.gui.NativeDialogUtil;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
+import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.common.wrappers.world.ClientLevelWrapper;
 import com.seibel.distanthorizons.common.wrappers.world.ServerLevelWrapper;
 import com.seibel.distanthorizons.core.file.structure.ClientOnlySaveStructure;
@@ -258,8 +260,16 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 			return;
 		}
 
-		// shown above the hotbar, where 1.7.10 shows the record playing message
-		Minecraft.getMinecraft().ingameGUI.setRecordPlaying(string, false);
+		IGtnhLibCommonAccessor gtnhLibAccessor = ModAccessorInjector.INSTANCE.get(IGtnhLibCommonAccessor.class);
+		if (gtnhLibAccessor != null)
+		{
+			gtnhLibAccessor.renderTextAboveHotbar(string);
+		}
+		else
+		{
+			// shown above the hotbar, where 1.7.10 shows the record playing message
+			Minecraft.getMinecraft().ingameGUI.setRecordPlaying(string, false);
+		}
 	}
 
 	//endregion

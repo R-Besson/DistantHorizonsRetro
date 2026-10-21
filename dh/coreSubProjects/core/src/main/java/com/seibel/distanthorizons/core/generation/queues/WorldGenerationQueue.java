@@ -539,31 +539,40 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		chunkGenFuture.thenRun(() ->
 		{
 			FullDataSourceV2 requestedDataSource = FullDataSourceV2.createEmpty(task.pos);
-			
-			// process chunks //
-			for (int i = 0; i < generatedChunks.size(); i++)
+
+			try
 			{
-				IChunkWrapper chunkWrapper = generatedChunks.get(i);
-				
-				// only light the chunk here if necessary,
-				// lighting before this point is preferred but for legacy API use this
-				// check should be done
-				if (!chunkWrapper.isDhBlockLightingCorrect())
+				// process chunks //
+				for (int i = 0; i < generatedChunks.size(); i++)
 				{
-					ArrayList<IChunkWrapper> nearbyChunkList = new ArrayList<>();
-					nearbyChunkList.add(chunkWrapper);
-					byte maxSkyLight = this.level.getLevelWrapper().hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT;
-					DhLightingEngine.INSTANCE.bakeChunkBlockLighting(chunkWrapper, nearbyChunkList, maxSkyLight);
+					IChunkWrapper chunkWrapper = generatedChunks.get(i);
+
+					// only light the chunk here if necessary,
+					// lighting before this point is preferred but for legacy API use this
+					// check should be done
+					if (!chunkWrapper.isDhBlockLightingCorrect())
+					{
+						ArrayList<IChunkWrapper> nearbyChunkList = new ArrayList<>();
+						nearbyChunkList.add(chunkWrapper);
+						byte maxSkyLight = this.level.getLevelWrapper().hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT;
+						DhLightingEngine.INSTANCE.bakeChunkBlockLighting(chunkWrapper, nearbyChunkList, maxSkyLight);
+					}
+
+					try (FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromChunk(this.level.getLevelWrapper(), chunkWrapper))
+					{
+						LodUtil.assertTrue(generatedDataSource != null);
+						requestedDataSource.updateFromDataSource(generatedDataSource);
+					}
 				}
-				
-				try (FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromChunk(this.level.getLevelWrapper(), chunkWrapper))
-				{
-					LodUtil.assertTrue(generatedDataSource != null);
-					requestedDataSource.updateFromDataSource(generatedDataSource);
-				}
+
+				returnFuture.complete(requestedDataSource);
 			}
-			
-			returnFuture.complete(requestedDataSource);
+			catch (Throwable e)
+			{
+				// the task has to complete, otherwise it would never free its generation slot
+				requestedDataSource.close();
+				returnFuture.completeExceptionally(e);
+			}
 		});
 		
 		return returnFuture;
@@ -593,23 +602,32 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		chunkGenFuture.thenRun(() ->
 		{
 			FullDataSourceV2 requestedDataSource = FullDataSourceV2.createEmpty(task.pos);
-			
-			for (int i = 0; i < generatedChunks.size(); i++)
+
+			try
 			{
-				DhApiChunk apiChunk = generatedChunks.get(i);
-				
-				try(FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromApiChunkData(apiChunk, this.generator.runApiValidation()))
+				for (int i = 0; i < generatedChunks.size(); i++)
 				{
-					requestedDataSource.updateFromDataSource(generatedDataSource);
+					DhApiChunk apiChunk = generatedChunks.get(i);
+
+					try(FullDataSourceV2 generatedDataSource = LodDataBuilder.createFromApiChunkData(apiChunk, this.generator.runApiValidation()))
+					{
+						requestedDataSource.updateFromDataSource(generatedDataSource);
+					}
+					catch (DataCorruptedException | IllegalArgumentException e)
+					{
+						LOGGER.error("World generator returned a corrupt API chunk. Error: [" + e.getMessage() + "]. World generator disabled.", e);
+						Config.Common.WorldGenerator.generatorPlan.set(EDhApiGeneratorPlan.DISABLED);
+					}
 				}
-				catch (DataCorruptedException | IllegalArgumentException e)
-				{
-					LOGGER.error("World generator returned a corrupt API chunk. Error: [" + e.getMessage() + "]. World generator disabled.", e);
-					Config.Common.WorldGenerator.generatorPlan.set(EDhApiGeneratorPlan.DISABLED);
-				}
+
+				returnFuture.complete(requestedDataSource);
 			}
-			
-			returnFuture.complete(requestedDataSource);
+			catch (Throwable e)
+			{
+				// the task has to complete, otherwise it would never free its generation slot
+				requestedDataSource.close();
+				returnFuture.completeExceptionally(e);
+			}
 		});
 		
 		return returnFuture;

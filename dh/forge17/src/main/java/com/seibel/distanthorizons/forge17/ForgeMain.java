@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.*;
@@ -119,6 +120,12 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 				this.addModCompatAccessor(IRpleAccessor.class, () -> rpleAccessor);
 				this.addModCompatAccessor(IRpleCommonAccessor.class, () -> rpleAccessor);
 			}
+
+			// GTNHLib
+			if (Loader.isModLoaded("gtnhlib"))
+			{
+				this.addModCompatAccessor(IGtnhLibCommonAccessor.class, GtnhLibAccessor::new);
+			}
         }
 		else if (!DISABLE_SERVER_FOR_TESTING)
 		{
@@ -137,7 +144,7 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 
         ForgeChunkManager.setForcedChunkLoadingCallback(
             instance,
-            (List<ForgeChunkManager.Ticket> tickets, World world) -> chunkLoadedCallback());
+            (List<ForgeChunkManager.Ticket> tickets, World world) -> releaseStaleTickets(tickets));
     }
 	private boolean enableGregTechAccessor()
 	{
@@ -151,7 +158,19 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 			return false;
 		}
 	}
-	private void chunkLoadedCallback() { }
+	/**
+	 * DH requests a new ticket each time a level loads and never needs to re-force
+	 * chunks from a previous session, so tickets restored from the world save are never used.
+	 * Release them, otherwise they pile up in forcedchunks.dat until the mod's ticket limit is reached,
+	 * after which DH can't request a ticket anymore.
+	 */
+	private static void releaseStaleTickets(List<ForgeChunkManager.Ticket> tickets)
+	{
+		for (ForgeChunkManager.Ticket ticket : tickets)
+		{
+			ForgeChunkManager.releaseTicket(ticket);
+		}
+	}
 	
 	//endregion
 	

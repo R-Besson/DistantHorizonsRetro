@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ServerPlayerStateManager
+public class ServerPlayerStateManager implements AutoCloseable
 {
 	private final ConcurrentMap<IServerPlayerWrapper, ServerPlayerState> connectedPlayerStateByPlayerWrapper = new ConcurrentHashMap<>();
 	private final ConcurrentMap<IServerPlayerWrapper, MessageQueueState> messageQueueByPlayerWrapper = new ConcurrentHashMap<>();
@@ -99,6 +99,22 @@ public class ServerPlayerStateManager
 		public final Queue<AbstractNetworkMessage> messageQueue = new ConcurrentLinkedQueue<>();
 		public final AtomicBoolean isBeingDrained = new AtomicBoolean();
 		
+	}
+	
+	
+	
+	//================//
+	// base overrides //
+	//================//
+	
+	/** closes the state (and event handlers) of players still connected when the world closes */
+	@Override
+	public void close()
+	{
+		for (IServerPlayerWrapper playerWrapper : this.connectedPlayerStateByPlayerWrapper.keySet())
+		{
+			this.unregisterLeftPlayer(playerWrapper);
+		}
 	}
 	
 	

@@ -308,10 +308,20 @@ public class FullDataToRenderDataTransformer
 		if (snowLayerBlockStates == null)
 		{
 			snowLayerBlockStates = new HashSet<>();
-			// ignore snow layers 1-3, everything above should be considered a full block
-			snowLayerBlockStates.add(WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault("minecraft:snow_STATE_{layers:1}", levelWrapper));
-			snowLayerBlockStates.add(WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault("minecraft:snow_STATE_{layers:2}", levelWrapper));
-			snowLayerBlockStates.add(WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault("minecraft:snow_STATE_{layers:3}", levelWrapper));
+			// ignore snow layers 1-3, everything above should be considered a full block.
+			// 1.7.10 calls the layer block "minecraft:snow_layer" ("minecraft:snow" is the full block)
+			// and stores the layer count minus one as its meta
+			for (int meta = 0; meta <= 2; meta++)
+			{
+				String serial = (meta == 0) ? "minecraft:snow_layer" : ("minecraft:snow_layer:" + meta);
+				IBlockStateWrapper snowLayer = WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault(serial, levelWrapper);
+
+				// a failed lookup returns air, which must not be treated as a snow layer
+				if (!snowLayer.isAir())
+				{
+					snowLayerBlockStates.add(snowLayer);
+				}
+			}
 		}
 		
 		int caveCullingMaxY = Config.Client.Advanced.Graphics.Culling.caveCullingHeight.get() - levelWrapper.getMinHeight();
@@ -363,7 +373,8 @@ public class FullDataToRenderDataTransformer
 			int blockLight = FullDataPointUtil.getBlockLight(fullData);
 			int skyLight = FullDataPointUtil.getSkyLight(fullData);
 			
-			mutableBlockPos.setY(bottomY + levelWrapper.getMinHeight());
+			// using the top Y samples the surface biome instead of a cave biome for tall datapoints
+			mutableBlockPos.setY(topY - 1 + levelWrapper.getMinHeight());
 			
 			IBiomeWrapper biome;
 			IBlockStateWrapper block;
@@ -650,16 +661,20 @@ public class FullDataToRenderDataTransformer
 				if (skylightToApplyToNextBlock != -1)
 				{
 					skyLight = skylightToApplyToNextBlock;
+					// remove the override so we don't accidentally override the next datapoint
+					skylightToApplyToNextBlock = -1;
 				}
-				
+
 				if (blocklightToApplyToNextBlock != -1)
 				{
 					blockLight = blocklightToApplyToNextBlock;
+					blocklightToApplyToNextBlock = -1;
 				}
-				
+
 				if (blockToApplyToNextBlock != null)
 				{
 					block = blockToApplyToNextBlock;
+					blockToApplyToNextBlock = null;
 				}
 			}
 			
