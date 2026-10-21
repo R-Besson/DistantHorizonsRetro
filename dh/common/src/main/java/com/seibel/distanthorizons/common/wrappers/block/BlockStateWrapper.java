@@ -115,6 +115,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	private final int hashCode;
 	/** Should be between {@link LodUtil#BLOCK_FULLY_OPAQUE} and {@link LodUtil#BLOCK_FULLY_OPAQUE} */
 	private final int opacity;
+	/** MC's light opacity, clamped to [0, 15] */
+	private final int lightOpacity;
 	/** used by the Iris shader mod to determine how each LOD should be rendered */
 	private byte blockMaterialId = 0;
 	/** {@link RenderDataPointUtil#SHAPE_NONE} etc. */
@@ -321,6 +323,11 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			}
 			
 			this.lodShape = calculateLodShape(this.blockState);
+			
+			// an opacity override from the API is used for lighting too
+			this.lightOpacity = (overrideEventParam != null && overrideEventParam.getOpacity() != null)
+				? this.opacity
+				: calculateLightOpacity(this.blockState, isAir(this.blockState));
 
 			// allow overriding if present
 			if (overrideEventParam != null
@@ -718,6 +725,17 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		return opacity;
 	}
 
+	private static int calculateLightOpacity(@Nullable IBlockState blockState, boolean isAir)
+	{
+		if (isAir || blockState == null)
+		{
+			return LodUtil.BLOCK_FULLY_TRANSPARENT;
+		}
+		
+		// IE leaves are 1, so light under a tree is only a little darker like in MC
+		return Math.max(LodUtil.BLOCK_FULLY_TRANSPARENT, Math.min(blockState.getBlock().getLightOpacity(), LodUtil.BLOCK_FULLY_OPAQUE));
+	}
+	
 	private static byte calculateLodShape(@Nullable IBlockState blockState)
 	{
 		if (blockState == null)
@@ -1053,6 +1071,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	public int getOpacity() { return this.opacity; }
 	@Override
 	public byte getLodShape() { return this.lodShape; }
+	@Override
+	public int getLightOpacity() { return this.lightOpacity; }
 
 	@Override
 	public int getLightEmission() { return getLightEmission(this.blockState); }

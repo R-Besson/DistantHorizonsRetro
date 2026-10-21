@@ -18,6 +18,8 @@ import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.shader.Framebuffer;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.MathHelper;
 
 import java.nio.FloatBuffer;
 
@@ -90,6 +92,62 @@ public class AngelicaAccessor implements IAngelicaAccessor
 
 	@Override
     public boolean canDoFadeShader() { return AngelicaConfig.enableIris; }
+
+	@Override
+	public int getShaderTerrainDistanceInBlocks()
+	{
+		try
+		{
+			if (!IrisApi.getInstance().isShaderPackInUse())
+			{
+				return -1;
+			}
+
+			// the same value MixinCameraUniforms gives shader packs as "far"
+			return getRenderedTerrainDistanceInBlocks();
+		}
+		catch (Throwable e)
+		{
+			// a different Angelica version
+			return -1;
+		}
+	}
+
+	/**
+	 * How far Angelica actually draws vanilla terrain, used for the "far" uniform (see MixinCameraUniforms). <br><br>
+	 *
+	 * With its own chunk tracking Angelica only draws a chunk once its neighbors are loaded,
+	 * so the last ring of the render distance is only drawn when the ring past it is loaded too.
+	 * Angelica always assumes it isn't, which at low render distances makes shader packs
+	 * fade vanilla terrain into LODs a whole chunk early
+	 * (in singleplayer MC loads at least 3 chunks around the player, so at render distance 2 the last ring is drawn).
+	 */
+	public static int getRenderedTerrainDistanceInBlocks()
+	{
+		Minecraft mc = Minecraft.getMinecraft();
+		int renderDistance = mc.gameSettings.renderDistanceChunks;
+		if (AngelicaConfig.useVanillaChunkTracking)
+		{
+			return renderDistance * 16;
+		}
+
+		WorldClient level = mc.theWorld;
+		EntityLivingBase camera = mc.renderViewEntity;
+		boolean outerRingLoaded = false;
+		if (level != null && camera != null)
+		{
+			int cameraChunkX = MathHelper.floor_double(camera.posX) >> 4;
+			int cameraChunkZ = MathHelper.floor_double(camera.posZ) >> 4;
+			int ringDistance = renderDistance + 1;
+			// missing client chunks are returned as empty chunks
+			outerRingLoaded = !level.getChunkFromChunkCoords(cameraChunkX + ringDistance, cameraChunkZ).isEmpty()
+				&& !level.getChunkFromChunkCoords(cameraChunkX - ringDistance, cameraChunkZ).isEmpty()
+				&& !level.getChunkFromChunkCoords(cameraChunkX, cameraChunkZ + ringDistance).isEmpty()
+				&& !level.getChunkFromChunkCoords(cameraChunkX, cameraChunkZ - ringDistance).isEmpty();
+		}
+
+		return (outerRingLoaded ? renderDistance : Math.max(1, renderDistance - 1)) * 16;
+	}
 
 	@Override
 	public boolean leavesUseBiomeFoliageColor()

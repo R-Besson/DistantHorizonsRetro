@@ -21,7 +21,6 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -40,7 +39,9 @@ import com.seibel.distanthorizons.core.api.internal.ClientApi;
 import com.seibel.distanthorizons.core.api.internal.ServerApi;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
 import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.f3.F3Screen;
@@ -133,11 +134,21 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 			return;
 		}
 
-		int renderDistance = mc.gameSettings.renderDistanceChunks;
-		int chunkDistanceX = Math.abs((MathHelper.floor_double(event.entity.posX) >> 4) - (MathHelper.floor_double(camera.posX) >> 4));
-		int chunkDistanceZ = Math.abs((MathHelper.floor_double(event.entity.posZ) >> 4) - (MathHelper.floor_double(camera.posZ) >> 4));
-		if (chunkDistanceX > renderDistance
-			|| chunkDistanceZ > renderDistance)
+		// Angelica (like Sodium) culls chunks by a circle around the camera, not a square of chunks,
+		// so a square would leave mobs visible in the corners where only LODs are drawn.
+		// the extra half chunk covers mobs on the far side of the last rendered chunks
+		double maxDistance = (mc.gameSettings.renderDistanceChunks * 16) + 8;
+
+		// shader packs fade vanilla terrain into LODs at Angelica's "far" distance instead
+		IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
+		int shaderTerrainDistance = (angelicaAccessor != null) ? angelicaAccessor.getShaderTerrainDistanceInBlocks() : -1;
+		if (shaderTerrainDistance != -1)
+		{
+			maxDistance = shaderTerrainDistance;
+		}
+		double distanceX = event.entity.posX - camera.posX;
+		double distanceZ = event.entity.posZ - camera.posZ;
+		if ((distanceX * distanceX) + (distanceZ * distanceZ) > (maxDistance * maxDistance))
 		{
 			event.setCanceled(true);
 		}

@@ -41,6 +41,14 @@ public interface IAngelicaAccessor extends IModAccessor
 	boolean leavesUseBiomeFoliageColor();
 
 	/**
+	 * How far vanilla terrain is drawn when a shader pack is active, in blocks. <br>
+	 * Shader packs fade vanilla terrain into LODs at Angelica's "far" uniform,
+	 * which can be a chunk shorter than MC's render distance. <br>
+	 * -1 if no shader pack is in use.
+	 */
+	int getShaderTerrainDistanceInBlocks();
+
+	/**
 	 * Uploads the "dhProjection" and "heightLimit" uniforms to the currently bound shader pack program. <br>
 	 * Angelica doesn't upload them to its DH programs without a shadow pass,
 	 * without one (IE in the Nether or with shadows off) they stay zero:

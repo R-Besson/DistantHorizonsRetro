@@ -33,11 +33,13 @@ repositories {
 
 // ==================== Dependencies ====================
 
-def angelicaVersion = "2.2.33"
+def angelicaVersion = "2.2.35"
 def gtnhlibVersion = "0.11.54"
+def hodgepodgeVersion = "2.7.218"
+def twilightforestVersion = "2.7.45"
 
 dependencies {
-    modCompileOnly "com.github.GTNewHorizons:Hodgepodge:2.7.13:dev"
+    modCompileOnly "com.github.GTNewHorizons:Hodgepodge:${hodgepodgeVersion}:dev"
     modCompileOnly("com.github.GTNewHorizons:GTNHLib:${gtnhlibVersion}:dev") { transitive = false }
     modCompileOnly("com.github.GTNewHorizons:GT5-Unofficial:5.09.51.469:dev") { transitive = false }
     modCompileOnly("com.github.GTNewHorizons:Angelica:${angelicaVersion}:dev") { transitive = false }
@@ -66,7 +68,7 @@ dependencies {
     // names than this project, so take the SRG release jar for unimined to remap.
     devClientMods "com.github.GTNewHorizons:Angelica:${angelicaVersion}@jar"
     devClientMods "com.github.GTNewHorizons:GTNHLib:${gtnhlibVersion}@jar"
-    devClientMods "com.github.GTNewHorizons:twilightforest:2.7.45@jar"
+    devClientMods "com.github.GTNewHorizons:twilightforest:${twilightforestVersion}@jar"
     // must match the Complementary version below
     devClientMods "maven.modrinth:euphoria-patches:1.10.5-${complementaryVersion}-forge1.7.10"
 

@@ -224,7 +224,7 @@ public class DhLightingEngine
 								for (int y = maxY; y >= minY; y--)
 								{
 									IBlockStateWrapper block = previousBlockState = neighborChunk.getBlockState(relX, y, relZ, mcBlockPos, previousBlockState);
-									if (block != null && block.getOpacity() != LodUtil.BLOCK_FULLY_TRANSPARENT)
+									if (block != null && block.getLightOpacity() != LodUtil.BLOCK_FULLY_TRANSPARENT)
 									{
 										// keep moving down until we find a non-transparent block
 										break;
@@ -391,7 +391,7 @@ public class DhLightingEngine
 					previousBlockState = neighbourBlockState;
 					
 					// Math.max(1, ...) is used so that the propagated light level always drops by at least 1, preventing infinite cycles.
-					int targetLightLevel = lightValue - Math.max(1, neighbourBlockState.getOpacity());
+					int targetLightLevel = lightValue - Math.max(1, neighbourBlockState.getLightOpacity());
 					if (targetLightLevel > currentBlockLight)
 					{
 						// this position is darker than the new light value, update/set it
@@ -468,7 +468,7 @@ public class DhLightingEngine
 		BitSet airIDs = new BitSet(dataSource.mapping.size());
 		for (int id = 0, size = dataSource.mapping.size(); id < size; id++)
 		{
-			if (dataSource.mapping.getBlockStateWrapper(id).getOpacity() == 0)
+			if (dataSource.mapping.getBlockStateWrapper(id).getLightOpacity() == 0)
 			{
 				airIDs.set(id, true);
 			}
@@ -573,7 +573,7 @@ public class DhLightingEngine
 							else
 							{
 								// determine how much light should be absorbed by this column
-								int absorption = dataSource.mapping.getBlockStateWrapper(FullDataPointUtil.getId(above)).getOpacity() * FullDataPointUtil.getHeight(above);
+								int absorption = dataSource.mapping.getBlockStateWrapper(FullDataPointUtil.getId(above)).getLightOpacity() * FullDataPointUtil.getHeight(above);
 								if (absorption < aboveLight)
 								{
 									// the above data point is partially translucent,

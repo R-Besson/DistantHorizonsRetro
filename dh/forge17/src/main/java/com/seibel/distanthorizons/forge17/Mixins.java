@@ -42,7 +42,13 @@ public enum Mixins implements IMixins
     CLIENT_FADE(
 		new MixinBuilder().setPhase(Phase.EARLY)
         .addExcludedMod(TargetedMod.ANGELICA)
-        .addClientMixins("MixinFramebuffer"));
+        .addClientMixins("MixinFramebuffer")),
+
+	// makes shader packs fade vanilla terrain into LODs at the real render distance
+    ANGELICA_FAR_UNIFORM(
+		new MixinBuilder().setPhase(Phase.EARLY)
+        .addRequiredMod(TargetedMod.ANGELICA)
+        .addClientMixins("angelica.MixinCameraUniforms"));
 	
 	
 	

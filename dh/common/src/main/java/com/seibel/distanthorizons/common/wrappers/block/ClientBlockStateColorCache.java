@@ -35,6 +35,7 @@ import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.block.BlockPane;
+import net.minecraft.block.BlockRotatedPillar;
 import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.IBlockAccess;
@@ -77,6 +78,10 @@ public class ClientBlockStateColorCache
 		ForgeDirection.UP,
 		ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST,
 		ForgeDirection.DOWN };
+	/** logs and other pillars are mostly seen from the side, their top is the end grain */
+	private static final ForgeDirection[] PILLAR_FACE_SAMPLE_ORDER = {
+		ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST,
+		ForgeDirection.UP, ForgeDirection.DOWN };
 
 
 
@@ -269,7 +274,8 @@ public class ClientBlockStateColorCache
 		EColorMode colorMode = EColorMode.getColorMode(blockState.block);
 		Integer transparentColor = null;
 		TextureAtlasSprite lastSprite = null;
-		for (ForgeDirection face : FACE_SAMPLE_ORDER)
+		ForgeDirection[] faceSampleOrder = (blockState.block instanceof BlockRotatedPillar) ? PILLAR_FACE_SAMPLE_ORDER : FACE_SAMPLE_ORDER;
+		for (ForgeDirection face : faceSampleOrder)
 		{
 			TextureAtlasSprite sprite = TextureAtlasSpriteWrapper.resolveFaceSprite(blockState, face.ordinal());
 			if (sprite == null || sprite == lastSprite)

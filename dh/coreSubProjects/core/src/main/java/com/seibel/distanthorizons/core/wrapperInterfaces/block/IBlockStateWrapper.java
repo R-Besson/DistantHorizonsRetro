@@ -43,7 +43,14 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	 * @see LodUtil#BLOCK_FULLY_TRANSPARENT
 	 */
 	int getOpacity();
-	
+
+	/**
+	 * How much light this block absorbs, used by DH's lighting engine. <br>
+	 * Unlike {@link #getOpacity()} this is MC's real value, IE leaves only absorb 1 light level
+	 * but are still opaque for culling.
+	 */
+	default int getLightOpacity() { return this.getOpacity(); }
+
 	int getLightEmission();
 	
 	byte getMaterialId();
