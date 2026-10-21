@@ -638,6 +638,12 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		//=============//
 		//region
 
+		// checked before the names, otherwise glowstone would be stone and shader packs wouldn't make it glow
+		if (getLightEmission(blockState) > 0)
+		{
+			return EDhApiBlockMaterial.ILLUMINATED;
+		}
+
 		if (lowercaseSerialString.contains("snow"))
 		{
 			return EDhApiBlockMaterial.SNOW;
@@ -657,11 +663,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			|| lowercaseSerialString.contains("ore"))
 		{
 			return EDhApiBlockMaterial.STONE;
-		}
-
-		if (getLightEmission(blockState) > 0)
-		{
-			return EDhApiBlockMaterial.ILLUMINATED;
 		}
 
 		//endregion

@@ -124,7 +124,8 @@ public class LodQuadBuilder implements AutoCloseable
 	
 	private boolean doTransparency;
 	private IClientLevelWrapper clientLevelWrapper;
-	
+	private boolean noSkyLight;
+
 	private EDhApiDebugRendering debugRenderingMode;
 	private EDhApiGrassSideRendering grassSideRenderingMode;
 	
@@ -157,7 +158,9 @@ public class LodQuadBuilder implements AutoCloseable
 		this.doTransparency = doTransparency;
 		
 		this.clientLevelWrapper = clientLevelWrapper;
-		
+		// faces next to open air default to full sky light, which lights up caves in dimensions without a sky
+		this.noSkyLight = (clientLevelWrapper != null && !clientLevelWrapper.hasSkyLight());
+
 		this.debugRenderingMode = Config.Client.Advanced.Debugging.debugRenderingColors.get();
 		this.grassSideRenderingMode = Config.Client.Advanced.Graphics.Quality.grassSideRendering.get();
 		
@@ -458,7 +461,7 @@ public class LodQuadBuilder implements AutoCloseable
 					quad.hasError ? ColorUtil.RED : color,
 					quad.hasError ? 0 : normalIndex,
 					quad.hasError ? 0 : quad.irisBlockMaterialId,
-					quad.hasError ? 15 : quad.skyLight,
+					quad.hasError ? 15 : (this.noSkyLight ? 0 : quad.skyLight),
 					quad.hasError ? 15 : quad.blockLight,
 					quad.hasError ? 0 : quad.textureTileId,
 					mx, my, mz);

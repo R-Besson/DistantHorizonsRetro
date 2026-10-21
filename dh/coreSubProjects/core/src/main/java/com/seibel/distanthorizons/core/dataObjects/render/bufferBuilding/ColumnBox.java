@@ -47,6 +47,8 @@ public class ColumnBox
 	 * that block position is covered/occluded by an adjacent block/column.
 	 */
 	private static final byte SKYLIGHT_COVERED = -1;
+	/** block light falloff on vertical faces is done in steps this tall to keep the quad count down */
+	private static final int BLOCK_LIGHT_FALLOFF_STEP_HEIGHT = 3;
 	
 	
 	
@@ -422,11 +424,25 @@ public class ColumnBox
 			{
 				// the topmost air keeps its max sky light (min is taken)
 				byte overhangSkyLight = (adjIndex == 0) ? LodUtil.MAX_MC_LIGHT : adjSkyLight;
-				applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMaxY, adjAboveMinY, overhangSkyLight, adjBlockLight);
+
+				// the stored block light is the light right above the adjacent point,
+				// it drops by one per block going up like it does in MC, otherwise a lava sea lights cliffs all the way to the ceiling
+				short stepStartY = adjMaxY;
+				while (stepStartY < adjAboveMinY)
 				{
-					LongArrayList temp = segments;
-					segments = newSegments;
-					newSegments = temp;
+					byte stepBlockLight = (byte) Math.max(LodUtil.MIN_MC_LIGHT, adjBlockLight - (stepStartY - adjMaxY));
+					short stepEndY = (stepBlockLight == LodUtil.MIN_MC_LIGHT)
+						? adjAboveMinY
+						: (short) Math.min(stepStartY + BLOCK_LIGHT_FALLOFF_STEP_HEIGHT, adjAboveMinY);
+
+					applyLightToRangeAndPopulateNewSgements(segments, newSegments, stepStartY, stepEndY, overhangSkyLight, stepBlockLight);
+					{
+						LongArrayList temp = segments;
+						segments = newSegments;
+						newSegments = temp;
+					}
+
+					stepStartY = stepEndY;
 				}
 			}
 		}
@@ -438,6 +454,8 @@ public class ColumnBox
 		// from segments         //
 		//=======================//
 		
+		boolean selfLit = irisBlockMaterialId == EDhApiBlockMaterial.LAVA.index
+			|| irisBlockMaterialId == EDhApiBlockMaterial.ILLUMINATED.index;
 		for (int i = 0; i < segments.size(); i++)
 		{
 			long segment = segments.getLong(i);
@@ -445,7 +463,9 @@ public class ColumnBox
 				builder, direction,
 				x, z, horizontalBlockWidth,
 				color, tryGetTextureId(faceTileIdsByDirectionOrdinal, direction),
-				irisBlockMaterialId, YSegmentUtil.getBlockLight(segment),
+				irisBlockMaterialId,
+				// light emitting blocks (lava falls) light their own faces, the falloff is only for light from the neighbors
+				selfLit ? (byte) Math.max(blockLight, YSegmentUtil.getBlockLight(segment)) : YSegmentUtil.getBlockLight(segment),
 				YSegmentUtil.getSkyLight(segment),
 				inputTransparent, 
 				YSegmentUtil.getEndY(segment), YSegmentUtil.getStartY(segment)

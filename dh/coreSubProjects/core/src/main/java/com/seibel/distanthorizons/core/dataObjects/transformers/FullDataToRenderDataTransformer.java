@@ -598,6 +598,20 @@ public class FullDataToRenderDataTransformer
 			}
 			
 			
+			// lava pockets hidden inside the Nether's netherrack are enclosed by solid blocks, in game they can't be seen
+			// but LODs are coarser than the real walls so they poke through as orange dots, draw them as the rock above instead
+			if (block.isLiquid()
+				&& block.getLightEmission() > 0
+				&& isFullyOpaqueBlockAt(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping))
+			{
+				IBlockStateWrapper blockAbove = getTouchingBlock(fullColumnData, fullDataIndex - 1, topY, true, fullDataMapping);
+				if (blockAbove != null
+					&& blockAbove.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE)
+				{
+					block = blockAbove;
+				}
+			}
+
 			int color;
 			// use the override values if necessary
 			if (colorToApplyToNextBlock == -1)
@@ -664,11 +678,11 @@ public class FullDataToRenderDataTransformer
 			}
 			else if (lightEmission == 0
 				&& block.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE
-				&& isCoveringLightEmitter(getTouchingBlock(fullColumnData, fullDataIndex - 1, topY, true, fullDataMapping)))
+				&& isCoveringBlock(getTouchingBlock(fullColumnData, fullDataIndex - 1, topY, true, fullDataMapping)))
 			{
-				// the stored light comes from the emitter sitting on this block (IE netherrack under a lava pocket
-				// in the Nether ceiling), its top face is covered so that light would only show on the sides and
-				// underside, lighting up the ceiling
+				// the stored light is the light inside the block sitting on this one, which MC keeps at 0 for opaque blocks.
+				// Anything else is from an emitter sitting on it (IE netherrack under a lava pocket in the Nether ceiling)
+				// or from lower detail LODs merging in a neighbor's hidden lava, both would light up random netherrack
 				blockLight = LodUtil.MIN_MC_LIGHT;
 			}
 
@@ -716,14 +730,14 @@ public class FullDataToRenderDataTransformer
 	}
 
 	/**
-	 * @return true for rendered light emitters (lava, glowstone) that cover the block below them,
+	 * @return true for opaque blocks and rendered light emitters (lava) that cover the block below them,
 	 * fire and torches don't cover it
 	 */
-	private static boolean isCoveringLightEmitter(@Nullable IBlockStateWrapper block)
+	private static boolean isCoveringBlock(@Nullable IBlockStateWrapper block)
 	{
 		return block != null
-			&& block.getLightEmission() > 0
-			&& (block.isLiquid() || block.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE);
+			&& (block.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE
+				|| (block.isLiquid() && block.getLightEmission() > 0));
 	}
 
 	/**

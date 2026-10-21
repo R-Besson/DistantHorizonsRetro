@@ -33,5 +33,13 @@ public interface IAngelicaAccessor extends IModAccessor
 	int getDepthTextureId();
 	
 	boolean canDoFadeShader();
-	
+
+	/**
+	 * Uploads the "dhProjection" and "heightLimit" uniforms to the currently bound shader pack program. <br>
+	 * Angelica doesn't upload them to its DH programs without a shadow pass,
+	 * without one (IE in the Nether or with shadows off) they stay zero:
+	 * the opaque LODs aren't drawn at all and everything above Y 96 is discarded as clouds.
+	 */
+	void uploadMissingShaderUniforms();
+
 }

@@ -31,6 +31,7 @@ import com.seibel.distanthorizons.core.util.math.DhVec3f;
 import com.seibel.distanthorizons.core.util.objects.SortedArraySet;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IVertexBufferWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
@@ -52,6 +53,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
+	private static final IAngelicaAccessor ANGELICA_ACCESSOR = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
 	
 	private static final DhVec3f MODEL_POS = new DhVec3f();
 	/** single event object used to reduce GC pressure */
@@ -370,6 +372,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		}
 		
 		
+		boolean missingUniformsUploaded = false;
 		if (bufferContainers != null)
 		{
 			for (int lodIndex = 0; lodIndex < bufferContainers.size(); lodIndex++)
@@ -395,6 +398,14 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 					GlDhMetaRenderer.INSTANCE.shaderProgramForThisFrame.setModelOffsetPos(MODEL_POS);
 					
 					ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeBufferRenderEvent.class, BEFORE_BUFFER_RENDER_EVENT_PARAM);
+
+					// the shader pack's program is bound now, it keeps uniform values so once per pass is enough
+					if (ANGELICA_ACCESSOR != null
+						&& !missingUniformsUploaded)
+					{
+						missingUniformsUploaded = true;
+						ANGELICA_ACCESSOR.uploadMissingShaderUniforms();
+					}
 				}
 				
 				IVertexBufferWrapper[] vertexBuffers = (opaquePass ? bufferContainer.vboOpaqueWrappers : bufferContainer.vboTransparentWrappers);
