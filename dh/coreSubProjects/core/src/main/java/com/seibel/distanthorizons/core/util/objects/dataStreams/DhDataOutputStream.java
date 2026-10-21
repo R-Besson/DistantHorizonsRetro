@@ -42,21 +42,30 @@ public class DhDataOutputStream extends DataOutputStream
 	private static final ThreadLocal<ResettableArrayCache> LZMA_RESETTABLE_ARRAY_CACHE_GETTER = ThreadLocal.withInitial(() -> new ResettableArrayCache(new LzmaArrayCache()));
 	
 	private final ByteArrayList outputByteArray;
-	private final ByteArrayOutputStream wrappedByteStream;
+	private final UnsynchronizedByteArrayOutputStream wrappedByteStream;
 	private final EDhApiDataCompressionMode compressionMode;
-	
-	
-	
+
+	/** {@link ByteArrayOutputStream}'s default */
+	private static final int DEFAULT_EXPECTED_SIZE_IN_BYTES = 32;
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	/**
 	 * @param outputByteArray where the contents of this stream will be written to when done
 	 */
 	public static DhDataOutputStream create(EDhApiDataCompressionMode compressionMode, ByteArrayList outputByteArray) throws IOException
-	{ return new DhDataOutputStream(new ByteArrayOutputStream(), compressionMode, outputByteArray); }
-	private DhDataOutputStream(ByteArrayOutputStream wrappedByteStream, EDhApiDataCompressionMode compressionMode, ByteArrayList outputByteArray) throws IOException
+	{ return create(compressionMode, outputByteArray, DEFAULT_EXPECTED_SIZE_IN_BYTES); }
+	/**
+	 * @param expectedUncompressedSizeInBytes how big the buffer starts out,
+	 *                                        a good estimate saves growing and copying it while writing
+	 */
+	public static DhDataOutputStream create(EDhApiDataCompressionMode compressionMode, ByteArrayList outputByteArray, int expectedUncompressedSizeInBytes) throws IOException
+	{ return new DhDataOutputStream(new UnsynchronizedByteArrayOutputStream(expectedUncompressedSizeInBytes), compressionMode, outputByteArray); }
+	private DhDataOutputStream(UnsynchronizedByteArrayOutputStream wrappedByteStream, EDhApiDataCompressionMode compressionMode, ByteArrayList outputByteArray) throws IOException
 	{ 
 		super(warpStream(wrappedByteStream, compressionMode));
 
@@ -130,7 +139,7 @@ public class DhDataOutputStream extends DataOutputStream
 		}
 		else
 		{
-			this.outputByteArray.addElements(0, this.wrappedByteStream.toByteArray());
+			this.wrappedByteStream.appendTo(this.outputByteArray);
 		}
 		
 	}

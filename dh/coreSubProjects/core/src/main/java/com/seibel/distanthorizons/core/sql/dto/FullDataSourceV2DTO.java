@@ -55,6 +55,11 @@ public class FullDataSourceV2DTO
 		implements IBaseDTO<Long>, INetworkObject, AutoCloseable
 {
 	public static final boolean VALIDATE_INPUT_DATAPOINTS = true;
+
+	/** used to size the encoding buffers, too small just means the buffer grows */
+	private static final int EXPECTED_BYTES_PER_DATA_POINT = 5;
+	/** block and biome names, IE "minecraft:stone_STATE_{...}" + "minecraft:plains" */
+	private static final int EXPECTED_BYTES_PER_MAPPING_ENTRY = 64;
 	
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("V2DTO");
 	
@@ -397,8 +402,20 @@ public class FullDataSourceV2DTO
 			minZ = 1;
 			maxZ = FullDataSourceV2.WIDTH-1;
 		}
-		
-		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray))
+
+		// a varint length per column, then a few small varints per data point (id, height, sometimes bottom Y and light)
+		int dataPointCount = 0;
+		for (int x = minX; x < maxX; x++)
+		{
+			for (int z = minZ; z < maxZ; z++)
+			{
+				LongArrayList col = inputDataArray[FullDataSourceV2.relativePosToIndex(x, z)];
+				dataPointCount += (col != null) ? col.size() : 0;
+			}
+		}
+		int expectedSizeInBytes = ((maxX - minX) * (maxZ - minZ)) + (dataPointCount * EXPECTED_BYTES_PER_DATA_POINT);
+
+		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray, expectedSizeInBytes))
 		{
 			// this method would be simpler if we allocated a bunch of temporary arrays,
 			// but we're trying to avoid garbage.
@@ -669,12 +686,9 @@ public class FullDataSourceV2DTO
 	
 	private static void writeGenerationStepsToBlob(ByteArrayList inputColumnGenStepByteArray, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException
 	{
-		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray))
+		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray, inputColumnGenStepByteArray.size()))
 		{
-			for (int i = 0; i < inputColumnGenStepByteArray.size(); i++)
-			{
-				compressedOut.writeByte(inputColumnGenStepByteArray.getByte(i));
-			}
+			compressedOut.write(inputColumnGenStepByteArray.elements(), 0, inputColumnGenStepByteArray.size());
 		}
 	}
 	private static void readBlobToGenerationSteps(ByteArrayList inputCompressedDataByteArray, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException, DataCorruptedException
@@ -693,12 +707,9 @@ public class FullDataSourceV2DTO
 	
 	private static void writeWorldCompressionModeToBlob(ByteArrayList inputWorldCompressionModeByteArray, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException
 	{
-		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray))
+		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray, inputWorldCompressionModeByteArray.size()))
 		{
-			for (int i = 0; i < inputWorldCompressionModeByteArray.size(); i++)
-			{
-				compressedOut.write(inputWorldCompressionModeByteArray.getByte(i));
-			}
+			compressedOut.write(inputWorldCompressionModeByteArray.elements(), 0, inputWorldCompressionModeByteArray.size());
 		}
 	}
 	private static void readBlobToWorldCompressionMode(ByteArrayList inputCompressedDataByteArray, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException, DataCorruptedException
@@ -717,7 +728,8 @@ public class FullDataSourceV2DTO
 	
 	private static void writeDataMappingToBlob(FullDataPointIdMap mapping, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException
 	{
-		try(DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray))
+		int expectedSizeInBytes = Integer.BYTES + (mapping.size() * EXPECTED_BYTES_PER_MAPPING_ENTRY);
+		try(DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray, expectedSizeInBytes))
 		{
 			mapping.serialize(compressedOut);
 		}
