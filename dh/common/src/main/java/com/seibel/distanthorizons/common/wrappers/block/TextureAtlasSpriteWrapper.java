@@ -54,7 +54,8 @@ public class TextureAtlasSpriteWrapper
 		// The sprite's pixel array isn't publicly accessible, so we rely on a Mixin
 		// (see forge17/.../MixinTextureAtlasSprite) which caches the base mipmap level.
 		IMixinTextureAtlasSprite spriteExt = (IMixinTextureAtlasSprite) sprite;
-		int[] spriteData = spriteExt.distanthorizons$getSpriteData();
+		int[][] frames = spriteExt.distanthorizons$getSpriteFrames();
+		int[] spriteData = (frames != null && frameIndex < frames.length) ? frames[frameIndex] : null;
 		if (spriteData == null)
 		{
 			// missing texture sentinel (matches the pink "missing" color used elsewhere)
@@ -70,6 +71,13 @@ public class TextureAtlasSpriteWrapper
 	}
 
 
+
+	/** at least 1 */
+	public static int getFrameCount(TextureAtlasSprite sprite)
+	{
+		int[][] frames = ((IMixinTextureAtlasSprite) sprite).distanthorizons$getSpriteFrames();
+		return (frames != null && frames.length > 0) ? frames.length : 1;
+	}
 
 	public static int getWidth(TextureAtlasSprite texture)
 	{

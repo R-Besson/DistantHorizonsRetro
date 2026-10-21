@@ -286,11 +286,11 @@ public class ClientBlockStateColorCache
 		return transparentColor;
 	}
 
-	/** if multiple frames are present, just the first one will be used */
+	/** averaged over every animation frame */
 	public static int calculateColorFromTexture(TextureAtlasSprite texture, EColorMode colorMode)
 	{
 		int count = 0;
-		int alpha = 0;
+		long alpha = 0;
 		double red = 0;
 		double green = 0;
 		double blue = 0;
@@ -298,44 +298,49 @@ public class ClientBlockStateColorCache
 
 		int textureHeight = TextureAtlasSpriteWrapper.getHeight(texture);
 		int textureWidth = TextureAtlasSpriteWrapper.getWidth(texture);
-		for (int v = 0; v < textureHeight; v++)
+		// averaged over the whole animation, IE lava pulses between darker and brighter orange
+		int frameCount = TextureAtlasSpriteWrapper.getFrameCount(texture);
+		for (int frame = 0; frame < frameCount; frame++)
 		{
-			for (int u = 0; u < textureWidth; u++)
+			for (int v = 0; v < textureHeight; v++)
 			{
-				tempColor = TextureAtlasSpriteWrapper.getPixelARGB(texture, 0, u, v);
-
-				int r = ColorUtil.getRed(tempColor);
-				int g = ColorUtil.getGreen(tempColor);
-				int b = ColorUtil.getBlue(tempColor);
-				int a = ColorUtil.getAlpha(tempColor);
-
-				int scale = 1;
-				if (colorMode == EColorMode.Leaves)
+				for (int u = 0; u < textureWidth; u++)
 				{
-					if (a == 0)
+					tempColor = TextureAtlasSpriteWrapper.getPixelARGB(texture, frame, u, v);
+	
+					int r = ColorUtil.getRed(tempColor);
+					int g = ColorUtil.getGreen(tempColor);
+					int b = ColorUtil.getBlue(tempColor);
+					int a = ColorUtil.getAlpha(tempColor);
+	
+					int scale = 1;
+					if (colorMode == EColorMode.Leaves)
 					{
-						continue; //same long grass
+						if (a == 0)
+						{
+							continue; //same long grass
+						}
+						else
+						{
+							a = 255; //just in case there are semi transparent pixels
+						}
 					}
-					else
+					else if (a == 0 && colorMode != EColorMode.Glass)
 					{
-						a = 255; //just in case there are semi transparent pixels
+						continue;
 					}
+					else if (colorMode == EColorMode.Flower && (g + 25 < b || g + 25 < r))
+					{
+						scale = FLOWER_COLOR_SCALE;
+					}
+					count += scale;
+					//apparently alpha is linear
+					alpha += a * scale;
+					//gamma correction is complicated
+					red += srgbToLinearTable[r] * a * scale;
+					green += srgbToLinearTable[g] * a * scale;
+					blue += srgbToLinearTable[b] * a * scale;
 				}
-				else if (a == 0 && colorMode != EColorMode.Glass)
-				{
-					continue;
-				}
-				else if (colorMode == EColorMode.Flower && (g + 25 < b || g + 25 < r))
-				{
-					scale = FLOWER_COLOR_SCALE;
-				}
-				count += scale;
-				//apparently alpha is linear
-				alpha += a * scale;
-				//gamma correction is complicated
-				red += srgbToLinearTable[r] * a * scale;
-				green += srgbToLinearTable[g] * a * scale;
-				blue += srgbToLinearTable[b] * a * scale;
 			}
 		}
 
@@ -346,7 +351,7 @@ public class ClientBlockStateColorCache
 		}
 		else
 		{
-			int averageAlpha = alpha / count;
+			int averageAlpha = (int) (alpha / count);
 			if (colorMode == EColorMode.Glass && averageAlpha != 0)
 			{
 				averageAlpha = Math.max(averageAlpha, MIN_GLASS_ALPHA);

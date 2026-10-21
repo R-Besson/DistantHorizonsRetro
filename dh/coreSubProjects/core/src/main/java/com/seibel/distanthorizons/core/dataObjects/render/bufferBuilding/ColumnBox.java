@@ -307,8 +307,10 @@ public class ColumnBox
 		
 		int adjCount = adjColumnView.size;
 		
-		// Start with the entire range at max light
-		segments.add(YSegmentUtil.encode(yMin, yMax, LodUtil.MAX_MC_LIGHT));
+		// Start with the entire range at max light.
+		// Block light is replaced with the light of the air next to the face where the adjacent column has some,
+		// otherwise a light on top of this column (IE fire on a hill) would light its whole side
+		segments.add(YSegmentUtil.encode(yMin, yMax, LodUtil.MAX_MC_LIGHT, blockLight));
 		
 		// Process each adjacent datapoint and split segments as needed
 		// (index -1 is a special case for the void datapoint)
@@ -358,7 +360,10 @@ public class ColumnBox
 				&& transparencyEnabled;
 			
 			byte adjSkyLight = RenderDataPointUtil.getLightSky(adjPoint);
+			// a data point's light is the light of the air right above it
+			byte adjBlockLight = RenderDataPointUtil.getLightBlock(adjPoint);
 			byte lightToApply;
+			byte blockLightToApply;
 			
 			if (!adjTransparent)
 			{
@@ -391,28 +396,33 @@ public class ColumnBox
 					&& RenderDataPointUtil.getYMax(adjPoint) >= caveCullingMaxY;
 				
 				lightToApply = useAdjLighting ? adjSkyLight : SKYLIGHT_COVERED;
+				blockLightToApply = useAdjLighting ? adjBlockLight : LodUtil.MIN_MC_LIGHT;
 			}
 			else
 			{
 				// Adjacent is transparent, use below light
 				lightToApply = RenderDataPointUtil.getLightSky(adjBelowPoint);
+				blockLightToApply = RenderDataPointUtil.getLightBlock(adjBelowPoint);
 			}
-			
-			
+
+
 			// Apply light to the range [adjMinY, adjMaxY)
-			applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMinY, adjMaxY, lightToApply);
+			applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMinY, adjMaxY, lightToApply, blockLightToApply);
 			{
 				// swap references so we can use the newly populated segments
 				LongArrayList temp = segments;
 				segments = newSegments;
 				newSegments = temp;
 			}
-			
-			// Fill overhang area [adjMaxY, adjAboveMinY) with adjSkyLight
-			short adjAboveMinY = RenderDataPointUtil.getYMin(adjAbovePoint);
+
+			// Fill overhang area [adjMaxY, adjAboveMinY) with adjSkyLight,
+			// or everything above the adjacent column's top
+			short adjAboveMinY = (adjIndex == 0) ? yMax : RenderDataPointUtil.getYMin(adjAbovePoint);
 			if (adjMaxY < adjAboveMinY)
 			{
-				applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMaxY, adjAboveMinY, adjSkyLight);
+				// the topmost air keeps its max sky light (min is taken)
+				byte overhangSkyLight = (adjIndex == 0) ? LodUtil.MAX_MC_LIGHT : adjSkyLight;
+				applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMaxY, adjAboveMinY, overhangSkyLight, adjBlockLight);
 				{
 					LongArrayList temp = segments;
 					segments = newSegments;
@@ -435,8 +445,8 @@ public class ColumnBox
 				builder, direction,
 				x, z, horizontalBlockWidth,
 				color, tryGetTextureId(faceTileIdsByDirectionOrdinal, direction),
-				irisBlockMaterialId, blockLight,
-				YSegmentUtil.getSkyLight(segment), 
+				irisBlockMaterialId, YSegmentUtil.getBlockLight(segment),
+				YSegmentUtil.getSkyLight(segment),
 				inputTransparent, 
 				YSegmentUtil.getEndY(segment), YSegmentUtil.getStartY(segment)
 			);
@@ -452,19 +462,20 @@ public class ColumnBox
 	 */
 	private static void applyLightToRangeAndPopulateNewSgements(
 			LongArrayList segments, LongArrayList newSegments, 
-			short rangeStart, short rangeEnd, 
-			byte newLight)
+			short rangeStart, short rangeEnd,
+			byte newLight, byte newBlockLight)
 	{
 		// clear the pooled array that the new segments will go into
 		newSegments.clear();
-		
+
 		for (int i = 0; i < segments.size(); i++)
 		{
 			long seg = segments.getLong(i);
 			short endY = YSegmentUtil.getEndY(seg);
 			short startY = YSegmentUtil.getStartY(seg);
 			byte skyLight = YSegmentUtil.getSkyLight(seg);
-			
+			byte blockLight = YSegmentUtil.getBlockLight(seg);
+
 			// No overlap
 			if (endY <= rangeStart 
 				|| startY >= rangeEnd)
@@ -478,19 +489,19 @@ public class ColumnBox
 			// Part before the range
 			if (startY < rangeStart)
 			{
-				newSegments.add(YSegmentUtil.encode(startY, rangeStart, skyLight));
+				newSegments.add(YSegmentUtil.encode(startY, rangeStart, skyLight, blockLight));
 			}
-			
-			// Overlapping part - take minimum light
+
+			// Overlapping part - take minimum sky light, the block light is replaced
 			short overlapStart = (short)Math.max(startY, rangeStart);
 			short overlapEnd = (short)Math.min(endY, rangeEnd);
 			byte minLight = (byte) Math.min(newLight, skyLight);
-			newSegments.add(YSegmentUtil.encode(overlapStart, overlapEnd, minLight));
-			
+			newSegments.add(YSegmentUtil.encode(overlapStart, overlapEnd, minLight, newBlockLight));
+
 			// Part after the range
 			if (endY > rangeEnd)
 			{
-				newSegments.add(YSegmentUtil.encode(rangeEnd, endY, skyLight));
+				newSegments.add(YSegmentUtil.encode(rangeEnd, endY, skyLight, blockLight));
 			}
 		}
 	}
@@ -579,21 +590,24 @@ public class ColumnBox
 		private static final int START_Y_OFFSET = 0;
 		private static final int END_Y_OFFSET = START_Y_OFFSET + HEIGHT_WIDTH;
 		private static final int SKY_LIGHT_OFFSET = END_Y_OFFSET + HEIGHT_WIDTH;
-		
-		
-		
-		public static long encode(short startY, short endY, byte skyLight)
+		private static final int BLOCK_LIGHT_OFFSET = SKY_LIGHT_OFFSET + SKY_LIGHT_WIDTH;
+
+
+
+		public static long encode(short startY, short endY, byte skyLight, byte blockLight)
 		{
 			long data = 0L;
 			data |= (long) (startY & START_Y_MASK) << START_Y_OFFSET;
 			data |= (long) (endY & END_Y_MASK) << END_Y_OFFSET;
 			data |= (long) (skyLight & SKY_LIGHT_MASK) << SKY_LIGHT_OFFSET;
+			data |= (long) (blockLight & SKY_LIGHT_MASK) << BLOCK_LIGHT_OFFSET;
 			return data;
 		}
-		
+
 		public static short getStartY(long data) { return (short) ((data >> START_Y_OFFSET) & START_Y_MASK); }
 		public static short getEndY(long data) { return (short) ((data >> END_Y_OFFSET) & END_Y_MASK); }
 		public static byte getSkyLight(long data) { return (byte) ((data >> SKY_LIGHT_OFFSET) & SKY_LIGHT_MASK); }
+		public static byte getBlockLight(long data) { return (byte) ((data >> BLOCK_LIGHT_OFFSET) & SKY_LIGHT_MASK); }
 		
 	}
 	

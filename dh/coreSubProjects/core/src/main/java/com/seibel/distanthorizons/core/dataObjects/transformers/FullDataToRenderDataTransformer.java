@@ -552,7 +552,10 @@ public class FullDataToRenderDataTransformer
 				int ignoredColor = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
 				int ignoredAlpha = ColorUtil.getAlpha(ignoredColor);
 				
-				if (colorBelowWithAvoidedBlocks)
+				// light emitting blocks (fire, torches) only pass on their light,
+				// otherwise netherrack under fire is painted fire colored
+				if (colorBelowWithAvoidedBlocks
+					&& block.getLightEmission() == 0)
 				{
 					// don't transfer the color when alpha is 0
 					// this prevents issues if grass is transparent
@@ -648,6 +651,29 @@ public class FullDataToRenderDataTransformer
 			
 			
 			
+			// light emitting blocks (lava, glowstone) light themselves. A LOD only stores the light
+			// above it, which can be 0 for lava falls in the Nether or chunks lit before their neighbors
+			int lightEmission = Math.min(block.getLightEmission(), LodUtil.MAX_MC_LIGHT);
+			if (lightEmission > blockLight
+				// lava pockets hidden inside the Nether's netherrack ceiling are enclosed by solid blocks,
+				// lower detail LODs can still expose them and they shouldn't glow there
+				&& !(isFullyOpaqueBlockAt(fullColumnData, fullDataIndex - 1, topY, true, fullDataMapping)
+					&& isFullyOpaqueBlockAt(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping)))
+			{
+				blockLight = lightEmission;
+			}
+			else if (lightEmission == 0
+				&& block.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE
+				&& isCoveringLightEmitter(getTouchingBlock(fullColumnData, fullDataIndex - 1, topY, true, fullDataMapping)))
+			{
+				// the stored light comes from the emitter sitting on this block (IE netherrack under a lava pocket
+				// in the Nether ceiling), its top face is covered so that light would only show on the sides and
+				// underside, lighting up the ceiling
+				blockLight = LodUtil.MIN_MC_LIGHT;
+			}
+
+
+
 			//=============================//
 			// merge same-colored adjacent //
 			//=============================//
@@ -681,7 +707,57 @@ public class FullDataToRenderDataTransformer
 			renderColumnData.set(0, RenderDataPointUtil.EMPTY_DATA);
 		}
 	}
-	
+
+	/** @see #getTouchingBlock */
+	private static boolean isFullyOpaqueBlockAt(LongArrayList fullColumnData, int index, int touchingY, boolean isAbove, FullDataPointIdMap fullDataMapping)
+	{
+		IBlockStateWrapper neighborBlock = getTouchingBlock(fullColumnData, index, touchingY, isAbove, fullDataMapping);
+		return neighborBlock != null && neighborBlock.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE;
+	}
+
+	/**
+	 * @return true for rendered light emitters (lava, glowstone) that cover the block below them,
+	 * fire and torches don't cover it
+	 */
+	private static boolean isCoveringLightEmitter(@Nullable IBlockStateWrapper block)
+	{
+		return block != null
+			&& block.getLightEmission() > 0
+			&& (block.isLiquid() || block.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE);
+	}
+
+	/**
+	 * @param index the neighboring data point, the column is ordered top to bottom
+	 * @param touchingY the Y the neighbor has to start or end at to be touching
+	 * @param isAbove true if the neighbor is above, then its bottom has to be at touchingY, otherwise its top
+	 * @return the neighbor's block, null if that data point doesn't exist or doesn't touch
+	 */
+	@Nullable
+	private static IBlockStateWrapper getTouchingBlock(LongArrayList fullColumnData, int index, int touchingY, boolean isAbove, FullDataPointIdMap fullDataMapping)
+	{
+		if (index < 0 || index >= fullColumnData.size())
+		{
+			return null;
+		}
+
+		long fullData = fullColumnData.getLong(index);
+		int neighborBottomY = FullDataPointUtil.getBottomY(fullData);
+		int neighborTouchingY = isAbove ? neighborBottomY : (neighborBottomY + FullDataPointUtil.getHeight(fullData));
+		if (neighborTouchingY != touchingY)
+		{
+			return null;
+		}
+
+		try
+		{
+			return fullDataMapping.getBlockStateWrapper(FullDataPointUtil.getId(fullData));
+		}
+		catch (IndexOutOfBoundsException e)
+		{
+			return null;
+		}
+	}
+
 	/**
 	 * Necessary to handle adjacent sky/block lighting
 	 * over the void.

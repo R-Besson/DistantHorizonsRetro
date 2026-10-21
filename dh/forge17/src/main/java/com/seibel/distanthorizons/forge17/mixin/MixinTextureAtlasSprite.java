@@ -1,6 +1,7 @@
 package com.seibel.distanthorizons.forge17.mixin;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -24,6 +25,8 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 	/** contains the individual pixel data in ARGB format */
     @Unique
     private int[] distanthorizons$spriteData;
+    @Unique
+    private int[][] distanthorizons$spriteFrames;
 	
 	
 	
@@ -43,23 +46,31 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 			return;
 		}
 		
-		int[][] frameData = this.framesTextureData.get(0); 
-		if (frameData == null)
+		// the base mipmap of every frame, animated textures (IE lava) change brightness between frames
+		int[][] frames = new int[this.framesTextureData.size()][];
+		int frameCount = 0;
+		for (int[][] frameData : this.framesTextureData)
 		{
-			return;
-		} 
-		
-		int[] data = frameData[0];
-		if (data == null)
+			if (frameData != null
+				&& frameData[0] != null)
+			{
+				frames[frameCount++] = frameData[0].clone();
+			}
+		}
+		if (frameCount == 0)
 		{
 			return;
 		}
-		
-		this.distanthorizons$spriteData = data.clone();
+
+		this.distanthorizons$spriteFrames = (frameCount == frames.length) ? frames : Arrays.copyOf(frames, frameCount);
+		this.distanthorizons$spriteData = this.distanthorizons$spriteFrames[0];
 	}
-	
-	@Override 
+
+	@Override
 	public int[] distanthorizons$getSpriteData() { return this.distanthorizons$spriteData; }
+
+	@Override
+	public int[][] distanthorizons$getSpriteFrames() { return this.distanthorizons$spriteFrames; }
 	
 	//endregion
 	
