@@ -35,6 +35,12 @@ public interface IAngelicaAccessor extends IModAccessor
 	boolean canDoFadeShader();
 
 	/**
+	 * True if Angelica's fancy biome blending is on, which tints every vanilla leaf
+	 * (including birch and spruce) with the biome's foliage color.
+	 */
+	boolean leavesUseBiomeFoliageColor();
+
+	/**
 	 * Uploads the "dhProjection" and "heightLimit" uniforms to the currently bound shader pack program. <br>
 	 * Angelica doesn't upload them to its DH programs without a shadow pass,
 	 * without one (IE in the Nether or with shadows off) they stay zero:

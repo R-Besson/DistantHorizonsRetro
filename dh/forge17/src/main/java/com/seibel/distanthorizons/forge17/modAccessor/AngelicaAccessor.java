@@ -22,6 +22,8 @@ import net.minecraft.client.shader.Framebuffer;
 import java.nio.FloatBuffer;
 
 import com.gtnewhorizons.angelica.config.AngelicaConfig;
+import com.gtnewhorizons.angelica.proxy.ClientProxy;
+import me.jellysquid.mods.sodium.client.gui.options.named.BiomeBlendMode;
 import com.gtnewhorizons.angelica.glsm.GLStateManager;
 
 import cpw.mods.fml.common.Loader;
@@ -88,6 +90,22 @@ public class AngelicaAccessor implements IAngelicaAccessor
 
 	@Override
     public boolean canDoFadeShader() { return AngelicaConfig.enableIris; }
+
+	@Override
+	public boolean leavesUseBiomeFoliageColor()
+	{
+		try
+		{
+			// Angelica's biome blending replaces the tint of minecraft:leaves and leaves2
+			// with the smoothed foliage color, ignoring the birch and spruce colors
+			return ClientProxy.options().quality.biomeBlendMode == BiomeBlendMode.FANCY;
+		}
+		catch (Throwable e)
+		{
+			// the options moved in a different Angelica version
+			return false;
+		}
+	}
 
 	@Override
 	public void uploadMissingShaderUniforms()
