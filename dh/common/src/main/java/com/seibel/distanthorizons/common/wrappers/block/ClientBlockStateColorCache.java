@@ -68,6 +68,8 @@ public class ClientBlockStateColorCache
 	public static final int INVALID_COLOR = -1;
 
 	private static final int FLOWER_COLOR_SCALE = 5;
+	/** 50% opacity */
+	private static final int MIN_GLASS_ALPHA = 128;
 
 	private static final ForgeDirection[] FACE_SAMPLE_ORDER = {
 		ForgeDirection.UP,
@@ -344,9 +346,15 @@ public class ClientBlockStateColorCache
 		}
 		else
 		{
+			int averageAlpha = alpha / count;
+			if (colorMode == EColorMode.Glass && averageAlpha != 0)
+			{
+				averageAlpha = Math.max(averageAlpha, MIN_GLASS_ALPHA);
+			}
+
 			// determine the average color
 			tempColor = ColorUtil.argbToInt(
-					alpha / count,
+					averageAlpha,
 					linearToSrgb((float) (red / (double) alpha)),
 					linearToSrgb((float) (green / (double) alpha)),
 					linearToSrgb((float) (blue / (double) alpha)));
