@@ -52,6 +52,10 @@ Download the latest version from [Releases](https://github.com/R-Besson/DistantH
 Shaders are supported with [Angelica](https://github.com/GTNewHorizons/Angelica) 2.1.12 or higher.
 Tested with [Complementary Shaders](https://modrinth.com/shader/complementary-reimagined) and [Euphoria Patches](https://modrinth.com/mod/euphoria-patches).
 
+## Key bindings
+
+Toggle LOD rendering and open the config from Options → Controls → Distant Horizons. They're unbound by default.
+
 ## Block colors
 
 LOD colors are averaged from each block's texture. If a block looks wrong in the distance, set its color in
@@ -76,8 +80,9 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 # Roadmap
 
 - [x] Key bindings (toggle LODs, open config)
+- [x] Faster LOD building, loading and saving
 - [ ] Correct ceilings for modded dimensions (currently only the Nether is detected)
-- [ ] Better block colors for GregTech, Chisel and other mods with custom textures
+- [ ] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
 - [ ] Faster world generation and lower memory use
 
 # Development
