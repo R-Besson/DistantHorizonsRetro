@@ -65,6 +65,14 @@ public class TextureAtlasSpriteWrapper
 	 */
 	private static final int ANISOTROPIC_SPRITE_BORDER = 8;
 
+	/**
+	 * Chisel's connected texture sheets are named after the block's plain texture plus this suffix. <br>
+	 * The plain texture is the unconnected piece, with borders on every edge.
+	 * The sheet holds 2x2 blocks' worth of pieces and its top-left quarter is the seamless piece
+	 * MC draws inside a wall of the same block, so only that quarter is sampled (see {@link #getWidth}).
+	 */
+	private static final String CONNECTED_TEXTURE_SHEET_SUFFIX = "-ctm";
+
 
 
 	public static int getPixelARGB(TextureAtlasSprite sprite, int frameIndex, int x, int y)
@@ -90,6 +98,34 @@ public class TextureAtlasSpriteWrapper
 
 
 
+	/**
+	 * The first frame's pixel at the given fraction (0-1) across the icon. <br>
+	 * Works for icons that are a region of an atlas sprite
+	 * (IE Chisel's variants and connected texture pieces, which are parts of a larger sheet),
+	 * flipped icons are read flipped like MC draws them.
+	 */
+	public static int getIconPixelARGB(IIcon icon, float fractionU, float fractionV)
+	{
+		TextureAtlasSprite sprite = hasSpriteData(icon) ? (TextureAtlasSprite) icon : findBlockAtlasSprite(icon.getIconName());
+		float spriteUWidth = (sprite != null) ? sprite.getMaxU() - sprite.getMinU() : 0;
+		float spriteVHeight = (sprite != null) ? sprite.getMaxV() - sprite.getMinV() : 0;
+		if (spriteUWidth == 0
+			|| spriteVHeight == 0)
+		{
+			return ColorUtil.HOT_PINK;
+		}
+
+		float u = icon.getMinU() + (icon.getMaxU() - icon.getMinU()) * fractionU;
+		float v = icon.getMinV() + (icon.getMaxV() - icon.getMinV()) * fractionV;
+
+		// the whole sprite, unlike getWidth() which only counts a connected texture sheet's top-left quarter
+		int width = sprite.getIconWidth() - (sprite.useAnisotropicFiltering ? ANISOTROPIC_SPRITE_BORDER * 2 : 0);
+		int height = sprite.getIconHeight() - (sprite.useAnisotropicFiltering ? ANISOTROPIC_SPRITE_BORDER * 2 : 0);
+		int x = (int) Math.floor((u - sprite.getMinU()) / spriteUWidth * width);
+		int y = (int) Math.floor((v - sprite.getMinV()) / spriteVHeight * height);
+		return getPixelARGB(sprite, 0, Math.max(0, Math.min(width - 1, x)), Math.max(0, Math.min(height - 1, y)));
+	}
+
 	/** at least 1 */
 	public static int getFrameCount(TextureAtlasSprite sprite)
 	{
@@ -97,13 +133,22 @@ public class TextureAtlasSpriteWrapper
 		return (frames != null && frames.length > 0) ? frames.length : 1;
 	}
 
+	/** connected texture sheets only count their top-left quarter */
 	public static int getWidth(TextureAtlasSprite texture)
 	{
-		return texture.getIconWidth() - (texture.useAnisotropicFiltering ? ANISOTROPIC_SPRITE_BORDER * 2 : 0);
+		int width = texture.getIconWidth() - (texture.useAnisotropicFiltering ? ANISOTROPIC_SPRITE_BORDER * 2 : 0);
+		return isConnectedTextureSheet(texture) ? width / 2 : width;
 	}
 	public static int getHeight(TextureAtlasSprite texture)
 	{
-		return texture.getIconHeight() - (texture.useAnisotropicFiltering ? ANISOTROPIC_SPRITE_BORDER * 2 : 0);
+		int height = texture.getIconHeight() - (texture.useAnisotropicFiltering ? ANISOTROPIC_SPRITE_BORDER * 2 : 0);
+		return isConnectedTextureSheet(texture) ? height / 2 : height;
+	}
+
+	private static boolean isConnectedTextureSheet(TextureAtlasSprite texture)
+	{
+		String iconName = texture.getIconName();
+		return iconName != null && iconName.endsWith(CONNECTED_TEXTURE_SHEET_SUFFIX);
 	}
 
 	public static float getMinU(TextureAtlasSprite sprite)
@@ -202,7 +247,14 @@ public class TextureAtlasSpriteWrapper
 			}
 		}
 
-		return (icon instanceof TextureAtlasSprite) ? (TextureAtlasSprite) icon : null;
+		if (!(icon instanceof TextureAtlasSprite))
+		{
+			return null;
+		}
+
+		// Chisel's connected textures, LODs are mostly walls and floors of the same block
+		TextureAtlasSprite connectedSheet = findBlockAtlasSprite(icon.getIconName() + CONNECTED_TEXTURE_SHEET_SUFFIX);
+		return (connectedSheet != null) ? connectedSheet : (TextureAtlasSprite) icon;
 	}
 
 	/** @return the block atlas sprite with this name, or null if there isn't one with pixel data */

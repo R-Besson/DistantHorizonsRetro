@@ -57,7 +57,10 @@ public class ColumnBox
 	//=========//
 	//region
 	
-	/** @param shape only used when the blockWidth is 1, see {@link RenderDataPointUtil#SHAPE_NONE} */
+	/**
+	 * @param shape only used when the blockWidth is 1, see {@link RenderDataPointUtil#SHAPE_NONE}
+	 * @param sideRowTileIds see {@link BlockTextureRegistry#getSideRowTileIds}
+	 */
 	public static void addBoxQuadsToBuilder(
 		LodQuadBuilder builder, PhantomArrayListCheckout phantomArrayCheckout, IClientLevelWrapper clientLevelWrapper,
 		short blockWidth, short yHeight,
@@ -65,7 +68,7 @@ public class ColumnBox
 		int color, byte irisBlockMaterialId, byte skyLight, byte blockLight, byte shape,
 		long topData, long bottomData,
 		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
-		short @Nullable [] faceTileIdsByDirectionOrdinal)
+		short @Nullable [] faceTileIdsByDirectionOrdinal, short @Nullable [][] sideRowTileIds)
 	{
 		// the closest LODs draw leaves like MC's fancy leaves, with see-through gaps and the faces between them
 		boolean seeThroughLeaves = blockWidth == 1
@@ -75,6 +78,8 @@ public class ColumnBox
 
 		builder.shapeForNewQuads = shape;
 		builder.seeThroughForNewQuads = seeThroughLeaves;
+		builder.sideRowTileIdsForNewQuads = sideRowTileIds;
+		builder.sideRowTopYForNewQuads = (short) (minY + yHeight);
 		try
 		{
 			addBoxQuads(
@@ -90,6 +95,7 @@ public class ColumnBox
 		{
 			builder.shapeForNewQuads = RenderDataPointUtil.SHAPE_NONE;
 			builder.seeThroughForNewQuads = false;
+			builder.sideRowTileIdsForNewQuads = null;
 		}
 	}
 	private static void addBoxQuads(

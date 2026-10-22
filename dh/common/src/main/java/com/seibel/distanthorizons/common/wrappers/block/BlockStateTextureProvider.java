@@ -19,10 +19,12 @@
 
 package com.seibel.distanthorizons.common.wrappers.block;
 
+import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockFaceTexture;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateFaceTextureProvider;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -47,7 +49,37 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 		}
 		return ClientBlockStateTextureCache.getFaceTexture((BlockStateWrapper) blockState, direction);
 	}
-	
+
+	@Nullable
+	@Override
+	public Object getPositionedAppearance(
+		IBlockStateWrapper blockState, IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
+		int blockX, int topY, int blockZ)
+	{
+		if (!(blockState instanceof BlockStateWrapper))
+		{
+			return null;
+		}
+		return ClientBlockStateTextureCache.getPositionedAppearance((BlockStateWrapper) blockState, levelWrapper, fullDataSource, blockX, topY, blockZ);
+	}
+
+	@Nullable
+	@Override
+	public BlockFaceTexture getPositionedFaceTexture(Object appearance, EDhDirection direction)
+	{
+		return ClientBlockStateTextureCache.getPositionedFaceTexture(appearance, direction);
+	}
+
+	@Override
+	public int getPositionedSideRowCount(Object appearance) { return ClientBlockStateTextureCache.getPositionedSideRowCount(appearance); }
+
+	@Nullable
+	@Override
+	public BlockFaceTexture getPositionedSideRowTexture(Object appearance, EDhDirection direction, int row)
+	{
+		return ClientBlockStateTextureCache.getPositionedSideRowTexture(appearance, direction, row);
+	}
+
 	@Override
 	public void clear() 
 	{

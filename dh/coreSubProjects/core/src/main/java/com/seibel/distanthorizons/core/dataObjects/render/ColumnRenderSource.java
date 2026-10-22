@@ -125,7 +125,7 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		this.textureSetPaletteIndices = this.pooledArraysCheckout.getByteArray(0, textureIndexCount);
 		this.texturePalette.add(BlockTextureRegistry.UNTEXTURED_ID);
 	}
-	private static boolean texturedLodsEnabledAtDetailLevel(byte dataDetailLevel)
+	public static boolean texturedLodsEnabledAtDetailLevel(byte dataDetailLevel)
 	{
 		return Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
 			&& dataDetailLevel <= Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel.get();

@@ -273,16 +273,18 @@ public class ColumnRenderBufferBuilder
 						
 						// determine which textures this data point's quads should use
 						short[] faceTileIdsByDirectionOrdinal = null;
+						short[][] sideRowTileIds = null;
 						if (renderSource.hasTextureSetIds())
 						{
 							short textureSetId = renderSource.getTextureSetId(relX, relZ, i);
 							faceTileIdsByDirectionOrdinal = BlockTextureRegistry.INSTANCE.getFaceTileIds(textureSetId);
+							sideRowTileIds = BlockTextureRegistry.INSTANCE.getSideRowTileIds(textureSetId);
 						}
-						
+
 						addRenderDataPointToBuilder(
 							clientLevelWrapper, phantomArrayCheckout,
 							data, topDataPoint, bottomDataPoint,
-							adjColumnViews, isSameDetailLevel, faceTileIdsByDirectionOrdinal,
+							adjColumnViews, isSameDetailLevel, faceTileIdsByDirectionOrdinal, sideRowTileIds,
 							thisDetailLevel, relX, relZ,
 							quadBuilder);
 					}
@@ -295,8 +297,9 @@ public class ColumnRenderBufferBuilder
 	private static void addRenderDataPointToBuilder(
 			IClientLevelWrapper clientLevelWrapper, PhantomArrayListCheckout phantomArrayCheckout,
 			long renderData, long topRenderData, long bottomRenderData, 
-			ColumnRenderView[] adjColumnViews, boolean[] isSameDetailLevel, short @Nullable [] faceTileIdsByDirectionOrdinal,
-			byte detailLevel, int renderSourceOffsetPosX, int renderSourceOffsetPosZ, 
+			ColumnRenderView[] adjColumnViews, boolean[] isSameDetailLevel,
+			short @Nullable [] faceTileIdsByDirectionOrdinal, short @Nullable [][] sideRowTileIds,
+			byte detailLevel, int renderSourceOffsetPosX, int renderSourceOffsetPosZ,
 			LodQuadBuilder quadBuilder)
 	{
 		long sectionPos = DhSectionPos.encode(detailLevel, renderSourceOffsetPosX, renderSourceOffsetPosZ);
@@ -429,7 +432,7 @@ public class ColumnRenderBufferBuilder
 			// shapes are only drawn by 1 block wide LODs
 			(blockWidth == 1) ? RenderDataPointUtil.getShape(renderData) : RenderDataPointUtil.SHAPE_NONE,
 			topRenderData, bottomRenderData, adjColumnViews, isSameDetailLevel,
-			faceTileIdsByDirectionOrdinal);
+			faceTileIdsByDirectionOrdinal, sideRowTileIds);
 	}
 	
 }

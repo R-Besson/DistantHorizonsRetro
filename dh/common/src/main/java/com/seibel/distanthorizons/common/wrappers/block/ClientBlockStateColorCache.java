@@ -444,6 +444,17 @@ public class ClientBlockStateColorCache
 		BiomeWrapper biomeWrapper, FullDataSourceV2 fullDataSource, DhBlockPos blockPos,
 		boolean allowApiOverride)
 	{
+		// blocks that look different depending on where they are (IE Chisel's connected textures)
+		// use what MC draws at this position
+		int baseColor = this.baseColor;
+		Integer positionedColor = (fullDataSource != null)
+			? ClientBlockStateTextureCache.getPositionedColor(this.blockStateWrapper, this.clientLevelWrapper, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ())
+			: null;
+		if (positionedColor != null)
+		{
+			baseColor = ColorUtil.setAlpha(positionedColor, ColorUtil.getAlpha(this.baseColor));
+		}
+
 		// only get the tint if the block needs to be tinted
 		int tintColor = ClientBlockStateColorCache.INVALID_COLOR;
 
@@ -452,7 +463,7 @@ public class ClientBlockStateColorCache
 			// don't try tinting blocks that don't support our method of tint getting
 			if (BROKEN_BLOCK_STATES.contains(this.blockState))
 			{
-				return this.baseColor;
+				return baseColor;
 			}
 
 
@@ -484,12 +495,12 @@ public class ClientBlockStateColorCache
 		int returnColor;
 		if (tintColor != ClientBlockStateColorCache.INVALID_COLOR)
 		{
-			returnColor = ColorUtil.multiplyARGBwithRGB(this.baseColor, tintColor);
+			returnColor = ColorUtil.multiplyARGBwithRGB(baseColor, tintColor);
 		}
 		else
 		{
 			// unable to get the tinted color, use the base color instead
-			returnColor = this.baseColor;
+			returnColor = baseColor;
 		}
 
 
@@ -503,7 +514,7 @@ public class ClientBlockStateColorCache
 			DhApiBlockColorOverrideEvent.EventParam eventParam = COLOR_OVERRIDE_EVENT_PARAM_THREAD_LOCAL.get();
 			eventParam.update(
 				this.clientLevelWrapper, fullDataSource,
-				this.blockStateWrapper, biomeWrapper, returnColor, tintColor, this.baseColor,
+				this.blockStateWrapper, biomeWrapper, returnColor, tintColor, baseColor,
 				blockPos.getX(), blockPos.getY(), blockPos.getZ()
 			);
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiBlockColorOverrideEvent.class, eventParam);

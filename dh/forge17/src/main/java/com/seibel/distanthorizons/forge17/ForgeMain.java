@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IChiselCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
@@ -125,6 +126,12 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 			if (Loader.isModLoaded("gtnhlib"))
 			{
 				this.addModCompatAccessor(IGtnhLibCommonAccessor.class, GtnhLibAccessor::new);
+			}
+
+			// Chisel
+			if (Loader.isModLoaded("chisel"))
+			{
+				this.addModCompatAccessor(IChiselCommonAccessor.class, ChiselAccessor::new);
 			}
         }
 		else if (!DISABLE_SERVER_FOR_TESTING)

@@ -213,7 +213,7 @@ public class FullDataToRenderDataTransformer
 		if (columnSource != null 
 			&& columnSource.hasTextureSetIds())
 		{
-			applyTextureSetIds(levelWrapper, fullDataSource, columnArrayView, fullDataColumn, columnSource, sourceRelX, sourceRelZ);
+			applyTextureSetIds(levelWrapper, fullDataSource, blockX, blockZ, columnArrayView, fullDataColumn, columnSource, sourceRelX, sourceRelZ);
 		}
 	}
 	
@@ -224,10 +224,14 @@ public class FullDataToRenderDataTransformer
 	 * keeping the texture consistent with the color it multiplies. <br><br>
 	 *
 	 * This runs after any vertical size reduction so it doesn't matter
-	 * how the data points were merged along the way.
+	 * how the data points were merged along the way. <br><br>
+	 *
+	 * Blocks that look different depending on where they are (IE Chisel's connected textures)
+	 * get the texture MC draws at this position.
 	 */
 	private static void applyTextureSetIds(
-			IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource, ColumnRenderView renderColumnData, LongArrayList fullDataColumn,
+			IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource, int blockX, int blockZ,
+			ColumnRenderView renderColumnData, LongArrayList fullDataColumn,
 			ColumnRenderSource columnSource, int sourceRelX, int sourceRelZ)
 	{
 		for (int renderIndex = 0; renderIndex < renderColumnData.size; renderIndex++)
@@ -287,7 +291,8 @@ public class FullDataToRenderDataTransformer
 							block = block.getPlantTopWithBottom(getTouchingBlock(fullDataColumn, fullIndex + 1, FullDataPointUtil.getBottomY(fullData), false, fullDataSource.mapping), levelWrapper);
 						}
 
-						textureId = BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(block);
+						textureId = BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(
+							block, levelWrapper, fullDataSource, blockX, topBlockY + levelWrapper.getMinHeight(), blockZ);
 					}
 					catch (IndexOutOfBoundsException ignore)
 					{

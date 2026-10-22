@@ -88,7 +88,7 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Vanilla-like LODs: biome blended grass and leaves, see-through leaves, tall grass and flowers, depth shaded water
 - [x] Fences, walls, slabs and snow layers shaped like the real blocks
 - [x] Mobs visible up to the render distance with shaders
-- [ ] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
+- [x] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
 - [ ] Block shapes (fences, walls, slabs) work with shaders
 - [ ] Shallow water tint near shores with shaders
 - [ ] Faster world generation and lower memory use
@@ -124,7 +124,8 @@ It is not synced from upstream.
 
 The dev client comes with [Angelica](https://github.com/GTNewHorizons/Angelica), Complementary Unbound
 with [Euphoria Patches](https://modrinth.com/mod/euphoria-patches) (select it in the shader pack menu)
-and [Twilight Forest](https://github.com/GTNewHorizons/twilightforest) for testing a modded dimension.
+[Twilight Forest](https://github.com/GTNewHorizons/twilightforest) for testing a modded dimension
+and [Chisel](https://github.com/GTNewHorizons/Chisel) for testing connected textures.
 Gradle downloads them, no manual setup needed.
 
 > [!TIP]

@@ -1,11 +1,14 @@
 package com.seibel.distanthorizons.common.backports;
 
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
+import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
 import com.seibel.distanthorizons.common.wrappers.block.TextureAtlasSpriteWrapper;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.FullDataPointUtil;
+import com.seibel.distanthorizons.core.util.LodUtil;
+import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +21,7 @@ import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
 
 /**
- * Used by {@link ClientBlockStateColorCache}
+ * Used by {@link ClientBlockStateColorCache} and ClientBlockStateTextureCache
  * in order to handle some world related operations.
  */
 public class FakeWorld implements IBlockAccess
@@ -34,6 +37,9 @@ public class FakeWorld implements IBlockAccess
 	/** neighboring biomes are read from here, null if unknown */
 	@Nullable
 	private FullDataSourceV2 fullDataSource;
+	/** if false every other block is air */
+	private boolean readNeighborBlocks = false;
+	private int levelMinY = 0;
 
 
 
@@ -47,6 +53,7 @@ public class FakeWorld implements IBlockAccess
 		int blockX, int blockY, int blockZ,
 		FakeBlockState blockState)
 	{
+		this.readNeighborBlocks = false;
 		this.realWorld = realWorld;
 		this.biome = biome;
 		this.fullDataSource = fullDataSource;
@@ -61,7 +68,22 @@ public class FakeWorld implements IBlockAccess
 			this.biome = BiomeGenBase.plains; // Fallback to prevent null pointers
 		}
 	}
-	
+
+	/**
+	 * Same as {@link #update}, but the other blocks are read from the LOD's full data,
+	 * used for textures that connect to their neighbors (IE Chisel's connected textures). <br>
+	 * Blocks outside the LOD are air.
+	 */
+	public void updateWithNeighbors(
+		IBlockAccess realWorld, FullDataSourceV2 fullDataSource, int levelMinY,
+		int blockX, int blockY, int blockZ,
+		FakeBlockState blockState)
+	{
+		this.update(realWorld, null, fullDataSource, blockX, blockY, blockZ, blockState);
+		this.readNeighborBlocks = true;
+		this.levelMinY = levelMinY;
+	}
+
 	//endregion
 	
 	
@@ -80,8 +102,9 @@ public class FakeWorld implements IBlockAccess
 		{
 			return this.blockState.block;
 		}
-		
-		return Blocks.air;
+
+		FakeBlockState neighbor = this.getNeighborBlockState(x, y, z);
+		return (neighbor != null) ? neighbor.block : Blocks.air;
 	}
 
 	@Override
@@ -112,8 +135,9 @@ public class FakeWorld implements IBlockAccess
 			 */
 			return TextureAtlasSpriteWrapper.getDoublePlantTopType(this.blockState.meta);
 		}
-		
-		return 0;
+
+		FakeBlockState neighbor = this.getNeighborBlockState(x, y, z);
+		return (neighbor != null) ? neighbor.meta : 0;
 	}
 
 	@Override
@@ -134,14 +158,9 @@ public class FakeWorld implements IBlockAccess
 			return this.biome;
 		}
 
-		long sectionPos = this.fullDataSource.getPos();
-		int columnWidth = DhSectionPos.getBlockWidth(sectionPos) / this.fullDataSource.getWidthInDataColumns();
-		int relX = Math.floorDiv(x - DhSectionPos.getMinCornerBlockX(sectionPos), columnWidth);
-		int relZ = Math.floorDiv(z - DhSectionPos.getMinCornerBlockZ(sectionPos), columnWidth);
-
 		// outside this LOD (IE on its border), the neighbor's biome isn't known
-		LongArrayList column = this.fullDataSource.tryGetColumnAtRelPos(relX, relZ);
-		if (column == null || column.isEmpty())
+		LongArrayList column = this.getColumn(x, z);
+		if (column == null)
 		{
 			return this.biome;
 		}
@@ -167,7 +186,146 @@ public class FakeWorld implements IBlockAccess
 
 	@Override
 	public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default) { throw new UnsupportedOperationException("isSideSolid() isn't implemented"); }
-	
+
+	//endregion
+
+
+
+	//=========//
+	// helpers //
+	//=========//
+	//region
+
+	/**
+	 * Walks down from the top block while the blocks below are the same and visible,
+	 * IE how far down a wall of the same block goes.
+	 *
+	 * @param topY the world Y of the visible block to start at
+	 * @param bottomY the lowest world Y to check
+	 */
+	public int getLowestSameBlockY(int x, int topY, int bottomY, int z)
+	{
+		int y = topY;
+		while (y > bottomY)
+		{
+			FakeBlockState below = this.getNeighborBlockState(x, y - 1, z);
+			if (below == null
+				|| below.block != this.blockState.block
+				|| below.meta != this.blockState.meta)
+			{
+				break;
+			}
+			y--;
+		}
+		return y;
+	}
+
+	/**
+	 * Hidden blocks aren't stored (see FullDataOcclusionCuller), the block above them is stretched down instead,
+	 * so below a data point's top block only visible blocks are known. Hidden ones are air.
+	 *
+	 * @return null if neighbors aren't read, the block is outside the LOD or unknown
+	 */
+	@Nullable
+	private FakeBlockState getNeighborBlockState(int x, int y, int z)
+	{
+		LongArrayList column = this.readNeighborBlocks ? this.getColumn(x, z) : null;
+		if (column == null)
+		{
+			return null;
+		}
+
+		int relY = y - this.levelMinY;
+		long dataPoint = getDataPointAtRelY(column, relY);
+		if (dataPoint == FullDataPointUtil.EMPTY_DATA_POINT)
+		{
+			return null;
+		}
+
+		int dataPointTopRelY = FullDataPointUtil.getBottomY(dataPoint) + FullDataPointUtil.getHeight(dataPoint) - 1;
+		if (relY != dataPointTopRelY
+			&& !this.isVisibleFromASide(x, relY, z))
+		{
+			return null;
+		}
+
+		IBlockStateWrapper wrapper = this.getBlockStateWrapper(dataPoint);
+		return (wrapper instanceof BlockStateWrapper && ((BlockStateWrapper) wrapper).blockState instanceof FakeBlockState)
+			? (FakeBlockState) ((BlockStateWrapper) wrapper).blockState
+			: null;
+	}
+
+	/** the same check FullDataOcclusionCuller uses to find hidden blocks */
+	private boolean isVisibleFromASide(int x, int relY, int z)
+	{
+		for (ForgeDirection direction : HORIZONTAL_DIRECTIONS)
+		{
+			// columns outside the LOD aren't culled against, so their blocks are all known
+			LongArrayList column = this.getColumn(x + direction.offsetX, z + direction.offsetZ);
+			if (column == null)
+			{
+				return true;
+			}
+
+			long dataPoint = getDataPointAtRelY(column, relY);
+			IBlockStateWrapper wrapper = (dataPoint != FullDataPointUtil.EMPTY_DATA_POINT) ? this.getBlockStateWrapper(dataPoint) : null;
+			if (wrapper == null
+				|| wrapper.getOpacity() < LodUtil.BLOCK_FULLY_OPAQUE)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	private static final ForgeDirection[] HORIZONTAL_DIRECTIONS = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST };
+
+	/** @return {@link FullDataPointUtil#EMPTY_DATA_POINT} if no data point covers this Y */
+	private static long getDataPointAtRelY(LongArrayList column, int relY)
+	{
+		for (int i = 0; i < column.size(); i++)
+		{
+			long dataPoint = column.getLong(i);
+			int bottomY = FullDataPointUtil.getBottomY(dataPoint);
+			if (relY >= bottomY
+				&& relY < bottomY + FullDataPointUtil.getHeight(dataPoint))
+			{
+				return dataPoint;
+			}
+		}
+		return FullDataPointUtil.EMPTY_DATA_POINT;
+	}
+
+	@Nullable
+	private IBlockStateWrapper getBlockStateWrapper(long dataPoint)
+	{
+		try
+		{
+			return this.fullDataSource.mapping.getBlockStateWrapper(FullDataPointUtil.getId(dataPoint));
+		}
+		catch (IndexOutOfBoundsException e)
+		{
+			return null;
+		}
+	}
+
+	/** @return null if the column is outside the LOD or empty */
+	@Nullable
+	private LongArrayList getColumn(int x, int z)
+	{
+		if (this.fullDataSource == null)
+		{
+			return null;
+		}
+
+		long sectionPos = this.fullDataSource.getPos();
+		int columnWidth = DhSectionPos.getBlockWidth(sectionPos) / this.fullDataSource.getWidthInDataColumns();
+		int relX = Math.floorDiv(x - DhSectionPos.getMinCornerBlockX(sectionPos), columnWidth);
+		int relZ = Math.floorDiv(z - DhSectionPos.getMinCornerBlockZ(sectionPos), columnWidth);
+
+		LongArrayList column = this.fullDataSource.tryGetColumnAtRelPos(relX, relZ);
+		return (column == null || column.isEmpty()) ? null : column;
+	}
+
 	//endregion
 	
 	

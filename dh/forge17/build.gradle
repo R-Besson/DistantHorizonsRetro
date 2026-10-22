@@ -37,20 +37,23 @@ def angelicaVersion = "2.2.35"
 def gtnhlibVersion = "0.11.54"
 def hodgepodgeVersion = "2.7.218"
 def twilightforestVersion = "2.7.45"
+def chiselVersion = "2.17.34-GTNH"
 
 dependencies {
     modCompileOnly "com.github.GTNewHorizons:Hodgepodge:${hodgepodgeVersion}:dev"
     modCompileOnly("com.github.GTNewHorizons:GTNHLib:${gtnhlibVersion}:dev") { transitive = false }
     modCompileOnly("com.github.GTNewHorizons:GT5-Unofficial:5.09.51.469:dev") { transitive = false }
     modCompileOnly("com.github.GTNewHorizons:Angelica:${angelicaVersion}:dev") { transitive = false }
+    modCompileOnly("com.github.GTNewHorizons:Chisel:${chiselVersion}:dev") { transitive = false }
     modCompileOnly "com.falsepattern:rple-mc1.7.10:2.1.0:api"
 
     modImplementation "io.github.legacymoddingmc:unimixins:0.3.1@jar"
 }
 
 // ==================== Dev Client Mods ====================
-// Angelica with Complementary Unbound + Euphoria Patches for testing shaders, and
-// Twilight Forest for testing a modded dimension. runClient copies them into
+// Angelica with Complementary Unbound + Euphoria Patches for testing shaders,
+// Twilight Forest for testing a modded dimension and Chisel for testing
+// connected textures. runClient copies them into
 // run/client/mods and run/client/shaderpacks. -PdevMods=false leaves them out.
 
 def devModsProperty = project.findProperty("devMods")
@@ -69,6 +72,7 @@ dependencies {
     devClientMods "com.github.GTNewHorizons:Angelica:${angelicaVersion}@jar"
     devClientMods "com.github.GTNewHorizons:GTNHLib:${gtnhlibVersion}@jar"
     devClientMods "com.github.GTNewHorizons:twilightforest:${twilightforestVersion}@jar"
+    devClientMods "com.github.GTNewHorizons:Chisel:${chiselVersion}@jar"
     // must match the Complementary version below
     devClientMods "maven.modrinth:euphoria-patches:1.10.5-${complementaryVersion}-forge1.7.10"
 

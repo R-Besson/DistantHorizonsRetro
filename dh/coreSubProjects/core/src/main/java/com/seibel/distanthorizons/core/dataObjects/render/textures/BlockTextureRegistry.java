@@ -19,10 +19,12 @@
 
 package com.seibel.distanthorizons.core.dataObjects.render.textures;
 
+import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateFaceTextureProvider;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.coreapi.util.TextureUtil;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * Assigns each block state face a global atlas tile id
@@ -80,6 +83,10 @@ public class BlockTextureRegistry
 	 */
 	private final ArrayList<short[]> faceTileIdsBySetId = new ArrayList<>();
 	private final ConcurrentHashMap<IBlockStateWrapper, Short> setIdByBlockStateWrapper = new ConcurrentHashMap<>();
+	/** keyed by {@link IBlockStateFaceTextureProvider#getPositionedAppearance} */
+	private final ConcurrentHashMap<Object, Short> setIdByPositionedAppearance = new ConcurrentHashMap<>();
+	/** see {@link #getSideRowTileIds} */
+	private final ConcurrentHashMap<Short, short[][]> sideRowTileIdsBySetId = new ConcurrentHashMap<>();
 	
 	
 	
@@ -128,11 +135,76 @@ public class BlockTextureRegistry
 		Short setId = this.setIdByBlockStateWrapper.get(blockState);
 		if (setId == null)
 		{
-			setId = this.registerBlockState(blockState);
+			setId = this.registerFaceSet(blockState, this.setIdByBlockStateWrapper,
+				direction -> TEXTURE_PROVIDER.getFaceTexture(blockState, direction), null);
 		}
 		return setId;
 	}
-	
+
+	/**
+	 * Same as {@link #getOrRegisterBlockStateSetId}, but for blocks that look different
+	 * depending on where they are the set matches what MC draws at this position.
+	 *
+	 * @see IBlockStateFaceTextureProvider#getPositionedAppearance
+	 */
+	public short getOrRegisterBlockStateSetId(
+		IBlockStateWrapper blockState, IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
+		int blockX, int topY, int blockZ)
+	{
+		Object appearance = TEXTURE_PROVIDER.getPositionedAppearance(blockState, levelWrapper, fullDataSource, blockX, topY, blockZ);
+		if (appearance == null)
+		{
+			return this.getOrRegisterBlockStateSetId(blockState);
+		}
+
+		Short setId = this.setIdByPositionedAppearance.get(appearance);
+		if (setId == null)
+		{
+			setId = this.registerFaceSet(appearance, this.setIdByPositionedAppearance,
+				direction -> TEXTURE_PROVIDER.getPositionedFaceTexture(appearance, direction),
+				faceTileIds -> this.createSideRowTileIds(appearance, faceTileIds));
+		}
+		return setId;
+	}
+	/** @return null if every row uses the set's side tiles */
+	private short @Nullable [][] createSideRowTileIds(Object appearance, short[] faceTileIds)
+	{
+		int rowCount = TEXTURE_PROVIDER.getPositionedSideRowCount(appearance);
+		if (rowCount == 0)
+		{
+			return null;
+		}
+
+		short[][] tileIdsByRow = new short[rowCount][];
+		for (int row = 0; row < rowCount; row++)
+		{
+			short[] rowTileIds = faceTileIds.clone();
+			for (EDhDirection direction : EDhDirection.CARDINAL_COMPASS)
+			{
+				BlockFaceTexture faceTexture = TEXTURE_PROVIDER.getPositionedSideRowTexture(appearance, direction, row);
+				if (faceTexture != null)
+				{
+					rowTileIds[direction.faceIndex] = this.getOrCreateTileId(faceTexture);
+				}
+			}
+			tileIdsByRow[row] = rowTileIds;
+		}
+		return tileIdsByRow;
+	}
+
+	/**
+	 * Some sets have different side tiles on each row of a wall,
+	 * IE the top and bottom of Chisel's connected textures.
+	 *
+	 * @return the face tile ids (like {@link #getFaceTileIds}) for each row counted down from the LOD's top block,
+	 *         rows past the end use the set's tiles. Null if every row uses the set's tiles.
+	 * @see IBlockStateFaceTextureProvider#getPositionedSideRowCount
+	 */
+	public short @Nullable [][] getSideRowTileIds(int setId)
+	{
+		return (setId > UNTEXTURED_ID) ? this.sideRowTileIdsBySetId.get((short) setId) : null;
+	}
+
 	/**
 	 * Returns the tile id for each face of the given set,
 	 * indexed by {@link EDhDirection#faceIndex}. <br>
@@ -149,14 +221,17 @@ public class BlockTextureRegistry
 		return this.faceTileIdsBySetId.get(setId);
 	}
 	
-	private short registerBlockState(IBlockStateWrapper blockState)
+	/** @param createSideRowTileIds null if the set's sides are the same on every row */
+	private <K> short registerFaceSet(
+		K key, ConcurrentHashMap<K, Short> setIdByKey, Function<EDhDirection, BlockFaceTexture> getFaceTexture,
+		@Nullable Function<short[], short[][]> createSideRowTileIds)
 	{
 		short[] faceTileIds = new short[6]; // 6 faces on a cube
 		boolean anyFaceTextured = false;
-		
+
 		for (EDhDirection direction : EDhDirection.ALL)
 		{
-			BlockFaceTexture faceTexture = TEXTURE_PROVIDER.getFaceTexture(blockState, direction);
+			BlockFaceTexture faceTexture = getFaceTexture.apply(direction);
 			short tileId = (faceTexture != null)
 					? this.getOrCreateTileId(faceTexture)
 					: UNTEXTURED_ID;
@@ -169,7 +244,7 @@ public class BlockTextureRegistry
 				&& direction != EDhDirection.UP
 				&& direction != EDhDirection.DOWN)
 			{
-				faceTexture = TEXTURE_PROVIDER.getFaceTexture(blockState, EDhDirection.UP);
+				faceTexture = getFaceTexture.apply(EDhDirection.UP);
 				tileId = (faceTexture != null)
 					? this.getOrCreateTileId(faceTexture)
 					: UNTEXTURED_ID;
@@ -202,8 +277,15 @@ public class BlockTextureRegistry
 				}
 			}
 		}
-		
-		Short existingSetId = this.setIdByBlockStateWrapper.putIfAbsent(blockState, textureId);
+
+		// added before the set id can be found so its rows are always there
+		short[][] sideRowTileIds = (textureId != UNTEXTURED_ID && createSideRowTileIds != null) ? createSideRowTileIds.apply(faceTileIds) : null;
+		if (sideRowTileIds != null)
+		{
+			this.sideRowTileIdsBySetId.put(textureId, sideRowTileIds);
+		}
+
+		Short existingSetId = setIdByKey.putIfAbsent(key, textureId);
 		return (existingSetId != null) ? existingSetId : textureId;
 	}
 	
@@ -414,6 +496,8 @@ public class BlockTextureRegistry
 	public synchronized void clear()
 	{
 		this.setIdByBlockStateWrapper.clear();
+		this.setIdByPositionedAppearance.clear();
+		this.sideRowTileIdsBySetId.clear();
 		short[] flatSet = this.faceTileIdsBySetId.get(UNTEXTURED_ID);
 		this.faceTileIdsBySetId.clear();
 		this.faceTileIdsBySetId.add(flatSet);

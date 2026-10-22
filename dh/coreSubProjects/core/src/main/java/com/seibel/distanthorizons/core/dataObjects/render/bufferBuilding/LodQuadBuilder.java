@@ -152,6 +152,18 @@ public class LodQuadBuilder implements AutoCloseable
 	public boolean seeThroughForNewQuads = false;
 	public static final byte SEE_THROUGH_NORMAL_INDEX_OFFSET = 8;
 
+	/**
+	 * If set, side quads are split into rows with their own tiles,
+	 * IE the top and bottom of a wall of Chisel's connected textures. <br>
+	 * Indexed by the row counted down from {@link #sideRowTopYForNewQuads}, then {@link EDhDirection#faceIndex},
+	 * rows past the end keep the quad's tile. Set by {@link ColumnBox} for each LOD box.
+	 *
+	 * @see com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry#getSideRowTileIds
+	 */
+	public short @Nullable [][] sideRowTileIdsForNewQuads = null;
+	/** the Y right above the first row */
+	public short sideRowTopYForNewQuads = 0;
+
 	private EDhApiDebugRendering debugRenderingMode;
 	private EDhApiGrassSideRendering grassSideRenderingMode;
 	
@@ -213,8 +225,14 @@ public class LodQuadBuilder implements AutoCloseable
 		{
 			throw new IllegalArgumentException("addQuadAdj() is only for adj direction! Not UP or Down!");
 		}
-		
-		
+
+		if (this.sideRowTileIdsForNewQuads != null)
+		{
+			this.addRowSplitQuadAdj(dir, x, y, z, width, height, color, faceTextureId, irisBlockMaterialId, skyLight, blockLight);
+			return;
+		}
+
+
 		ArrayList<BufferQuad> quadList;
 		if (this.doTransparency && ColorUtil.getAlpha(color) < 255)
 		{
@@ -241,7 +259,45 @@ public class LodQuadBuilder implements AutoCloseable
 		
 		quadList.add(quad);
 	}
-	
+	/** rows next to each other with the same tile stay one quad */
+	private void addRowSplitQuadAdj(
+		EDhDirection dir,
+		short x, short y, short z,
+		short width, short height,
+		int color, short faceTextureId,
+		byte irisBlockMaterialId, byte skyLight, byte blockLight)
+	{
+		short[][] rowTileIds = this.sideRowTileIdsForNewQuads;
+		this.sideRowTileIdsForNewQuads = null;
+		try
+		{
+			int endY = y + height;
+			int rowStartY = y;
+			while (rowStartY < endY)
+			{
+				short rowTileId = this.getRowTileId(rowTileIds, dir, rowStartY, faceTextureId);
+				int rowEndY = rowStartY + 1;
+				while (rowEndY < endY
+					&& this.getRowTileId(rowTileIds, dir, rowEndY, faceTextureId) == rowTileId)
+				{
+					rowEndY++;
+				}
+
+				this.addQuadAdj(dir, x, (short) rowStartY, z, width, (short) (rowEndY - rowStartY), color, rowTileId, irisBlockMaterialId, skyLight, blockLight);
+				rowStartY = rowEndY;
+			}
+		}
+		finally
+		{
+			this.sideRowTileIdsForNewQuads = rowTileIds;
+		}
+	}
+	private short getRowTileId(short[][] rowTileIds, EDhDirection dir, int blockY, short defaultTileId)
+	{
+		int row = this.sideRowTopYForNewQuads - 1 - blockY;
+		return (row >= 0 && row < rowTileIds.length) ? rowTileIds[row][dir.faceIndex] : defaultTileId;
+	}
+
 	// XZ
 	public void addQuadUp(
 		short minX, short maxY, short minZ, 

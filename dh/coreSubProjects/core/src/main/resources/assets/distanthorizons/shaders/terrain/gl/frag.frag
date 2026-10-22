@@ -142,6 +142,12 @@ void main()
         {
             discard;
         }
+        // see-through blocks (IE glass) show what's behind their texture's holes like MC's,
+        // further away mipmaps blur the holes away
+        if (vertexColor.a < 0.999 && tile.a < 0.25)
+        {
+            discard;
+        }
         // See-through leaves also cut out their gaps, which are marked with 254 alpha (see ClientBlockStateTextureCache).
         // Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
         // Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
