@@ -3,7 +3,12 @@
 </p>
 
 <p align="center">
-  A 1.7.10 / GTNH port of <a href="https://gitlab.com/distant-horizons-team/distant-horizons">Distant Horizons</a>, focused on optimized performance, stability and new features.
+  An unofficial 1.7.10 port of <a href="https://gitlab.com/distant-horizons-team/distant-horizons">Distant Horizons</a>, focused on optimized performance, stability and new features.
+</p>
+
+<p align="center">
+  Fork of <a href="https://github.com/DarkShadow44/DistantHorizonsStandalone">DistantHorizonsStandalone</a> by DarkShadow44.
+  Not affiliated with GTNH, the Distant Horizons team or DarkShadow44.
 </p>
 
 <p align="center">
@@ -68,14 +73,11 @@ minecraft:wool:14=A12722
 minecraft:tallgrass=00000000
 ```
 
-## GTNH
+## Using it in GTNH packs
 
-Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too old. To upgrade them in Prism Launcher:
+This is NOT an official GTNH mod and isn't supported by the GTNH team, report issues here.
 
-1. Download the latest [Angelica](https://github.com/GTNewHorizons/Angelica/releases), [lwjgl3ify](https://github.com/GTNewHorizons/lwjgl3ify/releases) (both the `.jar` and the `-multimc.zip`) and [GTNHLib](https://github.com/GTNewHorizons/GTNHLib/releases).
-2. Delete the old `angelica-*.jar`, `lwjgl3ify-*.jar` and `gtnhlib-*.jar` from your `mods` folder.
-3. Add the new jars and the Distant Horizons Retro jar to your `mods` folder.
-4. Unzip `lwjgl3ify-*-multimc.zip` into your Prism Launcher instance. It should overwrite your `mmc-pack.json`.
+Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too old. Use a daily build of GTNH instead.
 
 # Roadmap
 
@@ -99,7 +101,7 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 DistantHorizonsRetro/
 ├── settings.gradle      # includeBuild('dh'), reads the version from git
 ├── build.gradle         # runs the mod build, copies jars to build/libs
-├── .github/workflows/   # GTNH Actions
+├── .github/workflows/   # build and release workflows
 └── dh/                  # the mod
     ├── common/          # Minecraft-facing code (wrappers, rendering)
     ├── forge17/         # Forge entrypoint and mixins
@@ -128,11 +130,6 @@ Gradle downloads them, no manual setup needed.
 > [!TIP]
 > Run with `-PdevProfile=true` for performance profiling, `-PdevJava8=true` for Java 8
 > and `-PdevMods=false` to leave out the test mods
-
-## Versioning
-
-The mod version comes from the latest git tag (`dh/version.gradle`), there's nothing to edit.
-Builds of untagged commits get versions like `1.0.1-3-g990aa7f`.
 
 # Credits
 

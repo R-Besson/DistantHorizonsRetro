@@ -14,7 +14,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'gtnh-dh'
+rootProject.name = 'distant-horizons-retro'
 
 // Sets mod_version for this build and dh/
 apply from: 'dh/version.gradle'
