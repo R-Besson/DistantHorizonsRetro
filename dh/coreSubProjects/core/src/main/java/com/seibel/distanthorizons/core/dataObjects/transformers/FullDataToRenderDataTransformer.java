@@ -19,6 +19,7 @@
 
 package com.seibel.distanthorizons.core.dataObjects.transformers;
 
+import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
 import com.seibel.distanthorizons.api.enums.config.EDhApiBlocksToAvoid;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.core.config.Config;
@@ -116,7 +117,16 @@ public class FullDataToRenderDataTransformer
 		final long pos = fullDataSource.getPos();
 		final byte dataDetail = fullDataSource.getDataDetailLevel();
 		
-		final int maxVertSliceCount = Config.Client.Advanced.Graphics.Quality.verticalQuality.get().calculateMaxNumberOfVerticalSlicesAtDetailLevel(fullDataSource.getDataDetailLevel());
+		int configVertSliceCount = Config.Client.Advanced.Graphics.Quality.verticalQuality.get().calculateMaxNumberOfVerticalSlicesAtDetailLevel(dataDetail);
+		// Textured LODs are close enough to see single blocks, too few slices merge them together
+		// (IE a tree trunk drawn as the leaves above it, or sandstone as the sand on top),
+		// so they keep at least the high vertical quality's slices
+		if (Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
+			&& dataDetail <= Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel.get())
+		{
+			configVertSliceCount = Math.max(configVertSliceCount, EDhApiVerticalQuality.HIGH.calculateMaxNumberOfVerticalSlicesAtDetailLevel(dataDetail));
+		}
+		final int maxVertSliceCount = configVertSliceCount;
 		
 		
 		

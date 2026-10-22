@@ -261,6 +261,30 @@ public class ClientBlockStateColorCache
 
 
 	/**
+	 * The block's LOD color before biome tinting, the same as {@link #resolveColors()} calculates. <br>
+	 * Used as the reference textured LODs are relative to.
+	 */
+	public static int calculateUntintedColor(FakeBlockState blockState)
+	{
+		Integer overrideColor = BlockColorOverrides.get(blockState.block, blockState.meta);
+		if (overrideColor != null)
+		{
+			return overrideColor;
+		}
+
+		try
+		{
+			RESOLVE_LOCK.lock();
+			Integer faceColor = calculateColorFromFaces(blockState);
+			return (faceColor != null) ? faceColor : (0xFF000000 | blockState.block.getBlockColor());
+		}
+		finally
+		{
+			RESOLVE_LOCK.unlock();
+		}
+	}
+
+	/**
 	 * Uses the top face, unless it has no texture or is fully transparent
 	 * (IE missing textures or mods that only texture the sides), then tries the sides and bottom.
 	 *

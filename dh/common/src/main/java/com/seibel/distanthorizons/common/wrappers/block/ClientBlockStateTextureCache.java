@@ -31,7 +31,13 @@ import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.coreapi.util.TextureUtil;
+import com.seibel.distanthorizons.common.backports.FakeBlockState;
+import net.minecraft.block.BlockGrass;
+import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.ColorizerGrass;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -212,6 +218,8 @@ public class ClientBlockStateTextureCache
 			{
 				faceTextures[faceIndex] = bakeFaceTexture(blockStateWrapper, FACE_DIRECTIONS[faceIndex]);
 			}
+
+			matchVanillaFaces(blockStateWrapper, faceTextures);
 		}
 		catch (Exception bakeError)
 		{
@@ -237,7 +245,112 @@ public class ClientBlockStateTextureCache
 	private static BlockFaceTexture bakeFaceTexture(BlockStateWrapper blockStateWrapper, EDhDirection dhDirection)
 	{
 		TextureAtlasSprite sprite = getFaceSprite(blockStateWrapper, dhDirection);
+
+		// leaves use their fast graphics texture, which has dark gaps instead of transparent ones,
+		// LODs are solid so see-through gaps would show the LOD's flat color instead of the leaves behind
+		if (sprite != null
+			&& blockStateWrapper.blockState != null
+			&& blockStateWrapper.blockState.getBlock() instanceof BlockLeavesBase
+			&& !sprite.getIconName().endsWith(OPAQUE_LEAVES_SUFFIX))
+		{
+			TextureAtlasSprite opaqueSprite = TextureAtlasSpriteWrapper.findBlockAtlasSprite(sprite.getIconName() + OPAQUE_LEAVES_SUFFIX);
+			if (opaqueSprite != null)
+			{
+				sprite = opaqueSprite;
+			}
+		}
+
 		return bakeSpriteTexture(sprite);
+	}
+	private static final String OPAQUE_LEAVES_SUFFIX = "_opaque";
+	/** used for leaves without a fast graphics texture (IE some mods) */
+	private static final int LEAVES_GAP_COLOR = ColorUtil.argbToInt(255, 58, 58, 58);
+
+	/**
+	 * Makes each face's texture relative to the color its LOD face is drawn with,
+	 * so textured faces look like the real block's faces.
+	 */
+	private static void matchVanillaFaces(BlockStateWrapper blockStateWrapper, BlockFaceTexture[] faceTextures)
+	{
+		if (!(blockStateWrapper.blockState instanceof FakeBlockState))
+		{
+			return;
+		}
+		FakeBlockState blockState = (FakeBlockState) blockStateWrapper.blockState;
+
+		int untintedColor = ClientBlockStateColorCache.calculateUntintedColor(blockState);
+		boolean isGrass = blockState.block instanceof BlockGrass;
+		int dirtColor = isGrass ? ClientBlockStateColorCache.calculateUntintedColor(new FakeBlockState(Blocks.dirt, 0)) : 0;
+
+		for (int faceIndex = 0; faceIndex < faceTextures.length; faceIndex++)
+		{
+			BlockFaceTexture faceTexture = faceTextures[faceIndex];
+			if (faceTexture == null || !faceTexture.uploadAsColorRatio)
+			{
+				continue;
+			}
+
+			if (blockState.block instanceof BlockLeavesBase)
+			{
+				for (int i = 0; i < faceTexture.argbPixels.length; i++)
+				{
+					if (ColorUtil.getAlpha(faceTexture.argbPixels[i]) == 0)
+					{
+						faceTexture.argbPixels[i] = LEAVES_GAP_COLOR;
+					}
+				}
+			}
+
+			EDhDirection direction = FACE_DIRECTIONS[faceIndex];
+			if (isGrass && direction != EDhDirection.UP)
+			{
+				// grass sides and bottoms are drawn with the dirt color (see LodQuadBuilder)
+				if (direction != EDhDirection.DOWN)
+				{
+					addGrassSideOverlay(faceTexture);
+				}
+				faceTexture.ratioReferenceColor = dirtColor;
+			}
+			else
+			{
+				faceTexture.ratioReferenceColor = untintedColor;
+			}
+		}
+	}
+
+	/**
+	 * MC draws grass sides as the dirt-like side texture with the biome tinted overlay on top. <br>
+	 * Grass sides are drawn with the dirt color, which has no biome tint,
+	 * so the overlay is tinted with MC's forest grass color (temperature 0.7, rainfall 0.8).
+	 */
+	private static void addGrassSideOverlay(BlockFaceTexture faceTexture)
+	{
+		IIcon overlayIcon = BlockGrass.getIconSideOverlay();
+		TextureAtlasSprite overlaySprite = (overlayIcon != null) ? TextureAtlasSpriteWrapper.findBlockAtlasSprite(overlayIcon.getIconName()) : null;
+		if (overlaySprite == null)
+		{
+			return;
+		}
+
+		BlockFaceTexture overlayTexture = bakeSpriteTexture(overlaySprite);
+		for (int i = 0; i < faceTexture.argbPixels.length && i < overlayTexture.argbPixels.length; i++)
+		{
+			int overlay = overlayTexture.argbPixels[i];
+			int overlayAlpha = ColorUtil.getAlpha(overlay);
+			if (overlayAlpha == 0)
+			{
+				continue;
+			}
+
+			int tinted = ColorUtil.multiplyARGBwithRGB(overlay, ColorizerGrass.getGrassColor(0.7, 0.8));
+			float blend = overlayAlpha / 255.0f;
+			int base = faceTexture.argbPixels[i];
+			faceTexture.argbPixels[i] = ColorUtil.argbToInt(
+				255,
+				Math.round(ColorUtil.getRed(base) + (ColorUtil.getRed(tinted) - ColorUtil.getRed(base)) * blend),
+				Math.round(ColorUtil.getGreen(base) + (ColorUtil.getGreen(tinted) - ColorUtil.getGreen(base)) * blend),
+				Math.round(ColorUtil.getBlue(base) + (ColorUtil.getBlue(tinted) - ColorUtil.getBlue(base)) * blend));
+		}
 	}
 
 

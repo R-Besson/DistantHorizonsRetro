@@ -42,6 +42,13 @@ public class BlockFaceTexture
 	public final int[] argbPixels;
 	
 	public final boolean uploadAsColorRatio;
+	/**
+	 * The ARGB color the LOD face is drawn with before tinting and shading,
+	 * the ratio tile is relative to it so the textured face matches the real texture
+	 * (IE a sandstone side vs its top colored LOD, or a grass side drawn with the dirt color). <br>
+	 * 0 uses the texture's own average.
+	 */
+	public int ratioReferenceColor = 0;
 	
 	
 	

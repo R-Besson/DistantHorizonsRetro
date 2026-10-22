@@ -445,12 +445,15 @@ public class LodQuadBuilder implements AutoCloseable
 				if (this.debugRenderingMode == EDhApiDebugRendering.OFF)
 				{
 					// determine if any custom coloring logic should be used
-					if (this.grassSideRenderingMode != EDhApiGrassSideRendering.AS_GRASS)
+					if (this.grassSideRenderingMode != EDhApiGrassSideRendering.AS_GRASS
+						|| quad.textureTileId != 0)
 					{
 						// only change the vertex color if it's on the side or bottom
 						if (quad.direction.axis.isHorizontal() || quad.direction == EDhDirection.DOWN)
 						{
 							if (this.grassSideRenderingMode == EDhApiGrassSideRendering.AS_DIRT
+								// textured grass sides are relative to the dirt color, their texture has the grass strip (see ClientBlockStateTextureCache)
+								|| quad.textureTileId != 0
 								// if we want the color to fade, only apply the dirt color to the bottom vertices
 								|| (this.grassSideRenderingMode == EDhApiGrassSideRendering.FADE_TO_DIRT && quadBase[i][1] == 0)
 								// always render the bottom as dirt

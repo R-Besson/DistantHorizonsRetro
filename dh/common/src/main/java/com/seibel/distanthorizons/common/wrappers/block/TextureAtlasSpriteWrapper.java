@@ -175,6 +175,21 @@ public class TextureAtlasSpriteWrapper
 		return (icon instanceof TextureAtlasSprite) ? (TextureAtlasSprite) icon : null;
 	}
 
+	/** @return the block atlas sprite with this name, or null if there isn't one with pixel data */
+	@Nullable
+	public static TextureAtlasSprite findBlockAtlasSprite(String iconName)
+	{
+		ITextureObject blockAtlas = Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationBlocksTexture);
+		if (!(blockAtlas instanceof TextureMap))
+		{
+			return null;
+		}
+
+		// unknown names return the missing sprite, which has no sprite data
+		TextureAtlasSprite atlasSprite = ((TextureMap) blockAtlas).getAtlasSprite(iconName);
+		return hasSpriteData(atlasSprite) ? atlasSprite : null;
+	}
+
 	private static boolean hasSpriteData(@Nullable IIcon icon)
 	{
 		return icon instanceof TextureAtlasSprite
