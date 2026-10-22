@@ -16,6 +16,7 @@ public interface ILWJGLService
 	
 	boolean isOpenGLVersionSupported(int major, int minor);
 	boolean isExtensionSupported(EGLExtension extension);
+	boolean isFeatureSupported(EGLFeature feature);
 	int getPointerSize();
 	
 	//endregion

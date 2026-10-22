@@ -11,6 +11,7 @@ import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.system.Pointer;
 import com.seibel.distanthorizons.lwjgl.IDebugMessageHandler;
 import com.seibel.distanthorizons.lwjgl.EGLExtension;
+import com.seibel.distanthorizons.lwjgl.EGLFeature;
 import com.seibel.distanthorizons.lwjgl.ILWJGLService;
 import com.seibel.distanthorizons.lwjgl.AbstractMemoryStack;
 
@@ -77,7 +78,19 @@ public class LWJGL3Service implements ILWJGLService
     }
 
     @Override
-    public boolean isExtensionSupported(EGLExtension extension) 
+    public boolean isFeatureSupported(EGLFeature feature)
+    {
+        GLCapabilities caps = GL.getCapabilities();
+        switch (feature)
+        {
+            case glBufferStorage: return caps.glBufferStorage != 0L;
+            case glBindVertexBuffer: return caps.glBindVertexBuffer != 0L;
+            default: throw new UnsupportedOperationException("No logic defined for feature ["+feature+"].");
+        }
+    }
+
+    @Override
+    public boolean isExtensionSupported(EGLExtension extension)
     {
         GLCapabilities caps = GL.getCapabilities();
         switch (extension) 

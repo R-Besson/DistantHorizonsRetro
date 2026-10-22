@@ -27,6 +27,7 @@ import java.util.TreeSet;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import org.lwjgl.opengl.GL15;
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 
@@ -72,6 +73,9 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 	@Override
 	public void bindBufferToAllBindingPoints(int buffer)
 	{
+		// make sure our buffer is bound before we bind the attributes
+		LWJGL.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);
+		
 		for (int i = 0; i < this.pointers.length; i++)
 		{
 			LWJGL.glEnableVertexAttribArray(i);
@@ -102,6 +106,9 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 	@Override
 	public void bindBufferToBindingPoint(int buffer, int bindingPoint)
 	{
+		// make sure our buffer is bound before we bind the attributes
+		LWJGL.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);
+		
 		int[] bindingPointIndexes = this.bindingPointsToIndex[bindingPoint];
 		
 		for (int bindingPointIndex : bindingPointIndexes)

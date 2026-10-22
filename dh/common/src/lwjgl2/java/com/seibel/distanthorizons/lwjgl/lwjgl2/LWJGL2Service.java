@@ -8,6 +8,7 @@ import com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryStack;
 import com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities;
 import com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer;
 import com.seibel.distanthorizons.lwjgl.EGLExtension;
+import com.seibel.distanthorizons.lwjgl.EGLFeature;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,7 @@ import org.lwjgl.opengl.GLSync;
 import org.lwjgl.opengl.KHRDebug;
 
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -287,6 +289,33 @@ public class LWJGL2Service implements ILWJGLService
 		}
 	}
 	
+	@Override
+	public boolean isFeatureSupported(EGLFeature feature)
+	{
+		ContextCapabilities caps = GLContext.getCapabilities();
+		switch (feature)
+		{
+			case glBufferStorage: return isCapabilityFunctionLoaded(caps, "glBufferStorage");
+			case glBindVertexBuffer: return isCapabilityFunctionLoaded(caps, "glBindVertexBuffer");
+			default: throw new UnsupportedOperationException("No logic defined for feature ["+feature+"].");
+		}
+	}
+	/** LWJGL 2 keeps each function's pointer in a private field of the same name, 0 if the driver doesn't have it */
+	private static boolean isCapabilityFunctionLoaded(ContextCapabilities caps, String functionName)
+	{
+		try
+		{
+			Field field = caps.getClass().getDeclaredField(functionName);
+			field.setAccessible(true);
+			return field.getLong(caps) != 0L;
+		}
+		catch (ReflectiveOperationException | RuntimeException e)
+		{
+			LOGGER.error("Unable to check the GL function ["+functionName+"], error: ["+e.getMessage()+"].", e);
+			return false;
+		}
+	}
+
 	@Override
 	public boolean isExtensionSupported(EGLExtension extension)
 	{
