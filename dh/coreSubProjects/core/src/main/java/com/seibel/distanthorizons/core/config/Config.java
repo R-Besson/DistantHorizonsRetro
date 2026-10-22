@@ -835,16 +835,6 @@ public class Config
 							+ "beacon updating/rendering.\n"
 							+ "")
 						.build();
-
-					public static ConfigEntry<Boolean> hideEntitiesBeyondRenderDistance = new ConfigEntry.Builder<Boolean>()
-						.set(true)
-						.comment(""
-							+ "If true mobs outside the vanilla render distance won't be drawn. \n"
-							+ "\n"
-							+ "LODs can't hide them, so mobs behind hills or in caves \n"
-							+ "would be visible through the LODs. \n"
-							+ "")
-						.build();
 					
 					public static ConfigEntry<Boolean> disableFrustumCulling = new ConfigEntry.Builder<Boolean>()
 						.set(false)

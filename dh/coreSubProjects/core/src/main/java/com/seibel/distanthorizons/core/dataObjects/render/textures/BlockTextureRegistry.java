@@ -254,29 +254,33 @@ public class BlockTextureRegistry
 		int[] argbPixels = faceTexture.argbPixels;
 		
 		// average only the visible pixels, otherwise
-		// cutout textures (IE fences) would have overly dark averages
-		long redSum = 0;
-		long greenSum = 0;
-		long blueSum = 0;
-		int visibleCount = 0;
+		// cutout textures (IE fences) would have overly dark averages.
+		// The LOD's base color is averaged in linear light (see ClientBlockStateColorCache.calculateColorFromTexture),
+		// so the same average is used here, otherwise textured LODs would be brighter than the real block
+		// (IE leaves looking yellow-green on their lit top faces)
+		double redSum = 0;
+		double greenSum = 0;
+		double blueSum = 0;
+		double alphaSum = 0;
 		for (int i = 0; i < argbPixels.length; i++)
 		{
-			if (ColorUtil.getAlpha(argbPixels[i]) != 0)
+			int alpha = ColorUtil.getAlpha(argbPixels[i]);
+			if (alpha != 0)
 			{
-				redSum += ColorUtil.getRed(argbPixels[i]);
-				greenSum += ColorUtil.getGreen(argbPixels[i]);
-				blueSum += ColorUtil.getBlue(argbPixels[i]);
-				visibleCount++;
+				redSum += srgbToLinear(ColorUtil.getRed(argbPixels[i])) * alpha;
+				greenSum += srgbToLinear(ColorUtil.getGreen(argbPixels[i])) * alpha;
+				blueSum += srgbToLinear(ColorUtil.getBlue(argbPixels[i])) * alpha;
+				alphaSum += alpha;
 			}
 		}
-		if (visibleCount == 0)
+		if (alphaSum == 0)
 		{
 			return null;
 		}
-		
-		float averageRed = Math.max(redSum / (float) visibleCount, 1.0f);
-		float averageGreen = Math.max(greenSum / (float) visibleCount, 1.0f);
-		float averageBlue = Math.max(blueSum / (float) visibleCount, 1.0f);
+
+		float averageRed = Math.max(linearToSrgb(redSum / alphaSum), 1.0f);
+		float averageGreen = Math.max(linearToSrgb(greenSum / alphaSum), 1.0f);
+		float averageBlue = Math.max(linearToSrgb(blueSum / alphaSum), 1.0f);
 		
 		
 		byte[] uploadPixels = new byte[TILE_BYTE_COUNT];
@@ -294,9 +298,15 @@ public class BlockTextureRegistry
 				if (faceTexture.uploadAsColorRatio)
 				{
 					// upload as a ratio so the texture modifies the base DH defined color
-					red   = encodeRatio(ColorUtil.getRed(argb), averageRed);
-					green = encodeRatio(ColorUtil.getGreen(argb), averageGreen);
-					blue  = encodeRatio(ColorUtil.getBlue(argb), averageBlue);
+					float redRatio = ColorUtil.getRed(argb) / averageRed;
+					float greenRatio = ColorUtil.getGreen(argb) / averageGreen;
+					float blueRatio = ColorUtil.getBlue(argb) / averageBlue;
+					// ratios above the max are scaled down together,
+					// clamping them separately would shift the pixel's hue (IE tint leaves yellow)
+					float ratioScale = MAX_RATIO / Math.max(MAX_RATIO, Math.max(redRatio, Math.max(greenRatio, blueRatio)));
+					red   = encodeRatio(redRatio * ratioScale);
+					green = encodeRatio(greenRatio * ratioScale);
+					blue  = encodeRatio(blueRatio * ratioScale);
 					alpha = (byte)ColorUtil.getAlpha(argb);
 				}
 				else
@@ -335,9 +345,24 @@ public class BlockTextureRegistry
 		
 		return anyPixelDiffersFromAverage ? uploadPixels : null;
 	}
-	private static byte encodeRatio(int channel, float average)
+	/** @param channel 0-255 */
+	private static double srgbToLinear(int channel)
 	{
-		int encoded = Math.round((channel / average) * 127.5f);
+		double value = channel / 255.0;
+		return (value <= 0.04045) ? (value / 12.92) : Math.pow((value + 0.055) / 1.055, 2.4);
+	}
+	/** @return 0-255 */
+	private static float linearToSrgb(double value)
+	{
+		double srgb = (value <= 0.0031308) ? (value * 12.92) : (1.055 * Math.pow(value, 1.0 / 2.4) - 0.055);
+		return (float) (srgb * 255.0);
+	}
+
+	/** the largest ratio a tile pixel can store (255) */
+	private static final float MAX_RATIO = 2.0f;
+	private static byte encodeRatio(float ratio)
+	{
+		int encoded = Math.round(ratio * 127.5f);
 		return (byte) Math.min(encoded, 255);
 	}
 	

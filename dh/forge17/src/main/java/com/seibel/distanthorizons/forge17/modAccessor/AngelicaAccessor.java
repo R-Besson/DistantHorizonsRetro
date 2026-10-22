@@ -18,14 +18,12 @@ import java.lang.reflect.Method;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.MathHelper;
 
 import java.nio.FloatBuffer;
 
 import com.gtnewhorizons.angelica.config.AngelicaConfig;
-import com.gtnewhorizons.angelica.proxy.ClientProxy;
-import me.jellysquid.mods.sodium.client.gui.options.named.BiomeBlendMode;
+import com.gtnewhorizons.angelica.rendering.celeritas.CeleritasWorldRenderer;
+import org.embeddedt.embeddium.impl.render.chunk.RenderSectionManager;
 import com.gtnewhorizons.angelica.glsm.GLStateManager;
 
 import cpw.mods.fml.common.Loader;
@@ -93,75 +91,42 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	@Override
     public boolean canDoFadeShader() { return AngelicaConfig.enableIris; }
 
+	/** set if Angelica's renderer classes changed, so the failure is only paid for once */
+	private boolean chunkBuiltCheckUnsupported = false;
+	
 	@Override
-	public int getShaderTerrainDistanceInBlocks()
+	public Boolean isChunkBuilt(int chunkX, int chunkZ, int sectionCount)
 	{
+		if (this.chunkBuiltCheckUnsupported)
+		{
+			return null;
+		}
+		
 		try
 		{
-			if (!IrisApi.getInstance().isShaderPackInUse())
+			CeleritasWorldRenderer worldRenderer = CeleritasWorldRenderer.getInstanceOrNull();
+			if (worldRenderer == null)
 			{
-				return -1;
+				return null;
 			}
-
-			// the same value MixinCameraUniforms gives shader packs as "far"
-			return getRenderedTerrainDistanceInBlocks();
+			
+			// sections are only created inside the render distance,
+			// and empty (air) sections count as built once they've been processed
+			RenderSectionManager sectionManager = worldRenderer.getRenderSectionManager();
+			for (int sectionY = 0; sectionY < sectionCount; sectionY++)
+			{
+				if (!sectionManager.isSectionBuilt(chunkX, sectionY, chunkZ))
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 		catch (Throwable e)
 		{
-			// a different Angelica version
-			return -1;
-		}
-	}
-
-	/**
-	 * How far Angelica actually draws vanilla terrain, used for the "far" uniform (see MixinCameraUniforms). <br><br>
-	 *
-	 * With its own chunk tracking Angelica only draws a chunk once its neighbors are loaded,
-	 * so the last ring of the render distance is only drawn when the ring past it is loaded too.
-	 * Angelica always assumes it isn't, which at low render distances makes shader packs
-	 * fade vanilla terrain into LODs a whole chunk early
-	 * (in singleplayer MC loads at least 3 chunks around the player, so at render distance 2 the last ring is drawn).
-	 */
-	public static int getRenderedTerrainDistanceInBlocks()
-	{
-		Minecraft mc = Minecraft.getMinecraft();
-		int renderDistance = mc.gameSettings.renderDistanceChunks;
-		if (AngelicaConfig.useVanillaChunkTracking)
-		{
-			return renderDistance * 16;
-		}
-
-		WorldClient level = mc.theWorld;
-		EntityLivingBase camera = mc.renderViewEntity;
-		boolean outerRingLoaded = false;
-		if (level != null && camera != null)
-		{
-			int cameraChunkX = MathHelper.floor_double(camera.posX) >> 4;
-			int cameraChunkZ = MathHelper.floor_double(camera.posZ) >> 4;
-			int ringDistance = renderDistance + 1;
-			// missing client chunks are returned as empty chunks
-			outerRingLoaded = !level.getChunkFromChunkCoords(cameraChunkX + ringDistance, cameraChunkZ).isEmpty()
-				&& !level.getChunkFromChunkCoords(cameraChunkX - ringDistance, cameraChunkZ).isEmpty()
-				&& !level.getChunkFromChunkCoords(cameraChunkX, cameraChunkZ + ringDistance).isEmpty()
-				&& !level.getChunkFromChunkCoords(cameraChunkX, cameraChunkZ - ringDistance).isEmpty();
-		}
-
-		return (outerRingLoaded ? renderDistance : Math.max(1, renderDistance - 1)) * 16;
-	}
-
-	@Override
-	public boolean leavesUseBiomeFoliageColor()
-	{
-		try
-		{
-			// Angelica's biome blending replaces the tint of minecraft:leaves and leaves2
-			// with the smoothed foliage color, ignoring the birch and spruce colors
-			return ClientProxy.options().quality.biomeBlendMode == BiomeBlendMode.FANCY;
-		}
-		catch (Throwable e)
-		{
-			// the options moved in a different Angelica version
-			return false;
+			this.chunkBuiltCheckUnsupported = true;
+			LOGGER.warn("Unable to check which chunks Angelica has built, LODs will fill unbuilt chunks less precisely. Error: [" + e + "].");
+			return null;
 		}
 	}
 

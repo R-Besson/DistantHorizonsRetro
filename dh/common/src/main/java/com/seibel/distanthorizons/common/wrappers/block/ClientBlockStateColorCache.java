@@ -22,8 +22,6 @@ package com.seibel.distanthorizons.common.wrappers.block;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockColorOverrideEvent;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
@@ -443,20 +441,9 @@ public class ClientBlockStateColorCache
 				FakeBlockState fakeBlockState = (FakeBlockState)this.blockState;
 
 				FakeWorld fakeWorld = FAKE_WORLD_REF.get();
-				fakeWorld.update(realLevel, biomeWrapper.biome, blockPos.getX(), blockPos.getY(), blockPos.getZ(), fakeBlockState);
+				fakeWorld.update(realLevel, biomeWrapper.biome, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ(), fakeBlockState);
 
-				IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
-				if ((fakeBlockState.block == Blocks.leaves || fakeBlockState.block == Blocks.leaves2)
-					&& angelicaAccessor != null
-					&& angelicaAccessor.leavesUseBiomeFoliageColor())
-				{
-					// match Angelica, which tints birch and spruce with the biome color like oak
-					tintColor = biomeWrapper.biome.getBiomeFoliageColor(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-				}
-				else
-				{
-					tintColor = fakeBlockState.block.colorMultiplier(fakeWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ());
-				}
+				tintColor = fakeBlockState.block.colorMultiplier(fakeWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ());
 			}
 			catch (Exception e)
 			{

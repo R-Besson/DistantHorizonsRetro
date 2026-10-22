@@ -26,6 +26,7 @@ public enum Mixins implements IMixins
         .addClientMixins(
             "MixinActiveRenderInfo",
             "MixinChunk",
+            "MixinEntity",
             "MixinEntityRenderer",
             "MixinNetHandlerPlayClient",
             "MixinOptionsScreen",
@@ -48,7 +49,13 @@ public enum Mixins implements IMixins
     ANGELICA_FAR_UNIFORM(
 		new MixinBuilder().setPhase(Phase.EARLY)
         .addRequiredMod(TargetedMod.ANGELICA)
-        .addClientMixins("angelica.MixinCameraUniforms"));
+        .addClientMixins("angelica.MixinCameraUniforms")),
+
+	// draws block textures on LODs with shader packs
+    ANGELICA_LOD_TEXTURES(
+		new MixinBuilder().setPhase(Phase.EARLY)
+        .addRequiredMod(TargetedMod.ANGELICA)
+        .addClientMixins("angelica.MixinTransformPatcher", "angelica.MixinIrisLodRenderProgram"));
 	
 	
 	

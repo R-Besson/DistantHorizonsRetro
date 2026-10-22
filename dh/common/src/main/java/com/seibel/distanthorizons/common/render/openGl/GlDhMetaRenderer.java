@@ -12,6 +12,7 @@ import com.seibel.distanthorizons.common.render.openGl.glObject.GlDhFramebuffer;
 import com.seibel.distanthorizons.common.render.openGl.glObject.texture.*;
 import com.seibel.distanthorizons.common.render.openGl.postProcessing.copy.GlDhCopyShader;
 import com.seibel.distanthorizons.common.render.openGl.terrain.GlBlockTextureAtlas;
+import com.seibel.distanthorizons.common.render.openGl.terrain.VanillaChunkMask;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import com.seibel.distanthorizons.common.wrappers.misc.LightMapWrapper;
 import com.seibel.distanthorizons.core.config.Config;
@@ -121,6 +122,10 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		this.setGLState(renderParams, firstPass);
 		
 		this.bindLightmap(renderParams.lightmap);
+		
+		// LODs are skipped in the chunks MC drew vanilla terrain for
+		VanillaChunkMask.INSTANCE.update(MC_RENDER.getCameraExactPosition());
+		VanillaChunkMask.INSTANCE.bind();
 		
 		if (Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get())
 		{
@@ -389,6 +394,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 			GLMC.disableDepthMask();
 		}
 		this.unbindLightmap();
+		VanillaChunkMask.INSTANCE.unbind();
 		if (Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get())
 		{
 			GlBlockTextureAtlas.INSTANCE.unbind();

@@ -1,6 +1,13 @@
 package com.seibel.distanthorizons.common.backports;
 
+import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
+import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
+import com.seibel.distanthorizons.core.pos.DhSectionPos;
+import com.seibel.distanthorizons.core.util.FullDataPointUtil;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.init.Blocks;
@@ -23,21 +30,25 @@ public class FakeWorld implements IBlockAccess
 	private int blockZ;
 	
 	private FakeBlockState blockState;
-	
-	
-	
+	/** neighboring biomes are read from here, null if unknown */
+	@Nullable
+	private FullDataSourceV2 fullDataSource;
+
+
+
 	//========//
 	// update //
 	//========//
 	//region
-	
+
 	public void update(
-		IBlockAccess realWorld, BiomeGenBase biome, 
-		int blockX, int blockY, int blockZ, 
+		IBlockAccess realWorld, BiomeGenBase biome, @Nullable FullDataSourceV2 fullDataSource,
+		int blockX, int blockY, int blockZ,
 		FakeBlockState blockState)
 	{
 		this.realWorld = realWorld;
 		this.biome = biome;
+		this.fullDataSource = fullDataSource;
 		
 		this.blockX = blockX;
 		this.blockY = blockY;
@@ -112,8 +123,38 @@ public class FakeWorld implements IBlockAccess
 	@Override
 	public BiomeGenBase getBiomeGenForCoords(int x, int z)
 	{
-		// Not 100% accurate since grass samples the surrounding blocks, but good enough for now
-		return this.biome;
+		// Grass and leaves blend the biome colors of their neighbors (vanilla averages 3x3 columns),
+		// without the neighbors' real biomes a tree hanging over a biome border
+		// would get the other biome's color on those leaves (IE yellow plains leaves on a forest tree)
+		if (this.fullDataSource == null
+			|| (x == this.blockX && z == this.blockZ))
+		{
+			return this.biome;
+		}
+
+		long sectionPos = this.fullDataSource.getPos();
+		int columnWidth = DhSectionPos.getBlockWidth(sectionPos) / this.fullDataSource.getWidthInDataColumns();
+		int relX = Math.floorDiv(x - DhSectionPos.getMinCornerBlockX(sectionPos), columnWidth);
+		int relZ = Math.floorDiv(z - DhSectionPos.getMinCornerBlockZ(sectionPos), columnWidth);
+
+		// outside this LOD (IE on its border), the neighbor's biome isn't known
+		LongArrayList column = this.fullDataSource.tryGetColumnAtRelPos(relX, relZ);
+		if (column == null || column.isEmpty())
+		{
+			return this.biome;
+		}
+
+		// MC's biomes are per column, so any datapoint works
+		try
+		{
+			IBiomeWrapper biomeWrapper = this.fullDataSource.mapping.getBiomeWrapper(FullDataPointUtil.getId(column.getLong(0)));
+			BiomeGenBase columnBiome = (biomeWrapper instanceof BiomeWrapper) ? ((BiomeWrapper) biomeWrapper).biome : null;
+			return (columnBiome != null) ? columnBiome : this.biome;
+		}
+		catch (IndexOutOfBoundsException e)
+		{
+			return this.biome;
+		}
 	}
 
 	@Override

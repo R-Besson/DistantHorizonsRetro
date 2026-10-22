@@ -35,18 +35,10 @@ public interface IAngelicaAccessor extends IModAccessor
 	boolean canDoFadeShader();
 
 	/**
-	 * True if Angelica's fancy biome blending is on, which tints every vanilla leaf
-	 * (including birch and spruce) with the biome's foliage color.
+	 * @return true if Angelica has built every section of this chunk (so its vanilla terrain is drawn),
+	 *         null if that can't be checked (IE a different Angelica version)
 	 */
-	boolean leavesUseBiomeFoliageColor();
-
-	/**
-	 * How far vanilla terrain is drawn when a shader pack is active, in blocks. <br>
-	 * Shader packs fade vanilla terrain into LODs at Angelica's "far" uniform,
-	 * which can be a chunk shorter than MC's render distance. <br>
-	 * -1 if no shader pack is in use.
-	 */
-	int getShaderTerrainDistanceInBlocks();
+	Boolean isChunkBuilt(int chunkX, int chunkZ, int sectionCount);
 
 	/**
 	 * Uploads the "dhProjection" and "heightLimit" uniforms to the currently bound shader pack program. <br>

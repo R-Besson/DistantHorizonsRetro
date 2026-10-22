@@ -90,6 +90,9 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	// fragment shader uniforms
 	public int uClipDistance = -1;
 	public int uDitherDhRendering = -1;
+	public int uVanillaChunkMask = -1;
+	public int uVanillaChunkMaskRadius = -1;
+	public int uCameraPosInChunk = -1;
 	
 	// Noise Uniforms
 	public int uNoiseEnabled = -1;
@@ -130,6 +133,9 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		this.uModelOffset = this.getUniformLocation("uModelOffset");
 		this.uWorldYOffset = this.getUniformLocation("uWorldYOffset");
 		this.uDitherDhRendering = this.getUniformLocation("uDitherDhRendering");
+		this.uVanillaChunkMask = this.getUniformLocation("uVanillaChunkMask");
+		this.uVanillaChunkMaskRadius = this.getUniformLocation("uVanillaChunkMaskRadius");
+		this.uCameraPosInChunk = this.getUniformLocation("uCameraPosInChunk");
 		this.uMircoOffset = this.getUniformLocation("uMircoOffset");
 		this.uEarthRadius = this.getUniformLocation("uEarthRadius");
 		
@@ -297,6 +303,17 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			dhNearClipDistance += 16f;
 		}
 		this.setUniform(this.uClipDistance, dhNearClipDistance);
+		
+		// LODs are skipped in the chunks MC drew vanilla terrain for, instead of by distance,
+		// so LODs fill chunks MC hasn't built yet
+		VanillaChunkMask chunkMask = VanillaChunkMask.INSTANCE;
+		this.setUniform(this.uVanillaChunkMask, VanillaChunkMask.GL_BOUND_INDEX);
+		this.setUniform(this.uVanillaChunkMaskRadius, Config.Client.Advanced.Debugging.lodOnlyMode.get() ? 0 : chunkMask.getRadius());
+		DhVec3d cameraPos = MC_RENDER.getCameraExactPosition();
+		this.setUniform(this.uCameraPosInChunk, new DhVec3f(
+			(float) (cameraPos.x - (chunkMask.getCameraChunkX() * 16.0)),
+			0.0f,
+			(float) (cameraPos.z - (chunkMask.getCameraChunkZ() * 16.0))));
 	}
 	
 	@Override

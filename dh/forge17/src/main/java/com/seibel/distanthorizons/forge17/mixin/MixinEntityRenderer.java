@@ -13,6 +13,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.seibel.distanthorizons.core.config.Config;
+import org.spongepowered.asm.lib.Opcodes;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import com.seibel.distanthorizons.forge17.RenderHelper;
 import com.seibel.distanthorizons.forge17.ForgeMain;
 
@@ -61,6 +65,40 @@ public abstract class MixinEntityRenderer
 	
 	
 	
+	//===========//
+	// far plane //
+	//===========//
+	//region
+
+	@Shadow
+	private float farPlaneDistance;
+	
+	/** MC's far clip plane is twice this, so mobs are drawn as far as {@link MixinEntity} allows */
+	@Unique
+	private static final float DISTANT_HORIZONS_MIN_FAR_PLANE_DISTANCE = 128.0f;
+
+	/**
+	 * MC's far clip plane is only twice the render distance (64 blocks at render distance 2),
+	 * vanilla hides that with fog, but DH turns the fog off.
+	 * Anything past it is clipped and frustum culled, so mobs over the LODs would vanish.
+	 */
+	@Redirect(
+		method = "setupCameraTransform",
+		at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/EntityRenderer;farPlaneDistance:F", opcode = Opcodes.GETFIELD))
+	private float distanthorizons$extendFarPlane(EntityRenderer entityRenderer)
+	{
+		float farPlaneDistance = this.farPlaneDistance;
+		if (!Config.Client.quickEnableRendering.get())
+		{
+			return farPlaneDistance;
+		}
+		return Math.max(farPlaneDistance, DISTANT_HORIZONS_MIN_FAR_PLANE_DISTANCE);
+	}
+
+	//endregion
+
+
+
 	//==========//
 	// lightmap //
 	//==========//

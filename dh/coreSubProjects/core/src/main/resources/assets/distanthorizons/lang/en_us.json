@@ -406,10 +406,6 @@
     "Enable Beacon Distance Culling",
   "distanthorizons.config.client.advanced.graphics.culling.disableBeaconDistanceCulling.@tooltip":
     "If true beacons near the camera won't be drawn to prevent vanilla overdraw. \nIf false all beacons will be rendered.",
-  "distanthorizons.config.client.advanced.graphics.culling.hideEntitiesBeyondRenderDistance":
-    "Hide Mobs Beyond Render Distance",
-  "distanthorizons.config.client.advanced.graphics.culling.hideEntitiesBeyondRenderDistance.@tooltip":
-    "If true mobs outside the vanilla render distance won't be drawn, \nsince LODs can't hide them behind hills or in caves.",
   "distanthorizons.config.client.advanced.graphics.culling.disableFrustumCulling":
     "Disable Frustum Culling",
   "distanthorizons.config.client.advanced.graphics.culling.disableFrustumCulling.@tooltip":

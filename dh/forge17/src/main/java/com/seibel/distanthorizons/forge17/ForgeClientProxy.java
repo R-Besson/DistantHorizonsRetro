@@ -20,11 +20,9 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.shader.Framebuffer;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
@@ -39,9 +37,7 @@ import com.seibel.distanthorizons.core.api.internal.ClientApi;
 import com.seibel.distanthorizons.core.api.internal.ServerApi;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
 import com.seibel.distanthorizons.core.config.Config;
-import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.f3.F3Screen;
@@ -55,6 +51,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
+
 
 /**
  * This handles all events sent to the client.
@@ -104,56 +101,6 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
         });
     }
 	
-	//endregion
-	
-	
-	
-    //===============//
-    // entity events //
-    //===============//
-	//region
-
-	/**
-	 * LODs aren't in MC's depth buffer, so mobs outside the vanilla render distance
-	 * would be drawn on top of them, IE bats in caves or mobs behind hills. <br>
-	 * Vanilla hides them with fog, which DH turns off.
-	 */
-	@SubscribeEvent
-	public void hideEntitiesBeyondRenderDistance(RenderLivingEvent.Pre event)
-	{
-		if (!Config.Client.Advanced.Graphics.Culling.hideEntitiesBeyondRenderDistance.get()
-			|| !Config.Client.quickEnableRendering.get())
-		{
-			return;
-		}
-
-		Minecraft mc = Minecraft.getMinecraft();
-		EntityLivingBase camera = mc.renderViewEntity;
-		if (camera == null)
-		{
-			return;
-		}
-
-		// Angelica (like Sodium) culls chunks by a circle around the camera, not a square of chunks,
-		// so a square would leave mobs visible in the corners where only LODs are drawn.
-		// the extra half chunk covers mobs on the far side of the last rendered chunks
-		double maxDistance = (mc.gameSettings.renderDistanceChunks * 16) + 8;
-
-		// shader packs fade vanilla terrain into LODs at Angelica's "far" distance instead
-		IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
-		int shaderTerrainDistance = (angelicaAccessor != null) ? angelicaAccessor.getShaderTerrainDistanceInBlocks() : -1;
-		if (shaderTerrainDistance != -1)
-		{
-			maxDistance = shaderTerrainDistance;
-		}
-		double distanceX = event.entity.posX - camera.posX;
-		double distanceZ = event.entity.posZ - camera.posZ;
-		if ((distanceX * distanceX) + (distanceZ * distanceZ) > (maxDistance * maxDistance))
-		{
-			event.setCanceled(true);
-		}
-	}
-
 	//endregion
 
 

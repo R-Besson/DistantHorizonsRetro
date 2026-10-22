@@ -19,6 +19,13 @@ uniform sampler2D uBlockAtlas;
 // Fade/Clip Uniforms
 uniform float uClipDistance = 0.0;
 
+// 1 for chunks MC drew vanilla terrain for, centered on the camera's chunk (see VanillaChunkMask)
+uniform sampler2D uVanillaChunkMask;
+// 0 disables the mask
+uniform int uVanillaChunkMaskRadius;
+// the camera's position inside its chunk (only x and z are used)
+uniform vec3 uCameraPosInChunk;
+
 // Noise Uniforms
 uniform bool uNoiseEnabled;
 uniform int uNoiseSteps;
@@ -128,13 +135,29 @@ void main()
         // The tile's color ratio preserves the LOD's original tint and shading.
         // Tile color value of gray, 128 (half way between 0 and 255)
         // means the LOD will use it's base color.
-        vec3 clampedColor = clamp(fragColor.rgb * (tile.rgb * 2.0), 0.0, 1.0);
+        // Brightened colors are scaled down as a whole instead of clamped per channel,
+        // clamping would cap bright green leaves while red keeps rising, tinting them yellow.
+        vec3 texturedColor = max(fragColor.rgb * (tile.rgb * 2.0), 0.0);
+        float brightestChannel = max(texturedColor.r, max(texturedColor.g, texturedColor.b));
+        vec3 clampedColor = texturedColor / max(brightestChannel, 1.0);
         fragColor.rgb = mix(fragColor.rgb, clampedColor, tile.a);
     }
     
     float viewDist = length(vertexWorldPos);
-    
-    if (uDitherDhRendering)
+
+    if (uVanillaChunkMaskRadius > 0)
+    {
+        // skip LODs in chunks MC drew vanilla terrain for, everywhere else
+        // (IE chunks MC hasn't built yet) the LODs are drawn so there aren't any holes
+        ivec2 chunkOffset = ivec2(floor((vertexWorldPos.xz + uCameraPosInChunk.xz) / 16.0));
+        if (abs(chunkOffset.x) <= uVanillaChunkMaskRadius
+            && abs(chunkOffset.y) <= uVanillaChunkMaskRadius
+            && texelFetch(uVanillaChunkMask, chunkOffset + ivec2(uVanillaChunkMaskRadius), 0).r > 0.5)
+        {
+            discard;
+        }
+    }
+    else if (uDitherDhRendering)
     {
         // Dither out the fragment based on distance and noise.
         // Dithering is used since it works for both opaque and transparent rendering
