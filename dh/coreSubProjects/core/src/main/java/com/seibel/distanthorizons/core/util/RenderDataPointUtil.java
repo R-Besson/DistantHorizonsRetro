@@ -136,6 +136,12 @@ public class RenderDataPointUtil
 	public final static byte SHAPE_THICK_POST = 2;
 	/** the bottom half of a block, IE bottom slabs */
 	public final static byte SHAPE_BOTTOM_HALF = 3;
+	/**
+	 * two crossed diagonal planes, IE tall grass and flowers. <br>
+	 * Unlike the other shapes these are built as their own quads (see LodQuadBuilder#addCrossQuads),
+	 * they don't cover anything around them.
+	 */
+	public final static byte SHAPE_CROSS = 4;
 	
 	
 	

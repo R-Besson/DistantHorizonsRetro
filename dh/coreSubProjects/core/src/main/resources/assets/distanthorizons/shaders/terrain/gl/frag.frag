@@ -103,13 +103,18 @@ float bayerMatrix4x4(vec2 st)
  * Returns the texture coordinate for this fragment,
  * matching the orientation block textures are baked with.
  * The normal index is the same order as EDhDirection:
- * 0 down, 1 up, 2 north, 3 south, 4 west, 5 east
+ * 0 down, 1 up, 2 north, 3 south, 4 west, 5 east,
+ * 6 and 7 are the diagonal planes of crossed plants,
+ * see-through leaves add 8 (see LodQuadBuilder)
  */
 vec2 blockFaceUv()
 {
     vec3 pos = fract(vBlockPos);
-    switch (vNormalIndex)
+    uint face = (vNormalIndex >= 8u) ? (vNormalIndex - 8u) : vNormalIndex;
+    switch (face)
     {
+        case 6u:
+        case 7u: return vec2(pos.x, 1.0 - pos.y); // plant planes run along x
         case 0u: return vec2(pos.x, 1.0 - pos.z); // down
         case 1u: return vec2(pos.x, pos.z); // up
         case 2u: return vec2(1.0 - pos.x, 1.0 - pos.y); // north
@@ -131,7 +136,39 @@ void main()
         vec2 tileOrigin = vec2(float(vTextureTileId % 256u), float(vTextureTileId / 256u)) * 16.0;
         vec2 uv = (tileOrigin + blockFaceUv() * 16.0) / vec2(atlasSize);
         vec4 tile = texture(uBlockAtlas, uv);
-        
+
+        // plants are cut out like MC's
+        if (vNormalIndex >= 6u && vNormalIndex < 8u && tile.a < 0.5)
+        {
+            discard;
+        }
+        // See-through leaves also cut out their gaps, which are marked with 254 alpha (see ClientBlockStateTextureCache).
+        // Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
+        // Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
+        // fading to solid leaves in the distance
+        if (vNormalIndex >= 8u)
+        {
+            vec2 texelPos = blockFaceUv() * 16.0;
+            vec2 texelDx = dFdx(texelPos);
+            vec2 texelDy = dFdy(texelPos);
+            float texelsPerPixel = max(length(texelDx), length(texelDy));
+            float fade = 1.0 - smoothstep(4.0, 8.0, texelsPerPixel);
+            if (fade > 0.0)
+            {
+                float gaps = 0.0;
+                for (int i = 0; i < 4; i++)
+                {
+                    vec2 offset = vec2((i & 1) == 0 ? -0.25 : 0.25, (i & 2) == 0 ? -0.25 : 0.25);
+                    vec2 texel = mod(floor(texelPos + texelDx * offset.x + texelDy * offset.y), 16.0);
+                    gaps += (texelFetch(uBlockAtlas, ivec2(tileOrigin + texel), 0).a < 0.998) ? 0.25 : 0.0;
+                }
+                if (gaps * fade > bayerMatrix4x4(gl_FragCoord.xy) + 0.001)
+                {
+                    discard;
+                }
+            }
+        }
+
         // The tile's color ratio preserves the LOD's original tint and shading.
         // Tile color value of gray, 128 (half way between 0 and 255)
         // means the LOD will use it's base color.

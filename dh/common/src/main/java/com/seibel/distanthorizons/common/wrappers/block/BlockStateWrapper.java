@@ -1071,6 +1071,49 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	public int getOpacity() { return this.opacity; }
 	@Override
 	public byte getLodShape() { return this.lodShape; }
+
+	/** MC's crossed squares (IE tall grass, flowers, saplings) and double plants */
+	@Override
+	public boolean isCrossPlant()
+	{
+		if (this.blockState == null)
+		{
+			return false;
+		}
+		int renderType = this.blockState.getBlock().getRenderType();
+		return renderType == CROSSED_SQUARES_RENDER_TYPE || renderType == DOUBLE_PLANT_RENDER_TYPE;
+	}
+	private static final int CROSSED_SQUARES_RENDER_TYPE = 1;
+	private static final int DOUBLE_PLANT_RENDER_TYPE = 40;
+
+	/**
+	 * 1.7.10 double plant tops are always meta 8, their type is the bottom's meta.
+	 * The returned top's meta is 8 plus the type, which MC never stores
+	 * but is understood by {@link TextureAtlasSpriteWrapper#resolveFaceSprite} and FakeWorld.
+	 */
+	@Override
+	public IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow, ILevelWrapper levelWrapper)
+	{
+		if (this.blockState == null
+			|| !(this.blockState.getBlock() instanceof BlockDoublePlant)
+			|| this.blockState.getMeta() != DOUBLE_PLANT_TOP_META
+			|| !(blockBelow instanceof BlockStateWrapper))
+		{
+			return this;
+		}
+
+		IBlockState below = ((BlockStateWrapper) blockBelow).blockState;
+		if (below == null
+			|| below.getBlock() != this.blockState.getBlock()
+			|| (below.getMeta() & DOUBLE_PLANT_TOP_META) != 0)
+		{
+			return this;
+		}
+
+		return fromBlockState(this.blockState.getBlock(), DOUBLE_PLANT_TOP_META | below.getMeta(), levelWrapper);
+	}
+	private static final int DOUBLE_PLANT_TOP_META = 8;
+
 	@Override
 	public int getLightOpacity() { return this.lightOpacity; }
 

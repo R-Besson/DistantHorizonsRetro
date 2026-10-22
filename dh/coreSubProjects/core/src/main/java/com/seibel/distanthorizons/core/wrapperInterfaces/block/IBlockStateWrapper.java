@@ -23,6 +23,7 @@ import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockColorOverrideEvent;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockTextureOverrideEvent;
 import com.seibel.distanthorizons.core.util.LodUtil;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 
 import java.awt.*;
 
@@ -50,6 +51,20 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	 * but are still opaque for culling.
 	 */
 	default int getLightOpacity() { return this.getOpacity(); }
+
+	/**
+	 * True if MC draws this block as crossed planes (IE tall grass, flowers),
+	 * close LODs draw it the same way.
+	 */
+	default boolean isCrossPlant() { return false; }
+
+	/**
+	 * Some plants only store their type in their bottom half (IE 1.7.10's double plants),
+	 * this returns the top half with the type of the given bottom half.
+	 *
+	 * @param blockBelow the block under this one, null if unknown
+	 */
+	default IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow, ILevelWrapper levelWrapper) { return this; }
 
 	int getLightEmission();
 	

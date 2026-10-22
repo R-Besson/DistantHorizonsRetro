@@ -28,6 +28,7 @@ import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSour
 import com.seibel.distanthorizons.core.dataObjects.render.ColumnRenderSource;
 import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry;
 import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
+import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPosMutable;
@@ -37,6 +38,7 @@ import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.*;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
@@ -57,6 +59,7 @@ public class FullDataToRenderDataTransformer
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
+	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	
 	private static final LongOpenHashSet BROKEN_POS_SET = new LongOpenHashSet();
 	private static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Data Transformer");
@@ -210,7 +213,7 @@ public class FullDataToRenderDataTransformer
 		if (columnSource != null 
 			&& columnSource.hasTextureSetIds())
 		{
-			applyTextureSetIds(fullDataSource, columnArrayView, fullDataColumn, columnSource, sourceRelX, sourceRelZ);
+			applyTextureSetIds(levelWrapper, fullDataSource, columnArrayView, fullDataColumn, columnSource, sourceRelX, sourceRelZ);
 		}
 	}
 	
@@ -224,7 +227,7 @@ public class FullDataToRenderDataTransformer
 	 * how the data points were merged along the way.
 	 */
 	private static void applyTextureSetIds(
-			FullDataSourceV2 fullDataSource, ColumnRenderView renderColumnData, LongArrayList fullDataColumn,
+			IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource, ColumnRenderView renderColumnData, LongArrayList fullDataColumn,
 			ColumnRenderSource columnSource, int sourceRelX, int sourceRelZ)
 	{
 		for (int renderIndex = 0; renderIndex < renderColumnData.size; renderIndex++)
@@ -278,6 +281,12 @@ public class FullDataToRenderDataTransformer
 							}
 						}
 						
+						// the same plant top as the render data was built with (see setRenderColumnView)
+						if (RenderDataPointUtil.getShape(renderData) == RenderDataPointUtil.SHAPE_CROSS)
+						{
+							block = block.getPlantTopWithBottom(getTouchingBlock(fullDataColumn, fullIndex + 1, FullDataPointUtil.getBottomY(fullData), false, fullDataSource.mapping), levelWrapper);
+						}
+
 						textureId = BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(block);
 					}
 					catch (IndexOutOfBoundsException ignore)
@@ -295,6 +304,22 @@ public class FullDataToRenderDataTransformer
 		}
 	}
 	
+	/**
+	 * Grass keeps its own material under plants (IE tall grass),
+	 * its sides are drawn as dirt based on the grass material (see LodQuadBuilder),
+	 * with the plant's material they'd be drawn in the plant's green. <br>
+	 * Snow still replaces it, snowy grass sides aren't green in MC either.
+	 */
+	private static IBlockStateWrapper keepGrassMaterial(IBlockStateWrapper block, IBlockStateWrapper avoidedBlockAbove)
+	{
+		if (block.getMaterialId() == EDhApiBlockMaterial.GRASS.index
+			&& avoidedBlockAbove.getMaterialId() != EDhApiBlockMaterial.SNOW.index)
+		{
+			return block;
+		}
+		return avoidedBlockAbove;
+	}
+
 	private static void setRenderColumnView(
 			IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
 			int blockX, int blockZ,
@@ -306,6 +331,10 @@ public class FullDataToRenderDataTransformer
 		
 		boolean ignoreNonCollidingBlocks = (Config.Client.Advanced.Graphics.Culling.blocksToIgnore.get() == EDhApiBlocksToAvoid.NON_COLLIDING);
 		boolean colorBelowWithAvoidedBlocks = Config.Client.Advanced.Graphics.Culling.tintWithAvoidedBlocks.get();
+		boolean grassKeepsColorUnderPlants = Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
+			&& fullDataSource.getDataDetailLevel() <= Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel.get();
+		// plants are only drawn by 1 block wide LODs, wider LODs are full boxes (see ColumnBox)
+		boolean plantsAsCrosses = grassKeepsColorUnderPlants && fullDataSource.getDataDetailLevel() == 0;
 		
 		final ObjectOpenHashSet<IBlockStateWrapper> blockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredBlocks(levelWrapper);
 		final ObjectOpenHashSet<IBlockStateWrapper> caveBlockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredCaveBlocks(levelWrapper);
@@ -578,6 +607,29 @@ public class FullDataToRenderDataTransformer
 				}
 			}
 			
+			if (ignoreNonSolidBlock
+				&& plantsAsCrosses
+				&& block.isCrossPlant())
+			{
+				// close LODs draw plants (IE tall grass, flowers) as crossed planes like MC,
+				// the block below keeps its own color and is lit by the air the plant is in
+				block = block.getPlantTopWithBottom(getTouchingBlock(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping), levelWrapper);
+				int plantColor = ColorUtil.setAlpha(levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block), 255);
+				isColumnVoid = false;
+				long columnData = RenderDataPointUtil.createDataPoint(bottomY + blockHeight, bottomY, plantColor, skyLight, blockLight, block.getMaterialId(), RenderDataPointUtil.SHAPE_CROSS);
+				renderColumnData.set(renderDataIndex, columnData);
+				renderDataIndex++;
+
+				lastBottom = bottomY;
+				lastColor = plantColor;
+				lastBlock = block;
+				lastShape = RenderDataPointUtil.SHAPE_CROSS;
+
+				skylightToApplyToNextBlock = skyLight;
+				blocklightToApplyToNextBlock = blockLight;
+				continue;
+			}
+
 			if (ignoreNonSolidBlock)
 			{
 				int ignoredColor = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
@@ -645,11 +697,19 @@ public class FullDataToRenderDataTransformer
 
 			int color;
 			// use the override values if necessary
-			if (colorToApplyToNextBlock == -1)
+			if (colorToApplyToNextBlock == -1
+				// textured LODs are close enough to see the grass top, MC draws plants (IE tall grass) standing on it
+				// instead of recoloring it, so the grass keeps its own color like the grass around it
+				|| (grassKeepsColorUnderPlants
+					&& block.getMaterialId() == EDhApiBlockMaterial.GRASS.index
+					&& blockToApplyToNextBlock != null
+					&& blockToApplyToNextBlock.getMaterialId() != EDhApiBlockMaterial.SNOW.index))
 			{
 				// use this block's color
 				color = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
-				
+				// an ignored plant color mustn't carry over to the block below
+				colorToApplyToNextBlock = -1;
+
 				// use the skylight override if present
 				if (skylightToApplyToNextBlock != -1)
 				{
@@ -666,7 +726,7 @@ public class FullDataToRenderDataTransformer
 				
 				if (blockToApplyToNextBlock != null)
 				{
-					block = blockToApplyToNextBlock;
+					block = keepGrassMaterial(block, blockToApplyToNextBlock);
 					blockToApplyToNextBlock = null;
 				}
 			}
@@ -693,13 +753,18 @@ public class FullDataToRenderDataTransformer
 
 				if (blockToApplyToNextBlock != null)
 				{
-					block = blockToApplyToNextBlock;
+					block = keepGrassMaterial(block, blockToApplyToNextBlock);
 					blockToApplyToNextBlock = null;
 				}
 			}
-			
-			
-			
+
+			if (block.getMaterialId() == EDhApiBlockMaterial.WATER.index)
+			{
+				color = blendSeaFloorIntoWater(color, fullColumnData, fullDataIndex, bottomY, fullDataMapping, levelWrapper, biome, mutableBlockPos, fullDataSource);
+			}
+
+
+
 			// light emitting blocks (lava, glowstone) light themselves. A LOD only stores the light
 			// above it, which can be 0 for lava falls in the Nether or chunks lit before their neighbors
 			int lightEmission = Math.min(block.getLightEmission(), LodUtil.MAX_MC_LIGHT);
@@ -760,6 +825,59 @@ public class FullDataToRenderDataTransformer
 			renderColumnData.set(0, RenderDataPointUtil.EMPTY_DATA);
 		}
 	}
+
+	/**
+	 * MC's water is see-through, the sea floor shows through it, darker the deeper it is since water blocks light.
+	 * LOD water shows the water's color alone, so the floor is blended into it with MC's light curve
+	 * otherwise LOD water is a lot brighter than the vanilla water next to it.
+	 *
+	 * @param index the water's data point, the column is ordered top to bottom
+	 * @return the water's color with the floor blended in, unchanged if the water is opaque or has no floor
+	 */
+	private static int blendSeaFloorIntoWater(
+		int waterColor, LongArrayList fullColumnData, int index, int waterBottomY,
+		FullDataPointIdMap fullDataMapping, IClientLevelWrapper levelWrapper, IBiomeWrapper biome,
+		DhBlockPosMutable blockPos, FullDataSourceV2 fullDataSource)
+	{
+		int waterAlpha = ColorUtil.getAlpha(waterColor);
+		if (waterAlpha == 255
+			// shader packs draw their own water (depth, reflections) from the water's color
+			|| (IRIS_ACCESSOR != null && IRIS_ACCESSOR.isShaderPackInUse()))
+		{
+			return waterColor;
+		}
+
+		// the water may be split into several data points, the floor is under the last one
+		IBlockStateWrapper floor = getTouchingBlock(fullColumnData, index + 1, waterBottomY, false, fullDataMapping);
+		while (floor != null && floor.getMaterialId() == EDhApiBlockMaterial.WATER.index)
+		{
+			index++;
+			waterBottomY = FullDataPointUtil.getBottomY(fullColumnData.getLong(index));
+			floor = getTouchingBlock(fullColumnData, index + 1, waterBottomY, false, fullDataMapping);
+		}
+		if (floor == null || floor.isAir() || floor.isLiquid())
+		{
+			return waterColor;
+		}
+
+		// the floor's stored light is the light in the water right above it
+		long floorData = fullColumnData.getLong(index + 1);
+		int light = Math.max(FullDataPointUtil.getSkyLight(floorData), FullDataPointUtil.getBlockLight(floorData));
+		float lightRatio = light / (float) LodUtil.MAX_MC_LIGHT;
+		// MC's (1.7.10) lightmap brightness for a light level
+		float floorBrightness = lightRatio / ((1.0f - lightRatio) * 3.0f + 1.0f);
+
+		int floorColor = levelWrapper.getBlockColor(blockPos, biome, fullDataSource, floor);
+		float alpha = waterAlpha / 255.0f;
+		// the alpha is kept so the water is still drawn with the transparent LODs
+		return ColorUtil.argbToInt(waterAlpha,
+			blendWaterChannel(ColorUtil.getRed(waterColor), ColorUtil.getRed(floorColor), floorBrightness, alpha),
+			blendWaterChannel(ColorUtil.getGreen(waterColor), ColorUtil.getGreen(floorColor), floorBrightness, alpha),
+			blendWaterChannel(ColorUtil.getBlue(waterColor), ColorUtil.getBlue(floorColor), floorBrightness, alpha));
+	}
+	/** blended like MC's blending, without linearizing */
+	private static int blendWaterChannel(int water, int floor, float floorBrightness, float alpha)
+	{ return Math.round(water * alpha + floor * floorBrightness * (1.0f - alpha)); }
 
 	/** @see #getTouchingBlock */
 	private static boolean isFullyOpaqueBlockAt(LongArrayList fullColumnData, int index, int touchingY, boolean isAbove, FullDataPointIdMap fullDataMapping)

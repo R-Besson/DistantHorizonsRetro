@@ -67,7 +67,14 @@ public class ColumnBox
 		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
 		short @Nullable [] faceTileIdsByDirectionOrdinal)
 	{
+		// the closest LODs draw leaves like MC's fancy leaves, with see-through gaps and the faces between them
+		boolean seeThroughLeaves = blockWidth == 1
+			&& irisBlockMaterialId == EDhApiBlockMaterial.LEAVES.index
+			&& faceTileIdsByDirectionOrdinal != null
+			&& Config.Client.Advanced.Graphics.Texture.seeThroughLeaves.get();
+
 		builder.shapeForNewQuads = shape;
+		builder.seeThroughForNewQuads = seeThroughLeaves;
 		try
 		{
 			addBoxQuads(
@@ -77,11 +84,12 @@ public class ColumnBox
 				color, irisBlockMaterialId, skyLight, blockLight, shape,
 				topData, bottomData,
 				adjData, isAdjDataSameDetailLevel,
-				faceTileIdsByDirectionOrdinal);
+				faceTileIdsByDirectionOrdinal, seeThroughLeaves);
 		}
 		finally
 		{
 			builder.shapeForNewQuads = RenderDataPointUtil.SHAPE_NONE;
+			builder.seeThroughForNewQuads = false;
 		}
 	}
 	private static void addBoxQuads(
@@ -91,7 +99,7 @@ public class ColumnBox
 		int color, byte irisBlockMaterialId, byte skyLight, byte blockLight, byte shape,
 		long topData, long bottomData,
 		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
-		short @Nullable [] faceTileIdsByDirectionOrdinal)
+		short @Nullable [] faceTileIdsByDirectionOrdinal, boolean seeThroughLeaves)
 	{
 		//================//
 		// variable setup //
@@ -133,6 +141,19 @@ public class ColumnBox
 		{
 			return;
 		}
+
+		// plants are crossed planes instead of a box
+		// (they only exist in 1 block wide LODs, see FullDataToRenderDataTransformer)
+		if (shape == RenderDataPointUtil.SHAPE_CROSS)
+		{
+			builder.addCrossQuads(
+				minX, minY, minZ,
+				blockWidth, yHeight,
+				color, tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.NORTH),
+				irisBlockMaterialId,
+				skyLight, blockLight);
+			return;
+		}
 		
 		
 		
@@ -148,7 +169,9 @@ public class ColumnBox
 					&& (RenderDataPointUtil.getYMin(topData) == maxY)
 					&& !isTopTransparent
 					&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF
-					&& !isPost(getShape(topData, blockWidth));
+					&& !isPost(getShape(topData, blockWidth))
+					&& getShape(topData, blockWidth) != RenderDataPointUtil.SHAPE_CROSS
+					&& !isSeeThroughLeaves(topData, blockWidth);
 			
 			if (!skipTop)
 			{
@@ -167,7 +190,8 @@ public class ColumnBox
 			boolean skipBottom = RenderDataPointUtil.doesDataPointExist(bottomData)
 					&& (RenderDataPointUtil.getYMax(bottomData) == minY)
 					&& !isBottomTransparent
-					&& getShape(bottomData, blockWidth) == RenderDataPointUtil.SHAPE_NONE;
+					&& getShape(bottomData, blockWidth) == RenderDataPointUtil.SHAPE_NONE
+					&& !isSeeThroughLeaves(bottomData, blockWidth);
 			if (!skipBottom)
 			{
 				builder.addQuadDown(
@@ -178,7 +202,27 @@ public class ColumnBox
 					skyLightBottom, blockLight);
 			}
 		}
-		
+
+		// see-through leaves stacked in one LOD also show the faces between each leaf block
+		if (seeThroughLeaves)
+		{
+			for (int faceY = minY + 1; faceY < maxY; faceY++)
+			{
+				builder.addQuadUp(
+					minX, (short) faceY, minZ,
+					blockWidth,
+					ColorUtil.applyShade(color, clientLevelWrapper.getShade(EDhDirection.UP)), tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.UP),
+					irisBlockMaterialId,
+					skyLight, blockLight);
+				builder.addQuadDown(
+					minX, (short) faceY, minZ,
+					blockWidth,
+					ColorUtil.applyShade(color, clientLevelWrapper.getShade(EDhDirection.DOWN)), tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.DOWN),
+					irisBlockMaterialId,
+					skyLight, blockLight);
+			}
+		}
+
 		
 		
 		//========================================//
@@ -419,8 +463,14 @@ public class ColumnBox
 			byte blockLightToApply;
 			
 			// shaped neighbors don't fill their block, so they don't hide this face
-			boolean adjShaped = adjacentIsSameDetailLevel
-				&& getShape(adjPoint, horizontalBlockWidth) != RenderDataPointUtil.SHAPE_NONE;
+			boolean adjShaped = (adjacentIsSameDetailLevel
+					&& getShape(adjPoint, horizontalBlockWidth) != RenderDataPointUtil.SHAPE_NONE)
+				// plants never cover anything, even next to a lower detail LOD
+				|| (RenderDataPointUtil.doesDataPointExist(adjPoint)
+					&& RenderDataPointUtil.getShape(adjPoint) == RenderDataPointUtil.SHAPE_CROSS)
+				// faces behind see-through leaves can be seen through their gaps
+				|| (adjacentIsSameDetailLevel
+					&& isSeeThroughLeaves(adjPoint, horizontalBlockWidth));
 			boolean adjCoversFace = !adjShaped;
 			
 			if (adjShaped)
@@ -647,6 +697,19 @@ public class ColumnBox
 			: RenderDataPointUtil.SHAPE_NONE;
 	}
 	
+	/**
+	 * See-through leaves (like MC's fancy leaves) are only drawn by 1 block wide textured LODs,
+	 * the faces they touch can be seen through their gaps so they aren't culled.
+	 */
+	private static boolean isSeeThroughLeaves(long dataPoint, short blockWidth)
+	{
+		return blockWidth == 1
+			&& RenderDataPointUtil.doesDataPointExist(dataPoint)
+			&& RenderDataPointUtil.getBlockMaterialId(dataPoint) == EDhApiBlockMaterial.LEAVES.index
+			&& Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
+			&& Config.Client.Advanced.Graphics.Texture.seeThroughLeaves.get();
+	}
+
 	private static boolean isPost(byte shape)
 	{
 		return shape == RenderDataPointUtil.SHAPE_THIN_POST

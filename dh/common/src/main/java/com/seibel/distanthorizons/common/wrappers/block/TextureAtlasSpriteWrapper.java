@@ -27,6 +27,7 @@ import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IconFlipped;
 import net.minecraft.client.renderer.texture.ITextureObject;
@@ -43,6 +44,20 @@ import java.lang.reflect.Field;
 public class TextureAtlasSpriteWrapper
 {
 	private static final IGregTechCommonAccessor GREG_TECH_ACCESSOR = ModAccessorInjector.INSTANCE.get(IGregTechCommonAccessor.class);
+
+	/** meta bit MC sets on the top half of double plants */
+	private static final int DOUBLE_PLANT_TOP_BIT = 8;
+	/** the order of BlockDoublePlant's types (its meta), used in its icon names */
+	private static final String[] DOUBLE_PLANT_NAMES = { "sunflower", "syringa", "grass", "fern", "rose", "paeonia" };
+	private static final int TALL_GRASS_TYPE = 2;
+	
+	/** @param topMeta 8 for an untyped top, otherwise 8 + the bottom's meta */
+	public static int getDoublePlantTopType(int topMeta)
+	{
+		int type = topMeta & 7;
+		// sunflower tops (8 + 0) can't be told apart from untyped tops
+		return (type == 0 || type >= DOUBLE_PLANT_NAMES.length) ? TALL_GRASS_TYPE : type;
+	}
 
 	/**
 	 * Anisotropic sprites are stored with an eight-pixel wrapping border on
@@ -125,6 +140,21 @@ public class TextureAtlasSpriteWrapper
 	@Nullable
 	public static TextureAtlasSprite resolveFaceSprite(IBlockState blockstate, int sideOrdinal)
 	{
+		// The top half of a double plant only knows it's a top, the type is stored in the bottom half
+		// and without the world getIcon() returns the sunflower's bottom.
+		// LODs give tops their type as 8 + the bottom's meta (see BlockStateWrapper.getPlantTopWithBottom),
+		// a plain top (meta 8) is assumed to be tall grass, the most common one.
+		if (blockstate.getBlock() instanceof BlockDoublePlant
+			&& (blockstate.getMeta() & DOUBLE_PLANT_TOP_BIT) != 0)
+		{
+			int type = getDoublePlantTopType(blockstate.getMeta());
+			TextureAtlasSprite topSprite = findBlockAtlasSprite("double_plant_" + DOUBLE_PLANT_NAMES[type] + "_top");
+			if (topSprite != null)
+			{
+				return topSprite;
+			}
+		}
+
 		IIcon icon = null;
 
 		// GregTech

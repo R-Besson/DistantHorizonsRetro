@@ -2,6 +2,7 @@ package com.seibel.distanthorizons.common.backports;
 
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
+import com.seibel.distanthorizons.common.wrappers.block.TextureAtlasSpriteWrapper;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.FullDataPointUtil;
@@ -105,10 +106,11 @@ public class FakeWorld implements IBlockAccess
 			 * top block = meta 8
 			 * bottom block = meta 2
 			 * To get the color of the top block, BlockDoublePlant uses the meta of the bottom block.
-			 * Since this is a fake world we can't get the real meta for the bottom block.
-			 * We default to 2 since this applies a biome tint, which is what we want in most cases.
+			 * Since this is a fake world we can't get the real meta for the bottom block,
+			 * close LODs give the top the bottom's type (see BlockStateWrapper.getPlantTopWithBottom)
+			 * so IE lilac tops aren't tinted green, otherwise tall grass (2) is assumed since it's the most common.
 			 */
-			return 2;
+			return TextureAtlasSpriteWrapper.getDoublePlantTopType(this.blockState.meta);
 		}
 		
 		return 0;

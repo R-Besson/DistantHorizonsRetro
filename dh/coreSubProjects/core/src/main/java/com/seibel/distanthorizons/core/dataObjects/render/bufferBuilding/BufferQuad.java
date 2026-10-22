@@ -61,6 +61,8 @@ public final class BufferQuad
 	public EDhDirection direction;
 	/** {@link RenderDataPointUtil#SHAPE_NONE} etc. */
 	public byte shape;
+	/** see-through leaf faces (see LodQuadBuilder#seeThroughForNewQuads), their gaps are cut out */
+	public boolean seeThrough;
 	
 	public boolean hasError = false;
 	
@@ -105,6 +107,7 @@ public final class BufferQuad
 		this.blockLight = blockLight;
 		this.direction = direction;
 		this.shape = RenderDataPointUtil.SHAPE_NONE;
+		this.seeThrough = false;
 		this.sortKeyEastWest = computeSortKey(direction, true);
 		this.sortKeyNorthSouth = computeSortKey(direction, false);
 	}
@@ -164,6 +167,11 @@ public final class BufferQuad
 		// IE a row of fence posts would turn into a wall
 		if (this.shape != RenderDataPointUtil.SHAPE_NONE
 			|| quad.shape != RenderDataPointUtil.SHAPE_NONE)
+		{
+			return false;
+		}
+		
+		if (this.seeThrough != quad.seeThrough)
 		{
 			return false;
 		}

@@ -334,6 +334,10 @@
     "Max Textured Detail Level",
   "distanthorizons.config.client.advanced.graphics.texture.maxTexturedLodDetailLevel.@tooltip":
     "The highest detail level number that can render with block textures. \nAt higher detail levels each LOD covers multiple blocks, \nmaking textures smaller than a pixel and therefore invisible. \n\nLarger numbers texture more distant LODs \nbut increase memory usage.",
+  "distanthorizons.config.client.advanced.graphics.texture.seeThroughLeaves":
+    "See-Through Leaves",
+  "distanthorizons.config.client.advanced.graphics.texture.seeThroughLeaves.@tooltip":
+    "If true the closest LODs draw leaves with see-through gaps \nand the faces between leaf blocks, like MC's fancy leaves. \n\nCosts some performance in forests, \nif false leaf gaps are filled like MC's fast leaves.",
   "distanthorizons.config.client.advanced.graphics.texture.blocksDontRenderTextureCsv":
     "Blocks Don't Render Texture",
   "distanthorizons.config.client.advanced.graphics.texture.blocksDontRenderTextureCsv.@tooltip":

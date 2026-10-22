@@ -681,7 +681,19 @@ public class Config
 							+ "")
 						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
 						.build();
-					
+
+					public static ConfigEntry<Boolean> seeThroughLeaves = new ConfigEntry.Builder<Boolean>()
+						.set(true)
+						.comment(""
+							+ "If true the closest LODs draw leaves with see-through gaps \n"
+							+ "and the faces between leaf blocks, like MC's fancy leaves. \n"
+							+ " \n"
+							+ "Costs some performance in forests (more geometry close by), \n"
+							+ "if false leaf gaps are filled like MC's fast leaves. \n"
+							+ "")
+						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
+						.build();
+
 					public static ConfigEntry<String> blocksDontRenderTextureCsv = new ConfigEntry.Builder<String>()
 						.set("minecraft:bamboo")
 						.setAppearance(EConfigEntryAppearance.ALL)

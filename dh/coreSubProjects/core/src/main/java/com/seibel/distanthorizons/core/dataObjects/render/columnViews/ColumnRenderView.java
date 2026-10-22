@@ -307,11 +307,49 @@ public final class ColumnRenderView implements AutoCloseable
 		}
 		else
 		{
+			removeCrossedPlantsIfOverTarget(sourceData, target);
 			reducingList.populate(sourceData);
 			reducingList.reduce(output.maxVerticalSliceCount);
 			reducingList.copyTo(output);
 		}
 	}
+	/**
+	 * Plants (see {@link RenderDataPointUtil#SHAPE_CROSS}) are only decoration,
+	 * they're removed before blocks are merged, merged into a block they'd turn it into a plant.
+	 */
+	private static void removeCrossedPlantsIfOverTarget(ColumnRenderView sourceData, int target)
+	{
+		int existingCount = 0;
+		for (int index = 0; index < sourceData.size; index++)
+		{
+			if (RenderDataPointUtil.doesDataPointExist(sourceData.get(index)))
+			{
+				existingCount++;
+			}
+		}
+		if (existingCount <= target)
+		{
+			return;
+		}
+
+		int outputIndex = 0;
+		for (int index = 0; index < sourceData.size; index++)
+		{
+			long dataPoint = sourceData.get(index);
+			if (RenderDataPointUtil.doesDataPointExist(dataPoint)
+				&& RenderDataPointUtil.getShape(dataPoint) == RenderDataPointUtil.SHAPE_CROSS)
+			{
+				continue;
+			}
+			sourceData.set(outputIndex, dataPoint);
+			outputIndex++;
+		}
+		for (int index = outputIndex; index < sourceData.size; index++)
+		{
+			sourceData.set(index, RenderDataPointUtil.EMPTY_DATA);
+		}
+	}
+
 	private void fill(long value) { Arrays.fill(this.data.elements(), this.dataOffset, this.dataOffset + this.size, value); }
 	
 	//endregion

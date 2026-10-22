@@ -246,25 +246,30 @@ public class ClientBlockStateTextureCache
 	{
 		TextureAtlasSprite sprite = getFaceSprite(blockStateWrapper, dhDirection);
 
-		// leaves use their fast graphics texture, which has dark gaps instead of transparent ones,
-		// LODs are solid so see-through gaps would show the LOD's flat color instead of the leaves behind
+		// leaves use their fancy graphics texture so the gaps can be found (see matchVanillaFaces),
+		// with fast graphics MC gives the opaque one
 		if (sprite != null
 			&& blockStateWrapper.blockState != null
 			&& blockStateWrapper.blockState.getBlock() instanceof BlockLeavesBase
-			&& !sprite.getIconName().endsWith(OPAQUE_LEAVES_SUFFIX))
+			&& sprite.getIconName().endsWith(OPAQUE_LEAVES_SUFFIX))
 		{
-			TextureAtlasSprite opaqueSprite = TextureAtlasSpriteWrapper.findBlockAtlasSprite(sprite.getIconName() + OPAQUE_LEAVES_SUFFIX);
-			if (opaqueSprite != null)
+			String fancyName = sprite.getIconName().substring(0, sprite.getIconName().length() - OPAQUE_LEAVES_SUFFIX.length());
+			TextureAtlasSprite fancySprite = TextureAtlasSpriteWrapper.findBlockAtlasSprite(fancyName);
+			if (fancySprite != null)
 			{
-				sprite = opaqueSprite;
+				sprite = fancySprite;
 			}
 		}
 
 		return bakeSpriteTexture(sprite);
 	}
 	private static final String OPAQUE_LEAVES_SUFFIX = "_opaque";
-	/** used for leaves without a fast graphics texture (IE some mods) */
-	private static final int LEAVES_GAP_COLOR = ColorUtil.argbToInt(255, 58, 58, 58);
+	/**
+	 * The gaps of MC's fast graphics leaves are this dark gray. <br>
+	 * The 254 alpha marks them as gaps, DH's shader draws them as is,
+	 * shader packs show the lit leaves behind them like MC does (see ShaderPackLodTextures).
+	 */
+	private static final int LEAVES_GAP_COLOR = ColorUtil.argbToInt(254, 44, 44, 44);
 
 	/**
 	 * Makes each face's texture relative to the color its LOD face is drawn with,
