@@ -82,7 +82,13 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Key bindings (toggle LODs, open config)
 - [x] Faster LOD building, loading and saving
 - [x] Correct ceilings for modded dimensions
+- [x] Textured LODs, with and without shaders
+- [x] Vanilla-like LODs: biome blended grass and leaves, see-through leaves, tall grass and flowers, depth shaded water
+- [x] Fences, walls, slabs and snow layers shaped like the real blocks
+- [x] Mobs visible up to the render distance with shaders
 - [ ] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
+- [ ] Block shapes (fences, walls, slabs) work with shaders
+- [ ] Shallow water tint near shores with shaders
 - [ ] Faster world generation and lower memory use
 
 # Development
