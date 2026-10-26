@@ -436,7 +436,17 @@ public class ColumnBox
 			
 			
 			long adjAbovePoint = (adjIndex > 0) ? adjColumnView.get(adjIndex - 1) : RenderDataPointUtil.EMPTY_DATA;
-			
+			// where the overhang above this point ends, or everything above the adjacent column's top
+			short adjAboveMinY = (adjIndex == 0) ? yMax : RenderDataPointUtil.getYMin(adjAbovePoint);
+
+			// the segments only cover this face's height, so a point and overhang
+			// that end below the face wouldn't change any of them
+			if (adjMaxY <= yMin
+				&& adjAboveMinY <= yMin)
+			{
+				continue;
+			}
+
 			long adjBelowPoint;
 			if (adjIndex != -1)
 			{
@@ -527,17 +537,18 @@ public class ColumnBox
 
 
 			// Apply light to the range [adjMinY, adjMaxY)
-			applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMinY, adjMaxY, lightToApply, blockLightToApply, adjCoversFace);
+			if (adjMaxY > yMin)
 			{
-				// swap references so we can use the newly populated segments
-				LongArrayList temp = segments;
-				segments = newSegments;
-				newSegments = temp;
+				applyLightToRangeAndPopulateNewSgements(segments, newSegments, adjMinY, adjMaxY, lightToApply, blockLightToApply, adjCoversFace);
+				{
+					// swap references so we can use the newly populated segments
+					LongArrayList temp = segments;
+					segments = newSegments;
+					newSegments = temp;
+				}
 			}
 
-			// Fill overhang area [adjMaxY, adjAboveMinY) with adjSkyLight,
-			// or everything above the adjacent column's top
-			short adjAboveMinY = (adjIndex == 0) ? yMax : RenderDataPointUtil.getYMin(adjAbovePoint);
+			// Fill overhang area [adjMaxY, adjAboveMinY) with adjSkyLight
 			if (adjMaxY < adjAboveMinY)
 			{
 				// the topmost air keeps its max sky light (min is taken)
@@ -546,18 +557,24 @@ public class ColumnBox
 				// the stored block light is the light right above the adjacent point,
 				// it drops by one per block going up like it does in MC, otherwise a lava sea lights cliffs all the way to the ceiling
 				short stepStartY = adjMaxY;
-				while (stepStartY < adjAboveMinY)
+				// steps above the face can't change any segment
+				while (stepStartY < adjAboveMinY
+					&& stepStartY < yMax)
 				{
 					byte stepBlockLight = (byte) Math.max(LodUtil.MIN_MC_LIGHT, adjBlockLight - (stepStartY - adjMaxY));
 					short stepEndY = (stepBlockLight == LodUtil.MIN_MC_LIGHT)
 						? adjAboveMinY
 						: (short) Math.min(stepStartY + BLOCK_LIGHT_FALLOFF_STEP_HEIGHT, adjAboveMinY);
 
-					applyLightToRangeAndPopulateNewSgements(segments, newSegments, stepStartY, stepEndY, overhangSkyLight, stepBlockLight, false);
+					// neither can steps below it
+					if (stepEndY > yMin)
 					{
-						LongArrayList temp = segments;
-						segments = newSegments;
-						newSegments = temp;
+						applyLightToRangeAndPopulateNewSgements(segments, newSegments, stepStartY, stepEndY, overhangSkyLight, stepBlockLight, false);
+						{
+							LongArrayList temp = segments;
+							segments = newSegments;
+							newSegments = temp;
+						}
 					}
 
 					stepStartY = stepEndY;

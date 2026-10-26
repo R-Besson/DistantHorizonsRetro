@@ -134,7 +134,17 @@ public class LodQuadBuilder implements AutoCloseable
 	 * to prevent concurrency overhead.
 	 */
 	private final ArrayList<BufferQuad> bufferQuadCacheList = new ArrayList<>();
-	
+
+	/**
+	 * Reused by {@link #mergeQuadsInternal}, sorting primitive keys is much faster
+	 * than sorting the quads with a comparator. <br>
+	 * Each key is the quad's sort key with its list index in the low 16 bits.
+	 */
+	private long[] mergeSortKeys = new long[0];
+	private BufferQuad[] mergeSortQuads = new BufferQuad[0];
+	/** the sort keys' low 16 bits are always 0, see {@link BufferQuad#computeSortKey} */
+	private static final int MAX_PACKED_SORT_INDEX_COUNT = 1 << 16;
+
 	private boolean doTransparency;
 	private IClientLevelWrapper clientLevelWrapper;
 	private boolean noSkyLight;
@@ -400,17 +410,68 @@ public class LodQuadBuilder implements AutoCloseable
 	}
 	
 	/** Merges all of this builder's quads for the given directionIndex (up, down, left, etc.) in the given direction */
-	private static long mergeQuadsInternal(ArrayList<BufferQuad>[] list, int directionIndex, BufferMergeDirectionEnum mergeDirection)
+	private long mergeQuadsInternal(ArrayList<BufferQuad>[] list, int directionIndex, BufferMergeDirectionEnum mergeDirection)
 	{
-		if (list[directionIndex].size() <= 1)
+		ArrayList<BufferQuad> quads = list[directionIndex];
+		int quadCount = quads.size();
+		if (quadCount <= 1)
 		{
 			return 0;
 		}
-		
-		list[directionIndex].sort((objOne, objTwo) -> objOne.compare(objTwo, mergeDirection));
-		
+
+		if (quadCount > MAX_PACKED_SORT_INDEX_COUNT)
+		{
+			// too many quads to pack their index into the sort key
+			return mergeSortedQuadsWithComparator(quads, mergeDirection);
+		}
+
+		if (this.mergeSortKeys.length < quadCount)
+		{
+			this.mergeSortKeys = new long[quadCount];
+			this.mergeSortQuads = new BufferQuad[quadCount];
+		}
+		long[] keys = this.mergeSortKeys;
+		BufferQuad[] sortQuads = this.mergeSortQuads;
+
+		boolean eastWest = (mergeDirection == BufferMergeDirectionEnum.EastWest);
+		for (int i = 0; i < quadCount; i++)
+		{
+			BufferQuad quad = quads.get(i);
+			sortQuads[i] = quad;
+			// the index breaks ties in list order, the same order the stable comparator sort kept
+			keys[i] = (eastWest ? quad.sortKeyEastWest : quad.sortKeyNorthSouth) | i;
+		}
+		Arrays.sort(keys, 0, quadCount);
+
+		// only the quads that weren't merged into the one before them are kept
+		quads.clear();
 		long mergeCount = 0;
-		ListIterator<BufferQuad> iter = list[directionIndex].listIterator();
+		BufferQuad currentQuad = sortQuads[(int) (keys[0] & 0xFFFF)];
+		quads.add(currentQuad);
+		for (int i = 1; i < quadCount; i++)
+		{
+			BufferQuad nextQuad = sortQuads[(int) (keys[i] & 0xFFFF)];
+			if (currentQuad.tryMerge(nextQuad, mergeDirection))
+			{
+				mergeCount++;
+			}
+			else
+			{
+				currentQuad = nextQuad;
+				quads.add(nextQuad);
+			}
+		}
+
+		// don't keep the quads alive after this builder is done with them
+		Arrays.fill(sortQuads, 0, quadCount, null);
+		return mergeCount;
+	}
+	private static long mergeSortedQuadsWithComparator(ArrayList<BufferQuad> quads, BufferMergeDirectionEnum mergeDirection)
+	{
+		quads.sort((objOne, objTwo) -> objOne.compare(objTwo, mergeDirection));
+
+		long mergeCount = 0;
+		ListIterator<BufferQuad> iter = quads.listIterator();
 		BufferQuad currentQuad = iter.next();
 		while (iter.hasNext())
 		{
@@ -428,7 +489,7 @@ public class LodQuadBuilder implements AutoCloseable
 				currentQuad = nextQuad;
 			}
 		}
-		list[directionIndex].removeIf(Objects::isNull);
+		quads.removeIf(Objects::isNull);
 		return mergeCount;
 	}
 	
