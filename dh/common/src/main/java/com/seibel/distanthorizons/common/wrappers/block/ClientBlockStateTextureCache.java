@@ -89,6 +89,11 @@ public class ClientBlockStateTextureCache
 	private static final ReentrantLock BAKE_LOCK = new ReentrantLock();
 
 	private static final ConcurrentHashMap<BlockStateWrapper, BlockFaceTexture[]> TEXTURES_BY_BLOCK_WRAPPER = new ConcurrentHashMap<>();
+	/** see {@link #getSnowCoveredFaceTexture} */
+	private static final ConcurrentHashMap<BlockStateWrapper, BlockFaceTexture[]> SNOW_COVERED_TEXTURES_BY_BLOCK_WRAPPER = new ConcurrentHashMap<>();
+	/** MC's grass under snow, the dirt side with a strip of snow on top */
+	private static final String SNOWY_GRASS_SIDE_SPRITE_NAME = "grass_side_snowed";
+	private static final String SNOW_SPRITE_NAME = "snow";
 
 	private static final ThreadLocal<DhApiBlockTextureOverrideEvent.EventParam> TEXTURE_OVERRIDE_EVENT_PARAM_THREAD_LOCAL = ThreadLocal.withInitial(DhApiBlockTextureOverrideEvent.EventParam::new);
 
@@ -108,10 +113,78 @@ public class ClientBlockStateTextureCache
 		return faceTextures[direction.faceIndex];
 	}
 
+	/**
+	 * MC's grass has snowy sides under a snow layer, the snow is flattened onto it
+	 * so the top is the snow's (see FullDataToRenderDataTransformer).
+	 *
+	 * @return null if the block doesn't look different under snow
+	 */
+	@Nullable
+	public static BlockFaceTexture getSnowCoveredFaceTexture(BlockStateWrapper blockStateWrapper, EDhDirection direction)
+	{
+		if (!(blockStateWrapper.blockState instanceof FakeBlockState)
+			|| ((FakeBlockState) blockStateWrapper.blockState).block != Blocks.grass
+			|| !blockStateWrapper.renderTexture()
+			|| blockStateWrapper.allowApiTextureOverride())
+		{
+			return null;
+		}
+
+		BlockFaceTexture[] faceTextures = SNOW_COVERED_TEXTURES_BY_BLOCK_WRAPPER.computeIfAbsent(
+			blockStateWrapper,
+			ClientBlockStateTextureCache::bakeSnowCoveredGrassTextures);
+		return (faceTextures != null) ? faceTextures[direction.faceIndex] : null;
+	}
+	/** @return null if the snow textures aren't in the atlas */
+	@Nullable
+	private static BlockFaceTexture[] bakeSnowCoveredGrassTextures(BlockStateWrapper grassWrapper)
+	{
+		// the bottom is the grass' own dirt bottom
+		BlockFaceTexture bottomTexture = getFaceTexture(grassWrapper, EDhDirection.DOWN);
+
+		BAKE_LOCK.lock();
+		try
+		{
+			TextureAtlasSprite snowySideSprite = TextureAtlasSpriteWrapper.findBlockAtlasSprite(SNOWY_GRASS_SIDE_SPRITE_NAME);
+			TextureAtlasSprite snowSprite = TextureAtlasSpriteWrapper.findBlockAtlasSprite(SNOW_SPRITE_NAME);
+			if (snowySideSprite == null
+				|| snowSprite == null)
+			{
+				return null;
+			}
+
+			// the top is drawn with the snow's color, grass sides with the dirt color (see LodQuadBuilder)
+			BlockFaceTexture topTexture = bakeSpriteTexture(snowSprite);
+			topTexture.ratioReferenceColor = ClientBlockStateColorCache.calculateUntintedColor(new FakeBlockState(Blocks.snow_layer, 0));
+			BlockFaceTexture sideTexture = bakeSpriteTexture(snowySideSprite);
+			sideTexture.ratioReferenceColor = ClientBlockStateColorCache.calculateUntintedColor(new FakeBlockState(Blocks.dirt, 0));
+
+			BlockFaceTexture[] faceTextures = new BlockFaceTexture[FACE_DIRECTIONS.length];
+			for (int faceIndex = 0; faceIndex < FACE_DIRECTIONS.length; faceIndex++)
+			{
+				EDhDirection direction = FACE_DIRECTIONS[faceIndex];
+				faceTextures[faceIndex] = (direction == EDhDirection.UP) ? topTexture
+					: (direction == EDhDirection.DOWN) ? bottomTexture
+					: sideTexture;
+			}
+			return faceTextures;
+		}
+		catch (Exception bakeError)
+		{
+			LOGGER.warn("Failed to bake snowy grass textures, error: [" + bakeError.getMessage() + "], snowy grass will use the grass textures.", bakeError);
+			return null;
+		}
+		finally
+		{
+			BAKE_LOCK.unlock();
+		}
+	}
+
 	/** Should be called whenever MC's textures change, IE when resource packs are swapped. */
 	public static void clearCache()
 	{
 		TEXTURES_BY_BLOCK_WRAPPER.clear();
+		SNOW_COVERED_TEXTURES_BY_BLOCK_WRAPPER.clear();
 		AVERAGE_COLOR_BY_APPEARANCE.clear();
 		TEXTURED_COLOR_BY_APPEARANCE.clear();
 	}

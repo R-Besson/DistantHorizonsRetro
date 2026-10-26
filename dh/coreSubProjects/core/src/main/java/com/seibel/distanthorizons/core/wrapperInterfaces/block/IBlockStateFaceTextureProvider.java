@@ -44,6 +44,15 @@ public interface IBlockStateFaceTextureProvider extends IBindable
 	BlockFaceTexture getFaceTexture(IBlockStateWrapper blockState, EDhDirection direction);
 
 	/**
+	 * Same as {@link #getFaceTexture}, for a block with a thin layer of snow on it
+	 * that's flattened onto it (IE MC's grass has snowy sides).
+	 *
+	 * @return null if the block doesn't look different under snow
+	 */
+	@Nullable
+	BlockFaceTexture getSnowCoveredFaceTexture(IBlockStateWrapper blockState, EDhDirection direction);
+
+	/**
 	 * Some blocks look different depending on where they are
 	 * (IE Chisel's connected textures and position based variants). <br>
 	 * The returned object describes what each face looks like at this position

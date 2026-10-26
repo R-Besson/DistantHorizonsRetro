@@ -52,6 +52,17 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 
 	@Nullable
 	@Override
+	public BlockFaceTexture getSnowCoveredFaceTexture(IBlockStateWrapper blockState, EDhDirection direction)
+	{
+		if (!(blockState instanceof BlockStateWrapper))
+		{
+			return null;
+		}
+		return ClientBlockStateTextureCache.getSnowCoveredFaceTexture((BlockStateWrapper) blockState, direction);
+	}
+
+	@Nullable
+	@Override
 	public Object getPositionedAppearance(
 		IBlockStateWrapper blockState, IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
 		int blockX, int topY, int blockZ)

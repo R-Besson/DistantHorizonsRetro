@@ -291,8 +291,15 @@ public class FullDataToRenderDataTransformer
 							block = block.getPlantTopWithBottom(getTouchingBlock(fullDataColumn, fullIndex + 1, FullDataPointUtil.getBottomY(fullData), false, fullDataSource.mapping), levelWrapper);
 						}
 
-						textureId = BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(
-							block, levelWrapper, fullDataSource, blockX, topBlockY + levelWrapper.getMinHeight(), blockZ);
+						IBlockStateWrapper blockAbove = getTouchingBlock(fullDataColumn, fullIndex - 1, topBlockY + 1, true, fullDataSource.mapping);
+						// grass under a flattened snow layer, MC draws its sides snowy
+						textureId = (materialId == EDhApiBlockMaterial.GRASS.index
+								&& blockAbove != null
+								&& snowLayerBlockStates != null
+								&& snowLayerBlockStates.contains(blockAbove))
+							? BlockTextureRegistry.INSTANCE.getOrRegisterSnowCoveredSetId(block)
+							: BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(
+								block, levelWrapper, fullDataSource, blockX, topBlockY + levelWrapper.getMinHeight(), blockZ);
 					}
 					catch (IndexOutOfBoundsException ignore)
 					{
@@ -310,15 +317,15 @@ public class FullDataToRenderDataTransformer
 	}
 	
 	/**
-	 * Grass keeps its own material under plants (IE tall grass),
+	 * Grass keeps its own material under plants (IE tall grass) and snow,
 	 * its sides are drawn as dirt based on the grass material (see LodQuadBuilder),
-	 * with the plant's material they'd be drawn in the plant's green. <br>
-	 * Snow still replaces it, snowy grass sides aren't green in MC either.
+	 * with the plant's material they'd be drawn in the plant's green
+	 * and under snow they'd be white all the way down instead of MC's snowy grass sides
+	 * (which get their own textures, see applyTextureSetIds).
 	 */
 	private static IBlockStateWrapper keepGrassMaterial(IBlockStateWrapper block, IBlockStateWrapper avoidedBlockAbove)
 	{
-		if (block.getMaterialId() == EDhApiBlockMaterial.GRASS.index
-			&& avoidedBlockAbove.getMaterialId() != EDhApiBlockMaterial.SNOW.index)
+		if (block.getMaterialId() == EDhApiBlockMaterial.GRASS.index)
 		{
 			return block;
 		}

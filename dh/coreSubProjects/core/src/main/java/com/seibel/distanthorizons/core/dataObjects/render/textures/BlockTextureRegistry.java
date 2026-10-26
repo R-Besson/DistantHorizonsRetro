@@ -83,6 +83,8 @@ public class BlockTextureRegistry
 	 */
 	private final ArrayList<short[]> faceTileIdsBySetId = new ArrayList<>();
 	private final ConcurrentHashMap<IBlockStateWrapper, Short> setIdByBlockStateWrapper = new ConcurrentHashMap<>();
+	/** keyed by the block under the snow, see {@link #getOrRegisterSnowCoveredSetId} */
+	private final ConcurrentHashMap<IBlockStateWrapper, Short> setIdBySnowCoveredBlockState = new ConcurrentHashMap<>();
 	/** keyed by {@link IBlockStateFaceTextureProvider#getPositionedAppearance} */
 	private final ConcurrentHashMap<Object, Short> setIdByPositionedAppearance = new ConcurrentHashMap<>();
 	/**
@@ -141,6 +143,32 @@ public class BlockTextureRegistry
 		{
 			setId = this.registerFaceSet(blockState, this.setIdByBlockStateWrapper,
 				direction -> TEXTURE_PROVIDER.getFaceTexture(blockState, direction), null);
+		}
+		return setId;
+	}
+
+	/**
+	 * Same as {@link #getOrRegisterBlockStateSetId}, for a block with a thin layer of snow on it.
+	 *
+	 * @return the block's usual set if it doesn't look different under snow
+	 * @see IBlockStateFaceTextureProvider#getSnowCoveredFaceTexture
+	 */
+	public short getOrRegisterSnowCoveredSetId(IBlockStateWrapper blockState)
+	{
+		Short setId = this.setIdBySnowCoveredBlockState.get(blockState);
+		if (setId == null)
+		{
+			if (TEXTURE_PROVIDER.getSnowCoveredFaceTexture(blockState, EDhDirection.UP) == null)
+			{
+				// remembered so the provider isn't asked again
+				setId = this.getOrRegisterBlockStateSetId(blockState);
+				this.setIdBySnowCoveredBlockState.putIfAbsent(blockState, setId);
+			}
+			else
+			{
+				setId = this.registerFaceSet(blockState, this.setIdBySnowCoveredBlockState,
+					direction -> TEXTURE_PROVIDER.getSnowCoveredFaceTexture(blockState, direction), null);
+			}
 		}
 		return setId;
 	}
@@ -511,6 +539,7 @@ public class BlockTextureRegistry
 	public synchronized void clear()
 	{
 		this.setIdByBlockStateWrapper.clear();
+		this.setIdBySnowCoveredBlockState.clear();
 		this.setIdByPositionedAppearance.clear();
 		this.sideRowTileIdsBySetId = new short[0][][];
 		short[] flatSet = this.faceTileIdsBySetId.get(UNTEXTURED_ID);

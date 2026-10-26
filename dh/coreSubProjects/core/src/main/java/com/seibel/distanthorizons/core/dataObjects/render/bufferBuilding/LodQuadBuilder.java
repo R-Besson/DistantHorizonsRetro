@@ -728,18 +728,15 @@ public class LodQuadBuilder implements AutoCloseable
 		short minY = quad.y;
 		short maxY = (short) (quad.y + height);
 
-		// bottom start, bottom end, top end, top start,
-		// the back side is wound the other way so it isn't culled
-		short[][] corners = {
-			{ startX, minY, startZ },
-			{ endX, minY, endZ },
-			{ endX, maxY, endZ },
-			{ startX, maxY, startZ },
-		};
+		// corners 0-3 are bottom start, bottom end, top end, top start,
+		// the back side is wound the other way so it isn't culled.
+		// (computed instead of put in an array, there are a lot of plants)
 		for (int i = 0; i < 4; i++)
 		{
-			short[] corner = corners[backSide ? (4 - i) % 4 : i];
-			this.putVertex(bb, corner[0], corner[1], corner[2],
+			int corner = backSide ? (4 - i) % 4 : i;
+			boolean atEnd = (corner == 1 || corner == 2);
+			boolean atTop = (corner >= 2);
+			this.putVertex(bb, atEnd ? endX : startX, atTop ? maxY : minY, atEnd ? endZ : startZ,
 				quad.color,
 				normalIndex,
 				quad.irisBlockMaterialId,
