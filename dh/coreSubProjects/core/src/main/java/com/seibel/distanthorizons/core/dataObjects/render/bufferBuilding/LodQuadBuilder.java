@@ -137,13 +137,22 @@ public class LodQuadBuilder implements AutoCloseable
 
 	/**
 	 * Reused by {@link #mergeQuadsInternal}, sorting primitive keys is much faster
-	 * than sorting the quads with a comparator. <br>
-	 * Each key is the quad's sort key with its list index in the low 16 bits.
+	 * than sorting the quads with a comparator.
 	 */
 	private long[] mergeSortKeys = new long[0];
+	private long[] mergeSortKeysTemp = new long[0];
 	private BufferQuad[] mergeSortQuads = new BufferQuad[0];
-	/** the sort keys' low 16 bits are always 0, see {@link BufferQuad#computeSortKey} */
-	private static final int MAX_PACKED_SORT_INDEX_COUNT = 1 << 16;
+	private BufferQuad[] mergeSortQuadsTemp = new BufferQuad[0];
+	private final int[] radixBucketStarts = new int[RADIX_BUCKET_COUNT + 1];
+
+	/**
+	 * Smaller lists are quicker to sort with their list index packed into the sort keys' low 16 bits,
+	 * which are always 0 (see {@link BufferQuad#computeSortKey}). <br>
+	 * Must be at most 2^16 so the index fits.
+	 */
+	private static final int RADIX_SORT_MIN_QUAD_COUNT = 2048;
+	private static final int RADIX_BITS = 12;
+	private static final int RADIX_BUCKET_COUNT = 1 << RADIX_BITS;
 
 	private boolean doTransparency;
 	private IClientLevelWrapper clientLevelWrapper;
@@ -419,38 +428,28 @@ public class LodQuadBuilder implements AutoCloseable
 			return 0;
 		}
 
-		if (quadCount > MAX_PACKED_SORT_INDEX_COUNT)
-		{
-			// too many quads to pack their index into the sort key
-			return mergeSortedQuadsWithComparator(quads, mergeDirection);
-		}
-
 		if (this.mergeSortKeys.length < quadCount)
 		{
 			this.mergeSortKeys = new long[quadCount];
+			this.mergeSortKeysTemp = new long[quadCount];
 			this.mergeSortQuads = new BufferQuad[quadCount];
+			this.mergeSortQuadsTemp = new BufferQuad[quadCount];
 		}
-		long[] keys = this.mergeSortKeys;
-		BufferQuad[] sortQuads = this.mergeSortQuads;
 
+		// both sorts are stable, quads with the same key stay in list order like the comparator sort they replaced
 		boolean eastWest = (mergeDirection == BufferMergeDirectionEnum.EastWest);
-		for (int i = 0; i < quadCount; i++)
-		{
-			BufferQuad quad = quads.get(i);
-			sortQuads[i] = quad;
-			// the index breaks ties in list order, the same order the stable comparator sort kept
-			keys[i] = (eastWest ? quad.sortKeyEastWest : quad.sortKeyNorthSouth) | i;
-		}
-		Arrays.sort(keys, 0, quadCount);
+		BufferQuad[] sortedQuads = (quadCount < RADIX_SORT_MIN_QUAD_COUNT)
+			? this.sortQuadsWithPackedIndex(quads, quadCount, eastWest)
+			: this.radixSortQuads(quads, quadCount, eastWest);
 
 		// only the quads that weren't merged into the one before them are kept
 		quads.clear();
 		long mergeCount = 0;
-		BufferQuad currentQuad = sortQuads[(int) (keys[0] & 0xFFFF)];
+		BufferQuad currentQuad = sortedQuads[0];
 		quads.add(currentQuad);
 		for (int i = 1; i < quadCount; i++)
 		{
-			BufferQuad nextQuad = sortQuads[(int) (keys[i] & 0xFFFF)];
+			BufferQuad nextQuad = sortedQuads[i];
 			if (currentQuad.tryMerge(nextQuad, mergeDirection))
 			{
 				mergeCount++;
@@ -463,34 +462,80 @@ public class LodQuadBuilder implements AutoCloseable
 		}
 
 		// don't keep the quads alive after this builder is done with them
-		Arrays.fill(sortQuads, 0, quadCount, null);
+		Arrays.fill(this.mergeSortQuads, 0, quadCount, null);
+		Arrays.fill(this.mergeSortQuadsTemp, 0, quadCount, null);
 		return mergeCount;
 	}
-	private static long mergeSortedQuadsWithComparator(ArrayList<BufferQuad> quads, BufferMergeDirectionEnum mergeDirection)
-	{
-		quads.sort((objOne, objTwo) -> objOne.compare(objTwo, mergeDirection));
 
-		long mergeCount = 0;
-		ListIterator<BufferQuad> iter = quads.listIterator();
-		BufferQuad currentQuad = iter.next();
-		while (iter.hasNext())
+	/** @return the sorted quads, the list index breaks ties since it's packed into the low bits of each key */
+	private BufferQuad[] sortQuadsWithPackedIndex(ArrayList<BufferQuad> quads, int quadCount, boolean eastWest)
+	{
+		long[] keys = this.mergeSortKeys;
+		BufferQuad[] unsortedQuads = this.mergeSortQuads;
+		for (int i = 0; i < quadCount; i++)
 		{
-			BufferQuad nextQuad = iter.next();
-			
-			if (currentQuad.tryMerge(nextQuad, mergeDirection))
-			{
-				// merge successful, attempt to merge the next quad
-				mergeCount++;
-				iter.set(null);
-			}
-			else
-			{
-				// merge fail, move on to the next quad
-				currentQuad = nextQuad;
-			}
+			BufferQuad quad = quads.get(i);
+			unsortedQuads[i] = quad;
+			keys[i] = (eastWest ? quad.sortKeyEastWest : quad.sortKeyNorthSouth) | i;
 		}
-		quads.removeIf(Objects::isNull);
-		return mergeCount;
+		Arrays.sort(keys, 0, quadCount);
+
+		BufferQuad[] sortedQuads = this.mergeSortQuadsTemp;
+		for (int i = 0; i < quadCount; i++)
+		{
+			sortedQuads[i] = unsortedQuads[(int) (keys[i] & 0xFFFF)];
+		}
+		return sortedQuads;
+	}
+
+	/**
+	 * A stable least significant digit radix sort over the keys' upper 48 bits
+	 * (the low 16 are always 0), it's linear so large lists sort several times faster.
+	 *
+	 * @return the sorted quads
+	 */
+	private BufferQuad[] radixSortQuads(ArrayList<BufferQuad> quads, int quadCount, boolean eastWest)
+	{
+		long[] keys = this.mergeSortKeys;
+		long[] tempKeys = this.mergeSortKeysTemp;
+		BufferQuad[] sortedQuads = this.mergeSortQuads;
+		BufferQuad[] tempQuads = this.mergeSortQuadsTemp;
+		int[] bucketStarts = this.radixBucketStarts;
+
+		for (int i = 0; i < quadCount; i++)
+		{
+			BufferQuad quad = quads.get(i);
+			sortedQuads[i] = quad;
+			// flipping the sign bit makes the unsigned digit order match Long.compare's signed order
+			keys[i] = (eastWest ? quad.sortKeyEastWest : quad.sortKeyNorthSouth) ^ Long.MIN_VALUE;
+		}
+
+		for (int shift = 16; shift < Long.SIZE; shift += RADIX_BITS)
+		{
+			Arrays.fill(bucketStarts, 0);
+			for (int i = 0; i < quadCount; i++)
+			{
+				bucketStarts[(int) ((keys[i] >>> shift) & (RADIX_BUCKET_COUNT - 1)) + 1]++;
+			}
+			for (int bucket = 0; bucket < RADIX_BUCKET_COUNT; bucket++)
+			{
+				bucketStarts[bucket + 1] += bucketStarts[bucket];
+			}
+			for (int i = 0; i < quadCount; i++)
+			{
+				int destination = bucketStarts[(int) ((keys[i] >>> shift) & (RADIX_BUCKET_COUNT - 1))]++;
+				tempKeys[destination] = keys[i];
+				tempQuads[destination] = sortedQuads[i];
+			}
+
+			long[] swapKeys = keys;
+			keys = tempKeys;
+			tempKeys = swapKeys;
+			BufferQuad[] swapQuads = sortedQuads;
+			sortedQuads = tempQuads;
+			tempQuads = swapQuads;
+		}
+		return sortedQuads;
 	}
 	
 	//endregion
