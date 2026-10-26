@@ -24,6 +24,7 @@ import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureR
 import com.seibel.distanthorizons.core.render.AbstractBlockTextureAtlas;
 import com.seibel.distanthorizons.coreapi.util.TextureUtil;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 
 import java.nio.ByteBuffer;
@@ -96,6 +97,8 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 		LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 		LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
 		LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+		// a 16 pixel tile is 1 pixel at mipmap level 4, higher levels would average neighboring tiles together
+		LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 4);
 	}
 	
 	public int getTextureId() { return this.textureId; }

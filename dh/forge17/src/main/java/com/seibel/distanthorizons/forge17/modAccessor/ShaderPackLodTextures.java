@@ -60,8 +60,7 @@ public class ShaderPackLodTextures
 
 	/** OUTPUT is replaced with the pack's color output */
 	private static final String FRAGMENT_CODE = ""
-		+ "vec2 dhr_blockFaceUv() {\n"
-		+ "    vec3 pos = fract(dhr_BlockPos);\n"
+		+ "vec2 dhr_blockFaceUvAt(vec3 pos) {\n"
 		// 6 and 7 are the diagonal planes of crossed plants, see-through leaves add 8 (see LodQuadBuilder)
 		+ "    uint face = (dhr_NormalIndex >= 8u) ? (dhr_NormalIndex - 8u) : dhr_NormalIndex;\n"
 		+ "    if (face >= 6u) return vec2(pos.x, 1.0 - pos.y);\n"
@@ -72,12 +71,17 @@ public class ShaderPackLodTextures
 		+ "    if (face == 4u) return vec2(pos.z, 1.0 - pos.y);\n"
 		+ "    return vec2(1.0 - pos.z, 1.0 - pos.y);\n"
 		+ "}\n"
+		// the unwrapped coordinate is only used for its derivatives, the wrapped one jumps at block edges
+		// which would pick the blurriest mipmap there and leave lines (see frag.frag)
+		+ "vec2 dhr_blockFaceUv() { return dhr_blockFaceUvAt(fract(dhr_BlockPos)); }\n"
+		+ "vec2 dhr_blockFaceUvUnwrapped() { return dhr_blockFaceUvAt(dhr_BlockPos); }\n"
 		+ "void main() {\n"
 		+ "    dhr_packMain();\n"
 		+ "    if (dhr_hasTile()) {\n"
 		+ "        vec2 atlasSize = vec2(textureSize(" + ATLAS_UNIFORM + ", 0));\n"
 		+ "        vec2 tileOrigin = vec2(float(dhr_TileId % 256u), float(dhr_TileId / 256u)) * 16.0;\n"
-		+ "        vec4 tile = texture(" + ATLAS_UNIFORM + ", (tileOrigin + dhr_blockFaceUv() * 16.0) / atlasSize);\n"
+		+ "        vec2 dhr_uvUnwrapped = dhr_blockFaceUvUnwrapped() * 16.0 / atlasSize;\n"
+		+ "        vec4 tile = textureGrad(" + ATLAS_UNIFORM + ", (tileOrigin + dhr_blockFaceUv() * 16.0) / atlasSize, dFdx(dhr_uvUnwrapped), dFdy(dhr_uvUnwrapped));\n"
 		// plants are cut out like MC's
 		+ "        if (dhr_NormalIndex >= 6u && dhr_NormalIndex < 8u && tile.a < 0.5) discard;\n"
 		// see-through leaves don't cut out their gaps here, unlike DH's own shader (see frag.frag).

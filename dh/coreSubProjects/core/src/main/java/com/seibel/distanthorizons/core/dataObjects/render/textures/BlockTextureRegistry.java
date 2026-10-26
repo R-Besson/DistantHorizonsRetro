@@ -85,8 +85,12 @@ public class BlockTextureRegistry
 	private final ConcurrentHashMap<IBlockStateWrapper, Short> setIdByBlockStateWrapper = new ConcurrentHashMap<>();
 	/** keyed by {@link IBlockStateFaceTextureProvider#getPositionedAppearance} */
 	private final ConcurrentHashMap<Object, Short> setIdByPositionedAppearance = new ConcurrentHashMap<>();
-	/** see {@link #getSideRowTileIds} */
-	private final ConcurrentHashMap<Short, short[][]> sideRowTileIdsBySetId = new ConcurrentHashMap<>();
+	/**
+	 * see {@link #getSideRowTileIds}, indexed by set id. <br>
+	 * It's read for every LOD data point so it's an array instead of a map with boxed keys,
+	 * elements are written before the array is (re)published through this volatile field.
+	 */
+	private volatile short[][][] sideRowTileIdsBySetId = new short[0][][];
 	
 	
 	
@@ -202,7 +206,18 @@ public class BlockTextureRegistry
 	 */
 	public short @Nullable [][] getSideRowTileIds(int setId)
 	{
-		return (setId > UNTEXTURED_ID) ? this.sideRowTileIdsBySetId.get((short) setId) : null;
+		short[][][] rowTileIdsBySetId = this.sideRowTileIdsBySetId;
+		return (setId > UNTEXTURED_ID && setId < rowTileIdsBySetId.length) ? rowTileIdsBySetId[setId] : null;
+	}
+	private synchronized void putSideRowTileIds(short setId, short[][] sideRowTileIds)
+	{
+		short[][][] rowTileIdsBySetId = this.sideRowTileIdsBySetId;
+		if (setId >= rowTileIdsBySetId.length)
+		{
+			rowTileIdsBySetId = Arrays.copyOf(rowTileIdsBySetId, Math.max(setId + 1, rowTileIdsBySetId.length * 2));
+		}
+		rowTileIdsBySetId[setId] = sideRowTileIds;
+		this.sideRowTileIdsBySetId = rowTileIdsBySetId;
 	}
 
 	/**
@@ -282,7 +297,7 @@ public class BlockTextureRegistry
 		short[][] sideRowTileIds = (textureId != UNTEXTURED_ID && createSideRowTileIds != null) ? createSideRowTileIds.apply(faceTileIds) : null;
 		if (sideRowTileIds != null)
 		{
-			this.sideRowTileIdsBySetId.put(textureId, sideRowTileIds);
+			this.putSideRowTileIds(textureId, sideRowTileIds);
 		}
 
 		Short existingSetId = setIdByKey.putIfAbsent(key, textureId);
@@ -497,7 +512,7 @@ public class BlockTextureRegistry
 	{
 		this.setIdByBlockStateWrapper.clear();
 		this.setIdByPositionedAppearance.clear();
-		this.sideRowTileIdsBySetId.clear();
+		this.sideRowTileIdsBySetId = new short[0][][];
 		short[] flatSet = this.faceTileIdsBySetId.get(UNTEXTURED_ID);
 		this.faceTileIdsBySetId.clear();
 		this.faceTileIdsBySetId.add(flatSet);

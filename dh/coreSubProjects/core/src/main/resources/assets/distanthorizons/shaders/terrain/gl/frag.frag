@@ -107,9 +107,8 @@ float bayerMatrix4x4(vec2 st)
  * 6 and 7 are the diagonal planes of crossed plants,
  * see-through leaves add 8 (see LodQuadBuilder)
  */
-vec2 blockFaceUv()
+vec2 blockFaceUvAt(vec3 pos)
 {
-    vec3 pos = fract(vBlockPos);
     uint face = (vNormalIndex >= 8u) ? (vNormalIndex - 8u) : vNormalIndex;
     switch (face)
     {
@@ -123,6 +122,13 @@ vec2 blockFaceUv()
         default: return vec2(1.0 - pos.z, 1.0 - pos.y); // east
     }
 }
+vec2 blockFaceUv() { return blockFaceUvAt(fract(vBlockPos)); }
+/**
+ * The texture coordinate without wrapping at block edges, only used for its screen space derivatives.
+ * The wrapped coordinate jumps from 1 to 0 at each block edge, which makes the GPU pick the
+ * blurriest mipmap for those pixels, leaving lines along the block edges (IE on cut out plants)
+ */
+vec2 blockFaceUvUnwrapped() { return blockFaceUvAt(vBlockPos); }
 
 void main()
 {
@@ -135,7 +141,8 @@ void main()
         ivec2 atlasSize = textureSize(uBlockAtlas, 0);
         vec2 tileOrigin = vec2(float(vTextureTileId % 256u), float(vTextureTileId / 256u)) * 16.0;
         vec2 uv = (tileOrigin + blockFaceUv() * 16.0) / vec2(atlasSize);
-        vec4 tile = texture(uBlockAtlas, uv);
+        vec2 uvUnwrapped = blockFaceUvUnwrapped() * 16.0 / vec2(atlasSize);
+        vec4 tile = textureGrad(uBlockAtlas, uv, dFdx(uvUnwrapped), dFdy(uvUnwrapped));
 
         // plants are cut out like MC's
         if (vNormalIndex >= 6u && vNormalIndex < 8u && tile.a < 0.5)
@@ -155,8 +162,8 @@ void main()
         if (vNormalIndex >= 8u)
         {
             vec2 texelPos = blockFaceUv() * 16.0;
-            vec2 texelDx = dFdx(texelPos);
-            vec2 texelDy = dFdy(texelPos);
+            vec2 texelDx = dFdx(blockFaceUvUnwrapped() * 16.0);
+            vec2 texelDy = dFdy(blockFaceUvUnwrapped() * 16.0);
             float texelsPerPixel = max(length(texelDx), length(texelDy));
             float fade = 1.0 - smoothstep(4.0, 8.0, texelsPerPixel);
             if (fade > 0.0)
