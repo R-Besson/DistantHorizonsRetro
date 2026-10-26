@@ -340,7 +340,9 @@ public class FullDataToRenderDataTransformer
 			&& fullDataSource.getDataDetailLevel() <= Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel.get();
 		// plants are only drawn by 1 block wide LODs, wider LODs are full boxes (see ColumnBox)
 		boolean plantsAsCrosses = grassKeepsColorUnderPlants && fullDataSource.getDataDetailLevel() == 0;
-		
+		// shapes are only drawn by 1 block wide LODs, wider LODs tint the leaves with the snow instead
+		boolean snowLayersOnLeavesAsHalves = fullDataSource.getDataDetailLevel() == 0;
+
 		final ObjectOpenHashSet<IBlockStateWrapper> blockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredBlocks(levelWrapper);
 		final ObjectOpenHashSet<IBlockStateWrapper> caveBlockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredCaveBlocks(levelWrapper);
 		final ObjectOpenHashSet<IBlockStateWrapper> waterSubsurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSubsurfaceReplacementBlocks(levelWrapper);
@@ -577,6 +579,20 @@ public class FullDataToRenderDataTransformer
 			
 			// handle height reduction
 			boolean isSnowLayer = snowLayerBlockStates.contains(block);
+			if (isSnowLayer
+				&& snowLayersOnLeavesAsHalves
+				&& blockHeight == 1)
+			{
+				// MC draws a thin layer of snow on leaves, the leaves keep their color and gaps,
+				// flattening the snow onto them would turn the whole leaf block white
+				IBlockStateWrapper blockBelow = getTouchingBlock(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping);
+				if (blockBelow != null
+					&& blockBelow.getMaterialId() == EDhApiBlockMaterial.LEAVES.index)
+				{
+					isSnowLayer = false;
+					shape = RenderDataPointUtil.SHAPE_BOTTOM_HALF;
+				}
+			}
 			boolean isWaterSurfaceReplacement = waterSurfaceReplacementBlocks.contains(block);
 			if (isSnowLayer || isWaterSurfaceReplacement)
 			{

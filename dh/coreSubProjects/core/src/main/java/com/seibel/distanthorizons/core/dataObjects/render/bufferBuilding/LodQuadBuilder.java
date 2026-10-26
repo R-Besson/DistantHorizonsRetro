@@ -273,9 +273,11 @@ public class LodQuadBuilder implements AutoCloseable
 			)
 		{
 			this.premergeCount++;
+			// the merged quad isn't used, otherwise the cache runs dry and every quad is a new allocation
+			this.bufferQuadCacheList.add(quad);
 			return;
 		}
-		
+
 		quadList.add(quad);
 	}
 	/** rows next to each other with the same tile stay one quad */
@@ -453,6 +455,8 @@ public class LodQuadBuilder implements AutoCloseable
 			if (currentQuad.tryMerge(nextQuad, mergeDirection))
 			{
 				mergeCount++;
+				// merged quads go back to the cache so the next quads don't have to be allocated
+				this.bufferQuadCacheList.add(nextQuad);
 			}
 			else
 			{

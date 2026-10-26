@@ -108,6 +108,8 @@ public final class BufferQuad
 		this.direction = direction;
 		this.shape = RenderDataPointUtil.SHAPE_NONE;
 		this.seeThrough = false;
+		// quads are reused, see LodQuadBuilder.getOrCreateBufferQuad
+		this.hasError = false;
 		this.sortKeyEastWest = computeSortKey(direction, true);
 		this.sortKeyNorthSouth = computeSortKey(direction, false);
 	}

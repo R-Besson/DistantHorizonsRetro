@@ -72,12 +72,6 @@ public class ShaderPackLodTextures
 		+ "    if (face == 4u) return vec2(pos.z, 1.0 - pos.y);\n"
 		+ "    return vec2(1.0 - pos.z, 1.0 - pos.y);\n"
 		+ "}\n"
-		// 4x4 ordered dither, 0 to 15/16
-		+ "float dhr_bayer(vec2 fragCoord) {\n"
-		+ "    ivec2 p = ivec2(mod(fragCoord, 4.0));\n"
-		+ "    int b = ((p.x ^ p.y) & 1) * 8 + (p.y & 1) * 4 + (((p.x ^ p.y) >> 1) & 1) * 2 + ((p.y >> 1) & 1);\n"
-		+ "    return float(b) / 16.0;\n"
-		+ "}\n"
 		+ "void main() {\n"
 		+ "    dhr_packMain();\n"
 		+ "    if (dhr_hasTile()) {\n"
@@ -86,23 +80,9 @@ public class ShaderPackLodTextures
 		+ "        vec4 tile = texture(" + ATLAS_UNIFORM + ", (tileOrigin + dhr_blockFaceUv() * 16.0) / atlasSize);\n"
 		// plants are cut out like MC's
 		+ "        if (dhr_NormalIndex >= 6u && dhr_NormalIndex < 8u && tile.a < 0.5) discard;\n"
-		// see-through leaves also cut out their gaps (254 alpha), checked on exact texels since mipmaps blur the marks.
-		// Further away the share of gaps in a pixel is dithered out, fading to solid leaves in the distance
-		+ "        if (dhr_NormalIndex >= 8u) {\n"
-		+ "            vec2 dhr_texelPos = dhr_blockFaceUv() * 16.0;\n"
-		+ "            vec2 dhr_texelDx = dFdx(dhr_texelPos);\n"
-		+ "            vec2 dhr_texelDy = dFdy(dhr_texelPos);\n"
-		+ "            float dhr_fade = 1.0 - smoothstep(4.0, 8.0, max(length(dhr_texelDx), length(dhr_texelDy)));\n"
-		+ "            if (dhr_fade > 0.0) {\n"
-		+ "                float dhr_gaps = 0.0;\n"
-		+ "                for (int i = 0; i < 4; i++) {\n"
-		+ "                    vec2 dhr_offset = vec2((i & 1) == 0 ? -0.25 : 0.25, (i & 2) == 0 ? -0.25 : 0.25);\n"
-		+ "                    vec2 dhr_texel = mod(floor(dhr_texelPos + dhr_texelDx * dhr_offset.x + dhr_texelDy * dhr_offset.y), 16.0);\n"
-		+ "                    dhr_gaps += (texelFetch(" + ATLAS_UNIFORM + ", ivec2(tileOrigin + dhr_texel), 0).a < 0.998) ? 0.25 : 0.0;\n"
-		+ "                }\n"
-		+ "                if (dhr_gaps * dhr_fade > dhr_bayer(gl_FragCoord.xy) + 0.001) discard;\n"
-		+ "            }\n"
-		+ "        }\n"
+		// see-through leaves don't cut out their gaps here, unlike DH's own shader (see frag.frag).
+		// Packs don't shadow LODs, so the gaps of a leaf block's front and back line up into holes
+		// the sun shines straight through, MC's leaves are mostly in shadow inside so they're drawn dark below instead
 		// 128 gray is the LOD's own color.
 		// Brightened colors are scaled down as a whole (keeping their hue) to the pack's own brightest channel,
 		// at least 1 since most packs write to 8 bit buffers, clamping per channel would tint bright green leaves yellow
