@@ -130,10 +130,12 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 		// fire each bound event
 		boolean cancelEvent = false;
 		ArrayList<U> eventList = this.getAll(abstractEventClass);
-		ArrayList<IDhApiEvent<T>> eventsToRemove = new ArrayList<>();
-		
-		for (IDhApiEvent<T> event : eventList)
+		// only created when needed, some events are fired for every LOD buffer every frame
+		ArrayList<IDhApiEvent<T>> eventsToRemove = null;
+
+		for (int eventIndex = 0; eventIndex < eventList.size(); eventIndex++)
 		{
+			IDhApiEvent<T> event = eventList.get(eventIndex);
 			if (event != null)
 			{
 				try
@@ -175,6 +177,10 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 					
 					if (event.removeAfterFiring())
 					{
+						if (eventsToRemove == null)
+						{
+							eventsToRemove = new ArrayList<>();
+						}
 						eventsToRemove.add(event);
 					}
 				}
@@ -187,9 +193,12 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 		
 		
 		// remove any removeAfterFire events
-		for (IDhApiEvent<T> eventToRemove : eventsToRemove)
+		if (eventsToRemove != null)
 		{
-			this.unbind(abstractEventClass, eventToRemove.getClass());
+			for (IDhApiEvent<T> eventToRemove : eventsToRemove)
+			{
+				this.unbind(abstractEventClass, eventToRemove.getClass());
+			}
 		}
 		
 		return cancelEvent;

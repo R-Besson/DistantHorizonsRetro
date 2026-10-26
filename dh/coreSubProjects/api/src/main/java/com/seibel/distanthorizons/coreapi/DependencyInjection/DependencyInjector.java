@@ -243,8 +243,10 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 		if (dependencyList != null && dependencyList.size() != 0)
 		{
 			// check if each dependencies' delayed setup has been completed
-			for (IBindable dependency : dependencyList)
+			// (indexed instead of for-each, some dependencies are gotten for every LOD data point and an iterator each time adds up)
+			for (int i = 0; i < dependencyList.size(); i++)
 			{
+				IBindable dependency = dependencyList.get(i);
 				if (!dependency.getDelayedSetupComplete() && !allowIncompleteDependencies)
 				{
 					throw new IllegalStateException("Got dependency of type [" + interfaceClass.getSimpleName() + "], but the dependency's delayed setup hasn't been run!");
