@@ -239,14 +239,10 @@ public class FullDataSourceV2
 		this.isEmpty = empty;
 		
 		
-		// pooled data arrays
-		this.dataPoints = new LongArrayList[WIDTH * WIDTH];
-		for (int i = 0; i < WIDTH * WIDTH; i++)
-		{
-			// size defaulting to 0 since we don't know how many datapoints
-			// will be in this column yet
-			this.dataPoints[i] = this.pooledArraysCheckout.getLongArray(i, 0);
-		}
+		// pooled data arrays,
+		// size defaulting to 0 since we don't know how many datapoints
+		// will be in each column yet
+		this.dataPoints = this.pooledArraysCheckout.getEmptyLongArrays(WIDTH * WIDTH);
 		
 		// use incoming data if present
 		if (data != null)

@@ -32,6 +32,8 @@ import com.seibel.distanthorizons.core.config.Config;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
+
+import java.util.Arrays;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 
 /**
@@ -91,7 +93,10 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	public final ShortArrayList texturePalette = new ShortArrayList();
 	
 	private boolean isEmpty = true;
-	
+
+	/** the relative columns this source holds (max exclusive), see {@link #createEmptyPartial} */
+	public final int minX, maxX, minZ, maxZ;
+
 	
 	
 	//==============//
@@ -100,29 +105,63 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	//region
 	
 	public static ColumnRenderSource createEmpty(long pos, int maxVertSliceCount, int yOffset)
-	{ return new ColumnRenderSource(pos, maxVertSliceCount, yOffset); }
+	{ return new ColumnRenderSource(pos, maxVertSliceCount, yOffset, 0, WIDTH, 0, WIDTH); }
+	/**
+	 * Only holds the columns between the given relative positions (max exclusive),
+	 * reading any other column throws. <br>
+	 * Used for the neighbors of the section being built, which only need their edge facing it,
+	 * clearing the whole (pooled) data array for them took longer than building their edge.
+	 */
+	public static ColumnRenderSource createEmptyPartial(long pos, int maxVertSliceCount, int yOffset, int minX, int maxX, int minZ, int maxZ)
+	{ return new ColumnRenderSource(pos, maxVertSliceCount, yOffset, minX, maxX, minZ, maxZ); }
 	/**
 	 * Creates an empty ColumnRenderSource.
 	 *
 	 * @param pos the relative position of the container
 	 * @param maxVertSliceCount the maximum vertical size of the container
 	 */
-	private ColumnRenderSource(long pos, int maxVertSliceCount, int yOffset)
+	private ColumnRenderSource(long pos, int maxVertSliceCount, int yOffset, int minX, int maxX, int minZ, int maxZ)
 	{
 		super(ARRAY_LIST_POOL, 1, 0, 2, 0, 0);
-		
+
 		this.pos = pos;
 		this.yOffset = yOffset;
-		
+
 		this.maxVerticalSliceCount = maxVertSliceCount;
-		
+
+		this.minX = minX;
+		this.maxX = maxX;
+		this.minZ = minZ;
+		this.maxZ = maxZ;
+		boolean partial = (minX != 0 || maxX != WIDTH || minZ != 0 || maxZ != WIDTH);
+
 		int maxDatapointCount = WIDTH * WIDTH * this.maxVerticalSliceCount;
-		this.renderDataContainer = this.pooledArraysCheckout.getLongArray(0, maxDatapointCount);
-		this.voidRenderDataContainer = this.pooledArraysCheckout.getLongArray(1, WIDTH * WIDTH);
-		
 		// texture ids are only stored for high detail sections
 		int textureIndexCount = texturedLodsEnabledAtDetailLevel(this.getDataDetailLevel()) ? maxDatapointCount : 0;
-		this.textureSetPaletteIndices = this.pooledArraysCheckout.getByteArray(0, textureIndexCount);
+		this.voidRenderDataContainer = this.pooledArraysCheckout.getLongArray(1, WIDTH * WIDTH);
+		if (!partial)
+		{
+			this.renderDataContainer = this.pooledArraysCheckout.getLongArray(0, maxDatapointCount);
+			this.textureSetPaletteIndices = this.pooledArraysCheckout.getByteArray(0, textureIndexCount);
+		}
+		else
+		{
+			// only the held columns are cleared, the others can't be read
+			this.renderDataContainer = this.pooledArraysCheckout.getLongArrayWithoutClearing(0, maxDatapointCount);
+			this.textureSetPaletteIndices = this.pooledArraysCheckout.getByteArrayWithoutClearing(0, textureIndexCount);
+			for (int x = minX; x < maxX; x++)
+			{
+				for (int z = minZ; z < maxZ; z++)
+				{
+					int columnStart = this.getDatapointIndex(x, z, 0);
+					Arrays.fill(this.renderDataContainer.elements(), columnStart, columnStart + this.maxVerticalSliceCount, RenderDataPointUtil.EMPTY_DATA);
+					if (textureIndexCount != 0)
+					{
+						Arrays.fill(this.textureSetPaletteIndices.elements(), columnStart, columnStart + this.maxVerticalSliceCount, (byte) 0);
+					}
+				}
+			}
+		}
 		this.texturePalette.add(BlockTextureRegistry.UNTEXTURED_ID);
 	}
 	public static boolean texturedLodsEnabledAtDetailLevel(byte dataDetailLevel)
@@ -149,8 +188,8 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		int voidDataOffset = this.getVoidDatapointIndex(posX, posZ);
 		
 		// don't allow returning views that are outside this render source's bounds
-		if (posX < 0 || posX >= WIDTH
-			|| posZ < 0 || posZ >= WIDTH)
+		if (posX < this.minX || posX >= this.maxX
+			|| posZ < this.minZ || posZ >= this.maxZ)
 		{
 			throw new IllegalArgumentException("Column View pos outside valid range ["+posX+","+posZ+"].");
 		}
@@ -264,9 +303,9 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		
 		try (ColumnRenderView columnView = ColumnRenderView.getPooled())
 		{
-			for (int x = 0; x < WIDTH; x++)
+			for (int x = this.minX; x < this.maxX; x++)
 			{
-				for (int z = 0; z < WIDTH; z++)
+				for (int z = this.minZ; z < this.maxZ; z++)
 				{
 					this.populateColumnView(columnView, x, z);
 					for (int i = 0; i < columnView.size; i++)

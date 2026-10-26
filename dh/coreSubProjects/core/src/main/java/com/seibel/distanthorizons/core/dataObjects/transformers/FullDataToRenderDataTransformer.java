@@ -47,6 +47,8 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import com.seibel.distanthorizons.core.enums.EDhDirection;
+import com.seibel.distanthorizons.core.sql.dto.util.FullDataMinMaxPosUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -76,6 +78,13 @@ public class FullDataToRenderDataTransformer
 	@Nullable
 	public static ColumnRenderSource transformFullDataToRenderSource(
 			@Nullable FullDataSourceV2 fullDataSource, @Nullable IClientLevelWrapper levelWrapper)
+	{ return transformFullDataToRenderSource(fullDataSource, levelWrapper, null); }
+	/**
+	 * @param onlyEdge if not null only the columns along this edge are transformed and held by the returned source
+	 *                 (IE a neighbor of the section being built, see {@link FullDataMinMaxPosUtil#getEncodedMinMaxPos})
+	 */
+	public static ColumnRenderSource transformFullDataToRenderSource(
+			@Nullable FullDataSourceV2 fullDataSource, @Nullable IClientLevelWrapper levelWrapper, @Nullable EDhDirection onlyEdge)
 	{
 		if (fullDataSource == null)
 		{
@@ -90,7 +99,7 @@ public class FullDataToRenderDataTransformer
 		
 		try
 		{
-			return transformCompleteFullDataToColumnData(levelWrapper, fullDataSource);
+			return transformCompleteFullDataToColumnData(levelWrapper, fullDataSource, onlyEdge);
 		}
 		catch (InterruptedException e)
 		{
@@ -115,8 +124,18 @@ public class FullDataToRenderDataTransformer
 	 * Generally thrown if the method is running after the client leaves the current world.
 	 */
 	private static ColumnRenderSource transformCompleteFullDataToColumnData(
-		IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource) throws InterruptedException
+		IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource, @Nullable EDhDirection onlyEdge) throws InterruptedException
 	{
+		int minX = 0, maxX = FullDataSourceV2.WIDTH, minZ = 0, maxZ = FullDataSourceV2.WIDTH;
+		if (onlyEdge != null)
+		{
+			long encodedMinMaxPos = FullDataMinMaxPosUtil.getEncodedMinMaxPos(onlyEdge);
+			minX = FullDataMinMaxPosUtil.getAdjMinX(encodedMinMaxPos);
+			maxX = FullDataMinMaxPosUtil.getAdjMaxX(encodedMinMaxPos);
+			minZ = FullDataMinMaxPosUtil.getAdjMinZ(encodedMinMaxPos);
+			maxZ = FullDataMinMaxPosUtil.getAdjMaxZ(encodedMinMaxPos);
+		}
+
 		final long pos = fullDataSource.getPos();
 		final byte dataDetail = fullDataSource.getDataDetailLevel();
 		
@@ -133,7 +152,7 @@ public class FullDataToRenderDataTransformer
 		
 		
 		
-		final ColumnRenderSource columnSource = ColumnRenderSource.createEmpty(pos, maxVertSliceCount, levelWrapper.getMinHeight());
+		final ColumnRenderSource columnSource = ColumnRenderSource.createEmptyPartial(pos, maxVertSliceCount, levelWrapper.getMinHeight(), minX, maxX, minZ, maxZ);
 		if (fullDataSource.isEmpty)
 		{
 			return columnSource;
@@ -149,9 +168,9 @@ public class FullDataToRenderDataTransformer
 			RenderDataPointReducingList reducingList = new RenderDataPointReducingList())
 		{
 			DhBlockPosMutable mutableBlockPos = new DhBlockPosMutable();
-			for (int x = 0; x < FullDataSourceV2.WIDTH; x++)
+			for (int x = minX; x < maxX; x++)
 			{
-				for (int z = 0; z < FullDataSourceV2.WIDTH; z++)
+				for (int z = minZ; z < maxZ; z++)
 				{
 					columnSource.populateColumnView(columnArrayView, x, z);
 					LongArrayList dataColumn = fullDataSource.getColumnAtRelPos(x, z);

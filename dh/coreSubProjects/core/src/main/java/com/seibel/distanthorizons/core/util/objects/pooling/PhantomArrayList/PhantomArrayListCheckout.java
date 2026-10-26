@@ -45,8 +45,11 @@ public class PhantomArrayListCheckout implements AutoCloseable
 	private final ArrayList<LongArrayList> longArrayLists = new ArrayList<>();
 	private final ArrayList<CharArrayList> charArrayLists = new ArrayList<>();
 	private final ArrayList<ByteBufferCheckoutWrapper> byteBufferWrapperList = new ArrayList<>();
-	
-	
+
+	/** see {@link #getEmptyLongArrays}, kept since checkouts are reused */
+	private LongArrayList[] longArrayListArray = null;
+
+
 	
 	//=============//
 	// constructor //
@@ -128,6 +131,45 @@ public class PhantomArrayListCheckout implements AutoCloseable
 		LongArrayList list = this.longArrayLists.get(index);
 		ListUtil.clearAndSetSize(list, size);
 		return list;
+	}
+	/**
+	 * Like {@link #getLongArray}, but only the elements past the previous size are zeroed,
+	 * the rest keep whatever the last holder left in them. <br>
+	 * For holders that only use part of a large array and clear that part themselves.
+	 */
+	public LongArrayList getLongArrayWithoutClearing(int index, int size)
+	{
+		LongArrayList list = this.longArrayLists.get(index);
+		list.size(size);
+		return list;
+	}
+	/** @see #getLongArrayWithoutClearing */
+	public ByteArrayList getByteArrayWithoutClearing(int index, int size)
+	{
+		ByteArrayList list = this.byteArrayLists.get(index);
+		list.size(size);
+		return list;
+	}
+
+	/**
+	 * The first count long arrays, cleared, as an array. <br>
+	 * The array is reused by this checkout, so holders that need many arrays at once
+	 * (IE FullDataSourceV2's 4096 columns) don't allocate a new one each time.
+	 * It's only valid until this checkout is closed.
+	 */
+	public LongArrayList[] getEmptyLongArrays(int count)
+	{
+		if (this.longArrayListArray == null
+			|| this.longArrayListArray.length != count)
+		{
+			this.longArrayListArray = new LongArrayList[count];
+		}
+
+		for (int i = 0; i < count; i++)
+		{
+			this.longArrayListArray[i] = this.getLongArray(i, 0);
+		}
+		return this.longArrayListArray;
 	}
 	public CharArrayList getCharArray(int index, int size)
 	{
