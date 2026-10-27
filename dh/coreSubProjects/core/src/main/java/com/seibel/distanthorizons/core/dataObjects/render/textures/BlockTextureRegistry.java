@@ -83,6 +83,8 @@ public class BlockTextureRegistry
 	 */
 	private final ArrayList<short[]> faceTileIdsBySetId = new ArrayList<>();
 	private final ConcurrentHashMap<IBlockStateWrapper, Short> setIdByBlockStateWrapper = new ConcurrentHashMap<>();
+	/** see {@link #getOrRegisterTintedGrassSetId} */
+	private final ConcurrentHashMap<TintedGrassKey, Short> setIdByTintedGrass = new ConcurrentHashMap<>();
 	/** keyed by the block under the snow, see {@link #getOrRegisterSnowCoveredSetId} */
 	private final ConcurrentHashMap<IBlockStateWrapper, Short> setIdBySnowCoveredBlockState = new ConcurrentHashMap<>();
 	/** keyed by {@link IBlockStateFaceTextureProvider#getPositionedAppearance} */
@@ -171,6 +173,61 @@ public class BlockTextureRegistry
 			}
 		}
 		return setId;
+	}
+
+	/**
+	 * Same as {@link #getOrRegisterBlockStateSetId}, for grass whose side strip is tinted with the biome's grass color.
+	 *
+	 * @param grassColor the LOD's grass color, it's rounded here so similar colors share a set
+	 * @return the block's usual set if it isn't grass
+	 * @see IBlockStateFaceTextureProvider#getTintedGrassFaceTexture
+	 */
+	public short getOrRegisterTintedGrassSetId(IBlockStateWrapper blockState, int grassColor)
+	{
+		// 16 steps per channel, the strip is a few pixels so the difference can't be seen
+		int roundedColor = (grassColor & 0xF0F0F0) | 0x080808;
+		TintedGrassKey key = new TintedGrassKey(blockState, roundedColor);
+		Short setId = this.setIdByTintedGrass.get(key);
+		if (setId == null)
+		{
+			if (TEXTURE_PROVIDER.getTintedGrassFaceTexture(blockState, EDhDirection.NORTH, roundedColor) == null)
+			{
+				// remembered so the provider isn't asked again
+				setId = this.getOrRegisterBlockStateSetId(blockState);
+				this.setIdByTintedGrass.putIfAbsent(key, setId);
+			}
+			else
+			{
+				setId = this.registerFaceSet(key, this.setIdByTintedGrass,
+					direction -> TEXTURE_PROVIDER.getTintedGrassFaceTexture(blockState, direction, roundedColor), null);
+			}
+		}
+		return setId;
+	}
+	private static final class TintedGrassKey
+	{
+		private final IBlockStateWrapper blockState;
+		private final int color;
+
+		private TintedGrassKey(IBlockStateWrapper blockState, int color)
+		{
+			this.blockState = blockState;
+			this.color = color;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (!(obj instanceof TintedGrassKey))
+			{
+				return false;
+			}
+			TintedGrassKey other = (TintedGrassKey) obj;
+			return this.color == other.color && this.blockState.equals(other.blockState);
+		}
+
+		@Override
+		public int hashCode() { return this.blockState.hashCode() * 31 + this.color; }
 	}
 
 	/**
@@ -540,6 +597,7 @@ public class BlockTextureRegistry
 	{
 		this.setIdByBlockStateWrapper.clear();
 		this.setIdBySnowCoveredBlockState.clear();
+		this.setIdByTintedGrass.clear();
 		this.setIdByPositionedAppearance.clear();
 		this.sideRowTileIdsBySetId = new short[0][][];
 		short[] flatSet = this.faceTileIdsBySetId.get(UNTEXTURED_ID);

@@ -53,6 +53,15 @@ public interface IBlockStateFaceTextureProvider extends IBindable
 	BlockFaceTexture getSnowCoveredFaceTexture(IBlockStateWrapper blockState, EDhDirection direction);
 
 	/**
+	 * Same as {@link #getFaceTexture}, for grass whose sides MC tints with the biome's grass color.
+	 *
+	 * @param grassColor the LOD's grass color, rounded so similar colors share textures
+	 * @return null if the block isn't grass
+	 */
+	@Nullable
+	BlockFaceTexture getTintedGrassFaceTexture(IBlockStateWrapper blockState, EDhDirection direction, int grassColor);
+
+	/**
 	 * Some blocks look different depending on where they are
 	 * (IE Chisel's connected textures and position based variants). <br>
 	 * The returned object describes what each face looks like at this position

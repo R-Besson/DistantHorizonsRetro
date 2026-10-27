@@ -63,6 +63,17 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 
 	@Nullable
 	@Override
+	public BlockFaceTexture getTintedGrassFaceTexture(IBlockStateWrapper blockState, EDhDirection direction, int grassColor)
+	{
+		if (!(blockState instanceof BlockStateWrapper))
+		{
+			return null;
+		}
+		return ClientBlockStateTextureCache.getTintedGrassFaceTexture((BlockStateWrapper) blockState, direction, grassColor);
+	}
+
+	@Nullable
+	@Override
 	public Object getPositionedAppearance(
 		IBlockStateWrapper blockState, IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
 		int blockX, int topY, int blockZ)

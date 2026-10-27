@@ -89,6 +89,8 @@ public class ClientBlockStateTextureCache
 	private static final ReentrantLock BAKE_LOCK = new ReentrantLock();
 
 	private static final ConcurrentHashMap<BlockStateWrapper, BlockFaceTexture[]> TEXTURES_BY_BLOCK_WRAPPER = new ConcurrentHashMap<>();
+	/** see {@link #getTintedGrassFaceTexture}, keyed by the rounded grass color */
+	private static final ConcurrentHashMap<BlockStateWrapper, ConcurrentHashMap<Integer, BlockFaceTexture[]>> TINTED_GRASS_TEXTURES_BY_BLOCK_WRAPPER = new ConcurrentHashMap<>();
 	/** see {@link #getSnowCoveredFaceTexture} */
 	private static final ConcurrentHashMap<BlockStateWrapper, BlockFaceTexture[]> SNOW_COVERED_TEXTURES_BY_BLOCK_WRAPPER = new ConcurrentHashMap<>();
 	/** MC's grass under snow, the dirt side with a strip of snow on top */
@@ -180,10 +182,72 @@ public class ClientBlockStateTextureCache
 		}
 	}
 
+	/**
+	 * MC tints the strip of grass on grass sides with the biome's grass color,
+	 * the usual grass textures use one fixed tint since grass sides are drawn with the dirt color (see LodQuadBuilder).
+	 *
+	 * @param grassColor the LOD's grass (top) color, it should be rounded so similar colors share textures
+	 * @return null if the block isn't grass
+	 */
+	@Nullable
+	public static BlockFaceTexture getTintedGrassFaceTexture(BlockStateWrapper blockStateWrapper, EDhDirection direction, int grassColor)
+	{
+		if (!(blockStateWrapper.blockState instanceof FakeBlockState)
+			|| !(((FakeBlockState) blockStateWrapper.blockState).block instanceof BlockGrass)
+			|| !blockStateWrapper.renderTexture()
+			|| blockStateWrapper.allowApiTextureOverride())
+		{
+			return null;
+		}
+		if (direction == EDhDirection.UP
+			|| direction == EDhDirection.DOWN)
+		{
+			return getFaceTexture(blockStateWrapper, direction);
+		}
+
+		BlockFaceTexture[] faceTextures = TINTED_GRASS_TEXTURES_BY_BLOCK_WRAPPER
+			.computeIfAbsent(blockStateWrapper, wrapper -> new ConcurrentHashMap<>())
+			.computeIfAbsent(grassColor, color -> bakeTintedGrassSideTextures(blockStateWrapper, color));
+		return faceTextures[direction.faceIndex];
+	}
+	private static BlockFaceTexture[] bakeTintedGrassSideTextures(BlockStateWrapper grassWrapper, int grassColor)
+	{
+		FakeBlockState grassState = (FakeBlockState) grassWrapper.blockState;
+
+		// the LOD's color is the untinted (gray) top times the biome tint
+		int untintedColor = ClientBlockStateColorCache.calculateUntintedColor(grassState);
+		int tint = ColorUtil.rgbToInt(
+			untintRatio(ColorUtil.getRed(grassColor), ColorUtil.getRed(untintedColor)),
+			untintRatio(ColorUtil.getGreen(grassColor), ColorUtil.getGreen(untintedColor)),
+			untintRatio(ColorUtil.getBlue(grassColor), ColorUtil.getBlue(untintedColor)));
+		int dirtColor = ClientBlockStateColorCache.calculateUntintedColor(new FakeBlockState(Blocks.dirt, 0));
+
+		BlockFaceTexture[] faceTextures = new BlockFaceTexture[FACE_DIRECTIONS.length];
+		BAKE_LOCK.lock();
+		try
+		{
+			for (EDhDirection direction : EDhDirection.CARDINAL_COMPASS)
+			{
+				BlockFaceTexture sideTexture = bakeFaceTexture(grassWrapper, direction);
+				addGrassSideOverlay(sideTexture, tint);
+				sideTexture.ratioReferenceColor = dirtColor;
+				faceTextures[direction.faceIndex] = sideTexture;
+			}
+		}
+		finally
+		{
+			BAKE_LOCK.unlock();
+		}
+		return faceTextures;
+	}
+	private static int untintRatio(int tintedChannel, int untintedChannel)
+	{ return Math.min(255, tintedChannel * 255 / Math.max(1, untintedChannel)); }
+
 	/** Should be called whenever MC's textures change, IE when resource packs are swapped. */
 	public static void clearCache()
 	{
 		TEXTURES_BY_BLOCK_WRAPPER.clear();
+		TINTED_GRASS_TEXTURES_BY_BLOCK_WRAPPER.clear();
 		SNOW_COVERED_TEXTURES_BY_BLOCK_WRAPPER.clear();
 		AVERAGE_COLOR_BY_APPEARANCE.clear();
 		TEXTURED_COLOR_BY_APPEARANCE.clear();
@@ -413,8 +477,11 @@ public class ClientBlockStateTextureCache
 	 * MC draws grass sides as the dirt-like side texture with the biome tinted overlay on top. <br>
 	 * Grass sides are drawn with the dirt color, which has no biome tint,
 	 * so the overlay is tinted with MC's forest grass color (temperature 0.7, rainfall 0.8).
+	 * Textured LODs use the biome's own tint instead, see {@link #getTintedGrassFaceTexture}.
 	 */
 	private static void addGrassSideOverlay(BlockFaceTexture faceTexture)
+	{ addGrassSideOverlay(faceTexture, ColorizerGrass.getGrassColor(0.7, 0.8)); }
+	private static void addGrassSideOverlay(BlockFaceTexture faceTexture, int overlayTint)
 	{
 		IIcon overlayIcon = BlockGrass.getIconSideOverlay();
 		TextureAtlasSprite overlaySprite = (overlayIcon != null) ? TextureAtlasSpriteWrapper.findBlockAtlasSprite(overlayIcon.getIconName()) : null;
@@ -433,7 +500,7 @@ public class ClientBlockStateTextureCache
 				continue;
 			}
 
-			int tinted = ColorUtil.multiplyARGBwithRGB(overlay, ColorizerGrass.getGrassColor(0.7, 0.8));
+			int tinted = ColorUtil.multiplyARGBwithRGB(overlay, overlayTint);
 			float blend = overlayAlpha / 255.0f;
 			int base = faceTexture.argbPixels[i];
 			faceTexture.argbPixels[i] = ColorUtil.argbToInt(

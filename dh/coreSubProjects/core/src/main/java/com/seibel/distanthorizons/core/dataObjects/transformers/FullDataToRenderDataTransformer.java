@@ -319,6 +319,9 @@ public class FullDataToRenderDataTransformer
 								&& snowLayerBlockStates != null
 								&& snowLayerBlockStates.contains(blockAbove))
 							? BlockTextureRegistry.INSTANCE.getOrRegisterSnowCoveredSetId(block)
+							// MC tints the grass strip on the sides with the biome's grass color, IE brown in savannas
+							: (materialId == EDhApiBlockMaterial.GRASS.index)
+							? BlockTextureRegistry.INSTANCE.getOrRegisterTintedGrassSetId(block, RenderDataPointUtil.getColor(renderData))
 							: BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(
 								block, levelWrapper, fullDataSource, blockX, topBlockY + levelWrapper.getMinHeight(), blockZ);
 					}
