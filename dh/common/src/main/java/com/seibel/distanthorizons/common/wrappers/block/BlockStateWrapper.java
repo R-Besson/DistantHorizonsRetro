@@ -567,6 +567,22 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 
 
+		//=================//
+		// light emitting  //
+		//=================//
+		//region
+
+		// checked before the step sounds and names, otherwise torches and jack o'lanterns (wood sound)
+		// or glowstone (stone in its name) wouldn't glow with shader packs
+		if (getLightEmission(blockState) > 0)
+		{
+			return EDhApiBlockMaterial.ILLUMINATED;
+		}
+
+		//endregion
+
+
+
 		//======//
 		// wood //
 		//======//
@@ -652,12 +668,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		// misc/simple //
 		//=============//
 		//region
-
-		// checked before the names, otherwise glowstone would be stone and shader packs wouldn't make it glow
-		if (getLightEmission(blockState) > 0)
-		{
-			return EDhApiBlockMaterial.ILLUMINATED;
-		}
 
 		if (lowercaseSerialString.contains("snow"))
 		{

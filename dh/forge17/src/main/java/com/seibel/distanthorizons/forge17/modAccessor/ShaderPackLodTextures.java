@@ -1,5 +1,6 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
+import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -71,16 +72,21 @@ public class ShaderPackLodTextures
 
 	private static final String ATLAS_UNIFORM = "dhr_BlockAtlas";
 	private static final String ENABLED_UNIFORM = "dhr_TexturedLods";
+	private static final int ILLUMINATED_MATERIAL_ID = EDhApiBlockMaterial.ILLUMINATED.index;
 
 	private static final String VERTEX_CODE = ""
 		+ "out vec3 dhr_BlockPos;\n"
 		+ "flat out uint dhr_NormalIndex;\n"
 		+ "flat out uint dhr_TileId;\n"
+		+ "flat out uint dhr_MaterialId;\n"
+		+ "flat out vec3 dhr_FlatColor;\n"
 		+ "void main() {\n"
 		+ "    dhr_packMain();\n"
 		+ "    dhr_BlockPos = vec3(vPosition.xyz) + DHR_SHAPE_OFFSET;\n"
 		+ "    dhr_NormalIndex = irisExtra.y;\n"
 		+ "    dhr_TileId = irisExtra.z | (irisExtra.w << 8u);\n"
+		+ "    dhr_MaterialId = irisExtra.x;\n"
+		+ "    dhr_FlatColor = iris_color.rgb;\n"
 		+ "}\n";
 
 	/** placed before the pack's main so its code can use them */
@@ -90,6 +96,8 @@ public class ShaderPackLodTextures
 		+ "in vec3 dhr_BlockPos;\n"
 		+ "flat in uint dhr_NormalIndex;\n"
 		+ "flat in uint dhr_TileId;\n"
+		+ "flat in uint dhr_MaterialId;\n"
+		+ "flat in vec3 dhr_FlatColor;\n"
 		+ "bool dhr_hasTile() { return " + ENABLED_UNIFORM + " != 0 && dhr_TileId != 0u; }\n";
 
 	/** OUTPUT is replaced with the pack's color output */
@@ -125,6 +133,16 @@ public class ShaderPackLodTextures
 		// Brightened colors are scaled down as a whole (keeping their hue) to the pack's own brightest channel,
 		// at least 1 since most packs write to 8 bit buffers, clamping per channel would tint bright green leaves yellow
 		+ "        vec3 dhr_textured = max(OUTPUT.rgb * (tile.rgb * 2.0), 0.0);\n"
+		// Packs make the whole LOD of a light block glow evenly (IE Complementary's emission of 2.5),
+		// for MC's light blocks they only make the bright parts of the texture glow (IE glowstone's max(green - 0.3, 0)),
+		// otherwise the dark parts glow too and the block washes out.
+		// The glow is moved from the dark pixels to the bright ones the same way, relative to the LOD's own color
+		+ "        if (dhr_MaterialId == " + ILLUMINATED_MATERIAL_ID + "u) {\n"
+		+ "            vec3 dhr_pixel = dhr_FlatColor * tile.rgb * 2.0;\n"
+		+ "            float dhr_pixelGlow = max(max(dhr_pixel.r, dhr_pixel.g) - 0.3, 0.0) + 0.05;\n"
+		+ "            float dhr_flatGlow = max(max(dhr_FlatColor.r, dhr_FlatColor.g) - 0.3, 0.0) + 0.05;\n"
+		+ "            dhr_textured *= dhr_pixelGlow / dhr_flatGlow;\n"
+		+ "        }\n"
 		+ "        float dhr_limit = max(1.0, max(OUTPUT.r, max(OUTPUT.g, OUTPUT.b)));\n"
 		+ "        float dhr_brightest = max(dhr_textured.r, max(dhr_textured.g, dhr_textured.b));\n"
 		+ "        dhr_textured *= dhr_limit / max(dhr_brightest, dhr_limit);\n"

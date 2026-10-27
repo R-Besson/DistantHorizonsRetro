@@ -12,6 +12,8 @@ import net.minecraftforge.event.world.ChunkDataEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
+import java.util.HashMap;
+
 import com.seibel.distanthorizons.common.AbstractModInitializer;
 import com.seibel.distanthorizons.common.util.ProxyUtil;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
@@ -84,8 +86,15 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 		else
 		{
 			ServerThreadTaskHandler.INSTANCE.runTasks();
+
+			for (BlockChangeLodUpdater blockChangeLodUpdater : this.blockChangeLodUpdaterByWorld.values())
+			{
+				blockChangeLodUpdater.updateChangedChunks();
+			}
 		}
 	}
+	/** only used on the server thread */
+	private final HashMap<WorldServer, BlockChangeLodUpdater> blockChangeLodUpdaterByWorld = new HashMap<>();
 
     // ServerLevelLoadEvent
     @SubscribeEvent 
@@ -93,7 +102,16 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
     {
 		if (GetEventLevel(event) instanceof WorldServer)
 	    {
-			ServerApi.INSTANCE.serverLevelLoadEvent(getServerLevelWrapper((WorldServer) GetEventLevel(event)));
+			WorldServer world = (WorldServer) GetEventLevel(event);
+			ServerApi.INSTANCE.serverLevelLoadEvent(getServerLevelWrapper(world));
+
+			BlockChangeLodUpdater blockChangeLodUpdater = new BlockChangeLodUpdater(world);
+			world.addWorldAccess(blockChangeLodUpdater);
+			BlockChangeLodUpdater previousUpdater = this.blockChangeLodUpdaterByWorld.put(world, blockChangeLodUpdater);
+			if (previousUpdater != null)
+			{
+				world.removeWorldAccess(previousUpdater);
+			}
 		}
 	}
 
@@ -103,6 +121,12 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
     {
 		if (GetEventLevel(event) instanceof WorldServer)
 	    {
+			BlockChangeLodUpdater blockChangeLodUpdater = this.blockChangeLodUpdaterByWorld.remove((WorldServer) GetEventLevel(event));
+			if (blockChangeLodUpdater != null)
+			{
+				((WorldServer) GetEventLevel(event)).removeWorldAccess(blockChangeLodUpdater);
+			}
+
 			// the levels are looked up by their wrapper instance (it has no equals()),
 			// so this must be the cached wrapper the level was loaded with,
 			// otherwise the DH level stays open after MC unloads the dimension

@@ -69,6 +69,12 @@ public class ClientBlockStateColorCache
 	public static final int INVALID_COLOR = -1;
 
 	private static final int FLOWER_COLOR_SCALE = 5;
+	/**
+	 * Light blocks look like the color of their glowing parts (IE glowstone's orange spots, not its brown),
+	 * shader packs also color the light around them with it
+	 */
+	private static final int LIGHT_GLOWING_PIXEL_SCALE = 4;
+	private static final int LIGHT_GLOWING_PIXEL_MIN_BRIGHTNESS = 200;
 	/** 50% opacity */
 	private static final int MIN_GLASS_ALPHA = 128;
 
@@ -373,6 +379,10 @@ public class ClientBlockStateColorCache
 					{
 						scale = FLOWER_COLOR_SCALE;
 					}
+					else if (colorMode == EColorMode.Light && Math.max(r, Math.max(g, b)) >= LIGHT_GLOWING_PIXEL_MIN_BRIGHTNESS)
+					{
+						scale = LIGHT_GLOWING_PIXEL_SCALE;
+					}
 					count += scale;
 					//apparently alpha is linear
 					alpha += a * scale;
@@ -548,10 +558,18 @@ public class ClientBlockStateColorCache
 		Default,
 		Flower,
 		Leaves,
-		Glass;
+		Glass,
+		Light;
 
 		static EColorMode getColorMode(Block block)
 		{
+			// before glass, glowstone is made of glass
+			if (block.getLightValue() > 0
+				&& block.isOpaqueCube())
+			{
+				return Light;
+			}
+
 			if (block instanceof BlockLeavesBase)
 			{
 				return Leaves;
