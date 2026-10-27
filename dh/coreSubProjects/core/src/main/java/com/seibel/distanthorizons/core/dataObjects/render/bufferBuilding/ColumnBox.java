@@ -70,11 +70,14 @@ public class ColumnBox
 		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
 		short @Nullable [] faceTileIdsByDirectionOrdinal, short @Nullable [][] sideRowTileIds)
 	{
-		// the closest LODs draw leaves like MC's fancy leaves, with see-through gaps and the faces between them
-		boolean seeThroughLeaves = blockWidth == 1
-			&& irisBlockMaterialId == EDhApiBlockMaterial.LEAVES.index
-			&& faceTileIdsByDirectionOrdinal != null
+		// the closest LODs draw leaves like MC's fancy leaves, with see-through gaps and the faces between them,
+		// read once here since the config getters are slow enough to show up when checked for every neighbor
+		boolean seeThroughLeavesEnabled = blockWidth == 1
+			&& Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
 			&& Config.Client.Advanced.Graphics.Texture.seeThroughLeaves.get();
+		boolean seeThroughLeaves = seeThroughLeavesEnabled
+			&& irisBlockMaterialId == EDhApiBlockMaterial.LEAVES.index
+			&& faceTileIdsByDirectionOrdinal != null;
 
 		builder.shapeForNewQuads = shape;
 		builder.seeThroughForNewQuads = seeThroughLeaves;
@@ -89,7 +92,7 @@ public class ColumnBox
 				color, irisBlockMaterialId, skyLight, blockLight, shape,
 				topData, bottomData,
 				adjData, isAdjDataSameDetailLevel,
-				faceTileIdsByDirectionOrdinal, seeThroughLeaves);
+				faceTileIdsByDirectionOrdinal, seeThroughLeaves, seeThroughLeavesEnabled);
 		}
 		finally
 		{
@@ -105,7 +108,7 @@ public class ColumnBox
 		int color, byte irisBlockMaterialId, byte skyLight, byte blockLight, byte shape,
 		long topData, long bottomData,
 		ColumnRenderView[] adjData, boolean[] isAdjDataSameDetailLevel,
-		short @Nullable [] faceTileIdsByDirectionOrdinal, boolean seeThroughLeaves)
+		short @Nullable [] faceTileIdsByDirectionOrdinal, boolean seeThroughLeaves, boolean seeThroughLeavesEnabled)
 	{
 		//================//
 		// variable setup //
@@ -177,7 +180,7 @@ public class ColumnBox
 					&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF
 					&& !isPost(getShape(topData, blockWidth))
 					&& getShape(topData, blockWidth) != RenderDataPointUtil.SHAPE_CROSS
-					&& !isSeeThroughLeaves(topData, blockWidth);
+					&& !isSeeThroughLeaves(topData, seeThroughLeavesEnabled);
 			
 			if (!skipTop)
 			{
@@ -197,7 +200,7 @@ public class ColumnBox
 					&& (RenderDataPointUtil.getYMax(bottomData) == minY)
 					&& !isBottomTransparent
 					&& getShape(bottomData, blockWidth) == RenderDataPointUtil.SHAPE_NONE
-					&& !isSeeThroughLeaves(bottomData, blockWidth);
+					&& !isSeeThroughLeaves(bottomData, seeThroughLeavesEnabled);
 			if (!skipBottom)
 			{
 				builder.addQuadDown(
@@ -278,7 +281,8 @@ public class ColumnBox
 					adjCol, faceTileIdsByDirectionOrdinal,
 					adjSameDetailLevel, caveCullingMaxY, EDhDirection.NORTH, 
 					minX, minY, minZ, blockWidth, yHeight,
-					color, irisBlockMaterialId, blockLight);
+					color, irisBlockMaterialId, blockLight,
+					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
 		
@@ -305,7 +309,8 @@ public class ColumnBox
 					adjCol, faceTileIdsByDirectionOrdinal,
 					adjSameDetailLevel, caveCullingMaxY, EDhDirection.SOUTH,
 					minX, minY, maxZ, blockWidth, yHeight,
-					color, irisBlockMaterialId, blockLight);
+					color, irisBlockMaterialId, blockLight,
+					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
 		
@@ -332,7 +337,8 @@ public class ColumnBox
 					adjCol, faceTileIdsByDirectionOrdinal,
 					adjSameDetailLevel, caveCullingMaxY, EDhDirection.WEST, 
 					minX, minY, minZ, blockWidth, yHeight,
-					color, irisBlockMaterialId, blockLight);
+					color, irisBlockMaterialId, blockLight,
+					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
 		
@@ -359,7 +365,8 @@ public class ColumnBox
 					adjCol, faceTileIdsByDirectionOrdinal,
 					adjSameDetailLevel, caveCullingMaxY, EDhDirection.EAST, 
 					maxX, minY, minZ, blockWidth, yHeight,
-					color, irisBlockMaterialId, blockLight);
+					color, irisBlockMaterialId, blockLight,
+					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
 	}
@@ -369,7 +376,8 @@ public class ColumnBox
 		@NotNull ColumnRenderView adjColumnView, short @Nullable [] faceTileIdsByDirectionOrdinal,
 		boolean adjacentIsSameDetailLevel, int caveCullingMaxY, EDhDirection direction,
 		short x, short yMin, short z, short horizontalBlockWidth, short ySize,
-		int color, byte irisBlockMaterialId, byte blockLight)
+		int color, byte irisBlockMaterialId, byte blockLight,
+		boolean transparencyEnabled, boolean seeThroughLeavesEnabled)
 	{
 		// pooled arrays
 		LongArrayList segments = phantomArrayCheckout.getLongArray(0, 0);
@@ -403,7 +411,6 @@ public class ColumnBox
 		// determine face visibility/light //
 		//=================================//
 		
-		boolean transparencyEnabled = Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE;
 		boolean inputTransparent = ColorUtil.getAlpha(color) < 255 && transparencyEnabled;
 		short yMax = (short) (yMin + ySize);
 		
@@ -486,7 +493,7 @@ public class ColumnBox
 					&& RenderDataPointUtil.getShape(adjPoint) == RenderDataPointUtil.SHAPE_CROSS)
 				// faces behind see-through leaves can be seen through their gaps
 				|| (adjacentIsSameDetailLevel
-					&& isSeeThroughLeaves(adjPoint, horizontalBlockWidth));
+					&& isSeeThroughLeaves(adjPoint, seeThroughLeavesEnabled));
 			boolean adjCoversFace = !adjShaped;
 			
 			if (adjShaped)
@@ -723,14 +730,14 @@ public class ColumnBox
 	/**
 	 * See-through leaves (like MC's fancy leaves) are only drawn by 1 block wide textured LODs,
 	 * the faces they touch can be seen through their gaps so they aren't culled.
+	 *
+	 * @param seeThroughLeavesEnabled true if the LOD is 1 block wide and see-through leaves are enabled
 	 */
-	private static boolean isSeeThroughLeaves(long dataPoint, short blockWidth)
+	private static boolean isSeeThroughLeaves(long dataPoint, boolean seeThroughLeavesEnabled)
 	{
-		return blockWidth == 1
+		return seeThroughLeavesEnabled
 			&& RenderDataPointUtil.doesDataPointExist(dataPoint)
-			&& RenderDataPointUtil.getBlockMaterialId(dataPoint) == EDhApiBlockMaterial.LEAVES.index
-			&& Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
-			&& Config.Client.Advanced.Graphics.Texture.seeThroughLeaves.get();
+			&& RenderDataPointUtil.getBlockMaterialId(dataPoint) == EDhApiBlockMaterial.LEAVES.index;
 	}
 
 	private static boolean isPost(byte shape)
