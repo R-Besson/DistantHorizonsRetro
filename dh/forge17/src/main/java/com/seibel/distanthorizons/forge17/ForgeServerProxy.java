@@ -103,8 +103,11 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
     {
 		if (GetEventLevel(event) instanceof WorldServer)
 	    {
-			// Make new server level wrapper so it's not cached...
-			ServerApi.INSTANCE.serverLevelUnloadEvent(new ServerLevelWrapper((WorldServer) GetEventLevel(event)));
+			// the levels are looked up by their wrapper instance (it has no equals()),
+			// so this must be the cached wrapper the level was loaded with,
+			// otherwise the DH level stays open after MC unloads the dimension
+			// and a second one is opened on the same database when it's loaded again
+			ServerApi.INSTANCE.serverLevelUnloadEvent(getServerLevelWrapper((WorldServer) GetEventLevel(event)));
 		}
 	}
 

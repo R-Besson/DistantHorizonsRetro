@@ -135,6 +135,33 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
         }
     }
 	
+	/**
+	 * Called after the server changed blocks in a loaded chunk (see MixinNetHandlerPlayClient). <br>
+	 * The click event above fires before a block finishes breaking and misses other players' changes,
+	 * the server's block change packets are the actual result.
+	 */
+	public static void onClientBlocksChanged(World level, int chunkX, int chunkZ)
+	{
+		if (level == null
+			|| !MC.clientConnectedToDedicatedServer())
+		{
+			return;
+		}
+
+		ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(level);
+		if (SharedApi.isChunkAtChunkPosAlreadyUpdating(wrappedLevel, chunkX, chunkZ))
+		{
+			return;
+		}
+
+		Chunk chunk = level.getChunkFromChunkCoords(chunkX, chunkZ);
+		if (!ChunkWrapper.canSaveChunk(chunk))
+		{
+			return;
+		}
+		SharedApi.INSTANCE.applyChunkUpdate(new ChunkWrapper(chunk, wrappedLevel), wrappedLevel, true);
+	}
+
 	public static void onClientChunkFilled(Chunk chunk)
 	{
 		if (!MC.clientConnectedToDedicatedServer())

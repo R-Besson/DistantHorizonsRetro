@@ -142,6 +142,9 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			this.links = this.pooledArraysCheckout.getLongArray(0, 0);
 			this.data = this.pooledArraysCheckout.getLongArray(1, 0);
 			this.sortingArray = this.pooledArraysCheckout.getShortArray(0, 0);
+			// this list is reused, the last column's sizes would make reduce() work on an empty list
+			this.setSizeWithAir(0);
+			this.setSizeWithoutAir(0);
 			if (ASSERTS) this.checkLinks();
 			
 			return;
@@ -181,8 +184,10 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			this.setHighest(NULL);
 			this.setSmallest(NULL);
 			this.setBiggest(NULL);
+			this.setSizeWithAir(0);
+			this.setSizeWithoutAir(0);
 			if (ASSERTS) this.checkLinks();
-			
+
 			return;
 		}
 

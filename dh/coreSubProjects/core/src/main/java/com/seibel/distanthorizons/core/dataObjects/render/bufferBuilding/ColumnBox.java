@@ -500,7 +500,11 @@ public class ColumnBox
 				// faces behind see-through leaves can be seen through their gaps
 				|| (adjacentIsSameDetailLevel
 					&& isSeeThroughLeaves(adjPoint, seeThroughLeavesEnabled));
-			boolean adjCoversFace = !adjShaped;
+			// a transparent neighbor only hides the same material (IE the walls between water blocks),
+			// otherwise water behind glass (or glass in water) would be invisible
+			boolean adjOtherTransparentMaterial = adjTransparent
+				&& RenderDataPointUtil.getBlockMaterialId(adjPoint) != irisBlockMaterialId;
+			boolean adjCoversFace = !adjShaped && !adjOtherTransparentMaterial;
 			
 			if (adjShaped)
 			{
