@@ -45,6 +45,7 @@ import com.seibel.distanthorizons.coreapi.ModInfo;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrays;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -806,8 +807,9 @@ public class FullDataSourceV2
 		}
 
 		// sort the transitions from bottom to top,
-		// then remove the duplicates (cheaper than checking the whole list before each add)
-		yTransitions.sort(null);
+		// then remove the duplicates (cheaper than checking the whole list before each add).
+		// Sorted through the backing array, IntArrayList.sort() is List.sort() in this fastutil version which boxes every value
+		IntArrays.quickSort(yTransitions.elements(), 0, yTransitions.size());
 		int uniqueCount = 1;
 		for (int i = 1; i < yTransitions.size(); i++)
 		{
