@@ -186,10 +186,15 @@ public class BlockTextureRegistry
 	{
 		// 16 steps per channel, the strip is a few pixels so the difference can't be seen
 		int roundedColor = (grassColor & 0xF0F0F0) | 0x080808;
-		TintedGrassKey key = new TintedGrassKey(blockState, roundedColor);
-		Short setId = this.setIdByTintedGrass.get(key);
+		// this runs for every grass LOD, so lookups reuse a key and only new entries get their own
+		TintedGrassKey lookupKey = TINTED_GRASS_LOOKUP_KEY.get();
+		lookupKey.blockState = blockState;
+		lookupKey.color = roundedColor;
+		Short setId = this.setIdByTintedGrass.get(lookupKey);
+		lookupKey.blockState = null;
 		if (setId == null)
 		{
+			TintedGrassKey key = new TintedGrassKey(blockState, roundedColor);
 			if (TEXTURE_PROVIDER.getTintedGrassFaceTexture(blockState, EDhDirection.NORTH, roundedColor) == null)
 			{
 				// remembered so the provider isn't asked again
@@ -204,10 +209,12 @@ public class BlockTextureRegistry
 		}
 		return setId;
 	}
+	private static final ThreadLocal<TintedGrassKey> TINTED_GRASS_LOOKUP_KEY = ThreadLocal.withInitial(() -> new TintedGrassKey(null, 0));
+	/** only the thread local lookup keys are changed, keys in the map never are */
 	private static final class TintedGrassKey
 	{
-		private final IBlockStateWrapper blockState;
-		private final int color;
+		private IBlockStateWrapper blockState;
+		private int color;
 
 		private TintedGrassKey(IBlockStateWrapper blockState, int color)
 		{
