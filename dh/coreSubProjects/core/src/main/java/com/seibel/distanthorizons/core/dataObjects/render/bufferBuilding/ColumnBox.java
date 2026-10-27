@@ -451,6 +451,12 @@ public class ColumnBox
 			if (adjMaxY <= yMin
 				&& adjAboveMinY <= yMin)
 			{
+				// the column's points go from the top down,
+				// so every point after this one is below the face too
+				if (adjIndex >= 0)
+				{
+					break;
+				}
 				continue;
 			}
 

@@ -373,8 +373,9 @@ public class CloudRenderHandler
 		//region
 		
 		// camera position
-		int cameraPosX = (int)MC_RENDER.getCameraExactPosition().x;
-		int cameraPosZ = (int)MC_RENDER.getCameraExactPosition().z;
+		DhVec3d cameraPos = MC_RENDER.getCameraExactPosition();
+		int cameraPosX = (int)cameraPos.x;
+		int cameraPosZ = (int)cameraPos.z;
 		// offset the camera position by negative 1 width when below zero to fix off-by-one errors in the negative direction
 		if (cameraPosX < 0) { cameraPosX -= cloudParams.widthInBlocks; }
 		if (cameraPosZ < 0) { cameraPosZ -= cloudParams.widthInBlocks; }
@@ -402,7 +403,7 @@ public class CloudRenderHandler
 		
 		boolean cullCloud = this.shouldCloudBeCulled(
 				newMinPosX, newMinPosY, newMinPosZ,
-				cloudParams
+				cloudParams, cameraPos
 			);
 		if(cullCloud)
 		{
@@ -451,7 +452,7 @@ public class CloudRenderHandler
 	private float mixColors(float x, float y, float a) { return x * (1 - a) + y * a; }
 	private boolean shouldCloudBeCulled(
 			float minPosX, float minPosY, float minPosZ,
-			CloudParams cloudParams)
+			CloudParams cloudParams, DhVec3d cameraPos)
 	{
 		//========================//
 		// skip center 3x3 clouds //
@@ -489,7 +490,6 @@ public class CloudRenderHandler
 		this.cullingCorners[3].y = minPosY;
 		this.cullingCorners[3].z = minPosZ + cloudParams.widthInBlocks;
 		
-		DhVec3d cameraPos = MC_RENDER.getCameraExactPosition();
 		DhVec3f cameraLookAtVector = MC_RENDER.getLookAtVector();
 		cameraLookAtVector.normalize();
 		

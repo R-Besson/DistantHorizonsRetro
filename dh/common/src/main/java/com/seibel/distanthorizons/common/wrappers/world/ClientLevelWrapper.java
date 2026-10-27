@@ -82,6 +82,10 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 
 
 	private boolean cloudColorFailLogged = false;
+	/** only used by the render thread */
+	private Color cachedCloudColor = null;
+	private long cachedCloudColorWorldTime;
+	private float cachedCloudColorTickDelta;
 
 	private volatile IDhLevel dhLevel;
 	private volatile long lastAccessTime = System.currentTimeMillis();
@@ -527,13 +531,25 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	@Override
 	public Color getCloudColor(float tickDelta)
 	{
+		// every cloud instance asks for the color each frame, it only changes with the time and weather
+		long worldTime = this.level.getTotalWorldTime();
+		if (this.cachedCloudColor != null
+			&& this.cachedCloudColorWorldTime == worldTime
+			&& this.cachedCloudColorTickDelta == tickDelta)
+		{
+			return this.cachedCloudColor;
+		}
 
 		Vec3 colorVec3 = null;
 		try
 		{
 			colorVec3 = this.level.getCloudColour(tickDelta);
 
-			return new Color((float)colorVec3.xCoord, (float)colorVec3.yCoord, (float)colorVec3.zCoord);
+			Color color = new Color((float)colorVec3.xCoord, (float)colorVec3.yCoord, (float)colorVec3.zCoord);
+			this.cachedCloudColor = color;
+			this.cachedCloudColorWorldTime = worldTime;
+			this.cachedCloudColorTickDelta = tickDelta;
+			return color;
 		}
 		catch (Exception e)
 		{
