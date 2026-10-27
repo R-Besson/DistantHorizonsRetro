@@ -125,7 +125,14 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	 * @return true if a request was removed
 	 */
 	default boolean removeFarthestRequestIfFartherThan(long pos, DhBlockPos2D centerPos) { return false; }
-	
+
+	/**
+	 * @return false if this queue would never retrieve the given position,
+	 * IE it's past the server's allowed request distance.
+	 * Those positions are cancelled when submitted, so they shouldn't be queued or counted as remaining.
+	 */
+	default boolean canRetrievePos(long pos, DhBlockPos2D centerPos) { return true; }
+
 	CompletableFuture<DataSourceRetrievalResult> submitRetrievalTask(long pos, byte requiredDataDetail);
 	
 	//endregion

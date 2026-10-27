@@ -345,6 +345,13 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 	}
 	
 	@Override
+	public boolean canRetrievePos(long pos, DhBlockPos2D centerPos)
+	{
+		IFullDataSourceRetrievalQueue worldGenQueue = this.worldGenQueueRef.get();
+		return (worldGenQueue == null) || worldGenQueue.canRetrievePos(pos, centerPos);
+	}
+
+	@Override
 	public void removeRetrievalRequestIf(DhSectionPos.IPrimitiveLongConsumer removeIf)
 	{
 		IFullDataSourceRetrievalQueue worldGenQueue = this.worldGenQueueRef.get();

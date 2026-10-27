@@ -424,7 +424,10 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	 * @return true if room was made
 	 */
 	public boolean tryMakeRoomForRetrieval(long pos, DhBlockPos2D centerPos) { return false; }
-	
+
+	/** @see IFullDataSourceRetrievalQueue#canRetrievePos */
+	public boolean canRetrievePos(long pos, DhBlockPos2D centerPos) { return true; }
+
 	public void clearRetrievalQueue() { }
 	
 	/** Can be used to display how many total chunk retrieval requests should be available. */

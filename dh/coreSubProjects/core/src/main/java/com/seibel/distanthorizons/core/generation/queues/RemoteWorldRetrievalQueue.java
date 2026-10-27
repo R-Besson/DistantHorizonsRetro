@@ -81,6 +81,9 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 	}
 	
 	@Override
+	public boolean canRetrievePos(long pos, DhBlockPos2D centerPos) { return this.sectionInAllowedGenerationRadius(pos, centerPos); }
+
+	@Override
 	public boolean getCanRegenerate() { return this.canRegenerate; }
 	@Override
 	public void setCanRegenerate(boolean canRegen)

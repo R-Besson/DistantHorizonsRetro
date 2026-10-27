@@ -886,6 +886,19 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	//=================================//
 	//region world gen
 	
+	/**
+	 * Positions outside the generator's range (or past the server's request distance) are never retrieved,
+	 * queuing them just has them cancelled and put back as missing.
+	 */
+	private boolean canRetrievePos(long pos, DhBlockPos2D playerPos)
+	{
+		return WorldGenUtil.isPosInWorldGenRange(
+				pos,
+				Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
+				Config.Common.WorldGenerator.generationMaxChunkRadius.get())
+			&& this.fullDataSourceProvider.canRetrievePos(pos, playerPos);
+	}
+
 	/** @param updateEstimates false while the tree is still being checked, the estimates would only count part of it */
 	private void startQueuedRetrievalTasks(DhBlockPos2D playerPos, boolean updateEstimates)
 	{
@@ -909,14 +922,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		for (int i = 0; i < this.sortedMissingPosList.size(); i++)
 		{
 			long missingPos = this.sortedMissingPosList.get(i);
-			
-			// is this position within acceptable generator range?
-			boolean posInRange = WorldGenUtil.isPosInWorldGenRange(
-				missingPos,
-				Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
-				Config.Common.WorldGenerator.generationMaxChunkRadius.get()
-			);
-			if (!posInRange)
+			if (!this.canRetrievePos(missingPos, playerPos))
 			{
 				continue;
 			}
@@ -988,7 +994,12 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			for (int i = 0; i < this.sortedMissingPosList.size(); i++)
 			{
 				long missingPos = this.sortedMissingPosList.get(i);
-				
+				// positions that will never be retrieved would keep the count from reaching 0
+				if (!this.canRetrievePos(missingPos, playerPos))
+				{
+					continue;
+				}
+
 				// chunk count
 				long sectionWidthInChunks = DhSectionPos.getChunkWidth(missingPos);
 				totalWorldGenChunkCount += (sectionWidthInChunks * sectionWidthInChunks);
