@@ -33,7 +33,10 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IMutableBlockPosWr
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import net.minecraft.block.Block;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.Chunk;
 import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
@@ -135,19 +138,42 @@ public class ChunkWrapper implements IChunkWrapper
 
 	private static BiomeGenBase[] fillBiomeMap(Chunk chunk)
 	{
-		// We must use World.getBiomeGenForCoords since mods like LOTR override those functions. Getting it from the chunk is incorrect.
+		World world = chunk.worldObj;
+		// Mods like LOTR override the provider's biome lookup, those must go through the world.
+		// Otherwise the biome is read from this chunk, the world's lookup would end up there too
+		// but first checks the server's chunk map, which isn't thread safe and wrappers are created off thread.
+		boolean useWorldLookup = providerOverridesBiomeLookup(world.provider);
+		WorldChunkManager chunkManager = world.getWorldChunkManager();
+
 		BiomeGenBase[] biomeArray = new BiomeGenBase[LodUtil.CHUNK_WIDTH * LodUtil.CHUNK_WIDTH];
 		for (int x = 0; x < LodUtil.CHUNK_WIDTH; x++)
 		{
 			for (int z = 0; z < LodUtil.CHUNK_WIDTH; z++)
 			{
-				biomeArray[x * LodUtil.CHUNK_WIDTH + z] = chunk.worldObj.getBiomeGenForCoords(
-					(chunk.xPosition << 4) + x,
-					(chunk.zPosition << 4) + z);
+				biomeArray[x * LodUtil.CHUNK_WIDTH + z] = useWorldLookup
+					? world.getBiomeGenForCoords((chunk.xPosition << 4) + x, (chunk.zPosition << 4) + z)
+					: chunk.getBiomeGenForWorldCoords(x, z, chunkManager);
 			}
 		}
 		return biomeArray;
 	}
+
+	/** getBiomeGenForCoords is added by Forge, so its name isn't obfuscated */
+	private static boolean providerOverridesBiomeLookup(WorldProvider provider)
+	{
+		return PROVIDER_OVERRIDES_BIOME_LOOKUP.computeIfAbsent(provider.getClass(), (providerClass) ->
+		{
+			try
+			{
+				return providerClass.getMethod("getBiomeGenForCoords", int.class, int.class).getDeclaringClass() != WorldProvider.class;
+			}
+			catch (NoSuchMethodException e)
+			{
+				return true;
+			}
+		});
+	}
+	private static final ConcurrentHashMap<Class<?>, Boolean> PROVIDER_OVERRIDES_BIOME_LOOKUP = new ConcurrentHashMap<>();
 
 	//endregion
 	//endregion

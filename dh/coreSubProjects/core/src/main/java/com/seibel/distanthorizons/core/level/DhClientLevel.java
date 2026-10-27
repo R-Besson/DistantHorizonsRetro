@@ -118,9 +118,14 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		File saveFolder = saveStructure.getSaveFolder(clientLevelWrapper);
 		File pre23Folder = saveStructure.getPre23SaveFolder(clientLevelWrapper);
 		
+		// the old folder can be the same as the new one (IE a save structure override or no server key),
+		// moving a folder onto itself fails
+		boolean pre23FolderIsSaveFolder = pre23Folder.getAbsoluteFile().toPath().normalize()
+			.equals(saveFolder.getAbsoluteFile().toPath().normalize());
+
 		saveFolder.mkdirs();
-		
-		if (pre23Folder.exists())
+
+		if (!pre23FolderIsSaveFolder && pre23Folder.exists())
 		{
 			if (!pre23Folder.renameTo(saveFolder))
 			{
