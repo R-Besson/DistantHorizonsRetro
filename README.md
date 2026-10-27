@@ -89,7 +89,7 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Fences, walls, slabs and snow layers shaped like the real blocks
 - [x] Mobs visible up to the render distance with shaders
 - [x] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
-- [ ] Block shapes (fences, walls, slabs) work with shaders
+- [x] Block shapes (fences, walls, slabs) work with shaders
 - [ ] Shallow water tint near shores with shaders
 - [ ] Faster world generation and lower memory use
 

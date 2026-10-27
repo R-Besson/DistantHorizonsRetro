@@ -126,7 +126,7 @@ public class RenderDataPointUtil
 	
 	// Shapes are only drawn by 1 block wide LODs, wider LODs are always full boxes.
 	// They're applied by DH's vertex shader as an inset from the block's edges (see LodQuadBuilder),
-	// shader packs don't know about the inset and draw full boxes instead.
+	// shader packs get the same inset from the forge17 ShaderPackLodTextures patch.
 	
 	/** a full box */
 	public final static byte SHAPE_NONE = 0;

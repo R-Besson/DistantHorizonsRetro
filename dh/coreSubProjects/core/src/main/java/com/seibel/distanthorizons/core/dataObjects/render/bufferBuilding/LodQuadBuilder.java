@@ -780,7 +780,7 @@ public class LodQuadBuilder implements AutoCloseable
 			meta |= (short) (mircoOffset << 8);
 			
 			// the shape uses the 2 unused bits above the micro offset (0bss00_0000_0000_0000),
-			// DH's vertex shader insets the vertex based on it and shader packs ignore it
+			// DH's vertex shader insets the vertex based on it, shader packs get the same inset from ShaderPackLodTextures
 			meta |= (short) ((shape & 0b11) << 14);
 		}
 		bb.putShort(meta);

@@ -22,7 +22,10 @@ import java.util.regex.Pattern;
  * the color it wrote is multiplied by the block texture's ratio tile,
  * the same way DH's own LOD shader does (see terrain/gl/frag.frag). <br>
  * Packs whose LOD program can't be patched (no float output at location 0,
- * geometry or tessellation stages, old GLSL) are left untouched.
+ * geometry or tessellation stages, old GLSL) are left untouched. <br><br>
+ *
+ * Angelica's vertex setup is also fixed for every pack: the normals of plants and see-through leaves,
+ * and the LOD shapes (fence and wall posts, bottom slabs).
  */
 public class ShaderPackLodTextures
 {
@@ -34,6 +37,37 @@ public class ShaderPackLodTextures
 	/** Complementary's (and its forks') fake LOD texture: Noise3D(noisePos) + 0.5, where 0.5 + 0.5 changes nothing */
 	private static final Pattern COMPLEMENTARY_NOISE_PATTERN = Pattern.compile("Noise3D\\s*\\(\\s*noisePos\\s*\\)");
 	private static final Pattern OUTPUT_PATTERN = Pattern.compile("layout\\s*\\(\\s*location\\s*=\\s*0\\s*\\)\\s*out\\s+vec4\\s+(\\w+)\\s*;");
+	/** Angelica's _vert_init (see DHTerrainTransformer), its transformer prints it as "( vPosition . xyz + vec3 ( mx , my , mz ) )" */
+	private static final Pattern VERT_INIT_PATTERN = Pattern.compile("void\\s+_vert_init\\s*\\(");
+	private static final Pattern VERT_POSITION_PATTERN = Pattern.compile("_vert_position\\s*=\\s*\\(\\s*vPosition\\s*\\.\\s*xyz\\s*\\+\\s*vec3\\s*\\(\\s*mx\\s*,\\s*my\\s*,\\s*mz\\s*\\)\\s*\\)\\s*;");
+
+	/**
+	 * The LOD shape (fence and wall posts, bottom slabs), the same inset as DH's own vertex shader (see terrain/gl/vert.vert).
+	 * It's stored in the 2 bits above the micro offset (see LodQuadBuilder), which Angelica ignores.
+	 */
+	private static final String SHAPE_OFFSET_FUNCTION = ""
+		+ "vec3 dhr_shapeOffset() {\n"
+		+ "    uint shape = (vPosition.a >> 14u) & 3u;\n"
+		+ "    if (shape == 0u) return vec3(0.0);\n"
+		+ "    uint mirco = (vPosition.a >> 8u) & 0x3Fu;\n"
+		// which edge of the block this vertex is on, -1 = min, 1 = max.
+		// the micro offset gives the edges along the face, the normal gives the face's own edge
+		+ "    vec3 edge = vec3(\n"
+		+ "        (mirco & 1u) != 0u ? ((mirco & 2u) != 0u ? -1.0 : 1.0) : 0.0,\n"
+		+ "        (mirco & 4u) != 0u ? ((mirco & 8u) != 0u ? -1.0 : 1.0) : 0.0,\n"
+		+ "        (mirco & 16u) != 0u ? ((mirco & 32u) != 0u ? -1.0 : 1.0) : 0.0);\n"
+		+ "    uint face = (irisExtra.y >= 8u) ? (irisExtra.y - 8u) : irisExtra.y;\n"
+		+ "    if (face == 0u) edge.y = -1.0;\n"
+		+ "    else if (face == 1u) edge.y = 1.0;\n"
+		+ "    else if (face == 2u) edge.z = -1.0;\n"
+		+ "    else if (face == 3u) edge.z = 1.0;\n"
+		+ "    else if (face == 4u) edge.x = -1.0;\n"
+		+ "    else edge.x = 1.0;\n"
+		// thin post (fences) 4/16 wide, thick post (walls) 8/16 wide, bottom half (slabs) only moves the top down
+		+ "    if (shape == 1u) return vec3(-edge.x, 0.0, -edge.z) * (6.0 / 16.0);\n"
+		+ "    if (shape == 2u) return vec3(-edge.x, 0.0, -edge.z) * (4.0 / 16.0);\n"
+		+ "    return vec3(0.0, edge.y > 0.0 ? -0.5 : 0.0, 0.0);\n"
+		+ "}\n";
 
 	private static final String ATLAS_UNIFORM = "dhr_BlockAtlas";
 	private static final String ENABLED_UNIFORM = "dhr_TexturedLods";
@@ -44,7 +78,7 @@ public class ShaderPackLodTextures
 		+ "flat out uint dhr_TileId;\n"
 		+ "void main() {\n"
 		+ "    dhr_packMain();\n"
-		+ "    dhr_BlockPos = vec3(vPosition.xyz);\n"
+		+ "    dhr_BlockPos = vec3(vPosition.xyz) + DHR_SHAPE_OFFSET;\n"
 		+ "    dhr_NormalIndex = irisExtra.y;\n"
 		+ "    dhr_TileId = irisExtra.z | (irisExtra.w << 8u);\n"
 		+ "}\n";
@@ -139,14 +173,30 @@ public class ShaderPackLodTextures
 
 		// Angelica looks the normal up in a 6 entry array, plants use 6 and 7 for their diagonal planes (given an up normal like MC's plants)
 		// and see-through leaves add 8 to their face's index. This is needed even if textures can't be added.
+		String originalVertex = vertex;
 		Matcher normalMatcher = NORMAL_LOOKUP_PATTERN.matcher(vertex);
 		if (normalMatcher.find())
 		{
 			vertex = normalMatcher.replaceAll("(irisExtra.y >= 8u ? irisNormals[int(irisExtra.y - 8u)] : (irisExtra.y >= 6u ? vec3(0.0, 1.0, 0.0) : irisNormals[int(irisExtra.y)]))");
-			Map<PatchShaderType, String> normalFixed = new EnumMap<>(PatchShaderType.class);
-			normalFixed.putAll(shaders);
-			normalFixed.put(PatchShaderType.VERTEX, vertex);
-			shaders = normalFixed;
+		}
+
+		// LOD shapes move the vertex inside its block, this is needed even if textures can't be added
+		boolean shapesPatched = false;
+		Matcher vertInitMatcher = VERT_INIT_PATTERN.matcher(vertex);
+		if (vertInitMatcher.find()
+			&& VERT_POSITION_PATTERN.matcher(vertex).find())
+		{
+			vertex = vertex.substring(0, vertInitMatcher.start()) + SHAPE_OFFSET_FUNCTION + vertex.substring(vertInitMatcher.start());
+			vertex = VERT_POSITION_PATTERN.matcher(vertex).replaceFirst("_vert_position = (vPosition.xyz + vec3(mx, my, mz) + dhr_shapeOffset());");
+			shapesPatched = true;
+		}
+
+		if (!vertex.equals(originalVertex))
+		{
+			Map<PatchShaderType, String> vertexFixed = new EnumMap<>(PatchShaderType.class);
+			vertexFixed.putAll(shaders);
+			vertexFixed.put(PatchShaderType.VERTEX, vertex);
+			shaders = vertexFixed;
 		}
 
 		String skipReason = null;
@@ -190,7 +240,9 @@ public class ShaderPackLodTextures
 		Map<PatchShaderType, String> patched = new EnumMap<>(PatchShaderType.class);
 		patched.putAll(shaders);
 		patched.put(PatchShaderType.VERTEX,
-			MAIN_PATTERN.matcher(vertex).replaceFirst("void dhr_packMain()") + "\n" + VERTEX_CODE);
+			MAIN_PATTERN.matcher(vertex).replaceFirst("void dhr_packMain()") + "\n"
+				// the textures are placed on the shape's faces, not the full block's
+				+ VERTEX_CODE.replace("DHR_SHAPE_OFFSET", shapesPatched ? "dhr_shapeOffset()" : "vec3(0.0)"));
 		// Complementary adds a fake 4 per block noise to flat LODs, textured faces don't need it
 		String packFragment = COMPLEMENTARY_NOISE_PATTERN.matcher(fragment).replaceAll(Matcher.quoteReplacement("(dhr_hasTile() ? 0.5 : Noise3D(noisePos))"));
 		patched.put(PatchShaderType.FRAGMENT,
