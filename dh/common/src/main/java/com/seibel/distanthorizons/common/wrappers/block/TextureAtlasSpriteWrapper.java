@@ -23,7 +23,10 @@ import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinTextureAtlasSprite;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
+import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 import net.minecraft.block.Block;
@@ -35,6 +38,9 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * For wrapping/utilizing around TextureAtlasSprite
@@ -43,6 +49,8 @@ import java.lang.reflect.Field;
  */
 public class TextureAtlasSpriteWrapper
 {
+	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
+
 	private static final IGregTechCommonAccessor GREG_TECH_ACCESSOR = ModAccessorInjector.INSTANCE.get(IGregTechCommonAccessor.class);
 
 	/** meta bit MC sets on the top half of double plants */
@@ -184,6 +192,27 @@ public class TextureAtlasSpriteWrapper
 	 */
 	@Nullable
 	public static TextureAtlasSprite resolveFaceSprite(IBlockState blockstate, int sideOrdinal)
+	{
+		try
+		{
+			return tryResolveFaceSprite(blockstate, sideOrdinal);
+		}
+		catch (Exception | LinkageError e)
+		{
+			// Some mods' getIcon() throws for metas they don't expect (IE out of bounds icon arrays),
+			// that would fail the whole LOD section every time it's built.
+			// The block gets its fallback color instead.
+			if (ICON_ERROR_LOGGED_BLOCKS.add(blockstate.getBlock()))
+			{
+				LOGGER.warn("Unable to get the icon for block [" + GameData.getBlockRegistry().getNameForObject(blockstate.getBlock()) + "] meta [" + blockstate.getMeta() + "], error: [" + e + "].");
+			}
+			return null;
+		}
+	}
+	private static final Set<Block> ICON_ERROR_LOGGED_BLOCKS = Collections.newSetFromMap(new ConcurrentHashMap<>());
+
+	@Nullable
+	private static TextureAtlasSprite tryResolveFaceSprite(IBlockState blockstate, int sideOrdinal)
 	{
 		// The top half of a double plant only knows it's a top, the type is stored in the bottom half
 		// and without the world getIcon() returns the sunflower's bottom.

@@ -93,7 +93,24 @@ public class RenderUtil
 		
 		// Create a copy of the current matrix, so it won't be modified.
 		updateMatrix.set(mcProjMat);
-		
+
+		// orthographic cameras (IE Mineshot's) have no perspective divide,
+		// the perspective clip plane terms below would push every LOD out of the depth range
+		if (mcProjMat.m32 == 0.0f
+			&& mcProjMat.m33 == 1.0f)
+		{
+			if (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.FORWARD_Z
+				&& mcProjMat.m22 != 0.0f)
+			{
+				// MC's own near plane is kept, the camera can be placed far away from the player
+				float orthoNear = (mcProjMat.m23 + 1.0f) / mcProjMat.m22;
+				float orthoFar = Math.max((mcProjMat.m23 - 1.0f) / mcProjMat.m22, farClipDist);
+				updateMatrix.m22 = -2.0f / (orthoFar - orthoNear);
+				updateMatrix.m23 = -(orthoFar + orthoNear) / (orthoFar - orthoNear);
+			}
+			return;
+		}
+
 		
 		// Set new far and near clip plane values.
 		if (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.FORWARD_Z)

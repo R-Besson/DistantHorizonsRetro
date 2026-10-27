@@ -228,8 +228,16 @@ public class ClientBlockStateColorCache
 			// Backup tinting heuristics
 			// (aka guess that the block should be tinted if it's entirely white)
 			// getRenderColor(meta) catches blocks tinted per meta, IE Extra Utilities' Lapis Caelestis
-			this.needPostTinting = blockState.block.getBlockColor() != 0xFFFFFF // white
-				|| blockState.block.getRenderColor(blockState.meta) != 0xFFFFFF;
+			try
+			{
+				this.needPostTinting = blockState.block.getBlockColor() != 0xFFFFFF // white
+					|| blockState.block.getRenderColor(blockState.meta) != 0xFFFFFF;
+			}
+			catch (Exception e)
+			{
+				// some mods index per meta color arrays without checking the meta
+				this.needPostTinting = false;
+			}
 
 			if (blockState.block instanceof BlockGrass
 				|| blockState.block instanceof BlockLeavesBase
