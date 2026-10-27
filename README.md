@@ -91,7 +91,6 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
 - [x] Block shapes (fences, walls, slabs) work with shaders
 - [x] Fog from other mods (GregTech pollution smog) hides LODs like vanilla terrain
-- [ ] Shadows on LODs with shader packs
 - [ ] Glowing LODs at night: torches, lamps and lit windows visible from far away
 - [ ] Machines and block entities in LODs (GregTech machines, chests, AE2) with their textures
 - [ ] Detailed nearby LODs: stairs, panes, trapdoors, connected fences and walls

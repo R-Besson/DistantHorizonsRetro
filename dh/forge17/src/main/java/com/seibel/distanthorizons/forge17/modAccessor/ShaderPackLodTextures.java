@@ -119,8 +119,8 @@ public class ShaderPackLodTextures
 		// plants are cut out like MC's
 		+ "        if (dhr_NormalIndex >= 6u && dhr_NormalIndex < 8u && tile.a < 0.5) discard;\n"
 		// see-through leaves don't cut out their gaps here, unlike DH's own shader (see frag.frag).
-		// Packs don't shadow LODs, so the gaps of a leaf block's front and back line up into holes
-		// the sun shines straight through, MC's leaves are mostly in shadow inside so they're drawn dark below instead
+		// Cut out, the gaps of a leaf block's front and back line up into holes you can see straight through,
+		// MC's leaves are mostly in shadow inside so they're drawn dark below instead
 		// 128 gray is the LOD's own color.
 		// Brightened colors are scaled down as a whole (keeping their hue) to the pack's own brightest channel,
 		// at least 1 since most packs write to 8 bit buffers, clamping per channel would tint bright green leaves yellow
