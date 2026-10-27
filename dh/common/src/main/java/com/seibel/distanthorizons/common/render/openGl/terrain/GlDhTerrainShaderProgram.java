@@ -387,8 +387,49 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			// https://github.com/IrisShaders/Iris/blob/1.21.9/common/src/main/java/net/irisshaders/iris/compat/dh/LodRendererEvents.java#L346
 			GLMC.enableFaceCulling();
 		}
-		
-		
+
+		if (opaquePass)
+		{
+			this.renderBuffers(renderEventParam, true, bufferContainers);
+		}
+		else
+		{
+			// Transparent faces aren't sorted, if they wrote depth one drawn first would hide the ones behind it
+			// IE the water's surface hiding the glass under it (MC draws glass with the solid blocks so it doesn't have this issue).
+			// So the colors are drawn without depth, then the depth is written on its own
+			// for the fog and shader packs, which need the nearest transparent surface.
+			GLMC.disableDepthMask();
+			this.renderBuffers(renderEventParam, false, bufferContainers);
+
+			GLMC.enableDepthMask();
+			LWJGL.glColorMask(false, false, false, false);
+			this.renderBuffers(renderEventParam, false, bufferContainers);
+			LWJGL.glColorMask(true, true, true, true);
+		}
+
+
+
+		//=========================//
+		// debug wireframe cleanup //
+		//=========================//
+
+		if (renderWireframe)
+		{
+			// default back to GL_FILL since all other rendering uses it
+			LWJGL.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+			GLMC.enableFaceCulling();
+		}
+
+		// Restore GL states that vanilla expects
+		if (!opaquePass)
+		{
+			GLMC.disableBlend();
+			GLMC.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
+		}
+	}
+
+	private void renderBuffers(RenderParams renderEventParam, boolean opaquePass, SortedArraySet<LodBufferContainer> bufferContainers)
+	{
 		boolean missingUniformsUploaded = false;
 		if (bufferContainers != null)
 		{
@@ -476,28 +517,8 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 				}
 			}
 		}
-		
-		
-		
-		//=========================//
-		// debug wireframe cleanup //
-		//=========================//
-		
-		if (renderWireframe)
-		{
-			// default back to GL_FILL since all other rendering uses it 
-			LWJGL.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-			GLMC.enableFaceCulling();
-		}
-		
-		// Restore GL states that vanilla expects
-		if (!opaquePass)
-		{
-			GLMC.disableBlend();
-			GLMC.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO);
-		}
 	}
-	
+
 	//endregion
 	
 	
