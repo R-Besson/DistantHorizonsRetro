@@ -184,12 +184,20 @@ public class ColumnBox
 			
 			if (!skipTop)
 			{
+				// MC doesn't smooth light emitting blocks, they're drawn evenly lit
+				boolean selfLit = irisBlockMaterialId == EDhApiBlockMaterial.LAVA.index
+					|| irisBlockMaterialId == EDhApiBlockMaterial.ILLUMINATED.index;
+				int cornerLights = selfLit
+					? BufferQuad.UNIFORM_CORNER_LIGHTS
+					: getSmoothTopCornerLights(adjData, maxY, skyLightTop, blockLight);
+
 				builder.addQuadUp(
-					minX, maxY, minZ, 
-					blockWidth, 
+					minX, maxY, minZ,
+					blockWidth,
 					ColorUtil.applyShade(color, clientLevelWrapper.getShade(EDhDirection.UP)), tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.UP),
-					irisBlockMaterialId, 
-					skyLightTop, blockLight);
+					irisBlockMaterialId,
+					skyLightTop, blockLight,
+					cornerLights);
 			}
 		}
 		
@@ -729,6 +737,78 @@ public class ColumnBox
 	//================//
 	//region
 	
+	/**
+	 * Smooth lighting like MC's: each corner of a top face gets the average light of the air above
+	 * this column and the 2 columns next to that corner.
+	 * MC also uses the diagonal block, the adjacent data doesn't have it so the 2 sides stand in for it.
+	 * Neighbors that are solid at that height use this column's light instead, the same as MC.
+	 *
+	 * @return see {@link BufferQuad#cornerLights}
+	 */
+	private static int getSmoothTopCornerLights(ColumnRenderView[] adjData, short airY, byte skyLight, byte blockLight)
+	{
+		int center = (skyLight << 4) | blockLight;
+		int north = getAirLight(adjData[EDhDirection.NORTH.compassIndex], airY, center);
+		int south = getAirLight(adjData[EDhDirection.SOUTH.compassIndex], airY, center);
+		int west = getAirLight(adjData[EDhDirection.WEST.compassIndex], airY, center);
+		int east = getAirLight(adjData[EDhDirection.EAST.compassIndex], airY, center);
+
+		int cornerLights = 0;
+		for (int corner = 0; corner < 4; corner++)
+		{
+			int sideX = ((corner & 1) != 0) ? east : west;
+			int sideZ = ((corner & 2) != 0) ? south : north;
+			// (center + sideX + sideZ + diagonal) / 4, with the diagonal being the sides' average
+			int cornerSky = (2 * (center >>> 4) + 3 * (sideX >>> 4) + 3 * (sideZ >>> 4) + 4) / 8;
+			int cornerBlock = (2 * (center & 0xF) + 3 * (sideX & 0xF) + 3 * (sideZ & 0xF) + 4) / 8;
+			cornerLights |= ((cornerSky << 4) | cornerBlock) << (corner * 8);
+		}
+		return cornerLights;
+	}
+	/**
+	 * @return the light of the air at the given height in the column as (skyLight << 4 | blockLight),
+	 *          or the fallback if there isn't air there
+	 */
+	private static int getAirLight(@Nullable ColumnRenderView column, short airY, int fallback)
+	{
+		if (column == null)
+		{
+			return fallback;
+		}
+
+		// the column's points go from the top down
+		for (int i = 0; i < column.size; i++)
+		{
+			long dataPoint = column.get(i);
+			if (!RenderDataPointUtil.doesDataPointExist(dataPoint)
+				|| RenderDataPointUtil.hasZeroHeight(dataPoint))
+			{
+				continue;
+			}
+
+			short minY = RenderDataPointUtil.getYMin(dataPoint);
+			short maxY = RenderDataPointUtil.getYMax(dataPoint);
+			if (maxY <= airY)
+			{
+				// the first point below, a data point's light is the light of the air above it
+				return (RenderDataPointUtil.getLightSky(dataPoint) << 4) | RenderDataPointUtil.getLightBlock(dataPoint);
+			}
+
+			if (minY <= airY)
+			{
+				// something is at that height,
+				// only air, plants and shapes that don't fill their block let the light through
+				boolean lightPassesThrough = RenderDataPointUtil.getBlockMaterialId(dataPoint) == EDhApiBlockMaterial.AIR.index
+					|| RenderDataPointUtil.getShape(dataPoint) != RenderDataPointUtil.SHAPE_NONE;
+				return lightPassesThrough
+					? (RenderDataPointUtil.getLightSky(dataPoint) << 4) | RenderDataPointUtil.getLightBlock(dataPoint)
+					: fallback;
+			}
+		}
+
+		return fallback;
+	}
+
 	/** shapes are only drawn by 1 block wide LODs */
 	private static byte getShape(long dataPoint, short blockWidth)
 	{

@@ -53,7 +53,7 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	default int getLightOpacity() { return this.getOpacity(); }
 
 	/**
-	 * True if MC draws this block as crossed planes (IE tall grass, flowers),
+	 * True if MC draws this block as crossed planes (IE tall grass, flowers) or a thin sprite (torches, fire),
 	 * close LODs draw it the same way.
 	 */
 	default boolean isCrossPlant() { return false; }

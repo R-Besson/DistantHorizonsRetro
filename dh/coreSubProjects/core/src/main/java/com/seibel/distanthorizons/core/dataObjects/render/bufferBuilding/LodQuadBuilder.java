@@ -321,11 +321,20 @@ public class LodQuadBuilder implements AutoCloseable
 
 	// XZ
 	public void addQuadUp(
-		short minX, short maxY, short minZ, 
-		short blockWidth, 
+		short minX, short maxY, short minZ,
+		short blockWidth,
 		int color, short faceTextureId,
-		byte irisBlockMaterialId, 
+		byte irisBlockMaterialId,
 		byte skylight, byte blocklight)
+	{ this.addQuadUp(minX, maxY, minZ, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, BufferQuad.UNIFORM_CORNER_LIGHTS); }
+	/** @param cornerLights see {@link BufferQuad#cornerLights} */
+	public void addQuadUp(
+		short minX, short maxY, short minZ,
+		short blockWidth,
+		int color, short faceTextureId,
+		byte irisBlockMaterialId,
+		byte skylight, byte blocklight,
+		int cornerLights)
 	{
 		boolean isTransparent = (this.doTransparency && ColorUtil.getAlpha(color) < 255);
 		ArrayList<BufferQuad> quadList = isTransparent 
@@ -336,6 +345,20 @@ public class LodQuadBuilder implements AutoCloseable
 		quad.set(minX, maxY, minZ, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.UP);
 		quad.shape = this.shapeForNewQuads;
 		quad.seeThrough = this.seeThroughForNewQuads;
+		// evenly lit quads stay uniform so they can still be merged
+		int firstCorner = cornerLights & 0xFF;
+		if (cornerLights != BufferQuad.UNIFORM_CORNER_LIGHTS)
+		{
+			if (cornerLights == (firstCorner * 0x01010101))
+			{
+				quad.skyLight = (byte) (firstCorner >>> 4);
+				quad.blockLight = (byte) (firstCorner & 0xF);
+			}
+			else
+			{
+				quad.cornerLights = cornerLights;
+			}
+		}
 		quadList.add(quad);
 	}
 	
@@ -698,12 +721,23 @@ public class LodQuadBuilder implements AutoCloseable
 			}
 			
 			
+			byte skyLight = quad.skyLight;
+			byte blockLight = quad.blockLight;
+			if (quad.cornerLights != BufferQuad.UNIFORM_CORNER_LIGHTS)
+			{
+				// smooth lighting, only up faces have corner lights
+				int corner = quadBase[i][0] | (quadBase[i][1] << 1);
+				int cornerLight = (quad.cornerLights >>> (corner * 8)) & 0xFF;
+				skyLight = (byte) (cornerLight >>> 4);
+				blockLight = (byte) (cornerLight & 0xF);
+			}
+
 			this.putVertex(bb, (short) (quad.x + dx), (short) (quad.y + dy), (short) (quad.z + dz),
 					quad.hasError ? ColorUtil.RED : color,
 					quad.hasError ? 0 : normalIndex,
 					quad.hasError ? 0 : quad.irisBlockMaterialId,
-					quad.hasError ? 15 : (this.noSkyLight ? 0 : quad.skyLight),
-					quad.hasError ? 15 : quad.blockLight,
+					quad.hasError ? 15 : (this.noSkyLight ? 0 : skyLight),
+					quad.hasError ? 15 : blockLight,
 					quad.hasError ? 0 : quad.textureTileId,
 					quad.hasError ? RenderDataPointUtil.SHAPE_NONE : quad.shape,
 					mx, my, mz);

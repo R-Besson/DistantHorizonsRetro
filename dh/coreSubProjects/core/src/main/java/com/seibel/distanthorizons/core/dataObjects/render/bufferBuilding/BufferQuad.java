@@ -63,6 +63,13 @@ public final class BufferQuad
 	public byte shape;
 	/** see-through leaf faces (see LodQuadBuilder#seeThroughForNewQuads), their gaps are cut out */
 	public boolean seeThrough;
+	/**
+	 * Smooth lighting, the light of each corner as 4 bytes of (skyLight << 4 | blockLight),
+	 * the byte index is the corner, bit 0 = max x, bit 1 = max z. Only used by up faces. <br>
+	 * {@link #UNIFORM_CORNER_LIGHTS} if every corner uses {@link #skyLight} and {@link #blockLight}.
+	 */
+	public int cornerLights;
+	public static final int UNIFORM_CORNER_LIGHTS = -1;
 	
 	public boolean hasError = false;
 	
@@ -108,6 +115,7 @@ public final class BufferQuad
 		this.direction = direction;
 		this.shape = RenderDataPointUtil.SHAPE_NONE;
 		this.seeThrough = false;
+		this.cornerLights = UNIFORM_CORNER_LIGHTS;
 		// quads are reused, see LodQuadBuilder.getOrCreateBufferQuad
 		this.hasError = false;
 		this.sortKeyEastWest = computeSortKey(direction, true);
@@ -174,6 +182,13 @@ public final class BufferQuad
 		}
 		
 		if (this.seeThrough != quad.seeThrough)
+		{
+			return false;
+		}
+
+		// the corner lights only fit the quad they were made for
+		if (this.cornerLights != UNIFORM_CORNER_LIGHTS
+			|| quad.cornerLights != UNIFORM_CORNER_LIGHTS)
 		{
 			return false;
 		}
