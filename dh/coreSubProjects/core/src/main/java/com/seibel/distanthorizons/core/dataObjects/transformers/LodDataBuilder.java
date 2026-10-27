@@ -128,7 +128,9 @@ public class LodDataBuilder
 			int minBuildHeight = chunkWrapper.getMinNonEmptyHeight();
 			int exclusiveMaxBuildHeight = chunkWrapper.getExclusiveMaxBuildHeight();
 			int inclusiveMinBuildHeight = chunkWrapper.getInclusiveMinBuildHeight();
-			int dataCapacity = chunkWrapper.getHeight() / 4;
+			// only the blocks between the lowest and highest non-empty sections are stored,
+			// the whole height would be thousands of blocks with Cubic Chunks
+			int dataCapacity = (chunkWrapper.getMaxNonEmptyHeight() - minBuildHeight) / 4;
 			
 			for (int relBlockX = 0; relBlockX < LodUtil.CHUNK_WIDTH; relBlockX++)
 			{

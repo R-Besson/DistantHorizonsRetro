@@ -11,6 +11,7 @@ import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
 import com.seibel.distanthorizons.common.wrappers.level.KeyedClientLevelManager;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
@@ -425,16 +426,10 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	}
 
 	@Override
-	public int getMaxHeight()
-	{
-		return this.level.getHeight();
-	}
+	public int getMaxHeight() { return CubicChunksCompat.getMaxHeight(this.level); }
 
 	@Override
-	public int getMinHeight()
-	{
-		return 0;
-	}
+	public int getMinHeight() { return CubicChunksCompat.getMinHeight(this.level); }
 
 	@Override
 	public WorldClient getWrappedMcObject() { return this.level; }

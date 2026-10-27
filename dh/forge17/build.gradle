@@ -22,6 +22,15 @@ repositories {
             includeGroup "com.falsepattern"
         }
     }
+    ivy {
+        name = "Cubic Chunks" // only published as GitHub release files
+        url = "https://github.com/GTNewHorizons/CubicChunks1710/releases/download/"
+        patternLayout { artifact "[revision]/[module]-[revision](-[classifier]).[ext]" }
+        metadataSources { artifact() }
+        content {
+            includeModule "GTNewHorizons", "cubicchunks"
+        }
+    }
     maven {
         name = "Curse Maven" // CurseForge files by project and file ID
         url = "https://cursemaven.com"
@@ -38,6 +47,7 @@ def gtnhlibVersion = "0.11.54"
 def hodgepodgeVersion = "2.7.218"
 def twilightforestVersion = "2.7.45"
 def chiselVersion = "2.17.34-GTNH"
+def cubicChunksVersion = "v0.1.27-alpha-pre"
 
 dependencies {
     modCompileOnly "com.github.GTNewHorizons:Hodgepodge:${hodgepodgeVersion}:dev"
@@ -46,6 +56,7 @@ dependencies {
     modCompileOnly("com.github.GTNewHorizons:Angelica:${angelicaVersion}:dev") { transitive = false }
     modCompileOnly("com.github.GTNewHorizons:Chisel:${chiselVersion}:dev") { transitive = false }
     modCompileOnly "com.falsepattern:rple-mc1.7.10:2.1.0:api"
+    modCompileOnly "GTNewHorizons:cubicchunks:${cubicChunksVersion}:dev"
 
     modImplementation "io.github.legacymoddingmc:unimixins:0.3.1@jar"
 }
@@ -77,6 +88,16 @@ dependencies {
     devClientMods "maven.modrinth:euphoria-patches:1.10.5-${complementaryVersion}-forge1.7.10"
 
     devShaderPacks "maven.modrinth:complementary-unbound:${complementaryVersion}@zip"
+}
+
+// -PdevCubicChunks=true adds Cubic Chunks. It makes every world cubic, so it's left out by default
+def useDevCubicChunks = project.findProperty("devCubicChunks")?.toString()?.toBoolean() ?: false
+
+dependencies {
+    if (useDevCubicChunks) {
+        devClientMods "GTNewHorizons:cubicchunks:${cubicChunksVersion}@jar"
+        devClientMods "com.github.GTNewHorizons:RegionLib:v0.1.0-GTNH@jar"
+    }
 }
 
 // ==================== Java 25 Dev Client ====================

@@ -216,6 +216,10 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 		ServerThreadTaskHandler.INSTANCE.queueTask(() ->
 		{
 			Chunk chunk = event.world.getChunkFromBlockCoords(event.x, event.z);
+			if (!ChunkWrapper.canSaveChunk(chunk))
+			{
+				return null;
+			}
 			ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
 			SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
 			return null;

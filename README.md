@@ -92,11 +92,11 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Block shapes (fences, walls, slabs) work with shaders
 - [x] Fog from other mods (GregTech pollution smog) hides LODs like vanilla terrain
 - [x] Glowing LODs at night: smooth lighting, torches, lamps and glowstone that light up like vanilla
+- [ ] Cubic Chunks support
 - [ ] Machines and block entities in LODs (GregTech machines, chests, AE2) with their textures
 - [ ] Detailed nearby LODs: stairs, panes, trapdoors, connected fences and walls
 - [ ] Multithreaded world generation, several times faster LOD generation
 - [ ] Reliable multiplayer: the server generates and streams LODs to every player
-- [ ] Cubic Chunks support
 
 # Development
 

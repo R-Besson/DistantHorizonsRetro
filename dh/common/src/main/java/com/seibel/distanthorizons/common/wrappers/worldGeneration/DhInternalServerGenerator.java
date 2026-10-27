@@ -4,6 +4,8 @@ import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
 import com.seibel.distanthorizons.common.wrappers.McObjectConverter;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.worldGeneration.params.GlobalWorldGenParams;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
@@ -427,8 +429,12 @@ public class DhInternalServerGenerator
 			}
 
 			// load the target chunk itself.
-			// the wrapper is created here since it reads the chunk's biomes, which must happen on the server thread
-			Chunk chunk = provider.loadChunk(chunkPos.x, chunkPos.z);
+			// the wrapper is created here since it reads the chunk's biomes, which must happen on the server thread.
+			// Cubic Chunks only loads saved columns in loadChunk, without their cubes
+			ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(level);
+			Chunk chunk = (cubicChunks != null)
+				? cubicChunks.generateColumn(level, chunkPos.x, chunkPos.z)
+				: provider.loadChunk(chunkPos.x, chunkPos.z);
 			return (chunk != null) ? new ChunkWrapper(chunk, this.dhServerLevel.getLevelWrapper()) : null;
 		});
 	}

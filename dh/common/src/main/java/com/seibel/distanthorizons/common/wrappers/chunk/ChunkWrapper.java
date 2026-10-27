@@ -22,6 +22,10 @@ import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.misc.MutableBlockPosWrapper;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
+import net.minecraft.init.Blocks;
+import org.jetbrains.annotations.Nullable;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
@@ -82,6 +86,16 @@ public class ChunkWrapper implements IChunkWrapper
 
 	private final BiomeGenBase[] biomeList;
 
+	private final int minBuildHeight;
+	private final int maxBuildHeight;
+	/**
+	 * Cubic Chunks: the storage of every loaded cube from {@link #minBuildHeight} up, null if the world isn't cubic. <br>
+	 * Reading blocks through the chunk would load or generate missing cubes,
+	 * and cubes can unload before DH reads them.
+	 */
+	@Nullable
+	private final ExtendedBlockStorage[] cubicSections;
+
 
 
 	//=============//
@@ -101,6 +115,20 @@ public class ChunkWrapper implements IChunkWrapper
 
 		this.chunkPos = new DhChunkPos(chunk.xPosition, chunk.zPosition);
 		this.biomeList = fillBiomeMap(chunk);
+
+		ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(chunk.worldObj);
+		if (cubicChunks != null)
+		{
+			this.minBuildHeight = cubicChunks.getMinHeight(chunk.worldObj);
+			this.maxBuildHeight = cubicChunks.getMaxHeight(chunk.worldObj);
+			this.cubicSections = cubicChunks.getLoadedStorages(chunk, this.minBuildHeight >> 4, (this.maxBuildHeight >> 4) - 1);
+		}
+		else
+		{
+			this.minBuildHeight = 0;
+			this.maxBuildHeight = 256;
+			this.cubicSections = null;
+		}
 	}
 
 	/** used for copying */
@@ -110,7 +138,12 @@ public class ChunkWrapper implements IChunkWrapper
 		this.wrappedLevel = wrappedLevel;
 		this.chunkPos = new DhChunkPos(that.chunkPos.getX(), that.chunkPos.getZ());
 		this.biomeList = that.biomeList;
+		this.minBuildHeight = that.minBuildHeight;
+		this.maxBuildHeight = that.maxBuildHeight;
+		this.cubicSections = that.cubicSections;
 	}
+
+	private ExtendedBlockStorage[] getSections() { return (this.cubicSections != null) ? this.cubicSections : this.chunk.getBlockStorageArray(); }
 
 
 
@@ -186,25 +219,13 @@ public class ChunkWrapper implements IChunkWrapper
 	//region
 
 	@Override
-	public int getHeight() { return getHeight(this.chunk); }
-	public static int getHeight(Chunk chunk)
-	{
-		return 255;
-	}
+	public int getHeight() { return (this.cubicSections != null) ? this.maxBuildHeight - this.minBuildHeight : 255; }
 
 	@Override
-	public int getInclusiveMinBuildHeight() { return getInclusiveMinBuildHeight(this.chunk); }
-	public static int getInclusiveMinBuildHeight(Chunk chunk)
-	{
-		return 0;
-	}
+	public int getInclusiveMinBuildHeight() { return this.minBuildHeight; }
 
 	@Override
-	public int getExclusiveMaxBuildHeight() { return getExclusiveMaxBuildHeight(this.chunk); }
-	public static int getExclusiveMaxBuildHeight(Chunk chunk)
-	{
-		return 256;
-	}
+	public int getExclusiveMaxBuildHeight() { return this.maxBuildHeight; }
 
 	@Override
 	public int getMinNonEmptyHeight()
@@ -219,7 +240,7 @@ public class ChunkWrapper implements IChunkWrapper
 		this.minNonEmptyHeight = this.getInclusiveMinBuildHeight();
 
 		// determine the lowest empty section (bottom up)
-		ExtendedBlockStorage[] sections = this.chunk.getBlockStorageArray();
+		ExtendedBlockStorage[] sections = this.getSections();
 		for (int index = 0; index < sections.length; index++)
 		{
 			if (sections[index] == null)
@@ -251,7 +272,7 @@ public class ChunkWrapper implements IChunkWrapper
 		this.maxNonEmptyHeight = this.getExclusiveMaxBuildHeight();
 
 		// determine the highest empty section (top down)
-		ExtendedBlockStorage[] sections = this.chunk.getBlockStorageArray();
+		ExtendedBlockStorage[] sections = this.getSections();
 		for (int index = sections.length-1; index >= 0; index--)
 		{
 			// update at each position to fix using the max height if the chunk is empty
@@ -347,7 +368,9 @@ public class ChunkWrapper implements IChunkWrapper
 		// will be null if we want to use MC heightmaps
 		if (this.solidHeightMap == null)
 		{
-			return 255; // assume max height so we don't miss anything
+			// assume max height so we don't miss anything,
+			// Cubic Chunks worlds are thousands of blocks tall
+			return (this.cubicSections != null) ? this.getMaxNonEmptyHeight() - 1 : 255;
 		}
 		else
 		{
@@ -362,6 +385,12 @@ public class ChunkWrapper implements IChunkWrapper
 
 		if (this.lightBlockingHeightMap == null)
 		{
+			if (this.cubicSections != null)
+			{
+				// Cubic Chunks' height map covers the whole world, not just what DH stores
+				int height = this.chunk.getHeightValue(xRel, zRel);
+				return Math.max(this.getMinNonEmptyHeight(), Math.min(height, this.getMaxNonEmptyHeight() - 1));
+			}
 			return this.chunk.getHeightValue(xRel, zRel);
 		}
 		else
@@ -385,8 +414,8 @@ public class ChunkWrapper implements IChunkWrapper
 
 		try
 		{
-			final Block block = this.chunk.getBlock(relX, relY, relZ);
-			final int meta = this.chunk.getBlockMetadata(relX, relY, relZ);
+			final Block block = this.getBlock(relX, relY, relZ);
+			final int meta = this.getBlockMetadata(relX, relY, relZ);
 			return BlockStateWrapper.fromBlockState(block, meta, this.wrappedLevel);
 		}
 		catch (Exception e)
@@ -407,8 +436,8 @@ public class ChunkWrapper implements IChunkWrapper
 
 		try
 		{
-			final Block block = this.chunk.getBlock(relX, relY, relZ);
-			final int meta = this.chunk.getBlockMetadata(relX, relY, relZ);
+			final Block block = this.getBlock(relX, relY, relZ);
+			final int meta = this.getBlockMetadata(relX, relY, relZ);
 			return BlockStateWrapper.fromBlockState(block, meta, this.wrappedLevel, guess);
 		}
 		catch (Exception e)
@@ -420,6 +449,33 @@ public class ChunkWrapper implements IChunkWrapper
 
 			return BlockStateWrapper.AIR;
 		}
+	}
+
+	private Block getBlock(int relX, int y, int relZ)
+	{
+		if (this.cubicSections == null)
+		{
+			return this.chunk.getBlock(relX, y, relZ);
+		}
+
+		ExtendedBlockStorage section = this.getCubicSection(y);
+		return (section != null) ? section.getBlockByExtId(relX, y & 15, relZ) : Blocks.air;
+	}
+	private int getBlockMetadata(int relX, int y, int relZ)
+	{
+		if (this.cubicSections == null)
+		{
+			return this.chunk.getBlockMetadata(relX, y, relZ);
+		}
+
+		ExtendedBlockStorage section = this.getCubicSection(y);
+		return (section != null) ? section.getExtBlockMetadata(relX, y & 15, relZ) : 0;
+	}
+	@Nullable
+	private ExtendedBlockStorage getCubicSection(int y)
+	{
+		int index = (y - this.minBuildHeight) >> 4;
+		return (index >= 0 && index < this.cubicSections.length) ? this.cubicSections[index] : null;
 	}
 
 	@Override
@@ -445,9 +501,16 @@ public class ChunkWrapper implements IChunkWrapper
 	 */
 	public static boolean canSaveChunk(Chunk chunk)
 	{
-		return chunk != null
-			&& chunk.isTerrainPopulated
-			&& chunk.isLightPopulated;
+		if (chunk == null
+			|| !chunk.isTerrainPopulated
+			|| !chunk.isLightPopulated)
+		{
+			return false;
+		}
+
+		// Cubic Chunks columns are always marked as populated, their cubes may not be there yet
+		ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(chunk.worldObj);
+		return cubicChunks == null || cubicChunks.isColumnReady(chunk);
 	}
 
 	//endregion
@@ -535,7 +598,7 @@ public class ChunkWrapper implements IChunkWrapper
 			this.blockLightPosList = new ArrayList<>();
 
 			// MC doesn't store light emitting block positions, so we have to bruteforce it
-			for (ExtendedBlockStorage section : this.chunk.getBlockStorageArray())
+			for (ExtendedBlockStorage section : this.getSections())
 			{
 				if (section == null || section.isEmpty())
 				{

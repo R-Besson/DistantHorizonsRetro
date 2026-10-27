@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiLevelType;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
@@ -214,13 +215,10 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	}
 
 	@Override
-	public int getMaxHeight() { return this.level.getHeight(); }
+	public int getMaxHeight() { return CubicChunksCompat.getMaxHeight(this.level); }
 
 	@Override
-	public int getMinHeight()
-	{
-		return 0;
-	}
+	public int getMinHeight() { return CubicChunksCompat.getMinHeight(this.level); }
 
 	@Override
 	public WorldServer getWrappedMcObject() { return this.level; }

@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IChiselCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
@@ -147,6 +148,13 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 			HodgePodgeAccessor hodgePodgeAccessor = new HodgePodgeAccessor();
 			this.addModCompatAccessor(IHodgePodgeAccessor.class, () -> hodgePodgeAccessor);
 			this.addModCompatAccessor(IHodgePodgeCommonAccessor.class, () -> hodgePodgeAccessor);
+		}
+
+		// Cubic Chunks
+		// changes how worlds store and generate chunks on both sides
+		if (Loader.isModLoaded(CubicChunksAccessor.CUBIC_CHUNKS_MOD_ID))
+		{
+			this.addModCompatAccessor(ICubicChunksCommonAccessor.class, CubicChunksAccessor::new);
 		}
 
         ForgeChunkManager.setForcedChunkLoadingCallback(

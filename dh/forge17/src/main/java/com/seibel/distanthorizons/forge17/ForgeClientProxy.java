@@ -130,6 +130,10 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
                 {
 	                World level = event.world;
                     Chunk chunk = level.getChunkFromBlockCoords(event.x, event.z);
+					if (!ChunkWrapper.canSaveChunk(chunk))
+					{
+						return;
+					}
                     ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
                     SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
                 });
