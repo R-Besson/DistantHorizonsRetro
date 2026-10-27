@@ -87,6 +87,8 @@ public class CloudRenderHandler
 	
 	private final IDhClientLevel level;
 	private final IDhGenericRenderer renderer;
+	/** only used by {@link #preRender} on the render thread */
+	private final DhVec3d cameraPosScratch = new DhVec3d();
 	
 	/** cached array so we don't need to re-create it each frame for each cloud group */
 	private final DhVec3d[] cullingCorners = new DhVec3d[]
@@ -373,7 +375,8 @@ public class CloudRenderHandler
 		//region
 		
 		// camera position
-		DhVec3d cameraPos = MC_RENDER.getCameraExactPosition();
+		// every cloud group does this each frame, so the vector is reused
+		DhVec3d cameraPos = MC_RENDER.getCameraExactPosition(this.cameraPosScratch);
 		int cameraPosX = (int)cameraPos.x;
 		int cameraPosZ = (int)cameraPos.z;
 		// offset the camera position by negative 1 width when below zero to fix off-by-one errors in the negative direction

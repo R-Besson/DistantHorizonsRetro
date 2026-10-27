@@ -2,6 +2,7 @@ package com.seibel.distanthorizons.common.backports;
 
 import com.seibel.distanthorizons.core.api.internal.ClientApi;
 import com.seibel.distanthorizons.core.util.math.DhMat4f;
+import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import net.minecraft.entity.EntityLivingBase;
 
 import org.joml.Matrix4f;
@@ -37,6 +38,15 @@ public class Camera
 			this.update(entity, partialTicks);
 		}
 		return new Vector3d(this.pos);
+	}
+	/** Same as {@link #getUpdatedPos(EntityLivingBase, float)}, but fills the given vector instead of allocating a copy. */
+	public synchronized void getUpdatedPos(EntityLivingBase entity, float partialTicks, DhVec3d output)
+	{
+		if (entity != null)
+		{
+			this.update(entity, partialTicks);
+		}
+		output.set(this.pos.x, this.pos.y, this.pos.z);
 	}
 	
 	private void update(EntityLivingBase entity, float partialTicks)

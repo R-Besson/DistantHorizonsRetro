@@ -79,6 +79,18 @@ public class FullDataSourceV2
 	public static final int NUMB_OF_CHUNKS_WIDE = WIDTH / LodUtil.CHUNK_WIDTH;
 	
 	private static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("FullDataV2");
+	/** reused by {@link #mergeInputTwoByTwoDataColumn}, which runs for every column of every parent update */
+	private static final ThreadLocal<TwoByTwoMergeScratch> TWO_BY_TWO_MERGE_SCRATCH = ThreadLocal.withInitial(TwoByTwoMergeScratch::new);
+	private static class TwoByTwoMergeScratch
+	{
+		public final LongArrayList mergedColumn = new LongArrayList();
+		public final LongArrayList[] inputColumns = new LongArrayList[4];
+		public final IntArrayList yTransitions = new IntArrayList();
+		public final int[] currentIndices = new int[4];
+		public final int[] mergeIds = new int[4];
+		public final int[] mergeBlockLights = new int[4];
+		public final int[] mergeSkyLights = new int[4];
+	}
 	
 	private static final ThreadLocal<FullDataPointIdMap> DATA_MAP_FOR_REMAPPING_REF = ThreadLocal.withInitial(() -> new FullDataPointIdMap(DhSectionPos.encode((byte)0, 0, 0)));
 	
@@ -601,12 +613,14 @@ public class FullDataSourceV2
 		int recipientOffsetX = (DhSectionPos.getX(inputDataSource.pos) == minChildXPos) ? 0 : (WIDTH / 2);
 		int minChildZPos = DhSectionPos.getZ(DhSectionPos.getChildByIndex(this.pos, 0));
 		int recipientOffsetZ = (DhSectionPos.getZ(inputDataSource.pos) == minChildZPos) ? 0 : (WIDTH / 2);
-		
-		
-		
+
+
+
 		// merge the input's data points
 		// into this data source's
-		boolean dataChanged = false;
+		TwoByTwoMergeScratch mergeScratch = TWO_BY_TWO_MERGE_SCRATCH.get();
+		// an empty data source getting its first data is always a change
+		boolean dataChanged = this.isEmpty;
 		for (int x = 0; x < WIDTH; x += 2)
 		{
 			for (int z = 0; z < WIDTH; z += 2)
@@ -618,18 +632,25 @@ public class FullDataSourceV2
 				
 				// world gen //
 				byte inputGenStep = determineMinWorldGenStepForTwoByTwoColumn(inputDataSource.columnGenerationSteps, x, z);
+				// these are saved with the data, so changing them is a change too
+				dataChanged |= (this.columnGenerationSteps.getByte(recipientIndex) != inputGenStep);
 				this.columnGenerationSteps.set(recipientIndex, inputGenStep);
-				
-				
+
+
 				// world compression //
 				byte worldCompressionMode = determineHighestWorldCompressionForTwoByTwoColumn(inputDataSource.columnWorldCompressionMode, x, z);
+				dataChanged |= (this.columnWorldCompressionMode.getByte(recipientIndex) != worldCompressionMode);
 				this.columnWorldCompressionMode.set(recipientIndex, worldCompressionMode);
-				
-				
-				
+
+
+
 				// data points //
-				LongArrayList mergedInputDataArray = mergeInputTwoByTwoDataColumn(inputDataSource, x, z);
-				
+				LongArrayList mergedInputDataArray = mergeInputTwoByTwoDataColumn(inputDataSource, x, z, mergeScratch);
+				// remapped to this data source's IDs before comparing,
+				// otherwise the input's IDs would almost never match and every update would count as a change,
+				// propagating all the way up the tree
+				remapDataColumn(mergedInputDataArray, remappedIds);
+
 				// check if the data changed
 				if (this.dataPoints[recipientIndex] == null)
 				{
@@ -661,10 +682,20 @@ public class FullDataSourceV2
 					}
 				}
 				
-				this.dataPoints[recipientIndex] = mergedInputDataArray;
-				// copy over the new data, this is necessary to prevent remapping issues
-				this.remapDataColumn(recipientIndex, remappedIds);
-				
+				// the merged column is reused for the next column,
+				// so it's copied into this data source's (pooled) list
+				LongArrayList recipientColumn = this.dataPoints[recipientIndex];
+				if (recipientColumn == null)
+				{
+					recipientColumn = new LongArrayList(mergedInputDataArray.size());
+					this.dataPoints[recipientIndex] = recipientColumn;
+				}
+				else
+				{
+					recipientColumn.clear();
+				}
+				recipientColumn.addAll(mergedInputDataArray);
+
 				if (RUN_DATA_ORDER_VALIDATION)
 				{
 					throwIfDataColumnInWrongOrder(inputDataSource.pos, this.dataPoints[recipientIndex]);
@@ -715,16 +746,18 @@ public class FullDataSourceV2
 		}
 		return minWorldGenStepValue;
 	}
-	private static LongArrayList mergeInputTwoByTwoDataColumn(FullDataSourceV2 inputDataSource, int x, int z)
+	/** @return the merged column, only valid until the next call on this thread since it's part of the scratch */
+	private static LongArrayList mergeInputTwoByTwoDataColumn(FullDataSourceV2 inputDataSource, int x, int z, TwoByTwoMergeScratch scratch)
 	{
-		LongArrayList newColumnList = new LongArrayList();
-		
-		
+		LongArrayList newColumnList = scratch.mergedColumn;
+		newColumnList.clear();
+
+
 		//=========================//
 		// get the 4 input columns //
 		//=========================//
-		
-		LongArrayList[] inputColumns = new LongArrayList[4];
+
+		LongArrayList[] inputColumns = scratch.inputColumns;
 		int colIndex = 0;
 		for (int inputX = x; inputX < x + 2; inputX++)
 		{
@@ -745,45 +778,51 @@ public class FullDataSourceV2
 		// find all y levels where changes happen //
 		//========================================//
 		
-		IntArrayList yTransitions = new IntArrayList();
+		IntArrayList yTransitions = scratch.yTransitions;
+		yTransitions.clear();
 		for (int i = 0; i < 4; i++)
 		{
-			if (inputColumns[i] == null 
+			if (inputColumns[i] == null
 				|| inputColumns[i].isEmpty())
 			{
 				continue;
 			}
-			
+
 			for (int j = 0; j < inputColumns[i].size(); j++)
 			{
 				long datapoint = inputColumns[i].getLong(j);
 				int minY = FullDataPointUtil.getBottomY(datapoint);
 				int maxY = minY + FullDataPointUtil.getHeight(datapoint);
-				
-				if (!yTransitions.contains(minY))
-				{
-					yTransitions.add(minY);
-				}
-				
-				if (!yTransitions.contains(maxY))
-				{
-					yTransitions.add(maxY);
-				}
+
+				yTransitions.add(minY);
+				yTransitions.add(maxY);
 			}
 		}
-		
+
 		// can happen if the columns are empty
 		if (yTransitions.isEmpty())
 		{
 			return newColumnList;
 		}
-		
-		// sort the transitions from bottom to top
+
+		// sort the transitions from bottom to top,
+		// then remove the duplicates (cheaper than checking the whole list before each add)
 		yTransitions.sort(null);
-		
-		// create index trackers for each column, 
+		int uniqueCount = 1;
+		for (int i = 1; i < yTransitions.size(); i++)
+		{
+			int y = yTransitions.getInt(i);
+			if (y != yTransitions.getInt(uniqueCount - 1))
+			{
+				yTransitions.set(uniqueCount, y);
+				uniqueCount++;
+			}
+		}
+		yTransitions.size(uniqueCount);
+
+		// create index trackers for each column,
 		// starting with the top-most datapoint
-		int[] currentIndices = new int[4];
+		int[] currentIndices = scratch.currentIndices;
 		for (int i = 0; i < 4; i++)
 		{
 			if (inputColumns[i] != null 
@@ -809,9 +848,9 @@ public class FullDataSourceV2
 		int currentMinY = yTransitions.getInt(0);
 		int accumulatedHeight = 0;
 		
-		int[] mergeIds = new int[4];
-		int[] mergeBlockLights = new int[4];
-		int[] mergeSkyLights = new int[4];
+		int[] mergeIds = scratch.mergeIds;
+		int[] mergeBlockLights = scratch.mergeBlockLights;
+		int[] mergeSkyLights = scratch.mergeSkyLights;
 		
 		for (int yIndex = 0; yIndex < yTransitions.size() - 1; yIndex++)
 		{
@@ -949,9 +988,9 @@ public class FullDataSourceV2
 	 * Updating the incoming data source will cause issues if it is applied 
 	 * to anything else due to multiple remapping.
 	 */
-	private void remapDataColumn(int dataPointIndex, int[] remappedIds)
+	private void remapDataColumn(int dataPointIndex, int[] remappedIds) { remapDataColumn(this.dataPoints[dataPointIndex], remappedIds); }
+	private static void remapDataColumn(LongArrayList dataColumn, int[] remappedIds)
 	{
-		LongArrayList dataColumn = this.dataPoints[dataPointIndex];
 		for (int i = 0; i < dataColumn.size(); i++)
 		{
 			dataColumn.set(i, FullDataPointUtil.remap(remappedIds, dataColumn.getLong(i)));

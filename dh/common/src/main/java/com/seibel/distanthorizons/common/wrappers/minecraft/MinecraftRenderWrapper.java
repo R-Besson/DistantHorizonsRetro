@@ -102,11 +102,13 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	}
 
 	@Override
-	public DhVec3d getCameraExactPosition()
+	public DhVec3d getCameraExactPosition() { return this.getCameraExactPosition(new DhVec3d()); }
+	@Override
+	public DhVec3d getCameraExactPosition(DhVec3d output)
 	{
 		float frameTime = Minecraft.getMinecraft().timer.renderPartialTicks;
-		Vector3d projectedView = Camera.INSTANCE.getUpdatedPos(MC.renderViewEntity, frameTime);
-		return new DhVec3d(projectedView.x, projectedView.y, projectedView.z);
+		Camera.INSTANCE.getUpdatedPos(MC.renderViewEntity, frameTime, output);
+		return output;
 	}
 
 	@Override

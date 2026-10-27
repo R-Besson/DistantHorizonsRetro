@@ -68,7 +68,14 @@ public interface IMinecraftRenderWrapper extends IBindable
 	 * the position the player's camera).
 	 */
 	DhVec3d getCameraExactPosition();
-	
+	/**
+	 * Same as {@link #getCameraExactPosition()}, but fills the given vector instead of allocating one,
+	 * for callers that need the position many times per frame.
+	 *
+	 * @return the given vector
+	 */
+	DhVec3d getCameraExactPosition(DhVec3d output);
+
 	Color getFogColor(float partialTicks);
 	
 	/** Unless you really need to know if the player is blind, use {@link IMinecraftRenderWrapper#isFogStateSpecial()} instead */
