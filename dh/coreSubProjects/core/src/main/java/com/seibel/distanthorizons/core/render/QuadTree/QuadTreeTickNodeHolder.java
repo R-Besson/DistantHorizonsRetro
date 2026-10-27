@@ -129,9 +129,10 @@ public class QuadTreeTickNodeHolder
 		@Override
 		public int compare(QuadNode<LodRenderSection> nodeA, QuadNode<LodRenderSection> nodeB)
 		{
-			// closer LODs first
-			int aDist = DhSectionPos.getManhattanBlockDistance(nodeA.sectionPos, this.centerPos);
-			int bDist = DhSectionPos.getManhattanBlockDistance(nodeB.sectionPos, this.centerPos);
+			// closer LODs first,
+			// measured to the nearest edge so big sections next to the player aren't treated as far away
+			int aDist = DhSectionPos.getChebyshevSignedBlockDistance(nodeA.sectionPos, this.centerPos);
+			int bDist = DhSectionPos.getChebyshevSignedBlockDistance(nodeB.sectionPos, this.centerPos);
 			return Integer.compare(aDist, bDist); // smaller numbers first
 		}
 	}

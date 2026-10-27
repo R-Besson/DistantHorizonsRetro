@@ -80,6 +80,11 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	 */
 	private static final long QUEUE_THREAD_IDLE_WAIT_MS = 100L;
 	/**
+	 * How many sections are checked for missing data before the missing ones found so far are queued,
+	 * see where it's used for why.
+	 */
+	private static final int NODES_CHECKED_PER_QUEUE_FEED = 16;
+	/**
 	 * How often every loaded section is checked again for missing data. <br>
 	 * Sections are normally only checked once when they load, so anything that
 	 * didn't fully generate (IE a chunk that couldn't be loaded) would stay a hole until the level is reloaded.
@@ -502,21 +507,32 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			{
 				try
 				{
+					int checkedNodeCount = 0;
 					for (int i = 0; i < worldGenNodes.size(); i++)
 					{
 						QuadNode<LodRenderSection> node = worldGenNodes.get(i);
-						if (node == null 
-							|| node.value == null) 
+						if (node == null
+							|| node.value == null)
 						{
-							continue; 
+							continue;
 						}
-						
+
 						// since this section wants to render
 						// check if it needs any generation to do so
 						if (!node.value.queuedMissingSectionsForRetrieval)
 						{
 							node.value.queuedMissingSectionsForRetrieval = true;
 							this.tryQueuePosForRetrieval(node.value.pos); // can be quite slow
+							checkedNodeCount++;
+
+							// The nodes go from near to far and checking all of them can take a while,
+							// queue what's been found so far so holes near the player
+							// don't wait for the whole tree to be checked.
+							if (checkedNodeCount % NODES_CHECKED_PER_QUEUE_FEED == 0
+								&& !this.missingGenerationPosSet.isEmpty())
+							{
+								this.startQueuedRetrievalTasks(playerPos, false);
+							}
 						}
 					}
 					
@@ -526,7 +542,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					{
 						int missingPosCountBeforeQueuing = this.missingGenerationPosSet.size();
 						
-						this.startQueuedRetrievalTasks(playerPos);
+						this.startQueuedRetrievalTasks(playerPos, true);
 						
 						
 						boolean workRemaining = !this.missingGenerationPosSet.isEmpty();
@@ -870,15 +886,17 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	//=================================//
 	//region world gen
 	
-	private void startQueuedRetrievalTasks(DhBlockPos2D playerPos)
+	/** @param updateEstimates false while the tree is still being checked, the estimates would only count part of it */
+	private void startQueuedRetrievalTasks(DhBlockPos2D playerPos, boolean updateEstimates)
 	{
 		// sort the nodes from nearest to farthest
 		this.sortedMissingPosList.clear();
 		this.sortedMissingPosList.addAll(this.missingGenerationPosSet);
 		this.sortedMissingPosList.sort((posA, posB) ->
 		{
-			int aDist = DhSectionPos.getManhattanBlockDistance(posA, playerPos);
-			int bDist = DhSectionPos.getManhattanBlockDistance(posB, playerPos);
+			// same distance as the world gen queue uses to pick tasks
+			int aDist = DhSectionPos.getChebyshevSignedBlockDistance(posA, playerPos);
+			int bDist = DhSectionPos.getChebyshevSignedBlockDistance(posB, playerPos);
 			return Integer.compare(aDist, bDist);
 		});
 		
@@ -949,10 +967,17 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		
 		
 		
+		if (!updateEstimates)
+		{
+			return;
+		}
+
+
+
 		//==========================//
 		// calc task count estimate //
 		//==========================//
-		
+
 		// calculate an estimate for the max number of chunks for the queue
 		long totalWorldGenChunkCount = 0;
 		

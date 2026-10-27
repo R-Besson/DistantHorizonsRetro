@@ -191,14 +191,15 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	@Override
 	public boolean removeFarthestRequestIfFartherThan(long pos, DhBlockPos2D centerPos)
 	{
-		int posDistance = DhSectionPos.getManhattanBlockDistance(pos, centerPos);
-		
+		// same distance as the task picker, otherwise a request could be swapped out for one that's picked later
+		int posDistance = DhSectionPos.getChebyshevSignedBlockDistance(pos, centerPos);
+
 		long farthestPos = 0;
 		int farthestDistance = posDistance;
 		boolean fartherPosFound = false;
 		for (long waitingPos : this.waitingTaskByPos.keySet())
 		{
-			int distance = DhSectionPos.getManhattanBlockDistance(waitingPos, centerPos);
+			int distance = DhSectionPos.getChebyshevSignedBlockDistance(waitingPos, centerPos);
 			if (distance > farthestDistance)
 			{
 				farthestDistance = distance;
@@ -332,20 +333,27 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		}
 		
 		
-		// find the closest task
+		// find the closest task,
+		// strictly by the distance to its nearest edge so holes next to the player
+		// are always generated before anything farther out
 		TaskDistancePair closestTaskPair = this.waitingTaskByPos.reduceEntries(1024,
 			// get the target distance for each task
 			(Map.Entry<Long, DataSourceRetrievalTask> entry) ->
-			{ 
+			{
 				DataSourceRetrievalTask task = entry.getValue();
-				int distance = DhSectionPos.getCenterBlockPos(task.pos).chebyshevDist(targetPos);
-				distance /= DhSectionPos.getDetailLevel(task.pos); // generate low detail LODs first 
+				int distance = DhSectionPos.getChebyshevSignedBlockDistance(task.pos, targetPos);
 				return new TaskDistancePair(entry.getValue(), distance);
 			},
 			// find the closest task
 			(TaskDistancePair aTaskPair, TaskDistancePair bTaskPair) ->
 			{
-				return (aTaskPair.dist < bTaskPair.dist) ? aTaskPair : bTaskPair;
+				if (aTaskPair.dist != bTaskPair.dist)
+				{
+					return (aTaskPair.dist < bTaskPair.dist) ? aTaskPair : bTaskPair;
+				}
+
+				// larger sections first when tied, they're split into the smaller tasks that get generated
+				return (DhSectionPos.getDetailLevel(aTaskPair.task.pos) >= DhSectionPos.getDetailLevel(bTaskPair.task.pos)) ? aTaskPair : bTaskPair;
 			});
 		
 		if (closestTaskPair == null)
