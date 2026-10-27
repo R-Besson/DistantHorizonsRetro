@@ -92,6 +92,9 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Block shapes (fences, walls, slabs) work with shaders
 - [ ] Shallow water tint near shores with shaders
 - [ ] Faster world generation and lower memory use
+- [ ] GregTech pollution: smog hides LODs, polluted grass, leaves and water tinted in LODs
+- [ ] More block shapes: top slabs, carpets and layers at their real height, panes, trapdoors, stairs, connected fences and walls
+- [ ] Server setup guide (backup exclusions, request distance, generation settings)
 
 # Development
 

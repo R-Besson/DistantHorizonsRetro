@@ -255,8 +255,14 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 
 		return this.playerHasBlindingEffect()
 			|| fluidBlock.getMaterial().isLiquid()
-			|| fluidBlock instanceof IFluidBlock;
+			|| fluidBlock instanceof IFluidBlock
+			|| modDensityFogActive;
 	}
+	/**
+	 * True while a mod overrides MC's fog with a density (IE GregTech's pollution smog),
+	 * set by the forge17 MixinEntityRenderer every time MC sets up its fog.
+	 */
+	public static volatile boolean modDensityFogActive = false;
 
 
 

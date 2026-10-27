@@ -1,5 +1,6 @@
 package com.seibel.distanthorizons.forge17.mixin;
 
+import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IRpleAccessor;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -32,8 +33,30 @@ public abstract class MixinEntityRenderer
 	//region
 	
     @Inject(method = "setupFog", at = @At(value = "HEAD"))
-    private void enableFog(int p_78468_1_, float p_78468_2_, CallbackInfo ci) 
-    { RenderHelper.enableFog(); }
+    private void enableFog(int p_78468_1_, float p_78468_2_, CallbackInfo ci)
+    {
+	    RenderHelper.enableFog();
+	    // the blindness and cloud fog branches don't post the density event
+	    MinecraftRenderWrapper.modDensityFogActive = false;
+    }
+
+	/**
+	 * Mods (IE GregTech's pollution) make thick fog by cancelling the fog density event.
+	 * MC then draws everything past a few blocks in fog, so DH has to hide its LODs like it does underwater.
+	 */
+	@Redirect(
+		method = "setupFog",
+		at = @At(
+			value = "INVOKE",
+			target = "Lcpw/mods/fml/common/eventhandler/EventBus;post(Lcpw/mods/fml/common/eventhandler/Event;)Z",
+			remap = false,
+			ordinal = 0))
+	private boolean detectModDensityFog(EventBus instance, Event event)
+	{
+		boolean cancelled = instance.post(event);
+		MinecraftRenderWrapper.modDensityFogActive = cancelled;
+		return cancelled;
+	}
 
     @Redirect(
         method = "setupFog",
