@@ -498,13 +498,31 @@ public class ClientBlockStateTextureCache
 		BlockStateWrapper blockStateWrapper, IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
 		int blockX, int topY, int blockZ)
 	{ return getPositionedAppearance(blockStateWrapper, levelWrapper, fullDataSource, blockX, topY, blockZ, true); }
+	/**
+	 * Mod accessors are bound during mod init, long before LODs are built,
+	 * so the lookup (done for every LOD data point's color) is only done once.
+	 */
+	@Nullable
+	private static IChiselCommonAccessor getChiselAccessor()
+	{
+		if (!chiselAccessorLookedUp)
+		{
+			chiselAccessor = ModAccessorInjector.INSTANCE.get(IChiselCommonAccessor.class);
+			chiselAccessorLookedUp = true;
+		}
+		return chiselAccessor;
+	}
+	@Nullable
+	private static volatile IChiselCommonAccessor chiselAccessor = null;
+	private static volatile boolean chiselAccessorLookedUp = false;
+
 	/** @param withSideRows false if only the LOD's color is needed */
 	@Nullable
 	private static PositionedAppearance getPositionedAppearance(
 		BlockStateWrapper blockStateWrapper, IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
 		int blockX, int topY, int blockZ, boolean withSideRows)
 	{
-		IChiselCommonAccessor chiselAccessor = ModAccessorInjector.INSTANCE.get(IChiselCommonAccessor.class);
+		IChiselCommonAccessor chiselAccessor = getChiselAccessor();
 		if (chiselAccessor == null
 			|| !(blockStateWrapper.blockState instanceof FakeBlockState)
 			|| !chiselAccessor.hasPositionedTextures(((FakeBlockState) blockStateWrapper.blockState).block)

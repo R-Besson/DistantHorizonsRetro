@@ -1080,11 +1080,19 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		{
 			return false;
 		}
-		int renderType = this.blockState.getBlock().getRenderType();
-		return renderType == CROSSED_SQUARES_RENDER_TYPE || renderType == DOUBLE_PLANT_RENDER_TYPE;
+		Block block = this.blockState.getBlock();
+		int renderType = block.getRenderType();
+		return renderType == CROSSED_SQUARES_RENDER_TYPE
+			|| renderType == DOUBLE_PLANT_RENDER_TYPE
+			// mod plants with their own renderer, which almost always draws crossed squares too
+			// (IE Biomes O' Plenty's grasses and flowers). Vanilla's other bushes (crops, lily pads)
+			// have vanilla render types and aren't crosses
+			|| (block instanceof BlockBush && renderType >= FIRST_MOD_RENDER_TYPE);
 	}
 	private static final int CROSSED_SQUARES_RENDER_TYPE = 1;
 	private static final int DOUBLE_PLANT_RENDER_TYPE = 40;
+	/** vanilla's render types end at 41, mod renderers get the ids after it (see RenderingRegistry.getNextAvailableRenderId) */
+	private static final int FIRST_MOD_RENDER_TYPE = 42;
 
 	/**
 	 * 1.7.10 double plant tops are always meta 8, their type is the bottom's meta.

@@ -143,6 +143,11 @@ public class PriorityTaskPicker
 							// to completable futures becoming orphaned).
 							executor.taskQueue.add(task);
 						}
+
+						// the executor's pool is full, polling again would only be rejected again
+						// (spinning on rejections while holding the lock until a thread frees up),
+						// the next task is started when a running one finishes
+						break;
 					}
 				}
 			}

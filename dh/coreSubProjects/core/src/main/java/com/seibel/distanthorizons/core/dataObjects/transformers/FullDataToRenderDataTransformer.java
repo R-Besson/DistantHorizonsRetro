@@ -310,10 +310,12 @@ public class FullDataToRenderDataTransformer
 							block = block.getPlantTopWithBottom(getTouchingBlock(fullDataColumn, fullIndex + 1, FullDataPointUtil.getBottomY(fullData), false, fullDataSource.mapping), levelWrapper);
 						}
 
-						IBlockStateWrapper blockAbove = getTouchingBlock(fullDataColumn, fullIndex - 1, topBlockY + 1, true, fullDataSource.mapping);
+						IBlockStateWrapper blockAbove = (materialId == EDhApiBlockMaterial.GRASS.index)
+							? getTouchingBlock(fullDataColumn, fullIndex - 1, topBlockY + 1, true, fullDataSource.mapping)
+							: null;
 						// grass under a flattened snow layer, MC draws its sides snowy
-						textureId = (materialId == EDhApiBlockMaterial.GRASS.index
-								&& blockAbove != null
+						textureId = (blockAbove != null
+								&& blockAbove.getMaterialId() == EDhApiBlockMaterial.SNOW.index
 								&& snowLayerBlockStates != null
 								&& snowLayerBlockStates.contains(blockAbove))
 							? BlockTextureRegistry.INSTANCE.getOrRegisterSnowCoveredSetId(block)
@@ -604,7 +606,9 @@ public class FullDataToRenderDataTransformer
 				&& block.getOpacity() != LodUtil.BLOCK_FULLY_OPAQUE;
 			
 			// handle height reduction
-			boolean isSnowLayer = snowLayerBlockStates.contains(block);
+			// the material is checked first since it's a lot quicker than the set for every data point
+			boolean isSnowLayer = block.getMaterialId() == EDhApiBlockMaterial.SNOW.index
+				&& snowLayerBlockStates.contains(block);
 			if (isSnowLayer
 				&& snowLayersOnLeavesAsHalves
 				&& blockHeight == 1)
