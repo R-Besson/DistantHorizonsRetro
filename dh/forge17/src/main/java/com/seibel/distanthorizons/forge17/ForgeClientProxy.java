@@ -56,7 +56,7 @@ import org.lwjgl.input.Keyboard;
 /**
  * This handles all events sent to the client.
  */
-public class ForgeClientProxy implements AbstractModInitializer.IEventProxy 
+public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClientProxy implements AbstractModInitializer.IEventProxy
 {
 
     private static final IMinecraftClientWrapper MC = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
@@ -115,7 +115,8 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
     {
         // RIGHT_CLICK_AIR has no block position (x/z are always 0)
         if (MC.clientConnectedToDedicatedServer()
-	        && event.action != PlayerInteractEvent.Action.RIGHT_CLICK_AIR)
+	        && event.action != PlayerInteractEvent.Action.RIGHT_CLICK_AIR
+	        && isPlayedWorld(event.world))
 		{
             ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(event.world);
             if (SharedApi.isChunkAtBlockPosAlreadyUpdating(wrappedLevel, event.x, event.z)) 
@@ -142,7 +143,7 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 	 */
 	public static void onClientBlocksChanged(World level, int chunkX, int chunkZ)
 	{
-		if (level == null
+		if (!isPlayedWorld(level)
 			|| !MC.clientConnectedToDedicatedServer())
 		{
 			return;
@@ -170,7 +171,7 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 		}
 		
 		World level = chunk.worldObj;
-		if (level == null || !level.isRemote)
+		if (!isPlayedWorld(level))
 		{
 			return;
 		}
@@ -186,7 +187,14 @@ public class ForgeClientProxy implements AbstractModInitializer.IEventProxy
 		ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
 		SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
 	}
-	
+
+	/**
+	 * Mods make their own fake client worlds (IE Funky Locomotion, GuideNH's previews),
+	 * DH would load a level and save folder for each of them
+	 */
+	private static boolean isPlayedWorld(World level)
+	{ return level != null && level.isRemote && level == Minecraft.getMinecraft().theWorld; }
+
 	//endregion
 	
 	
