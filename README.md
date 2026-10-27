@@ -90,11 +90,14 @@ Older GTNH packs ship versions of Angelica, lwjgl3ify and GTNHLib that are too o
 - [x] Mobs visible up to the render distance with shaders
 - [x] Better block colors for Chisel and other mods with connected textures (use the color override file for now)
 - [x] Block shapes (fences, walls, slabs) work with shaders
-- [ ] Shallow water tint near shores with shaders
-- [ ] Faster world generation and lower memory use
-- [ ] GregTech pollution: smog hides LODs, polluted grass, leaves and water tinted in LODs
-- [ ] More block shapes: top slabs, carpets and layers at their real height, panes, trapdoors, stairs, connected fences and walls
-- [ ] Server setup guide (backup exclusions, request distance, generation settings)
+- [x] Fog from other mods (GregTech pollution smog) hides LODs like vanilla terrain
+- [ ] Shadows on LODs with shader packs
+- [ ] Glowing LODs at night: torches, lamps and lit windows visible from far away
+- [ ] Machines and block entities in LODs (GregTech machines, chests, AE2) with their textures
+- [ ] Detailed nearby LODs: stairs, panes, trapdoors, connected fences and walls
+- [ ] Multithreaded world generation, several times faster LOD generation
+- [ ] Reliable multiplayer: the server generates and streams LODs to every player
+- [ ] Cubic Chunks support
 
 # Development
 
