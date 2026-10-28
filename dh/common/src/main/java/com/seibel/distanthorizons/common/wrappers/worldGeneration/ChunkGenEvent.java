@@ -26,15 +26,12 @@ import java.util.function.Consumer;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGenerationStep;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 public final class ChunkGenEvent
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();;
 	
 	private static final AtomicInteger DEBUG_ID_REF = new AtomicInteger(0);
 	

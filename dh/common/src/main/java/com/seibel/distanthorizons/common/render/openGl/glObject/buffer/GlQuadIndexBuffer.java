@@ -21,8 +21,6 @@ package com.seibel.distanthorizons.common.render.openGl.glObject.buffer;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiGpuUploadMethod;
 import com.seibel.distanthorizons.common.render.openGl.glObject.enums.GLEnums;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
@@ -33,7 +31,6 @@ import java.nio.ByteBuffer;
 /** aka GlQuadElementBuffer */
 public class GlQuadIndexBuffer extends GLIndexBuffer
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	
 	

@@ -39,8 +39,6 @@ import com.seibel.distanthorizons.common.render.openGl.postProcessing.GlScreenQu
 import com.seibel.distanthorizons.common.render.openGl.util.GlAbstractShaderRenderer;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
@@ -55,7 +53,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 {
 	public static GlDhCopyShader INSTANCE = new GlDhCopyShader();
 	
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 	

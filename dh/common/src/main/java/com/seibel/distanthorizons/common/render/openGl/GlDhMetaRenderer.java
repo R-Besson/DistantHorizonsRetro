@@ -29,7 +29,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRender
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.OverrideInjector;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
@@ -488,13 +487,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		// "glActiveTexture" isn't called here, binding to the active unit works
 		GLMC.glBindTexture(previousBoundTextureId);
 	}
-	
-	private boolean irisShadersInactive()
-	{
-		return !(IRIS_ACCESSOR != null
-			&& IRIS_ACCESSOR.isShaderPackInUse());
-	}
-	
+
 	//endregion
 	
 	

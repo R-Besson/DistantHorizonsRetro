@@ -4,10 +4,8 @@ import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftRenderWrapp
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IRpleAccessor;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -19,7 +17,6 @@ import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import com.seibel.distanthorizons.forge17.RenderHelper;
-import com.seibel.distanthorizons.forge17.ForgeMain;
 
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventBus;

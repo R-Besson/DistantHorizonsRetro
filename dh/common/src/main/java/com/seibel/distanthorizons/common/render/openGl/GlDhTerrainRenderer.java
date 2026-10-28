@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.common.render.openGl;
 
-import com.seibel.distanthorizons.common.render.openGl.terrain.GlBlockTextureAtlas;
 import com.seibel.distanthorizons.common.render.openGl.terrain.GlDhTerrainShaderProgram;
 import com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.LodBufferContainer;
 import com.seibel.distanthorizons.core.render.RenderParams;

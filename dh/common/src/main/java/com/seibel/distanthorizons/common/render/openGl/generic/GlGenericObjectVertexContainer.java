@@ -2,8 +2,6 @@ package com.seibel.distanthorizons.common.render.openGl.generic;
 
 import com.seibel.distanthorizons.api.objects.render.DhApiRenderableBox;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.renderer.RenderableBoxGroup;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IDhGenericObjectVertexBufferContainer;
@@ -21,7 +19,6 @@ import java.util.List;
  */
 public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBufferContainer
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	

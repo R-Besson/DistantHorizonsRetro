@@ -109,38 +109,7 @@ public class GlShaderProgram
 	
 	
 	
-	//============//
-	// attributes //
-	//============//
-	//region
-	
-	/**
-	 * WARNING: Slow native call! Cache it if possible!
-	 * Gets the location of an attribute variable with specified name.
-	 * Calls GL20.glGetAttribLocation(id, name)
-	 *
-	 * @param name Attribute name
-	 * @return Location of the attribute
-	 * @throws RuntimeException if attribute not found
-	 */
-	public int getAttributeLocation(CharSequence name)
-	{
-		int i = LWJGL.glGetAttribLocation(id, name);
-		if (i == -1) throw new RuntimeException("Attribute name not found: " + name);
-		return i;
-	}
-	/**
-	 * Same as above but without throwing errors. <br>
-	 * Returns -1 if the attribute doesn't exist or has been optimized out.
-	 */
-	public int tryGetAttributeLocation(CharSequence name)
-	{ return LWJGL.glGetAttribLocation(this.id, name); }
-	
-	//endregion
-	
-	
-	
-	//==========//
+//==========//
 	// uniforms //
 	//==========//
 	//region

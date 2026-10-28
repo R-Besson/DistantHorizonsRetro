@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.common.render.openGl.glObject.texture;
 
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
@@ -25,43 +24,6 @@ public enum EGlDhDepthBufferFormat
 	EGlDhDepthBufferFormat(boolean combinedStencil) { this.combinedStencil = combinedStencil; }
 	
 	
-	
-	@Nullable
-	public static EGlDhDepthBufferFormat fromGlEnum(int glenum)
-	{
-		switch (glenum)
-		{
-			case GL11.GL_DEPTH_COMPONENT:
-				return EGlDhDepthBufferFormat.DEPTH;
-			case GL14.GL_DEPTH_COMPONENT16:
-				return EGlDhDepthBufferFormat.DEPTH16;
-			case GL14.GL_DEPTH_COMPONENT24:
-				return EGlDhDepthBufferFormat.DEPTH24;
-			case GL14.GL_DEPTH_COMPONENT32:
-				return EGlDhDepthBufferFormat.DEPTH32;
-			case GL30.GL_DEPTH_COMPONENT32F:
-				return EGlDhDepthBufferFormat.DEPTH32F;
-			case GL30.GL_DEPTH_STENCIL:
-				return EGlDhDepthBufferFormat.DEPTH_STENCIL;
-			case GL30.GL_DEPTH24_STENCIL8:
-				return EGlDhDepthBufferFormat.DEPTH24_STENCIL8;
-			case GL30.GL_DEPTH32F_STENCIL8:
-				return EGlDhDepthBufferFormat.DEPTH32F_STENCIL8;
-			default:
-				return null;
-		}
-	}
-	
-	public static EGlDhDepthBufferFormat fromGlEnumOrDefault(int glenum)
-	{
-		EGlDhDepthBufferFormat format = fromGlEnum(glenum);
-		if (format == null)
-		{
-			// yolo, just assume it's GL_DEPTH_COMPONENT
-			return EGlDhDepthBufferFormat.DEPTH;
-		}
-		return format;
-	}
 	
 	public int getGlInternalFormat()
 	{

@@ -21,8 +21,6 @@ package com.seibel.distanthorizons.common.render.openGl.test;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiGpuUploadMethod;
 import com.seibel.distanthorizons.common.render.openGl.postProcessing.apply.GlDhApplyShader;
-import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.common.render.openGl.glObject.buffer.GLVertexBuffer;
@@ -30,7 +28,6 @@ import com.seibel.distanthorizons.common.render.openGl.glObject.shader.GlShaderP
 import com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute.GlAbstractVertexAttribute;
 import com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute.GlVertexPointer;
 import com.seibel.distanthorizons.core.render.RenderParams;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTestTriangleRenderer;
 import org.lwjgl.opengl.GL11;
@@ -49,8 +46,6 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 {
 	public static final DhLogger LOGGER = new DhLoggerBuilder().build(); 
 	
-	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
-	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	
 	public static final GlTestTriangleRenderer INSTANCE = new GlTestTriangleRenderer();
 	

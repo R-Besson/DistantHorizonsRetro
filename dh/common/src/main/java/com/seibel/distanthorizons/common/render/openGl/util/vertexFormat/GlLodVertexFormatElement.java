@@ -41,7 +41,6 @@ public class GlLodVertexFormatElement
 	private final int index;
 	private final int count;
 	private final int byteSize;
-	private final boolean isPadding;
 	
 	public GlLodVertexFormatElement(int newIndex, GlLodVertexFormatElement.DataType newType, int newCount, boolean isPadding)
 	{
@@ -49,33 +48,16 @@ public class GlLodVertexFormatElement
 		this.index = newIndex;
 		this.count = newCount;
 		this.byteSize = newType.getSize() * this.count;
-		this.isPadding = isPadding;
-	}
-	
-	public final boolean getIsPadding()
-	{
-		return isPadding;
 	}
 	
 	public final GlLodVertexFormatElement.DataType getType()
 	{
 		return this.dataType;
 	}
-	
-	public final int getIndex()
-	{
-		return this.index;
-	}
-	
+
 	public final int getByteSize()
 	{
 		return this.byteSize;
-	}
-	
-	// added by Forge
-	public int getElementCount()
-	{
-		return count;
 	}
 	
 	

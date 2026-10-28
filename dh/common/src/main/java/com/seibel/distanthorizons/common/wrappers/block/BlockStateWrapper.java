@@ -86,12 +86,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	private static final String DIRT_RESOURCE_LOCATION_STRING = "minecraft:dirt";
 	private static BlockStateWrapper dirtBlock = null;
 
-	private static final String ICE_RESOURCE_LOCATION_STRING = "minecraft:ice";
-	private static BlockStateWrapper iceBlock = null;
-
-	private static final String SNOW_RESOURCE_LOCATION_STRING = "minecraft:snow";
-	private static BlockStateWrapper snowBlock = null;
-
 	//endregion
 
 
@@ -947,40 +941,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		return dirtBlock;
 	}
 
-	public static BlockStateWrapper getIceBlockStateWrapper(ILevelWrapper levelWrapper)
-	{
-		// use the cached version if possible
-		if (iceBlock != null)
-		{
-			return iceBlock;
-		}
-
-		iceBlock = BlockStateWrapper.deserializeOrDefault(ICE_RESOURCE_LOCATION_STRING, levelWrapper);
-		if (iceBlock.equals(AIR))
-		{
-			LOGGER.warn("Failed to deserialize ["+ICE_RESOURCE_LOCATION_STRING+"], issues may occur.");
-		}
-
-		return iceBlock;
-	}
-
-	public static BlockStateWrapper getSnowBlockStateWrapper(ILevelWrapper levelWrapper)
-	{
-		// use the cached version if possible
-		if (snowBlock != null)
-		{
-			return snowBlock;
-		}
-
-		snowBlock = BlockStateWrapper.deserializeOrDefault(SNOW_RESOURCE_LOCATION_STRING, levelWrapper);
-		if (snowBlock.equals(AIR))
-		{
-			LOGGER.warn("Failed to deserialize ["+SNOW_RESOURCE_LOCATION_STRING+"], issues may occur.");
-		}
-
-		return snowBlock;
-	}
-
 	//endregion
 
 
@@ -1068,8 +1028,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		waterBlock = null;
 		dirtBlock = null;
-		iceBlock = null;
-		snowBlock = null;
 	}
 
 	//endregion

@@ -231,17 +231,6 @@ public class MemoryStack extends Pointer.Default implements AutoCloseable
         return size;
     }
 
-    /**
-     * Returns the current frame index.
-     *
-     * <p>
-     * This is the current number of nested {@link #push} calls.
-     * </p>
-     */
-    public int getFrameIndex() {
-        return frameIndex;
-    }
-
     /** Returns the memory address at the current stack pointer. */
     public long getPointerAddress() {
         return address + (pointer & 0xFFFF_FFFFL);

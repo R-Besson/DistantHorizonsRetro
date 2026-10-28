@@ -16,7 +16,6 @@
 package com.seibel.distanthorizons.forge17;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
@@ -46,7 +45,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.network.NetworkCheckHandler;
 
 /**
  * Initialize and setup the Mod. <br>

@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 
 /**
  * This is used to represent a single vertex
@@ -44,7 +42,6 @@ public class GlLodVertexFormat
 	
 	
 	private final ImmutableList<GlLodVertexFormatElement> elements;
-	private final IntList offsets = new IntArrayList();
 	private final int byteSize;
 	
 	public GlLodVertexFormat(ImmutableList<GlLodVertexFormatElement> elementList)
@@ -54,7 +51,6 @@ public class GlLodVertexFormat
 		
 		for (GlLodVertexFormatElement LodVertexFormatElement : elementList)
 		{
-			this.offsets.add(i);
 			i += LodVertexFormatElement.getByteSize();
 		}
 		
@@ -66,20 +62,8 @@ public class GlLodVertexFormat
 		return this.byteSize;
 	}
 	
-	public ImmutableList<GlLodVertexFormatElement> getElements()
-	{
-		return this.elements;
-	}
-	
-	
-	// Forge added method
-	public int getOffset(int index)
-	{
-		return offsets.getInt(index);
-	}
-	
-	
-	
+
+
 	@Override
 	public String toString() { return "format: " + this.elements.size() + " elements: " + this.elements.stream().map(Object::toString).collect(Collectors.joining(" ")); }
 	

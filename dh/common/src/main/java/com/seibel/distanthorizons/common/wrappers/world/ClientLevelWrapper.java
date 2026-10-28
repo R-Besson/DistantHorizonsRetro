@@ -182,34 +182,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	@Override
 	public IDhLevel getDhLevel() { return this.dhLevel; }
 
-	/**
-	 * can be used when speed is important and the same level is likely to be passed in,
-	 * IE rendering.
-	 */
-	@Nullable
-	public static IClientLevelWrapper getWrapperIfDifferent(
-		@Nullable IClientLevelWrapper levelWrapper,
-		@NotNull WorldClient level)
-	{
-		if (KEYED_CLIENT_LEVEL_MANAGER.isEnabled())
-		{
-			IServerKeyedClientLevel keyedLevel = KEYED_CLIENT_LEVEL_MANAGER.getServerKeyedLevel(getWrapper(level, true));
-			if (keyedLevel != levelWrapper)
-			{
-				return getWrapper(level);
-			}
-		}
-
-		ClientLevelWrapper clientLevelWrapper = (ClientLevelWrapper)levelWrapper;
-		if (clientLevelWrapper == null
-			|| clientLevelWrapper.level != level)
-		{
-			return getWrapper(level);
-		}
-
-		return clientLevelWrapper;
-	}
-
 	@Nullable
 	public static IClientLevelWrapper getWrapper(
 		@NotNull WorldClient level)

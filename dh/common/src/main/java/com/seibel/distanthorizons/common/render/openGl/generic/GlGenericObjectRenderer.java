@@ -34,7 +34,6 @@ import com.seibel.distanthorizons.common.render.openGl.glObject.buffer.GLIndexBu
 import com.seibel.distanthorizons.common.render.openGl.glObject.buffer.GLVertexBuffer;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import com.seibel.distanthorizons.core.config.Config;
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.jar.EPlatform;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -43,7 +42,6 @@ import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.render.renderer.GenericRenderObjectFactory;
 import com.seibel.distanthorizons.core.render.renderer.RenderableBoxGroup;
 import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrapper;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhGenericRenderer;
@@ -73,7 +71,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
-	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	
 	private static final DhApiRenderableBoxGroupShading DEFAULT_SHADING = DhApiRenderableBoxGroupShading.getUnshaded();
@@ -701,26 +698,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 				break;
 			}
 		}
-	}
-	
-	//endregion
-	
-	
-	
-	//=========//
-	// getters //
-	//=========//
-	//region
-	
-	/** @throws IllegalStateException if {@link #init()} function hasn't been called yet */
-	public boolean getInstancedRenderingAvailable() throws IllegalStateException
-	{
-		if (!this.init)
-		{
-			throw new IllegalStateException("GL initialization hasn't been completed.");
-		}
-		
-		return this.instancedRenderingAvailable; 
 	}
 	
 	//endregion
