@@ -21,7 +21,8 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 public class RenderHelper 
 {
-	private static final IAngelicaAccessor ANGELICA_ACCESSOR = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
+	/** Not cached in a static: the Tessellator mixin can load this class during the loading screen, before ForgeMain binds the accessor */
+	private static IAngelicaAccessor getAngelicaAccessor() { return ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class); }
 	
 	private static DhMat4f modelViewMatrix;
 	private static DhMat4f projectionMatrix;
@@ -67,7 +68,7 @@ public class RenderHelper
 		
 		// set GL state for DH rendering
 	    // TODO could we use DH's GLState object? or would that be overkill?
-	    if (ANGELICA_ACCESSOR == null) 
+	    if (getAngelicaAccessor() == null) 
 		{
 			LWJGL.glDisable(GL32.GL_ALPHA_TEST);
         }
@@ -83,7 +84,7 @@ public class RenderHelper
 		
 		// restore the GL State
 	    LWJGL.glDepthFunc(GL32.GL_LEQUAL);
-        if (ANGELICA_ACCESSOR == null) 
+        if (getAngelicaAccessor() == null) 
 		{
 			LWJGL.glEnable(GL32.GL_ALPHA_TEST);
         }
@@ -98,8 +99,8 @@ public class RenderHelper
 	
     public static void renderFade(boolean translucent) 
     {
-        if (ANGELICA_ACCESSOR != null
-            && !ANGELICA_ACCESSOR.canDoFadeShader()) 
+        if (getAngelicaAccessor() != null
+            && !getAngelicaAccessor().canDoFadeShader()) 
 		{
 			return;
         }
@@ -107,7 +108,7 @@ public class RenderHelper
         ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
         ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
 	    
-	    if (ANGELICA_ACCESSOR == null)
+	    if (getAngelicaAccessor() == null)
 	    {
 		    LWJGL.glDisable(GL32.GL_ALPHA_TEST);
 	    }
@@ -120,7 +121,7 @@ public class RenderHelper
 	    {
 		    ClientApi.INSTANCE.renderFadeOpaque();
 	    }
-	    if (ANGELICA_ACCESSOR == null)
+	    if (getAngelicaAccessor() == null)
 	    {
 		    LWJGL.glEnable(GL32.GL_ALPHA_TEST);
 	    }
@@ -131,7 +132,7 @@ public class RenderHelper
 	
     public static void renderDeferredLods() 
     {
-        if (ANGELICA_ACCESSOR == null) 
+        if (getAngelicaAccessor() == null) 
 		{
             return;
         }

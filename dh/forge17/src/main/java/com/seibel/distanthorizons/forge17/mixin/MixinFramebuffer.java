@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -23,7 +24,15 @@ public class MixinFramebuffer
     public int framebufferTextureWidth;
     @Shadow
     public int framebufferTextureHeight;
-	
+
+	/**
+	 * If this framebuffer's depth attachment was created as a texture. <br>
+	 * Checked when it's deleted instead of the current flag, the main framebuffer is rebuilt
+	 * right after the flag is turned on and its old depth attachment is still a renderbuffer.
+	 */
+	@Unique
+	private boolean distanthorizons$depthIsTexture = false;
+
 	
 	
 	//========================//
@@ -37,12 +46,13 @@ public class MixinFramebuffer
     private int createDepthTexture() 
     {
 	    // if the mixin is disabled, just call the base method
-        if (!MixinFlags.framebufferMixinEnabled) 
+        this.distanthorizons$depthIsTexture = MixinFlags.framebufferMixinEnabled;
+        if (!this.distanthorizons$depthIsTexture)
 		{
 			// despite the GL method name, this also apparently returns the depth texture ID
             return OpenGlHelper.func_153185_f(); // glGenRenderbuffers
         }
-		
+
 		
         int depthTextureId = TextureUtil.glGenTextures();
 		
@@ -72,7 +82,7 @@ public class MixinFramebuffer
     private void bindDepthTexture(int frameBufferId, int depthTexture) 
     {
 		// if the mixin is disabled, just call the base method
-        if (!MixinFlags.framebufferMixinEnabled) 
+        if (!this.distanthorizons$depthIsTexture)
 		{
             OpenGlHelper.func_153176_h(frameBufferId, depthTexture); // glBindRenderbuffer
             return;
@@ -86,8 +96,8 @@ public class MixinFramebuffer
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OpenGlHelper;func_153184_g(I)V"))
     private void deleteDepthTexture(int depthTexture) 
     {
-	    // if the mixin is disabled, just call the base method
-        if (!MixinFlags.framebufferMixinEnabled) 
+	    // deleted the way it was created, see distanthorizons$depthIsTexture
+        if (!this.distanthorizons$depthIsTexture)
 		{
             OpenGlHelper.func_153184_g(depthTexture); // glDeleteRenderbuffers
             return;

@@ -252,32 +252,5 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
     { return ServerPlayerWrapper.getWrapper((EntityPlayerMP) event.player); }
 	
 	//endregion
-	
-	
-	
-	//================//
-	// helper classes //
-	//================//
-	//region
-	
-	private static class ChunkLoadEvent
-	{
-		public final ChunkWrapper chunkWrapper;
-		public final ILevelWrapper level;
-		
-		/** 
-		 * used to track how long this event has
-		 * been queued so we can clean up old tasks.
-		 */
-		public int numberOfTicksSinceQueue = 0;
-		
-		
-		
-		private ChunkLoadEvent(ChunkWrapper chunkWrapper, ILevelWrapper level)
-		{
-			this.chunkWrapper = chunkWrapper;
-			this.level = level;
-		}
-	}
-	
+
 }

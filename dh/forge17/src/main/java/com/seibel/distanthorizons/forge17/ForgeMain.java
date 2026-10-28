@@ -47,7 +47,6 @@ import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
-import cpw.mods.fml.relauncher.Side;
 
 /**
  * Initialize and setup the Mod. <br>
@@ -60,8 +59,6 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 
     @Mod.Instance
     public static Object instance;
-
-    private static final boolean DISABLE_SERVER_FOR_TESTING = false;
 
     public static boolean isHodgePodgeInstalled = false;
 	
@@ -104,15 +101,14 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
             }
 			
 			// angelica
-            if (Loader.isModLoaded(AngelicaAccessor.ANGELICA_MOD_ID) 
-	            && event.getSide() == Side.CLIENT) 
+            if (Loader.isModLoaded(AngelicaAccessor.ANGELICA_MOD_ID))
 			{
 				AngelicaAccessor angelicaAccessor = new AngelicaAccessor();
                 angelicaAccessor.throwIfUnsupportedAngelicaVersion();
-				
-				// we don't use try-add here since there's some additional validation beyond 
-				// just the mod being present 
-				this.addModCompatAccessor(IAngelicaAccessor.class, AngelicaAccessor::new);
+
+				// we don't use try-add here since there's some additional validation beyond
+				// just the mod being present
+				this.addModCompatAccessor(IAngelicaAccessor.class, () -> angelicaAccessor);
 			}
 			
 			// RPLE
@@ -135,7 +131,7 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 				this.addModCompatAccessor(IChiselCommonAccessor.class, ChiselAccessor::new);
 			}
         }
-		else if (!DISABLE_SERVER_FOR_TESTING)
+		else
 		{
             this.onInitializeServer();
         }
@@ -200,11 +196,6 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 	@Mod.EventHandler
 	public void onServerAboutToStart(FMLServerAboutToStartEvent event)
 	{
-		if (DISABLE_SERVER_FOR_TESTING)
-		{
-			return;
-		}
-
 		ServerThreadTaskHandler.INSTANCE.reset();
 		
 		// FML doesn't define an order between handlers of the same event,
@@ -223,22 +214,12 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
     @Mod.EventHandler
     public void serverWorldUnloadEvent(FMLServerStoppingEvent event) 
     {
-        if (DISABLE_SERVER_FOR_TESTING) 
-		{
-            return;
-        }
-		
         ServerApi.INSTANCE.serverUnloadEvent();
     }
 	
     @Mod.EventHandler
     public void serverWorldUnloadEvent(FMLServerStoppedEvent event) 
     {
-        if (DISABLE_SERVER_FOR_TESTING) 
-		{
-            return;
-        }
-		
         ForgeServerProxy.serverStopping();
     }
 	
