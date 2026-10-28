@@ -2,6 +2,7 @@ package com.seibel.distanthorizons.forge17.modAccessor;
 
 import java.awt.Color;
 
+import com.seibel.distanthorizons.core.util.RenderUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.forge17.modAccessor.exceptions.AngelicaVersionGuiException;
 import cpw.mods.fml.common.versioning.VersionParser;
@@ -128,6 +129,33 @@ public class AngelicaAccessor implements IAngelicaAccessor
 			LOGGER.warn("Unable to check which chunks Angelica has built, LODs will fill unbuilt chunks less precisely. Error: [" + e + "].");
 			return null;
 		}
+	}
+
+	@Override
+	public float getShaderPackVanillaTerrainDistance()
+	{
+		if (!AngelicaConfig.enableIris
+			|| !ShaderPackLodTextures.isVanillaTerrainFadedAtFar()
+			|| !IrisApi.getInstance().isShaderPackInUse())
+		{
+			return -1;
+		}
+
+		return getShaderPackFarDistance();
+	}
+
+	/**
+	 * Shader packs fade vanilla terrain into the LODs by the "far" uniform (see MixinCameraUniforms). <br>
+	 * Angelica makes it a chunk shorter than the render distance with DH installed,
+	 * but vanilla terrain can end sooner (Cubic Chunks loads columns in its own time)
+	 * or later (the camera is rarely at the edge of its chunk),
+	 * so it's where vanilla terrain actually ends, which the packs fade it out by.
+	 */
+	public static int getShaderPackFarDistance()
+	{
+		int renderDistanceInBlocks = Minecraft.getMinecraft().gameSettings.renderDistanceChunks * 16;
+		int vanillaTerrainEnd = (int) RenderUtil.getVanillaTerrainEndDistanceInBlocks();
+		return Math.max(16, Math.min(vanillaTerrainEnd, renderDistanceInBlocks));
 	}
 
 	@Override

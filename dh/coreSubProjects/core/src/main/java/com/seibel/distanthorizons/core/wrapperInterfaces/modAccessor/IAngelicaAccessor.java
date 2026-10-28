@@ -48,4 +48,10 @@ public interface IAngelicaAccessor extends IModAccessor
 	 */
 	void uploadMissingShaderUniforms();
 
+	/**
+	 * @return how far from the camera (in blocks) the shader pack dithers vanilla terrain out,
+	 *         showing the LODs past it, -1 if no shader pack is in use or it doesn't
+	 */
+	float getShaderPackVanillaTerrainDistance();
+
 }

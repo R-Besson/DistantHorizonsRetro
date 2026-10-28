@@ -133,11 +133,12 @@ void main()
         vertexWorldPos.xz = vertexWorldPos.xz * sin(phi) / phi;
     }
     
+    // sky light in the low 4 bits, block light in the high 4 (see LodQuadBuilder.putVertex)
     uint lights = meta & 0xFFu;
-    float skyLight = (float(lights/16u)+0.5) / 16.0;
-    float blockLight = (mod(float(lights), 16.0)+0.5) / 16.0;
+    float blockLight = (float(lights/16u)+0.5) / 16.0;
+    float skyLight = (mod(float(lights), 16.0)+0.5) / 16.0;
     // MC's lightmap has block light along x and sky light along y (see EntityRenderer.updateLightmap),
-    // swapped every LOD would be lit like a full torch during the day, ignoring the sun's brightness
+    // swapped the sky light would light LODs like a torch, even at night
     vertexColor = vec4(texture(uLightMap, vec2(blockLight, skyLight)).xyz, 1.0);
     
     if (!uIsWhiteWorld)

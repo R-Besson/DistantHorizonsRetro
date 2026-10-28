@@ -103,6 +103,9 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 	}
 
 	@Override
+	public boolean isCubeLoaded(Chunk column, int cubeY) { return ((IColumn) column).getLoadedCube(cubeY) != null; }
+
+	@Override
 	@Nullable
 	public int[] getSurfaceCubeRange(Chunk column)
 	{

@@ -5,6 +5,7 @@ import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommon
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.util.RenderUtil;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import net.minecraft.client.Minecraft;
@@ -49,6 +50,10 @@ public class VanillaChunkMask
 	/** 1 if MC drew this chunk, indexed by ((z + radius) * width) + (x + radius) */
 	private byte[] renderedByChunk = new byte[0];
 	private ByteBuffer uploadBuffer = null;
+	/** horizontal distance from the camera to the nearest chunk MC can't draw (unloaded or past the render distance) */
+	private float vanillaTerrainEndDistance = 0;
+	/** if the chunk's terrain is loaded, one chunk wider than the mask on each side */
+	private boolean[] terrainLoadedByChunk = new boolean[0];
 	private long lastUpdateMs = 0;
 	private long firstUpdateMs = 0;
 	private boolean diagnosticLogged = false;
@@ -99,12 +104,44 @@ public class VanillaChunkMask
 
 		IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
 		ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(level);
+		// which chunks have their terrain loaded, one chunk past the mask so every chunk in it has all its neighbors
+		int loadedRadius = newRadius + 1;
+		int loadedWidth = (loadedRadius * 2) + 1;
+		if (this.terrainLoadedByChunk.length != loadedWidth * loadedWidth)
+		{
+			this.terrainLoadedByChunk = new boolean[loadedWidth * loadedWidth];
+		}
+		for (int offsetZ = -loadedRadius; offsetZ <= loadedRadius; offsetZ++)
+		{
+			for (int offsetX = -loadedRadius; offsetX <= loadedRadius; offsetX++)
+			{
+				this.terrainLoadedByChunk[((offsetZ + loadedRadius) * loadedWidth) + (offsetX + loadedRadius)]
+					= isTerrainLoaded(cubicChunks, level.getChunkFromChunkCoords(newCameraChunkX + offsetX, newCameraChunkZ + offsetZ));
+			}
+		}
+
+		double nearestUnloadedDistanceSquared = Double.MAX_VALUE;
 		for (int offsetZ = -newRadius; offsetZ <= newRadius; offsetZ++)
 		{
 			for (int offsetX = -newRadius; offsetX <= newRadius; offsetX++)
 			{
 				int chunkX = newCameraChunkX + offsetX;
 				int chunkZ = newCameraChunkZ + offsetZ;
+
+				// MC never draws past the render distance, Cubic Chunks only draws columns with their surface cubes loaded.
+				// Angelica only builds a chunk once the chunks around it are loaded too,
+				// so the last ring of loaded chunks isn't drawn. Vanilla MC loads a chunk past the render distance,
+				// Cubic Chunks doesn't, so with it vanilla terrain ends a chunk before the loaded chunks do
+				boolean loaded = Math.abs(offsetX) <= renderDistance
+					&& Math.abs(offsetZ) <= renderDistance
+					&& this.isTerrainLoaded(offsetX, offsetZ, loadedRadius, loadedWidth)
+					&& (angelicaAccessor == null || this.areNeighborsLoaded(offsetX, offsetZ, loadedRadius, loadedWidth));
+				if (!loaded)
+				{
+					double distanceX = Math.max(0.0, Math.max((chunkX * 16.0) - cameraPos.x, cameraPos.x - ((chunkX * 16.0) + 16.0)));
+					double distanceZ = Math.max(0.0, Math.max((chunkZ * 16.0) - cameraPos.z, cameraPos.z - ((chunkZ * 16.0) + 16.0)));
+					nearestUnloadedDistanceSquared = Math.min(nearestUnloadedDistanceSquared, (distanceX * distanceX) + (distanceZ * distanceZ));
+				}
 
 				boolean rendered;
 				Boolean angelicaBuilt = (angelicaAccessor != null) ? isChunkBuilt(angelicaAccessor, cubicChunks, level, chunkX, chunkZ) : null;
@@ -125,8 +162,36 @@ public class VanillaChunkMask
 			}
 		}
 
+		this.vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
+		RenderUtil.setVanillaTerrainEndDistanceInBlocks(this.vanillaTerrainEndDistance);
+
 		this.upload(width);
 		this.tryLogDiagnostic(nowMs, renderDistance, angelicaAccessor != null);
+	}
+	private boolean isTerrainLoaded(int offsetX, int offsetZ, int loadedRadius, int loadedWidth)
+	{ return this.terrainLoadedByChunk[((offsetZ + loadedRadius) * loadedWidth) + (offsetX + loadedRadius)]; }
+	private boolean areNeighborsLoaded(int offsetX, int offsetZ, int loadedRadius, int loadedWidth)
+	{
+		for (int neighborZ = offsetZ - 1; neighborZ <= offsetZ + 1; neighborZ++)
+		{
+			for (int neighborX = offsetX - 1; neighborX <= offsetX + 1; neighborX++)
+			{
+				if (!this.isTerrainLoaded(neighborX, neighborZ, loadedRadius, loadedWidth))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	/** @return true if MC has the terrain to draw this chunk, whether or not it's been built yet */
+	private static boolean isTerrainLoaded(@Nullable ICubicChunksCommonAccessor cubicChunks, Chunk chunk)
+	{
+		if (chunk.isEmpty())
+		{
+			return false;
+		}
+		return cubicChunks == null || cubicChunks.isColumnReady(chunk);
 	}
 	private static Boolean isChunkBuilt(IAngelicaAccessor angelicaAccessor, @Nullable ICubicChunksCommonAccessor cubicChunks, WorldClient level, int chunkX, int chunkZ)
 	{
@@ -260,6 +325,8 @@ public class VanillaChunkMask
 	public int getRadius() { return (this.textureId != 0) ? this.radius : 0; }
 	public int getCameraChunkX() { return this.cameraChunkX; }
 	public int getCameraChunkZ() { return this.cameraChunkZ; }
+	/** 0 if the mask hasn't been built yet */
+	public float getVanillaTerrainEndDistance() { return this.vanillaTerrainEndDistance; }
 
 	//endregion
 

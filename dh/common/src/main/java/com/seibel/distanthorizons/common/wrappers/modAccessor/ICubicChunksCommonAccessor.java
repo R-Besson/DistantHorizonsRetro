@@ -37,6 +37,9 @@ public interface ICubicChunksCommonAccessor extends IModAccessor
 	 */
 	boolean isColumnReady(Chunk column);
 
+	/** @return true if the column's cube is loaded, empty (all air) cubes included */
+	boolean isCubeLoaded(Chunk column, int cubeY);
+
 	/**
 	 * Doesn't load anything, the column's height map covers its unloaded cubes too.
 	 *

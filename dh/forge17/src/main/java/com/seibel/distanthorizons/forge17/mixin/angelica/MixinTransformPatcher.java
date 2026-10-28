@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 
-/** Adds DH's block textures to the shader pack's LOD program, see ShaderPackLodTextures */
+/** Adds DH's block textures to the shader pack's LOD program and fixes its vanilla water fade, see ShaderPackLodTextures */
 @Mixin(value = TransformPatcher.class, remap = false)
 public class MixinTransformPatcher
 {
@@ -22,6 +22,12 @@ public class MixinTransformPatcher
 	private static void distanthorizons$addLodTextures(CallbackInfoReturnable<Map<PatchShaderType, String>> cir)
 	{
 		cir.setReturnValue(ShaderPackLodTextures.patch(cir.getReturnValue()));
+	}
+
+	@Inject(method = "patchCeleritasTerrain", at = @At("RETURN"), cancellable = true, require = 0)
+	private static void distanthorizons$ditherVanillaWater(CallbackInfoReturnable<Map<PatchShaderType, String>> cir)
+	{
+		cir.setReturnValue(ShaderPackLodTextures.patchVanillaTranslucents(cir.getReturnValue()));
 	}
 
 }

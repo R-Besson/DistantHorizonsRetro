@@ -36,7 +36,7 @@ public enum Mixins implements IMixins
             "MixinTextureMap")),
 	
     FIX_SIDE_FACING_UNLOADED_CHUNKS_BEING_RENDERED(
-		new MixinBuilder().addExcludedMod(TargetedMod.ANGELICA)
+		new MixinBuilder()
         .addClientMixins("MixinBlock_SideFacingUnloadedChunk", "IMixinChunkCache_SideFacingUnloaded")
         .setPhase(Phase.EARLY)),
 	
@@ -45,11 +45,23 @@ public enum Mixins implements IMixins
         .addExcludedMod(TargetedMod.ANGELICA)
         .addClientMixins("MixinFramebuffer")),
 
+	// makes shader packs fade vanilla terrain into LODs where vanilla terrain ends
+    ANGELICA_FAR_UNIFORM(
+		new MixinBuilder().setPhase(Phase.EARLY)
+        .addRequiredMod(TargetedMod.ANGELICA)
+        .addClientMixins("angelica.MixinCameraUniforms")),
+
 	// draws block textures on LODs with shader packs
     ANGELICA_LOD_TEXTURES(
 		new MixinBuilder().setPhase(Phase.EARLY)
         .addRequiredMod(TargetedMod.ANGELICA)
-        .addClientMixins("angelica.MixinTransformPatcher", "angelica.MixinIrisLodRenderProgram"));
+        .addClientMixins("angelica.MixinTransformPatcher", "angelica.MixinIrisLodRenderProgram")),
+
+	// LOD-only mode with Angelica's terrain renderer
+    ANGELICA_LOD_ONLY(
+		new MixinBuilder().setPhase(Phase.EARLY)
+        .addRequiredMod(TargetedMod.ANGELICA)
+        .addClientMixins("angelica.MixinRenderGlobal_LodOnly"));
 	
 	
 	

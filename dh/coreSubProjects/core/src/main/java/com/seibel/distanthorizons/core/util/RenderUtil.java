@@ -277,10 +277,27 @@ public class RenderUtil
 			fadeStart += 16f;
 		}
 
-		// a chunk of margin, the camera can be anywhere in its chunk
-		float vanillaEdge = (MC_RENDER.getRenderDistance() - 1) * LodUtil.CHUNK_WIDTH;
+		float vanillaEdge = getVanillaTerrainEndDistanceInBlocks();
 		return Math.max(1.0f, Math.min(fadeStart, vanillaEdge / 1.9f));
 	}
+
+	/**
+	 * How far MC's terrain reaches around the camera, horizontally. <br>
+	 * Measured from the chunks MC can draw when available (see VanillaChunkMask),
+	 * Cubic Chunks can leave columns inside the render distance without their surface loaded.
+	 */
+	public static float getVanillaTerrainEndDistanceInBlocks()
+	{
+		float measured = vanillaTerrainEndDistanceInBlocks;
+		if (measured > 0.0f)
+		{
+			return measured;
+		}
+		// a chunk of margin, the camera can be anywhere in its chunk
+		return (MC_RENDER.getRenderDistance() - 1) * LodUtil.CHUNK_WIDTH;
+	}
+	public static void setVanillaTerrainEndDistanceInBlocks(float distance) { vanillaTerrainEndDistanceInBlocks = distance; }
+	private static volatile float vanillaTerrainEndDistanceInBlocks = 0.0f;
 
 	/**
 	 * Returns a new distance if the player is sufficiently far above the world.

@@ -235,7 +235,8 @@ public class RenderDataPointUtil
 	public static short getYMin(long dataPoint) { return (short) ((dataPoint >>> MIN_Y_SHIFT) & MIN_Y_MASK); }
 	public static long setYMin(long dataPoint, int minY) { return (long) ((dataPoint & ~(MIN_Y_MASK << MIN_Y_SHIFT)) | (minY & MIN_Y_MASK) << MIN_Y_SHIFT); }
 	
-	public static short getAlpha(long dataPoint) { return (short) ((((dataPoint >>> ALPHA_SHIFT) & ALPHA_MASK) << ALPHA_DOWNSIZE_SHIFT) | 0b1111); }
+	/** 4 bits are kept (see {@link #ALPHA_DOWNSIZE_SHIFT}), times 17 maps them back onto 0-255 without rounding everything up */
+	public static short getAlpha(long dataPoint) { return (short) (((dataPoint >>> ALPHA_SHIFT) & ALPHA_MASK) * 17); }
 	public static short getRed(long dataPoint) { return (short) ((dataPoint >>> RED_SHIFT) & RED_MASK); }
 	public static short getGreen(long dataPoint) { return (short) ((dataPoint >>> GREEN_SHIFT) & GREEN_MASK); }
 	public static short getBlue(long dataPoint) { return (short) ((dataPoint >>> BLUE_SHIFT) & BLUE_MASK); }

@@ -47,6 +47,20 @@ vec3 calcViewPosition(float fragmentDepth, mat4 invMvmProj)
 }
 
 
+/** the same 4x4 ordered dither the LODs fade in with (see terrain/gl/frag.frag) */
+float bayerMatrix4x4(vec2 st)
+{
+    int x = int(mod(st.x, 4.0));
+    int y = int(mod(st.y, 4.0));
+    float bayer4x4[16] = float[16](
+        0.0,  8.0,  2.0, 10.0,
+        12.0,  4.0, 14.0,  6.0,
+        3.0, 11.0,  1.0,  9.0,
+        15.0,  7.0, 13.0,  5.0
+    );
+    return bayer4x4[y * 4 + x] / 16.0;
+}
+
 /**
  * Used to fade out vanilla chunks so the transition
  * between DH and vanilla is smoother.
@@ -105,7 +119,9 @@ void main()
         // Smoothly transition between combinedMcDhColor and uDhColorTexture
         // as the depth increases from the camera
         float fadeStep = smoothstep(uStartFadeBlockDistance, uEndFadeBlockDistance, mcFragmentDistance);
-        fragColor = mix(combinedMcDhColor, dhColor, fadeStep);
+        // dithered instead of mixed, a mix shows MC's terrain and the LODs at half strength on top of each other
+        // and anything that doesn't line up exactly (IE leaf gaps) looks drawn twice
+        fragColor = (fadeStep > bayerMatrix4x4(gl_FragCoord.xy) + 0.001) ? dhColor : combinedMcDhColor;
         fragColor.a = 1.0;
     }
     else

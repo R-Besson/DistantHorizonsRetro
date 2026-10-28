@@ -6,11 +6,15 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
 import com.gtnewhorizons.angelica.glsm.GLStateManager;
+import com.seibel.distanthorizons.forge17.RenderHelper;
 import net.coderbot.iris.pipeline.transform.PatchShaderType;
+import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 
+import java.nio.FloatBuffer;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -41,6 +45,12 @@ public class ShaderPackLodTextures
 	/** Angelica's _vert_init (see DHTerrainTransformer), its transformer prints it as "( vPosition . xyz + vec3 ( mx , my , mz ) )" */
 	private static final Pattern VERT_INIT_PATTERN = Pattern.compile("void\\s+_vert_init\\s*\\(");
 	private static final Pattern VERT_POSITION_PATTERN = Pattern.compile("_vert_position\\s*=\\s*\\(\\s*vPosition\\s*\\.\\s*xyz\\s*\\+\\s*vec3\\s*\\(\\s*mx\\s*,\\s*my\\s*,\\s*mz\\s*\\)\\s*\\)\\s*;");
+	/** Complementary's LOD water skips pixels with any vanilla terrain: texture2D(depthtex0, screenPos.xy).r < 1.0, Angelica prints texture2D as texture */
+	private static final Pattern VANILLA_DEPTH_CHECK_PATTERN = Pattern.compile("texture(?:2D)?\\s*\\(\\s*depthtex0\\s*,\\s*([^()]*?)\\s*\\)\\s*\\.\\s*r\\s*<\\s*1(?:\\.0*)?f?");
+	private static final Pattern TAA_JITTER_PATTERN = Pattern.compile("TAAJitter\\s*\\(");
+	private static final Pattern SCREEN_TO_VIEW_PATTERN = Pattern.compile("vec3\\s+ScreenToView\\s*\\(\\s*vec3");
+	private static final Pattern VIEW_TO_PLAYER_PATTERN = Pattern.compile("vec3\\s+ViewToPlayer\\s*\\(\\s*vec3");
+	private static final Pattern FAR_UNIFORM_PATTERN = Pattern.compile("uniform\\s+float\\s+far\\s*;");
 
 	/**
 	 * The LOD shape (fence and wall posts, bottom slabs), the same inset as DH's own vertex shader (see terrain/gl/vert.vert).
@@ -70,6 +80,16 @@ public class ShaderPackLodTextures
 		+ "    return vec3(0.0, edge.y > 0.0 ? -0.5 : 0.0, 0.0);\n"
 		+ "}\n";
 
+	/**
+	 * Complementary's water (shared with vanilla water) fades out past the "far" uniform where it finds nothing under it,
+	 * which is meant for vanilla water at the edge of the render distance.
+	 * Under LOD water that check reads the opaque LODs' depth (dhDepthTex1), when that's empty
+	 * every LOD water past "far" (a chunk short of the render distance) turned see-through.
+	 * LOD water is never at the edge of anything, so the fade is removed there.
+	 */
+	private static final Pattern WATER_FAR_FADE_PATTERN = Pattern.compile("if\\s*\\(\\s*depthT\\s*==\\s*1\\.0\\s*\\)\\s*color\\s*\\.\\s*a\\s*\\*=\\s*smoothstep\\s*\\(\\s*far\\s*,\\s*far\\s*\\*\\s*0\\.9\\s*,\\s*lViewPos\\s*\\)\\s*;");
+
+	private static final String MC_PROJECTION_INVERSE_UNIFORM = "dhr_mcProjectionInverse";
 	private static final String ATLAS_UNIFORM = "dhr_BlockAtlas";
 	private static final String ENABLED_UNIFORM = "dhr_TexturedLods";
 	private static final int ILLUMINATED_MATERIAL_ID = EDhApiBlockMaterial.ILLUMINATED.index;
@@ -89,6 +109,26 @@ public class ShaderPackLodTextures
 		+ "    dhr_FlatColor = iris_color.rgb;\n"
 		+ "}\n";
 
+	/** the same 4x4 ordered dither as DH's own LOD shader */
+	private static final String BAYER_FUNCTION = ""
+		+ "float dhr_bayer4x4(vec2 pos) {\n"
+		+ "    int x = int(mod(pos.x, 4.0));\n"
+		+ "    int y = int(mod(pos.y, 4.0));\n"
+		+ "    float bayer[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);\n"
+		+ "    return bayer[y * 4 + x] / 16.0;\n"
+		+ "}\n";
+
+	/**
+	 * Complementary's vanilla water (and other see-through terrain) fades out by "far" with its alpha (DH_BLENDING),
+	 * unlike its solid terrain which is dithered out. Faded out it still writes depth,
+	 * so the pack treats it as vanilla water with nothing under it (the solid terrain was dithered out),
+	 * drawing neither water's color: the water past "far" was see-through. <br>
+	 * It's dithered out instead, with the exact opposite pattern of the LOD water (see VANILLA_SHOWN_FUNCTION),
+	 * so the LOD water fills every pixel it leaves.
+	 */
+	private static final Pattern VANILLA_WATER_FADE_PATTERN = Pattern.compile("fog\\s*=\\s*exp\\s*\\(\\s*-\\s*3\\.0\\s*\\*\\s*fog\\s*\\)\\s*;\\s*color\\s*\\.\\s*a\\s*\\*=\\s*fog\\s*;");
+	private static final String VANILLA_WATER_DITHER = "fog = exp(-3.0 * fog); if (fog <= dhr_bayer4x4(gl_FragCoord.xy) + 0.001) discard;";
+
 	/** placed before the pack's main so its code can use them */
 	private static final String FRAGMENT_DECLARATIONS = ""
 		+ "uniform sampler2D " + ATLAS_UNIFORM + ";\n"
@@ -98,7 +138,32 @@ public class ShaderPackLodTextures
 		+ "flat in uint dhr_TileId;\n"
 		+ "flat in uint dhr_MaterialId;\n"
 		+ "flat in vec3 dhr_FlatColor;\n"
-		+ "bool dhr_hasTile() { return " + ENABLED_UNIFORM + " != 0 && dhr_TileId != 0u; }\n";
+		+ "bool dhr_hasTile() { return " + ENABLED_UNIFORM + " != 0 && dhr_TileId != 0u; }\n"
+		+ BAYER_FUNCTION;
+
+	/**
+	 * Placed before the pack's main, after its own functions. <br>
+	 * Complementary (with TAA on) dithers vanilla terrain out by its "far" uniform (DH_BLENDING),
+	 * fading vanilla water out the same way, and draws LOD water only where there's no vanilla terrain at all.
+	 * Angelica makes "far" a chunk shorter than the render distance with DH installed,
+	 * so past it the vanilla water was faded out while the LOD water under it was skipped,
+	 * leaving a ring of water you could see straight through. <br>
+	 * The LOD water is only skipped where the vanilla terrain is still drawn,
+	 * with the same fade so the two waters dither into each other. <br>
+	 * Angelica swaps gbufferProjection for DH's projection in LOD programs (so ScreenToView reads LOD depths),
+	 * MC's own projection is uploaded separately to read the vanilla depth (see bindUniforms).
+	 */
+	private static final String VANILLA_SHOWN_FUNCTION = ""
+		+ "uniform mat4 " + MC_PROJECTION_INVERSE_UNIFORM + ";\n"
+		+ "bool dhr_vanillaTerrainShown(vec2 coord) {\n"
+		+ "    float dhr_depth = texture(depthtex0, coord).r;\n"
+		+ "    if (dhr_depth >= 1.0) return false;\n"
+		+ "    vec4 dhr_viewPos = " + MC_PROJECTION_INVERSE_UNIFORM + " * vec4(vec3(coord, dhr_depth) * 2.0 - 1.0, 1.0);\n"
+		+ "    vec3 dhr_playerPos = ViewToPlayer(dhr_viewPos.xyz / dhr_viewPos.w);\n"
+		+ "    float dhr_distance = max(length(dhr_playerPos.xz), abs(dhr_playerPos.y)) / far;\n"
+		+ "    float dhr_shown = exp(-3.0 * pow(dhr_distance, 16.0));\n"
+		+ "    return dhr_shown > dhr_bayer4x4(gl_FragCoord.xy) + 0.001;\n"
+		+ "}\n";
 
 	/** OUTPUT is replaced with the pack's color output */
 	private static final String FRAGMENT_CODE = ""
@@ -126,9 +191,25 @@ public class ShaderPackLodTextures
 		+ "        vec4 tile = textureGrad(" + ATLAS_UNIFORM + ", (tileOrigin + dhr_blockFaceUv() * 16.0) / atlasSize, dFdx(dhr_uvUnwrapped), dFdy(dhr_uvUnwrapped));\n"
 		// plants are cut out like MC's
 		+ "        if (dhr_NormalIndex >= 6u && dhr_NormalIndex < 8u && tile.a < 0.5) discard;\n"
-		// see-through leaves don't cut out their gaps here, unlike DH's own shader (see frag.frag).
-		// Cut out, the gaps of a leaf block's front and back line up into holes you can see straight through,
-		// MC's leaves are mostly in shadow inside so they're drawn dark below instead
+		// See-through leaves cut out their gaps like DH's own shader (see frag.frag), they're marked with 254 alpha.
+		// Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
+		// Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
+		// fading to solid leaves in the distance
+		+ "        if (dhr_NormalIndex >= 8u) {\n"
+		+ "            vec2 dhr_texelPos = dhr_blockFaceUv() * 16.0;\n"
+		+ "            vec2 dhr_texelDx = dFdx(dhr_blockFaceUvUnwrapped() * 16.0);\n"
+		+ "            vec2 dhr_texelDy = dFdy(dhr_blockFaceUvUnwrapped() * 16.0);\n"
+		+ "            float dhr_gapFade = 1.0 - smoothstep(4.0, 8.0, max(length(dhr_texelDx), length(dhr_texelDy)));\n"
+		+ "            if (dhr_gapFade > 0.0) {\n"
+		+ "                float dhr_gaps = 0.0;\n"
+		+ "                for (int dhr_i = 0; dhr_i < 4; dhr_i++) {\n"
+		+ "                    vec2 dhr_offset = vec2((dhr_i & 1) == 0 ? -0.25 : 0.25, (dhr_i & 2) == 0 ? -0.25 : 0.25);\n"
+		+ "                    vec2 dhr_texel = mod(floor(dhr_texelPos + dhr_texelDx * dhr_offset.x + dhr_texelDy * dhr_offset.y), 16.0);\n"
+		+ "                    dhr_gaps += (texelFetch(" + ATLAS_UNIFORM + ", ivec2(tileOrigin + dhr_texel), 0).a < 0.998) ? 0.25 : 0.0;\n"
+		+ "                }\n"
+		+ "                if (dhr_gaps * dhr_gapFade > dhr_bayer4x4(gl_FragCoord.xy) + 0.001) discard;\n"
+		+ "            }\n"
+		+ "        }\n"
 		// 128 gray is the LOD's own color.
 		// Brightened colors are scaled down as a whole (keeping their hue) to the pack's own brightest channel,
 		// at least 1 since most packs write to 8 bit buffers, clamping per channel would tint bright green leaves yellow
@@ -146,12 +227,13 @@ public class ShaderPackLodTextures
 		+ "        float dhr_limit = max(1.0, max(OUTPUT.r, max(OUTPUT.g, OUTPUT.b)));\n"
 		+ "        float dhr_brightest = max(dhr_textured.r, max(dhr_textured.g, dhr_textured.b));\n"
 		+ "        dhr_textured *= dhr_limit / max(dhr_brightest, dhr_limit);\n"
-		// leaf gaps that aren't cut out keep their dark color like MC's leaves
 		+ "        OUTPUT.rgb = mix(OUTPUT.rgb, dhr_textured, tile.a);\n"
 		+ "    }\n"
 		+ "}\n";
 
 	private static boolean loggedSkip = false;
+	/** set when the pack's LOD water program is patched, see {@link #isVanillaTerrainFadedAtFar()} */
+	private static volatile boolean vanillaTerrainFadedAtFar = false;
 
 
 
@@ -159,6 +241,51 @@ public class ShaderPackLodTextures
 	// patching //
 	//==========//
 	//region
+
+	/**
+	 * @return true if the last loaded shader pack dithers vanilla terrain out by its "far" uniform
+	 *         and draws LODs past it (Complementary with TAA on, see VANILLA_SHOWN_FUNCTION)
+	 */
+	public static boolean isVanillaTerrainFadedAtFar() { return vanillaTerrainFadedAtFar; }
+
+	/** @return Angelica's terrain program with its see-through blocks dithered out by "far", see VANILLA_WATER_FADE_PATTERN */
+	public static Map<PatchShaderType, String> patchVanillaTranslucents(Map<PatchShaderType, String> shaders)
+	{
+		try
+		{
+			if (shaders == null)
+			{
+				return null;
+			}
+
+			String vertex = shaders.get(PatchShaderType.VERTEX);
+			String fragment = shaders.get(PatchShaderType.FRAGMENT);
+			if (vertex == null
+				|| fragment == null
+				|| !VANILLA_WATER_FADE_PATTERN.matcher(fragment).find()
+				|| !MAIN_PATTERN.matcher(fragment).find())
+			{
+				return shaders;
+			}
+
+			String patchedFragment = VANILLA_WATER_FADE_PATTERN.matcher(fragment).replaceAll(Matcher.quoteReplacement(VANILLA_WATER_DITHER));
+			Matcher mainMatcher = MAIN_PATTERN.matcher(patchedFragment);
+			mainMatcher.find();
+			patchedFragment = patchedFragment.substring(0, mainMatcher.start()) + BAYER_FUNCTION + patchedFragment.substring(mainMatcher.start());
+			// Not test compiled like the LOD program, Angelica patches its terrain programs on worker threads without a GL context.
+			// Only one line is swapped for plain GLSL and a self contained function is added
+
+			Map<PatchShaderType, String> patched = new EnumMap<>(PatchShaderType.class);
+			patched.putAll(shaders);
+			patched.put(PatchShaderType.FRAGMENT, patchedFragment);
+			return patched;
+		}
+		catch (Throwable e)
+		{
+			LOGGER.warn("Unable to fix the shader pack's vanilla water fade, error: [" + e + "].", e);
+			return shaders;
+		}
+	}
 
 	/** @return the patched shaders, or the original ones if the pack's program can't be patched */
 	public static Map<PatchShaderType, String> patch(Map<PatchShaderType, String> shaders)
@@ -263,8 +390,24 @@ public class ShaderPackLodTextures
 				+ VERTEX_CODE.replace("DHR_SHAPE_OFFSET", shapesPatched ? "dhr_shapeOffset()" : "vec3(0.0)"));
 		// Complementary adds a fake 4 per block noise to flat LODs, textured faces don't need it
 		String packFragment = COMPLEMENTARY_NOISE_PATTERN.matcher(fragment).replaceAll(Matcher.quoteReplacement("(dhr_hasTile() ? 0.5 : Noise3D(noisePos))"));
+		packFragment = WATER_FAR_FADE_PATTERN.matcher(packFragment).replaceAll("");
+		String fragmentDeclarations = FRAGMENT_DECLARATIONS;
+		if (VANILLA_DEPTH_CHECK_PATTERN.matcher(packFragment).find())
+		{
+			// only Complementary's LOD water program checks for vanilla terrain (see VANILLA_SHOWN_FUNCTION),
+			// its DH_BLENDING is on with TAA, which jitters the vertices
+			vanillaTerrainFadedAtFar = TAA_JITTER_PATTERN.matcher(vertex).find();
+			if (vanillaTerrainFadedAtFar
+				&& SCREEN_TO_VIEW_PATTERN.matcher(packFragment).find()
+				&& VIEW_TO_PLAYER_PATTERN.matcher(packFragment).find()
+				&& FAR_UNIFORM_PATTERN.matcher(packFragment).find())
+			{
+				packFragment = VANILLA_DEPTH_CHECK_PATTERN.matcher(packFragment).replaceAll("dhr_vanillaTerrainShown($1)");
+				fragmentDeclarations += VANILLA_SHOWN_FUNCTION;
+			}
+		}
 		patched.put(PatchShaderType.FRAGMENT,
-			MAIN_PATTERN.matcher(packFragment).replaceFirst(Matcher.quoteReplacement(FRAGMENT_DECLARATIONS + "void dhr_packMain()"))
+			MAIN_PATTERN.matcher(packFragment).replaceFirst(Matcher.quoteReplacement(fragmentDeclarations + "void dhr_packMain()"))
 				+ "\n" + FRAGMENT_CODE.replace("OUTPUT", outputMatcher.group(1)));
 
 		// Angelica throws (disabling the whole pack) if its program doesn't compile,
@@ -352,6 +495,8 @@ public class ShaderPackLodTextures
 
 	private static void tryBindAtlas(int programId)
 	{
+		uploadMcProjectionInverse(programId);
+
 		int atlasUniform = GLStateManager.glGetUniformLocation(programId, ATLAS_UNIFORM);
 		int enabledUniform = GLStateManager.glGetUniformLocation(programId, ENABLED_UNIFORM);
 		if (atlasUniform == -1 || enabledUniform == -1)
@@ -377,6 +522,30 @@ public class ShaderPackLodTextures
 		GLStateManager.glActiveTexture(GL13.GL_TEXTURE0 + previousUnit);
 		GLStateManager.glUniform1i(atlasUniform, unit);
 	}
+
+	/** see VANILLA_SHOWN_FUNCTION */
+	private static void uploadMcProjectionInverse(int programId)
+	{
+		int uniform = GLStateManager.glGetUniformLocation(programId, MC_PROJECTION_INVERSE_UNIFORM);
+		if (uniform == -1)
+		{
+			return;
+		}
+
+		Matrix4f projectionInverse = RenderHelper.getProjectionMatrix().createJomlMatrix().invert();
+		// put manually, JOML's get(FloatBuffer) can segfault (see McObjectConverter), GL expects column major
+		MATRIX_BUFFER.clear();
+		for (int column = 0; column < 4; column++)
+		{
+			for (int row = 0; row < 4; row++)
+			{
+				MATRIX_BUFFER.put(projectionInverse.get(column, row));
+			}
+		}
+		MATRIX_BUFFER.flip();
+		GL20.glUniformMatrix4(uniform, false, MATRIX_BUFFER);
+	}
+	private static final FloatBuffer MATRIX_BUFFER = BufferUtils.createFloatBuffer(16);
 
 	//endregion
 
