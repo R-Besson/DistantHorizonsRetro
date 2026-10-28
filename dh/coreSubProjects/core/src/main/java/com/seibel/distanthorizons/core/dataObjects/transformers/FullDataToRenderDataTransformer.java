@@ -418,6 +418,9 @@ public class FullDataToRenderDataTransformer
 		int lastColor = 0;
 		int lastBottom = -10_000;
 		IBlockStateWrapper lastBlock = null;
+		// the sky light above the water this column's floor is under
+		int waterSurfaceSkyLight = -1;
+		boolean shaderPackInUse = IRIS_ACCESSOR != null && IRIS_ACCESSOR.isShaderPackInUse();
 		byte lastShape = RenderDataPointUtil.SHAPE_NONE;
 		
 		// there are several instances where we'll want
@@ -819,6 +822,22 @@ public class FullDataToRenderDataTransformer
 			if (block.getMaterialId() == EDhApiBlockMaterial.WATER.index)
 			{
 				color = blendSeaFloorIntoWater(color, fullColumnData, fullDataIndex, bottomY, fullDataMapping, levelWrapper, biome, mutableBlockPos, fullDataSource);
+
+				if (lastBlock == null
+					|| lastBlock.getMaterialId() != EDhApiBlockMaterial.WATER.index)
+				{
+					waterSurfaceSkyLight = skyLight;
+				}
+			}
+			else if (shaderPackInUse
+				&& lastBlock != null
+				&& lastBlock.getMaterialId() == EDhApiBlockMaterial.WATER.index
+				&& waterSurfaceSkyLight > skyLight)
+			{
+				// shader packs light MC's terrain under water with the sun from their shadow map (water doesn't block it),
+				// without a DH shadow program LODs are lit by their sky light instead, which would make the floor a lot darker,
+				// the pack still darkens deep water itself
+				skyLight = waterSurfaceSkyLight;
 			}
 
 

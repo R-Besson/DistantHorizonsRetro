@@ -1105,7 +1105,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			// mod plants with their own renderer, which almost always draws crossed squares too
 			// (IE Biomes O' Plenty's grasses and flowers). Vanilla's other bushes (crops, lily pads)
 			// have vanilla render types and aren't crosses
-			|| (block instanceof BlockBush && renderType >= FIRST_MOD_RENDER_TYPE);
+			|| (block instanceof BlockBush && renderType >= FIRST_MOD_RENDER_TYPE)
+			// vines are flat on a wall, a LOD can't hold that but from a distance
+			// crosses read as the same hanging green (IE swamp trees), skipped they'd be gone entirely
+			|| block instanceof BlockVine;
 	}
 	private static final int CROSSED_SQUARES_RENDER_TYPE = 1;
 	private static final int TORCH_RENDER_TYPE = 2;
