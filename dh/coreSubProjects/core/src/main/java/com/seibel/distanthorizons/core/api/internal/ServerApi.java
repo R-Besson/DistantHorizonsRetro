@@ -152,7 +152,9 @@ public class ServerApi
 		LOGGER.info("Player ["+player.getName()+"] changed level: ["+originLevel.getKeyedLevelDimensionName()+"] -> ["+destinationLevel.getKeyedLevelDimensionName()+"].");
 		if (serverWorld != null)
 		{
-			serverWorld.changePlayerLevel(player, originLevel, destinationLevel);
+			// Levels find their players themselves (see AbstractDhServerLevel#getPlayersInLevel),
+			// but some mods create a level without firing its load event until the player is already in it
+			serverWorld.getOrLoadServerLevel(destinationLevel);
 		}
 	}
 	
