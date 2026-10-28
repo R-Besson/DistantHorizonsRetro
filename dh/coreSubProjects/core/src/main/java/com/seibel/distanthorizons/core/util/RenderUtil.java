@@ -263,7 +263,26 @@ public class RenderUtil
 				* (MathUtil.pow2(aspectRatio) + 1d)));
 	}
 	
-	/** 
+	/**
+	 * LODs are dithered in from this distance to 1.5x it (see frag.frag),
+	 * then the vanilla fade turns MC's terrain into the LODs from 1.5x to 1.9x it (see vanilla_fade.frag). <br>
+	 * Both have to finish inside MC's render distance, otherwise the edge of MC's terrain is visible.
+	 */
+	public static float getLodFadeStartDistanceInBlocks()
+	{
+		float fadeStart = getNearClipPlaneInBlocks();
+		if (!Config.Client.Advanced.Debugging.lodOnlyMode.get())
+		{
+			// this added value prevents the near clip plane and discard circle from touching, which looks bad
+			fadeStart += 16f;
+		}
+
+		// a chunk of margin, the camera can be anywhere in its chunk
+		float vanillaEdge = (MC_RENDER.getRenderDistance() - 1) * LodUtil.CHUNK_WIDTH;
+		return Math.max(1.0f, Math.min(fadeStart, vanillaEdge / 1.9f));
+	}
+
+	/**
 	 * Returns a new distance if the player is sufficiently far above the world.
 	 * @return -1 if no override is necessary 
 	 */

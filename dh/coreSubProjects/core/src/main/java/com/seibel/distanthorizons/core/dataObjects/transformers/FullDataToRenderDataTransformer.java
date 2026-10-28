@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.core.dataObjects.transformers;
 import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
 import com.seibel.distanthorizons.api.enums.config.EDhApiBlocksToAvoid;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
+import com.seibel.distanthorizons.api.enums.rendering.EDhApiTransparency;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
@@ -882,11 +883,11 @@ public class FullDataToRenderDataTransformer
 
 	/**
 	 * MC's water is see-through, the sea floor shows through it, darker the deeper it is since water blocks light.
-	 * LOD water shows the water's color alone, so the floor is blended into it with MC's light curve
+	 * Opaque LOD water (transparency disabled) shows the water's color alone, so the floor is blended into it with MC's light curve
 	 * otherwise LOD water is a lot brighter than the vanilla water next to it.
 	 *
 	 * @param index the water's data point, the column is ordered top to bottom
-	 * @return the water's color with the floor blended in, unchanged if the water is opaque or has no floor
+	 * @return the water's color with the floor blended in, unchanged if the water is see-through or has no floor
 	 */
 	private static int blendSeaFloorIntoWater(
 		int waterColor, LongArrayList fullColumnData, int index, int waterBottomY,
@@ -895,6 +896,9 @@ public class FullDataToRenderDataTransformer
 	{
 		int waterAlpha = ColorUtil.getAlpha(waterColor);
 		if (waterAlpha == 255
+			// see-through LOD water already shows the floor LOD under it, lit like MC's,
+			// blending it in as well counts the floor twice (deep water too dark, shallow water too grey)
+			|| Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE
 			// shader packs draw their own water (depth, reflections) from the water's color
 			|| (IRIS_ACCESSOR != null && IRIS_ACCESSOR.isShaderPackInUse()))
 		{

@@ -1,5 +1,7 @@
 package com.seibel.distanthorizons.common.render.openGl.terrain;
 
+import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -7,6 +9,8 @@ import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.world.chunk.Chunk;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
@@ -19,9 +23,9 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Which chunks around the camera MC has drawn vanilla terrain for. <br>
- * LODs are skipped in those chunks and drawn everywhere else,
- * so LODs fill chunks MC hasn't built yet (no holes) without showing through vanilla terrain
- * (IE through the gaps in fancy leaves).
+ * LODs are always drawn in the chunks MC hasn't built yet (no holes),
+ * in the drawn ones they're clipped and dithered by distance like normal
+ * so they blend into the vanilla terrain at the edge of the render distance.
  */
 public class VanillaChunkMask
 {
@@ -94,6 +98,7 @@ public class VanillaChunkMask
 		this.cameraChunkZ = newCameraChunkZ;
 
 		IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
+		ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(level);
 		for (int offsetZ = -newRadius; offsetZ <= newRadius; offsetZ++)
 		{
 			for (int offsetX = -newRadius; offsetX <= newRadius; offsetX++)
@@ -102,7 +107,7 @@ public class VanillaChunkMask
 				int chunkZ = newCameraChunkZ + offsetZ;
 
 				boolean rendered;
-				Boolean angelicaBuilt = (angelicaAccessor != null) ? angelicaAccessor.isChunkBuilt(chunkX, chunkZ, SECTION_COUNT) : null;
+				Boolean angelicaBuilt = (angelicaAccessor != null) ? isChunkBuilt(angelicaAccessor, cubicChunks, level, chunkX, chunkZ) : null;
 				if (angelicaBuilt != null)
 				{
 					// Angelica only builds sections inside the render distance
@@ -122,6 +127,47 @@ public class VanillaChunkMask
 
 		this.upload(width);
 		this.tryLogDiagnostic(nowMs, renderDistance, angelicaAccessor != null);
+	}
+	private static Boolean isChunkBuilt(IAngelicaAccessor angelicaAccessor, @Nullable ICubicChunksCommonAccessor cubicChunks, WorldClient level, int chunkX, int chunkZ)
+	{
+		// Only the sections holding the chunk's top blocks are checked.
+		// Nothing below them can be: Angelica only builds sections the camera can see,
+		// so sections under the ground or under water never count as built.
+		Chunk chunk = level.getChunkFromChunkCoords(chunkX, chunkZ);
+		if (chunk.isEmpty())
+		{
+			return false;
+		}
+		// Cubic Chunks sections are cubes, its height map covers the whole world
+		int[] surfaceSectionRange = (cubicChunks != null) ? cubicChunks.getSurfaceCubeRange(chunk) : getSurfaceSectionRange(chunk);
+		if (surfaceSectionRange == null)
+		{
+			return false;
+		}
+		return angelicaAccessor.isChunkBuilt(chunkX, chunkZ, surfaceSectionRange[0], surfaceSectionRange[1]);
+	}
+	/** @return the lowest and highest section Y holding the chunk's top blocks, null if the chunk has no blocks */
+	@Nullable
+	private static int[] getSurfaceSectionRange(Chunk chunk)
+	{
+		int lowestTopY = Integer.MAX_VALUE;
+		int highestTopY = Integer.MIN_VALUE;
+		for (int x = 0; x < 16; x++)
+		{
+			for (int z = 0; z < 16; z++)
+			{
+				// the height map is one above the highest block that blocks light, water included
+				int topY = chunk.getHeightValue(x, z) - 1;
+				lowestTopY = Math.min(lowestTopY, topY);
+				highestTopY = Math.max(highestTopY, topY);
+			}
+		}
+		if (highestTopY < 0)
+		{
+			return null;
+		}
+		lowestTopY = Math.max(lowestTopY, 0);
+		return new int[] { lowestTopY >> 4, Math.min(highestTopY >> 4, SECTION_COUNT - 1) };
 	}
 	/** logged once per game, used to check the mask matches what MC actually drew */
 	private void tryLogDiagnostic(long nowMs, int renderDistance, boolean angelicaPresent)

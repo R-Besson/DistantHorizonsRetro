@@ -74,6 +74,39 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 	public boolean isColumnReady(Chunk column)
 	{
 		World world = column.worldObj;
+		int[] surfaceCubeRange = this.getSurfaceCubeRange(column);
+		if (surfaceCubeRange == null)
+		{
+			// nothing generated or loaded yet
+			return false;
+		}
+
+		// a couple of cubes below the lowest top block, the top block can be water
+		// and cliffs and shores show the cubes below them
+		int minCubeY = Math.max(surfaceCubeRange[0] - SURFACE_CUBES_BELOW, this.getMinHeight(world) >> 4);
+		for (int cubeY = minCubeY; cubeY <= surfaceCubeRange[1]; cubeY++)
+		{
+			Cube cube = ((IColumn) column).getLoadedCube(cubeY);
+			if (cube == null)
+			{
+				return false;
+			}
+
+			// the client only gets finished cubes from the server
+			if (!world.isRemote
+				&& (!cube.isPopulated() || !cube.isInitialLightingDone()))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	@Nullable
+	public int[] getSurfaceCubeRange(Chunk column)
+	{
+		World world = column.worldObj;
 		int minHeight = this.getMinHeight(world);
 		int maxHeight = this.getMaxHeight(world);
 
@@ -92,31 +125,11 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 		}
 		if (highestTopY < minHeight)
 		{
-			// nothing generated or loaded yet
-			return false;
+			return null;
 		}
 		lowestTopY = Math.max(lowestTopY, minHeight);
 		highestTopY = Math.min(highestTopY, maxHeight - 1);
-
-		// a couple of cubes below the lowest surface so cliffs and shores aren't cut off
-		int minCubeY = Math.max((lowestTopY >> 4) - SURFACE_CUBES_BELOW, minHeight >> 4);
-		int maxCubeY = highestTopY >> 4;
-		for (int cubeY = minCubeY; cubeY <= maxCubeY; cubeY++)
-		{
-			Cube cube = ((IColumn) column).getLoadedCube(cubeY);
-			if (cube == null)
-			{
-				return false;
-			}
-
-			// the client only gets finished cubes from the server
-			if (!world.isRemote
-				&& (!cube.isPopulated() || !cube.isInitialLightingDone()))
-			{
-				return false;
-			}
-		}
-		return true;
+		return new int[] { lowestTopY >> 4, highestTopY >> 4 };
 	}
 
 	@Override

@@ -95,7 +95,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	private boolean chunkBuiltCheckUnsupported = false;
 	
 	@Override
-	public Boolean isChunkBuilt(int chunkX, int chunkZ, int sectionCount)
+	public Boolean isChunkBuilt(int chunkX, int chunkZ, int minSectionY, int maxSectionY)
 	{
 		if (this.chunkBuiltCheckUnsupported)
 		{
@@ -113,7 +113,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 			// sections are only created inside the render distance,
 			// and empty (air) sections count as built once they've been processed
 			RenderSectionManager sectionManager = worldRenderer.getRenderSectionManager();
-			for (int sectionY = 0; sectionY < sectionCount; sectionY++)
+			for (int sectionY = minSectionY; sectionY <= maxSectionY; sectionY++)
 			{
 				if (!sectionManager.isSectionBuilt(chunkX, sectionY, chunkZ))
 				{

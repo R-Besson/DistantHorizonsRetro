@@ -114,7 +114,8 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 		this.repo = new FullDataSourceV2Repo(AbstractDhRepo.DEFAULT_DATABASE_TYPE, new File(this.saveDir.getPath() + File.separator + ISaveStructure.DATABASE_NAME));
 		this.level = level;
 		this.levelWrapper = level.getLevelWrapper();
-		
+		this.repo.setLevelMinYGetter(this.levelWrapper::getMinHeight);
+
 		this.levelId = this.levelWrapper.getDhIdentifier();
 		
 		this.dataUpdater = new FullDataUpdaterV2(this, this.levelId);

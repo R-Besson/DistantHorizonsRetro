@@ -104,9 +104,17 @@ public class FullDataSourceV2DTO
 	
 	public long lastModifiedUnixDateTime;
 	public long createdUnixDateTime;
-	
-	
-	
+
+	/**
+	 * The level's min height when this was saved, the data's Y values are relative to it. <br>
+	 * Null when it didn't come from the database (IE network payloads),
+	 * those are already relative to the current min height.
+	 */
+	@Nullable
+	public Integer savedMinY;
+
+
+
 	//==============//
 	// constructors //
 	//==============//
@@ -287,6 +295,13 @@ public class FullDataSourceV2DTO
 			}
 			
 			readBlobToDataMapping(dataSource.mapping, this.compressedMappingByteArray, dataSource.getPos(), levelWrapper,  compressionModeEnum);
+
+			// IE Cubic Chunks was added to a world that already had LODs
+			if (this.savedMinY != null
+				&& this.savedMinY != levelWrapper.getMinHeight())
+			{
+				shiftDataPointsY(dataSource.dataPoints, this.savedMinY - levelWrapper.getMinHeight());
+			}
 		}
 		
 		
@@ -313,9 +328,44 @@ public class FullDataSourceV2DTO
 		
 		return dataSource;
 	}
-	
-	
-	
+
+	/** cuts off anything that ends up outside the 12 bit Y range */
+	private static void shiftDataPointsY(LongArrayList[] dataArray, int yOffset)
+	{
+		int maxY = FullDataPointUtil.MIN_Y_MASK;
+		for (LongArrayList column : dataArray)
+		{
+			for (int i = column.size() - 1; i >= 0; i--)
+			{
+				long dataPoint = column.getLong(i);
+				if (dataPoint == FullDataPointUtil.EMPTY_DATA_POINT)
+				{
+					continue;
+				}
+
+				int bottomY = FullDataPointUtil.getBottomY(dataPoint) + yOffset;
+				int topY = bottomY + FullDataPointUtil.getHeight(dataPoint);
+				bottomY = Math.max(bottomY, 0);
+				topY = Math.min(topY, maxY);
+				if (topY <= bottomY)
+				{
+					column.removeLong(i);
+					continue;
+				}
+
+				dataPoint = FullDataPointUtil.setBottomY(dataPoint, bottomY);
+				column.set(i, FullDataPointUtil.setHeight(dataPoint, topY - bottomY));
+			}
+
+			if (column.isEmpty())
+			{
+				column.add(FullDataPointUtil.EMPTY_DATA_POINT);
+			}
+		}
+	}
+
+
+
 	//=================//
 	// (de)serializing //
 	//=================//

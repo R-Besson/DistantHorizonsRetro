@@ -296,16 +296,10 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		this.setUniform(this.uIsWhiteWorld, Config.Client.Advanced.Debugging.enableWhiteWorld.get());
 		
 		// Clip Uniform
-		float dhNearClipDistance = RenderUtil.getNearClipPlaneInBlocks();
-		if (!Config.Client.Advanced.Debugging.lodOnlyMode.get())
-		{
-			// this added value prevents the near clip plane and discard circle from touching, which looks bad
-			dhNearClipDistance += 16f;
-		}
-		this.setUniform(this.uClipDistance, dhNearClipDistance);
+		this.setUniform(this.uClipDistance, RenderUtil.getLodFadeStartDistanceInBlocks());
 		
-		// LODs are skipped in the chunks MC drew vanilla terrain for, instead of by distance,
-		// so LODs fill chunks MC hasn't built yet
+		// LODs are always drawn in the chunks MC hasn't built yet,
+		// everywhere else they're clipped and dithered by distance
 		VanillaChunkMask chunkMask = VanillaChunkMask.INSTANCE;
 		this.setUniform(this.uVanillaChunkMask, VanillaChunkMask.GL_BOUND_INDEX);
 		this.setUniform(this.uVanillaChunkMaskRadius, Config.Client.Advanced.Debugging.lodOnlyMode.get() ? 0 : chunkMask.getRadius());

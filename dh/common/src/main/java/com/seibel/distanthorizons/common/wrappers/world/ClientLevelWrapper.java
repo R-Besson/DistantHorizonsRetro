@@ -425,11 +425,22 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		return !this.level.provider.hasNoSky;
 	}
 
+	// In singleplayer the server level's heights are used,
+	// Cubic Chunks only gives the client level its real height range a moment after it's loaded.
+	// In multiplayer ClientApi rebuilds the LODs when the range changes.
 	@Override
-	public int getMaxHeight() { return CubicChunksCompat.getMaxHeight(this.level); }
+	public int getMaxHeight()
+	{
+		IServerLevelWrapper serverLevel = this.tryGetServerSideWrapper();
+		return (serverLevel != null) ? serverLevel.getMaxHeight() : CubicChunksCompat.getMaxHeight(this.level);
+	}
 
 	@Override
-	public int getMinHeight() { return CubicChunksCompat.getMinHeight(this.level); }
+	public int getMinHeight()
+	{
+		IServerLevelWrapper serverLevel = this.tryGetServerSideWrapper();
+		return (serverLevel != null) ? serverLevel.getMinHeight() : CubicChunksCompat.getMinHeight(this.level);
+	}
 
 	@Override
 	public WorldClient getWrappedMcObject() { return this.level; }

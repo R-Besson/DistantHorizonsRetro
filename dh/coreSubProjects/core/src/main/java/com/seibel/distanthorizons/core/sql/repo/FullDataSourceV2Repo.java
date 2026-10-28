@@ -20,6 +20,7 @@
 package com.seibel.distanthorizons.core.sql.repo;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiDataCompressionMode;
+import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGenerationStep;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.generation.tasks.DataSourceRetrievalTask;
@@ -42,6 +43,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.IntSupplier;
 
 public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2DTO>
 {
@@ -67,6 +69,22 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	 */
 	@Nullable
 	private final FullDataLookupCache lookupCache;
+
+	/**
+	 * Saved with each row so data from before the level's min height changed
+	 * (IE Cubic Chunks was added) can be moved to the new one. <br>
+	 * Read on every save since a client level only knows its real height after joining.
+	 */
+	private IntSupplier levelMinYGetter = () -> 0;
+	public void setLevelMinYGetter(IntSupplier levelMinYGetter)
+	{
+		this.levelMinYGetter = levelMinYGetter;
+		// cached generation steps depend on the min height (see getColumnGenerationStepForPos)
+		if (this.lookupCache != null)
+		{
+			this.lookupCache.invalidateAll();
+		}
+	}
 
 	//endregion
 
@@ -180,27 +198,30 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		long pos = DhSectionPos.encode(sectionDetailLevel, posX, posZ);
 		
 		int dataChecksum = resultSet.getInt("DataChecksum");
-		
-		
+		// rows saved before this was used have 0, the vanilla min height
+		int savedMinY = resultSet.getInt("MinY");
+
+
 		byte dataFormatVersion = resultSet.getByte("DataFormatVersion");
 		byte compressionModeValue = resultSet.getByte("CompressionMode");
-		
+
 		// while these values can be null in the DB, null would just equate to false
 		boolean applyToParent = (resultSet.getInt("ApplyToParent")) == 1;
 		boolean applyToChildren = (resultSet.getInt("ApplyToChildren")) == 1;
 		boolean regenerate = (resultSet.getInt("Regenerate")) == 1;
-		
+
 		long lastModifiedUnixDateTime = resultSet.getLong("LastModifiedUnixDateTime");
 		long createdUnixDateTime = resultSet.getLong("CreatedUnixDateTime");
-		
-		
-		
+
+
+
 		//===================//
 		// set DTO variables //
 		//===================//
-		
+
 		FullDataSourceV2DTO dto = FullDataSourceV2DTO.CreateEmptyDataSourceForDecoding();
-		
+		dto.savedMinY = savedMinY;
+
 		// set pooled arrays
 		dto.compressedDataByteArray = putAllBytes(resultSet.getBinaryStream("Data"), dto.compressedDataByteArray);
 		dto.compressedColumnGenStepByteArray = putAllBytes(resultSet.getBinaryStream("ColumnGenerationStep"), dto.compressedColumnGenStepByteArray);
@@ -239,26 +260,28 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		//======================//
 		
 		int dataChecksum = resultSet.getInt("DataChecksum");
-		
-		
+		int savedMinY = resultSet.getInt("MinY");
+
+
 		byte dataFormatVersion = resultSet.getByte("DataFormatVersion");
 		byte compressionModeValue = resultSet.getByte("CompressionMode");
-		
+
 		// while these values can be null in the DB, null would just equate to false
 		boolean applyToParent = (resultSet.getInt("ApplyToParent")) == 1;
 		boolean applyToChildren = (resultSet.getInt("ApplyToChildren")) == 1;
 		boolean regenerate = (resultSet.getInt("Regenerate")) == 1;
-		
+
 		long lastModifiedUnixDateTime = resultSet.getLong("LastModifiedUnixDateTime");
 		long createdUnixDateTime = resultSet.getLong("CreatedUnixDateTime");
-		
-		
-		
+
+
+
 		//===================//
 		// set DTO variables //
 		//===================//
-		
+
 		FullDataSourceV2DTO dto = FullDataSourceV2DTO.CreateEmptyDataSourceForDecoding();
+		dto.savedMinY = savedMinY;
 		// set pooled arrays
 		dto.compressedDataByteArray = putAllBytes(resultSet.getBinaryStream("AdjData"), dto.compressedDataByteArray);
 		dto.compressedColumnGenStepByteArray = putAllBytes(resultSet.getBinaryStream("ColumnGenerationStep"), dto.compressedColumnGenStepByteArray);
@@ -305,6 +328,8 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			") \n" +
 			"ON CONFLICT(DetailLevel, PosX, PosZ) DO UPDATE SET \n" +
 			"    DataChecksum = excluded.DataChecksum \n" +
+			// the data is always written relative to the current min height
+			"   ,MinY = excluded.MinY \n" +
 			
 			"   ,Data = excluded.Data \n" +
 			"   ,ColumnGenerationStep = excluded.ColumnGenerationStep \n" +
@@ -337,7 +362,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		statement.setInt(i++, DhSectionPos.getX(dto.pos));
 		statement.setInt(i++, DhSectionPos.getZ(dto.pos));
 		
-		statement.setInt(i++, 0); // unused MinY column
+		statement.setInt(i++, this.levelMinYGetter.getAsInt());
 
 		statement.setInt(i++, dto.dataChecksum);
 		
@@ -375,7 +400,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	
 	private final String getAdjForDirectionSqlTemplate =
 			"SELECT \n" +
-					"   DataChecksum, \n" +
+					"   MinY, DataChecksum, \n" +
 					"   ColumnGenerationStep, ColumnWorldCompressionMode, Mapping, \n" +
 					"   DataFormatVersion, CompressionMode, ApplyToParent, ApplyToChildren, Regenerate, \n" +
 					"   LastModifiedUnixDateTime, CreatedUnixDateTime, \n" +
@@ -657,7 +682,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	
 	
 	private final String getColumnGenerationStepSql =
-			"select ColumnGenerationStep, CompressionMode " +
+			"select ColumnGenerationStep, CompressionMode, MinY " +
 			"from "+this.getTableName()+" " +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
 	/** @return null if nothing exists for this position */
@@ -716,6 +741,17 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 						DhDataInputStream compressedIn = DhDataInputStream.create(byteArrayList, compressionModeEnum, checkout))
 					{
 						putAllBytes(compressedIn, outputByteArray);
+					}
+
+					// Saved with a different min height, IE before Cubic Chunks was added or removed.
+					// The two store the world separately (Cubic Chunks doesn't write vanilla's region files)
+					// so the terrain can differ, the data is still shown (shifted) until it's regenerated.
+					if (result.getInt("MinY") != this.levelMinYGetter.getAsInt())
+					{
+						for (int stepIndex = 0; stepIndex < outputByteArray.size(); stepIndex++)
+						{
+							outputByteArray.set(stepIndex, EDhApiWorldGenerationStep.EMPTY.value);
+						}
 					}
 
 					if (this.lookupCache != null)

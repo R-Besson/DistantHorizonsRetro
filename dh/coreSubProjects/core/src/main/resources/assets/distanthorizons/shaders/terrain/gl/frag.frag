@@ -195,17 +195,21 @@ void main()
     
     float viewDist = length(vertexWorldPos);
 
+    // chunks MC hasn't drawn vanilla terrain for yet are always filled with LODs so there aren't any holes,
+    // everywhere else the LODs are clipped and dithered by distance like normal,
+    // the vanilla fade pass then fades MC's terrain into them (see vanilla_fade.frag)
+    bool vanillaChunkMissing = false;
     if (uVanillaChunkMaskRadius > 0)
     {
-        // skip LODs in chunks MC drew vanilla terrain for, everywhere else
-        // (IE chunks MC hasn't built yet) the LODs are drawn so there aren't any holes
         ivec2 chunkOffset = ivec2(floor((vertexWorldPos.xz + uCameraPosInChunk.xz) / 16.0));
-        if (abs(chunkOffset.x) <= uVanillaChunkMaskRadius
+        vanillaChunkMissing = abs(chunkOffset.x) <= uVanillaChunkMaskRadius
             && abs(chunkOffset.y) <= uVanillaChunkMaskRadius
-            && texelFetch(uVanillaChunkMask, chunkOffset + ivec2(uVanillaChunkMaskRadius), 0).r > 0.5)
-        {
-            discard;
-        }
+            && texelFetch(uVanillaChunkMask, chunkOffset + ivec2(uVanillaChunkMaskRadius), 0).r < 0.5;
+    }
+
+    if (vanillaChunkMissing)
+    {
+        // drawn as is
     }
     else if (uDitherDhRendering)
     {

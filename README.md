@@ -136,6 +136,7 @@ Gradle downloads them, no manual setup needed.
 > [!TIP]
 > Run with `-PdevProfile=true` for performance profiling, `-PdevJava8=true` for Java 8
 > and `-PdevMods=false` to leave out the test mods
+> and `-PdevCubicChunks=true` to add CubicChunks to the dev client
 
 # Credits
 

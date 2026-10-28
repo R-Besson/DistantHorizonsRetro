@@ -38,6 +38,15 @@ public interface ICubicChunksCommonAccessor extends IModAccessor
 	boolean isColumnReady(Chunk column);
 
 	/**
+	 * Doesn't load anything, the column's height map covers its unloaded cubes too.
+	 *
+	 * @return the lowest and highest cube Y holding the column's top blocks,
+	 *         null if the column has no blocks within DH's height range
+	 */
+	@Nullable
+	int[] getSurfaceCubeRange(Chunk column);
+
+	/**
 	 * Has to be called on the server thread.
 	 * Loads or generates, populates and lights the column and
 	 * its cubes within the generation range.

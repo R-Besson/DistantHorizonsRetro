@@ -19,7 +19,20 @@
 
 package com.seibel.distanthorizons.common.render.openGl.postProcessing.copy;
 
+import com.seibel.distanthorizons.api.enums.config.EDhApiDepthDirection;
+import com.seibel.distanthorizons.api.enums.config.EDhApiDepthRange;
+import com.seibel.distanthorizons.api.enums.config.EDhApiMcRenderingFadeMode;
+import com.seibel.distanthorizons.api.enums.rendering.EDhApiRendererMode;
 import com.seibel.distanthorizons.common.render.openGl.GlDhMetaRenderer;
+import com.seibel.distanthorizons.common.render.openGl.terrain.VanillaChunkMask;
+import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
+import com.seibel.distanthorizons.core.render.RenderParams;
+import com.seibel.distanthorizons.core.util.RenderUtil;
+import com.seibel.distanthorizons.core.util.math.DhVec3d;
+import com.seibel.distanthorizons.core.util.math.DhVec3f;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.common.render.openGl.glObject.GLState;
 import com.seibel.distanthorizons.common.render.openGl.glObject.shader.GlShaderProgram;
 import com.seibel.distanthorizons.common.render.openGl.postProcessing.GlScreenQuad;
@@ -49,7 +62,15 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 	
 	// uniforms
 	public int uCopyTexture;
-	
+	public int uDepthTexture;
+	public int uDhInvMvmProj;
+	public int uDepthIsZeroToPositiveOne;
+	public int uIsReverseZDepth;
+	public int uKeepMcDistance;
+	public int uVanillaChunkMask;
+	public int uVanillaChunkMaskRadius;
+	public int uCameraPosInChunk;
+
 	
 	
 	//=======//
@@ -70,9 +91,70 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		
 		// uniform setup
 		this.uCopyTexture = this.shader.getUniformLocation("uCopyTexture");
-		
+		// try get, these are optimized out if the shader never uses them
+		this.uDepthTexture = this.shader.tryGetUniformLocation("uDepthTexture");
+		this.uDhInvMvmProj = this.shader.tryGetUniformLocation("uDhInvMvmProj");
+		this.uDepthIsZeroToPositiveOne = this.shader.tryGetUniformLocation("uDepthIsZeroToPositiveOne");
+		this.uIsReverseZDepth = this.shader.tryGetUniformLocation("uIsReverseZDepth");
+		this.uKeepMcDistance = this.shader.tryGetUniformLocation("uKeepMcDistance");
+		this.uVanillaChunkMask = this.shader.tryGetUniformLocation("uVanillaChunkMask");
+		this.uVanillaChunkMaskRadius = this.shader.tryGetUniformLocation("uVanillaChunkMaskRadius");
+		this.uCameraPosInChunk = this.shader.tryGetUniformLocation("uCameraPosInChunk");
+
 	}
-	
+
+	//endregion
+
+
+
+	//==========//
+	// uniforms //
+	//==========//
+	//region
+
+	@Override
+	protected void onApplyUniforms(RenderParams renderParams)
+	{
+		this.shader.setUniform(this.uDhInvMvmProj, renderParams.dhInverseMvmProjectionMatrix);
+		this.shader.setUniform(this.uDepthIsZeroToPositiveOne, (RENDER_DEF.getDepthRange() == EDhApiDepthRange.ZERO_TO_POS_ONE) ? 1 : 0);
+		this.shader.setUniform(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
+
+		// LODs are dithered in and the vanilla fade blends MC's terrain into them up to this distance,
+		// where MC draws its own terrain over them they aren't copied, otherwise see-through LODs (IE water)
+		// would be seen through MC's own while it fades, looking twice as bright
+		this.shader.setUniform(this.uKeepMcDistance, isVanillaFadeActive() ? RenderUtil.getLodFadeStartDistanceInBlocks() * 1.9f : 0.0f);
+
+		VanillaChunkMask chunkMask = VanillaChunkMask.INSTANCE;
+		this.shader.setUniform(this.uVanillaChunkMask, VanillaChunkMask.GL_BOUND_INDEX);
+		this.shader.setUniform(this.uVanillaChunkMaskRadius, chunkMask.getRadius());
+		DhVec3d cameraPos = MC_RENDER.getCameraExactPosition();
+		this.shader.setUniform(this.uCameraPosInChunk, new DhVec3f(
+			(float) (cameraPos.x - (chunkMask.getCameraChunkX() * 16.0)),
+			0.0f,
+			(float) (cameraPos.z - (chunkMask.getCameraChunkZ() * 16.0))));
+	}
+
+	/** the same conditions MC's terrain is faded into the LODs under, see ClientApi#renderFadeTransparent and RenderHelper#renderFade */
+	private static boolean isVanillaFadeActive()
+	{
+		if (Config.Client.Advanced.Debugging.rendererMode.get() != EDhApiRendererMode.DEFAULT
+			|| Config.Client.Advanced.Graphics.Quality.vanillaFadeMode.get() == EDhApiMcRenderingFadeMode.NONE
+			|| Config.Client.Advanced.Debugging.lodOnlyMode.get())
+		{
+			return false;
+		}
+
+		IIrisAccessor irisAccessor = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
+		if (irisAccessor != null
+			&& irisAccessor.isShaderPackInUse())
+		{
+			return false;
+		}
+
+		IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
+		return angelicaAccessor == null || angelicaAccessor.canDoFadeShader();
+	}
+
 	//endregion
 	
 	
@@ -116,7 +198,8 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 			GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 			GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveColorTextureId());
 			LWJGL.glUniform1i(this.uCopyTexture, 0);
-			
+			this.bindDepthAndChunkMask();
+
 			// Copy to MC's framebuffer
 			GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, targetFrameBuffer);
 			
@@ -125,6 +208,16 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		// everything's been restored, except at this point the MC framebuffer should now be used instead
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, targetFrameBuffer);
 		
+	}
+	private void bindDepthAndChunkMask()
+	{
+		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
+		GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId());
+		LWJGL.glUniform1i(this.uDepthTexture, 1);
+
+		// unbound in the render pass cleanup
+		VanillaChunkMask.INSTANCE.bind();
+		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 	}
 	private void renderToMcTexture()
 	{
@@ -160,9 +253,10 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 			GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 			GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveColorTextureId());
 			LWJGL.glUniform1i(this.uCopyTexture, 0);
-			
-			
-			
+			this.bindDepthAndChunkMask();
+
+
+
 			LWJGL.glFramebufferTexture(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, targetColorTextureId, 0);
 			
 			// Copy to MC's texture via MC's framebuffer

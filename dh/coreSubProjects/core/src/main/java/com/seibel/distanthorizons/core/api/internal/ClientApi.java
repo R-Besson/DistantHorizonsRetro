@@ -164,6 +164,9 @@ public class ClientApi
 	 * when shaders are disabled.
 	 */
 	private boolean irisShadersEnabledLastFrame = false;
+	/** only used to compare against, never dereferenced */
+	private IClientLevelWrapper heightCheckLevelLastFrame = null;
+	private int levelMinHeightLastFrame = 0;
 	
 	
 	
@@ -430,7 +433,32 @@ public class ClientApi
 							DhApi.Delayed.renderProxy.clearRenderDataCache();
 						}
 					}
-					
+
+					//endregion
+
+
+
+					//==============================//
+					// level height re-build trigger //
+					//==============================//
+					//region
+
+					// IE Cubic Chunks only gets the world's real height range from the server
+					// after the level is loaded, LODs built before that are at the wrong height
+					IClientLevelWrapper clientLevel = RENDER_STATE.clientLevelWrapper;
+					if (clientLevel != null)
+					{
+						int minHeight = clientLevel.getMinHeight();
+						if (clientLevel == this.heightCheckLevelLastFrame
+							&& minHeight != this.levelMinHeightLastFrame)
+						{
+							LOGGER.info("Level min height changed from [" + this.levelMinHeightLastFrame + "] to [" + minHeight + "], rebuilding LODs.");
+							DhApi.Delayed.renderProxy.clearRenderDataCache();
+						}
+						this.heightCheckLevelLastFrame = clientLevel;
+						this.levelMinHeightLastFrame = minHeight;
+					}
+
 					//endregion
 					
 					

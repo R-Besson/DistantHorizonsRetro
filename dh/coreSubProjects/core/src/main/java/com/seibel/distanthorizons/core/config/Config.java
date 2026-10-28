@@ -911,7 +911,7 @@ public class Config
 						.build();
 					
 					public static ConfigEntry<String> waterSurfaceBlockReplacementCsv = new ConfigEntry.Builder<String>()
-						.set("minecraft:lily_pad")
+						.set("minecraft:waterlily")
 						.setAppearance(EConfigEntryAppearance.ALL)
 						.addListener(RenderBlockCacheCsvHandler.INSTANCE)
 						.comment(""

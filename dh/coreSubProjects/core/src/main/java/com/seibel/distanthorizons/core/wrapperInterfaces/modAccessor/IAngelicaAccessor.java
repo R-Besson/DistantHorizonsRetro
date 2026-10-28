@@ -35,10 +35,10 @@ public interface IAngelicaAccessor extends IModAccessor
 	boolean canDoFadeShader();
 
 	/**
-	 * @return true if Angelica has built every section of this chunk (so its vanilla terrain is drawn),
-	 *         null if that can't be checked (IE a different Angelica version)
+	 * @return true if Angelica has built every section of this chunk from minSectionY to maxSectionY (inclusive),
+	 *         so its vanilla terrain is drawn, null if that can't be checked (IE a different Angelica version)
 	 */
-	Boolean isChunkBuilt(int chunkX, int chunkZ, int sectionCount);
+	Boolean isChunkBuilt(int chunkX, int chunkZ, int minSectionY, int maxSectionY);
 
 	/**
 	 * Uploads the "dhProjection" and "heightLimit" uniforms to the currently bound shader pack program. <br>

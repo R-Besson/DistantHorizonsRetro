@@ -1008,6 +1008,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		return getAllBlockWrappers(blockStringList, levelWrapper);
 	}
+	/** block names since MC 1.13 to their 1.7.10 names */
+	private static final Map<String, String> MODERN_BLOCK_NAME_ALIASES = Collections.singletonMap("minecraft:lily_pad", "minecraft:waterlily");
 	private static ObjectOpenHashSet<IBlockStateWrapper> getAllBlockWrappers(ObjectOpenHashSet<String> blockResourceLocationSet, ILevelWrapper levelWrapper)
 	{
 		// deserialize each of the given resource locations
@@ -1026,6 +1028,8 @@ public class BlockStateWrapper implements IBlockStateWrapper
 				{
 					continue;
 				}
+				// configs can still have block names from newer MC versions (IE the old defaults)
+				cleanedResourceLocation = MODERN_BLOCK_NAME_ALIASES.getOrDefault(cleanedResourceLocation, cleanedResourceLocation);
 
 
 				BlockStateWrapper defaultBlockStateToIgnore = (BlockStateWrapper) deserialize(cleanedResourceLocation, levelWrapper);

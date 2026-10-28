@@ -128,10 +128,8 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 		this.shader.setUniform(this.uDhInvMvmProj, this.inverseDhMvmProjMatrix);
 		
 		
-		float dhNearClipDistance = RenderUtil.getNearClipPlaneInBlocks();
-		// this added value prevents the near clip plane and discard circle from touching, which looks bad
-		dhNearClipDistance += 16f;
-		
+		float dhNearClipDistance = RenderUtil.getLodFadeStartDistanceInBlocks();
+
 		// measured in blocks
 		// these multipliers in James' tests should provide a fairly smooth transition
 		// without having underdraw issues
