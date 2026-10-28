@@ -149,14 +149,13 @@ public class RenderParams extends DhApiRenderParam
 			return "No Generic Renderer Present";
 		}
 		
-		if (this.dhModelViewMatrix.equals(DhMat4f.IDENTITY) 
-			|| this.dhModelViewMatrix.equals(DhMat4f.EMPTY))
+		// the identity matrix isn't checked, it's a valid camera rotation (IE looking straight along one axis)
+		if (this.dhModelViewMatrix.equals(DhMat4f.EMPTY))
 		{
 			return "No DH MVM Matrix Given";
 		}
-		
-		if (this.mcModelViewMatrix.equals(DhMat4f.IDENTITY) 
-			|| this.mcModelViewMatrix.equals(DhMat4f.EMPTY))
+
+		if (this.mcModelViewMatrix.equals(DhMat4f.EMPTY))
 		{
 			return "No MC MVM Matrix Given";
 		}

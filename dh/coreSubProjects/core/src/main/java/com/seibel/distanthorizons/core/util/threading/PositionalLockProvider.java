@@ -59,8 +59,9 @@ public class PositionalLockProvider
 				lock = new ExpiringLock();
 			}
 			
+			// clean up the expired locks on a separate thread, unless it's already running
 			if (this.lockByPos.size() > MAX_NUMBER_OF_LOCKS
-				&& this.lockRemovalThreadRunning.getAndSet(true))
+				&& !this.lockRemovalThreadRunning.getAndSet(true))
 			{
 				LOCK_CLEANUP_THREAD.execute(this::removeExpiredLocks);
 			}

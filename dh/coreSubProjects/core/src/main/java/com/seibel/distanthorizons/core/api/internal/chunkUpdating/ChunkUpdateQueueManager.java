@@ -50,8 +50,15 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	
 	public static final long UPDATE_DEBOUNCE_NANOS = TimeUnit.MILLISECONDS.toNanos(250);
 	
-	/** how long to wait between queue checks if the queue was empty */
+	/** how long to wait between queue checks if the LOD builder can't take more updates */
 	private static final int PROCESS_QUEUE_DELAY_MS = 50;
+	/**
+	 * The empty queue is woken up when chunks are added,
+	 * this is only so the expired chunks are still cleaned up now and then
+	 */
+	private static final int EMPTY_QUEUE_MAX_WAIT_MS = 1_000;
+	/** notified when chunks are added to either queue */
+	private final Object queueThreadNotifier = new Object();
 	/** how long to wait when the closest chunk update is still waiting on {@link #UPDATE_DEBOUNCE_NANOS} */
 	private static final int DEBOUNCE_WAIT_DELAY_MS = 5;
 	
@@ -156,7 +163,13 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 		
 		queue.addItem(pos,updateData);
 		this.queuedChunkWrapperByChunkPos.put(pos, updateData.chunkWrapper); // replaces the queued chunk if present to use the new data
-		
+
+		// wake the queueing thread if it's waiting on an empty queue
+		synchronized (this.queueThreadNotifier)
+		{
+			this.queueThreadNotifier.notifyAll();
+		}
+
 		remainingSlots = this.maxSize - this.getQueuedCount();
 		if (remainingSlots <= 0)
 		{
@@ -254,13 +267,23 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 			{
 				this.processQueue();
 				
-				// if the queue is empty, 
-				// reduce the rate that we check the queue again
-				if (this.lodBuilderExecutorUnavailable
-					|| (this.updateQueue.isEmpty() && this.preUpdateQueue.isEmpty()))
+				if (this.lodBuilderExecutorUnavailable)
 				{
+					// nothing signals when the LOD builder frees up, so check back shortly
 					Thread.sleep(PROCESS_QUEUE_DELAY_MS);
-					
+				}
+				else if (this.updateQueue.isEmpty() && this.preUpdateQueue.isEmpty())
+				{
+					// wait for new chunks instead of polling the empty queue,
+					// checked under the lock so a chunk added in between isn't missed
+					synchronized (this.queueThreadNotifier)
+					{
+						if (this.updateQueue.isEmpty() && this.preUpdateQueue.isEmpty())
+						{
+							this.queueThreadNotifier.wait(EMPTY_QUEUE_MAX_WAIT_MS);
+						}
+					}
+
 					// clean up to fix expired chunks not being cleaned up if the queue is empty
 					this.queuedChunkWrapperByChunkPos.cleanUp();
 				}
