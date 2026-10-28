@@ -136,7 +136,9 @@ void main()
     uint lights = meta & 0xFFu;
     float skyLight = (float(lights/16u)+0.5) / 16.0;
     float blockLight = (mod(float(lights), 16.0)+0.5) / 16.0;
-    vertexColor = vec4(texture(uLightMap, vec2(skyLight, blockLight)).xyz, 1.0);
+    // MC's lightmap has block light along x and sky light along y (see EntityRenderer.updateLightmap),
+    // swapped every LOD would be lit like a full torch during the day, ignoring the sun's brightness
+    vertexColor = vec4(texture(uLightMap, vec2(blockLight, skyLight)).xyz, 1.0);
     
     if (!uIsWhiteWorld)
     {

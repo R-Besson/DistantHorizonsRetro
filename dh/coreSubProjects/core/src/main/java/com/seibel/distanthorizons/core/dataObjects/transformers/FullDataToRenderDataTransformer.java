@@ -657,7 +657,10 @@ public class FullDataToRenderDataTransformer
 					}
 					else //if (isWaterSurfaceReplacement)
 					{
-						colorToApplyToNextBlock = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
+						// the water below keeps its own color and see-through alpha,
+						// passing this one on (like other skipped blocks) made it opaque:
+						// lighter specks without shaders and solid water cubes with them
+						continue;
 					}
 				}
 			}
