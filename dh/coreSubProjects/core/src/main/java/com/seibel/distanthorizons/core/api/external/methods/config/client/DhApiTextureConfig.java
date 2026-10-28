@@ -20,7 +20,6 @@
 package com.seibel.distanthorizons.core.api.external.methods.config.client;
 
 import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
-import com.seibel.distanthorizons.api.interfaces.config.client.IDhApiNoiseTextureConfig;
 import com.seibel.distanthorizons.api.interfaces.config.client.IDhApiTextureConfig;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.api.DhApiConfigValue;

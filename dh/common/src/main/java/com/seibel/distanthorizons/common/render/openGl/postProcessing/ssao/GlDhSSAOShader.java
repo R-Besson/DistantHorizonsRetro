@@ -34,8 +34,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRender
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 /**
  * Draws the SSAO to a texture. <br><br>
  *

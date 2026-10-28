@@ -43,7 +43,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccess
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IOverrideInjector;
 import com.seibel.distanthorizons.core.util.math.DhMat4f;
-import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;

@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.sql.repo;
 
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGenerationStep;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
-import com.seibel.distanthorizons.core.sql.dto.ChunkHashDTO;
 import com.seibel.distanthorizons.core.sql.dto.FullDataSourceV1DTO;
 import com.seibel.distanthorizons.coreapi.util.StringUtil;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -33,7 +32,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1DTO>

@@ -20,7 +20,6 @@
 package testItems.sql;
 
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
-import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.sql.repo.AbstractDhRepo;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
 
 public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompoundKeyDto>
 {

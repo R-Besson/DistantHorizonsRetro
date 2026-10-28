@@ -24,7 +24,6 @@ import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGenerat
 import com.seibel.distanthorizons.api.interfaces.override.IDhApiOverrideable;
 import com.seibel.distanthorizons.api.objects.data.DhApiChunk;
 import com.seibel.distanthorizons.api.objects.data.DhApiTerrainDataPoint;
-import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
 
 import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;

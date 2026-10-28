@@ -23,8 +23,6 @@ import com.seibel.distanthorizons.api.enums.EDhApiDetailLevel;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 
-import java.util.ArrayList;
-
 /**
  * Holds a single datapoint of terrain data.
  *

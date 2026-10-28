@@ -3,9 +3,6 @@ package com.seibel.distanthorizons.core.multiplayer.client;
 import com.seibel.distanthorizons.core.network.messages.fullData.FullDataSplitMessage;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
 
 public class ClientCongestionControl
 {

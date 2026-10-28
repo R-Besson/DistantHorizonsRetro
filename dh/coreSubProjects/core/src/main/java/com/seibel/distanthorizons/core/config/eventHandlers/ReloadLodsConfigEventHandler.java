@@ -21,11 +21,6 @@ package com.seibel.distanthorizons.core.config.eventHandlers;
 
 import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderProxy;
-import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
-import com.seibel.distanthorizons.core.util.TimerUtil;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ReloadLodsConfigEventHandler extends AbstractDelayedConfigEventHandler
 {

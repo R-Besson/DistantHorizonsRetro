@@ -36,9 +36,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftCli
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 
-import java.io.File;
 import java.util.*;
-import java.util.List;
 
 /**
  * This handles any configuration the user has access to.

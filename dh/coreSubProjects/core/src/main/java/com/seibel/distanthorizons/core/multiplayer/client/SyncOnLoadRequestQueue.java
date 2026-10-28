@@ -2,12 +2,9 @@ package com.seibel.distanthorizons.core.multiplayer.client;
 
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.generation.queues.RemoteWorldRetrievalQueue;
-import com.seibel.distanthorizons.core.generation.tasks.DataSourceRetrievalResult;
 import com.seibel.distanthorizons.core.level.DhClientLevel;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
-
-import java.util.concurrent.CompletableFuture;
 
 /** 
  * This queue only handles LOD updates for

@@ -22,7 +22,6 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.chunk;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
-import org.apache.logging.log4j.LogManager;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.ArrayList;

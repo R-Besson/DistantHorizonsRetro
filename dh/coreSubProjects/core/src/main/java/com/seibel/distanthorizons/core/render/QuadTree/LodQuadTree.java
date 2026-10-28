@@ -20,7 +20,6 @@
 package com.seibel.distanthorizons.core.render.QuadTree;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiMaxHorizontalResolution;
-import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;

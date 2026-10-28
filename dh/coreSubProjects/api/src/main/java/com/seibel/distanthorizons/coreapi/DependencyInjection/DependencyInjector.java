@@ -24,7 +24,6 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IDepend
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This class takes care of tracking objects used in dependency injection.

@@ -19,17 +19,12 @@
 
 package com.seibel.distanthorizons.api.methods.events.abstractEvents;
 
-import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
-import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
-import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiCancelableEvent;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiEventParam;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiCancelableEventParam;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiFogRenderParam;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiMutableFogRenderParam;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiRenderParam;
-import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
-import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 
 /**
  * Fired before DH renders its fog.

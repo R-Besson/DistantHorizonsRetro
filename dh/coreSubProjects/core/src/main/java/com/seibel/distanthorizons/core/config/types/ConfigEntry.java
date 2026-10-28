@@ -32,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * This config type allows for entering text, number, or enum values.

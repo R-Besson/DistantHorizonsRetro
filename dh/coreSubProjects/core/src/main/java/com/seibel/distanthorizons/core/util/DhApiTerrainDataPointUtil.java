@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.core.util;
 
-import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.objects.data.DhApiTerrainDataPoint;
 import com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;

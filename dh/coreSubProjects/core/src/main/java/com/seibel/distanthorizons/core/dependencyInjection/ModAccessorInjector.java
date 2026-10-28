@@ -25,8 +25,6 @@ import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccessor;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 
-import java.lang.invoke.MethodHandles;
-
 /**
  * This class takes care of dependency injection for mod accessors. (for mod compatibility
  * support).  <Br> <Br>

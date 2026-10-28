@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.core.api.internal.chunkUpdating;
 
-import com.seibel.distanthorizons.core.api.internal.SharedApi;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import org.jetbrains.annotations.Nullable;
 

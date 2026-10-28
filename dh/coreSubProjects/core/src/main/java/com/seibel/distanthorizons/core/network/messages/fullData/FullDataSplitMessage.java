@@ -25,8 +25,6 @@ import com.seibel.distanthorizons.core.network.messages.AbstractNetworkMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-import java.util.Timer;
-
 /**
  * Used to send part of a {@link FullDataPayload}.
  * 

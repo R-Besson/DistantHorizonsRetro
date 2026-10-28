@@ -5,8 +5,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import java.util.Locale;
 import java.util.Optional;
 

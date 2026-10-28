@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.api.methods.events.sharedParameterObjects;
 
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiRenderPass;
 import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
-import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiWorldLoadEvent;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiEventParam;
 import com.seibel.distanthorizons.api.objects.math.DhApiMat4f;
 

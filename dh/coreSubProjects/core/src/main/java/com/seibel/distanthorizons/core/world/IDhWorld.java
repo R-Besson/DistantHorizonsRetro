@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Shared base between all DH world objects. <br><br>

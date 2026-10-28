@@ -21,7 +21,6 @@ package testItems.events.objects;
 
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiEventParam;
 import testItems.events.abstractObjects.AbstractDhApiRemoveAfterFireTestEvent;
-import testItems.events.abstractObjects.AbstractDhApiTestEvent;
 
 /**
  * Dummy test event for unit tests.

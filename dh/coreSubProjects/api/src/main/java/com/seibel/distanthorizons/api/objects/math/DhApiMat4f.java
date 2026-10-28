@@ -21,8 +21,6 @@ package com.seibel.distanthorizons.api.objects.math;
 
 import com.seibel.distanthorizons.api.interfaces.util.IDhApiCopyable;
 
-import java.nio.FloatBuffer;
-
 /**
  * An (almost) exact copy of Minecraft's 1.16.5
  * implementation of a 4x4 float matrix. <br><br>

@@ -20,7 +20,6 @@
 package com.seibel.distanthorizons.api.methods.events.abstractEvents;
 
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup;
-import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiCancelableEvent;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiEventParam;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiCancelableEventParam;

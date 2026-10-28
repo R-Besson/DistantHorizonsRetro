@@ -20,17 +20,12 @@
 package com.seibel.distanthorizons.api.methods.events.abstractEvents;
 
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiDirection;
-import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
-import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiEvent;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiEventParam;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiEventParam;
-import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.coreapi.util.TextureUtil;
-
-import java.util.function.Consumer;
 
 /**
  * This event is fired the first time DH needs to render a {@link IDhApiBlockStateWrapper}.

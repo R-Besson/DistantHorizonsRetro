@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;

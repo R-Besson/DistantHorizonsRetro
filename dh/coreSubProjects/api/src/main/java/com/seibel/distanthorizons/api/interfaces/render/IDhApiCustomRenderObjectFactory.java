@@ -1,7 +1,6 @@
 package com.seibel.distanthorizons.api.interfaces.render;
 
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3d;
-import com.seibel.distanthorizons.api.objects.math.DhApiVec3f;
 import com.seibel.distanthorizons.api.objects.render.DhApiRenderableBox;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 

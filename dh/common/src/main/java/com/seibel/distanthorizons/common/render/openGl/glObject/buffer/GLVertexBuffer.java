@@ -30,7 +30,6 @@ import com.seibel.distanthorizons.core.render.RenderThreadTaskHandler;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IVertexBufferWrapper;
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiGpuUploadMethod;
 import org.lwjgl.opengl.GL15;

@@ -20,16 +20,10 @@
 package com.seibel.distanthorizons.core.logging;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiLoggerLevel;
-import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
-import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import org.apache.logging.log4j.LogManager;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * @see DhLogger

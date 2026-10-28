@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.api.interfaces.render;
 
-import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.interfaces.IDhApiUnsafeWrapper;
 
 /**

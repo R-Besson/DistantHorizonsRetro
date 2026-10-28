@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.core.config.api.converters;
 
-import com.seibel.distanthorizons.api.enums.rendering.EDhApiRendererMode;
 import com.seibel.distanthorizons.coreapi.interfaces.config.IConverter;
 
 /**

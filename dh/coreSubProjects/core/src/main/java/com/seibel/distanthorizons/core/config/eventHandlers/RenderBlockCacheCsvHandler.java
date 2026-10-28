@@ -20,19 +20,10 @@
 package com.seibel.distanthorizons.core.config.eventHandlers;
 
 import com.seibel.distanthorizons.api.DhApi;
-import com.seibel.distanthorizons.api.enums.config.EDhApiMcRenderingFadeMode;
-import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeRenderEvent;
-import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiCancelableEventParam;
-import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiRenderParam;
-import com.seibel.distanthorizons.core.config.Config;
-import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
-import com.seibel.distanthorizons.coreapi.util.StringUtil;
-
-import java.util.Timer;
 
 public class RenderBlockCacheCsvHandler extends AbstractDelayedConfigEventHandler
 {

@@ -22,7 +22,6 @@ package testItems.events.abstractObjects;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiCancelableEvent;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiOneTimeEvent;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiCancelableEventParam;
-import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiEventParam;
 
 /**
  * A dummy event implementation used for unit testing.

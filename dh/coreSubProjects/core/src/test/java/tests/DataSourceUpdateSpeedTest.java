@@ -30,7 +30,6 @@ import com.seibel.distanthorizons.core.util.objects.DataCorruptedException;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.junit.Assert;
-import org.junit.Test;
 import testItems.wrappers.TestBiomeWrapper;
 import testItems.wrappers.TestBlockStateWrapper;
 

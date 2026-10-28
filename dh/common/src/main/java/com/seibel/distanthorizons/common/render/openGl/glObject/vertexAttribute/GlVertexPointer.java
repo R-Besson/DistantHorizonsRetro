@@ -22,8 +22,6 @@ package com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute
 import com.seibel.distanthorizons.coreapi.util.MathUtil;
 import org.lwjgl.opengl.GL11;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 public final class GlVertexPointer
 {
 	public final int elementCount;

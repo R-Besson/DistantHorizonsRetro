@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.api.internal;
 
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiWorldLoadEvent;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiWorldUnloadEvent;
-import com.seibel.distanthorizons.core.Initializer;
 import com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkUpdateData;
 import com.seibel.distanthorizons.core.api.internal.chunkUpdating.ChunkUpdateQueueManager;
 import com.seibel.distanthorizons.core.api.internal.chunkUpdating.WorldChunkUpdateManager;
@@ -33,7 +32,6 @@ import com.seibel.distanthorizons.core.level.IDhLevel;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
-import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
 import com.seibel.distanthorizons.core.render.RenderThreadTaskHandler;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.sql.repo.AbstractDhRepo;
@@ -50,7 +48,6 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 /** Contains code and variables used by both {@link ClientApi} and {@link ServerApi} */
 public class SharedApi

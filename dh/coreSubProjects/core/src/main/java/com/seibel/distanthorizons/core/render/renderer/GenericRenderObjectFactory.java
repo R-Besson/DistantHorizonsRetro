@@ -27,7 +27,6 @@ import com.seibel.distanthorizons.api.objects.render.DhApiRenderableBox;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 
-import java.util.List;
 import java.util.*;
 
 /**

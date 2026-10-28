@@ -24,8 +24,6 @@ import com.seibel.distanthorizons.common.render.openGl.glObject.enums.GLEnums;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import java.nio.ByteBuffer;
 
 /** aka GlQuadElementBuffer */

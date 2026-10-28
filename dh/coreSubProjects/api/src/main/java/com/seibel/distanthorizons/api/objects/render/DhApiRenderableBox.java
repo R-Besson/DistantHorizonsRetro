@@ -4,7 +4,6 @@ package com.seibel.distanthorizons.api.objects.render;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup;
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3d;
-import com.seibel.distanthorizons.api.objects.math.DhApiVec3f;
 
 import java.awt.*;
 

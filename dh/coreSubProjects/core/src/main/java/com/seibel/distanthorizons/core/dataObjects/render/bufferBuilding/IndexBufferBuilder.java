@@ -3,7 +3,6 @@ package com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 public class IndexBufferBuilder
 {

@@ -23,7 +23,6 @@ import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.io.ParsingMode;
 import com.electronwill.nightconfig.json.JsonFormat;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import org.apache.logging.log4j.LogManager;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 
 /**
