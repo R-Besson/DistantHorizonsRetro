@@ -89,6 +89,15 @@ public class ShaderPackLodTextures
 	 */
 	private static final Pattern WATER_FAR_FADE_PATTERN = Pattern.compile("if\\s*\\(\\s*depthT\\s*==\\s*1\\.0\\s*\\)\\s*color\\s*\\.\\s*a\\s*\\*=\\s*smoothstep\\s*\\(\\s*far\\s*,\\s*far\\s*\\*\\s*0\\.9\\s*,\\s*lViewPos\\s*\\)\\s*;");
 
+	/**
+	 * Complementary lights leaves (shared with MC's, see leaves.glsl) through their back with the sun
+	 * and gives them a strong highlight, both meant to be hidden by its shadow map where the sun can't reach.
+	 * LODs aren't in the shadow map, so their leaves glowed white even behind a mountain.
+	 * LOD leaves are lit like the rest of the LODs instead, only on the side facing the sun and without the highlight.
+	 */
+	private static final Pattern LEAVES_SUBSURFACE_PATTERN = Pattern.compile("subsurfaceMode\\s*=\\s*2\\s*,\\s*isFoliage\\s*=\\s*true\\s*;");
+	private static final Pattern LEAVES_HIGHLIGHT_PATTERN = Pattern.compile("highlightMult\\s*=\\s*factor\\s*\\*\\s*4\\.0\\s*\\+\\s*2\\.0\\s*;");
+
 	private static final String MC_PROJECTION_INVERSE_UNIFORM = "dhr_mcProjectionInverse";
 	private static final String ATLAS_UNIFORM = "dhr_BlockAtlas";
 	private static final String ENABLED_UNIFORM = "dhr_TexturedLods";
@@ -391,6 +400,8 @@ public class ShaderPackLodTextures
 		// Complementary adds a fake 4 per block noise to flat LODs, textured faces don't need it
 		String packFragment = COMPLEMENTARY_NOISE_PATTERN.matcher(fragment).replaceAll(Matcher.quoteReplacement("(dhr_hasTile() ? 0.5 : Noise3D(noisePos))"));
 		packFragment = WATER_FAR_FADE_PATTERN.matcher(packFragment).replaceAll("");
+		packFragment = LEAVES_SUBSURFACE_PATTERN.matcher(packFragment).replaceAll("subsurfaceMode = 0, isFoliage = true;");
+		packFragment = LEAVES_HIGHLIGHT_PATTERN.matcher(packFragment).replaceAll("highlightMult = 0.0;");
 		String fragmentDeclarations = FRAGMENT_DECLARATIONS;
 		if (VANILLA_DEPTH_CHECK_PATTERN.matcher(packFragment).find())
 		{
