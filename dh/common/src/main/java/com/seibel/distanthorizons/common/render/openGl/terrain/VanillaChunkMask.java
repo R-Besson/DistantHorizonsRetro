@@ -50,8 +50,6 @@ public class VanillaChunkMask
 	/** 1 if MC drew this chunk, indexed by ((z + radius) * width) + (x + radius) */
 	private byte[] renderedByChunk = new byte[0];
 	private ByteBuffer uploadBuffer = null;
-	/** horizontal distance from the camera to the nearest chunk MC can't draw (unloaded or past the render distance) */
-	private float vanillaTerrainEndDistance = 0;
 	/** if the chunk's terrain is loaded, one chunk wider than the mask on each side */
 	private boolean[] terrainLoadedByChunk = new boolean[0];
 	private long lastUpdateMs = 0;
@@ -161,9 +159,10 @@ public class VanillaChunkMask
 				this.renderedByChunk[((offsetZ + newRadius) * width) + (offsetX + newRadius)] = (byte) (rendered ? 1 : 0);
 			}
 		}
-
-		this.vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
-		RenderUtil.setVanillaTerrainEndDistanceInBlocks(this.vanillaTerrainEndDistance);
+		
+		/** horizontal distance from the camera to the nearest chunk MC can't draw (unloaded or past the render distance) */
+		float vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
+		RenderUtil.setVanillaTerrainEndDistanceInBlocks(vanillaTerrainEndDistance);
 
 		this.upload(width);
 		this.tryLogDiagnostic(nowMs, renderDistance, angelicaAccessor != null);

@@ -104,7 +104,7 @@ public class LzmaArrayCache extends ArrayCache
 	public int[] getIntArray(int size, boolean fillWithZeros) 
 	{
 		ArrayList<int[]> cacheList = this.intCache.computeIfAbsent(size, (newSize) -> new ArrayList<>(4));
-		if (cacheList.size() == 0)
+		if (cacheList.isEmpty())
 		{
 			return new int[size];
 		}

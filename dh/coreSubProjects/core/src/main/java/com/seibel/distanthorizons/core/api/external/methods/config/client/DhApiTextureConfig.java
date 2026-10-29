@@ -34,24 +34,24 @@ public class DhApiTextureConfig implements IDhApiTextureConfig
 	
 	@Override
 	public IDhApiConfigValue<Boolean> texturesEnabled()
-	{ return new DhApiConfigValue<Boolean, Boolean>(Config.Client.Advanced.Graphics.Texture.enableTexturedLods); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.enableTexturedLods); }
 	@Override
 	public IDhApiConfigValue<Integer> maxTexturedLodDetailLevel()
-	{ return new DhApiConfigValue<Integer, Integer>(Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel); }
 	
 	
 	
 	@Override
 	public IDhApiConfigValue<String> blocksDontRenderTextureCsv()
-	{ return new DhApiConfigValue<String, String>(Config.Client.Advanced.Graphics.Texture.blocksDontRenderTextureCsv); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blocksDontRenderTextureCsv); }
 	@Override
 	public IDhApiConfigValue<String> blocksDontUseSideTextureCsv()
-	{ return new DhApiConfigValue<String, String>(Config.Client.Advanced.Graphics.Texture.blocksDontUseSideTextureCsv); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blocksDontUseSideTextureCsv); }
 	@Override
 	public IDhApiConfigValue<String> blockTagsDontUseSideTextureCsv()
-	{ return new DhApiConfigValue<String, String>(Config.Client.Advanced.Graphics.Texture.blockTagsDontUseSideTextureCsv); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blockTagsDontUseSideTextureCsv); }
 	@Override
 	public IDhApiConfigValue<String> blocksAlwaysRasterizeTextureCsv()
-	{ return new DhApiConfigValue<String, String>(Config.Client.Advanced.Graphics.Texture.blocksAlwaysRasterizeTextureCsv); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blocksAlwaysRasterizeTextureCsv); }
 	
 }

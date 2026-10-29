@@ -11,9 +11,6 @@ public enum EGlDhInternalTextureFormat
 
 
 	private final int glFormat;
-	/** kept to document which GL version each format needs */
-	@SuppressWarnings("unused")
-	private final EGlVersion minimumGlVersion;
 	private final EGlDhPixelFormat expectedPixelFormat;
 
 
@@ -21,7 +18,7 @@ public enum EGlDhInternalTextureFormat
 	EGlDhInternalTextureFormat(int glFormat, EGlVersion minimumGlVersion, EGlDhPixelFormat expectedPixelFormat)
 	{
 		this.glFormat = glFormat;
-		this.minimumGlVersion = minimumGlVersion;
+		/** kept to document which GL version each format needs */
 		this.expectedPixelFormat = expectedPixelFormat;
 	}
 

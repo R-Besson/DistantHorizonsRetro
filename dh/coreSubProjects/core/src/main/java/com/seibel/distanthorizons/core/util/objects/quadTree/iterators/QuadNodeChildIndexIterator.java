@@ -51,7 +51,7 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 	
 	
 	@Override
-	public boolean hasNext() { return this.iteratorQueue.size() != 0; }
+	public boolean hasNext() { return !this.iteratorQueue.isEmpty(); }
 	
 	@Override
 	public Integer next()
@@ -60,9 +60,8 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 		{
 			throw new NoSuchElementException();
 		}
-		
-		Integer index = this.iteratorQueue.poll();
-		return index;
+
+        return this.iteratorQueue.poll();
 	}
 	
 	

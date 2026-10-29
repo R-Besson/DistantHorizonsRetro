@@ -77,7 +77,7 @@ public class FullDataSourceV1
 	/** A flattened 2D array (for the X and Z directions) containing an array for the Y direction. */
 	private final long[][] dataArrays;
 	
-	private long pos;
+	private final long pos;
 	
 	private boolean isEmpty = true;
 	

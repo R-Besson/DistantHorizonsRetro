@@ -194,19 +194,15 @@ public class ClassicConfigGUI
 		public final Gui indexButton;
 
 		private final String text;
-
-		private final List<Gui> children = new ArrayList<>();
-
+		
 		@NotNull
 		private final EConfigCommentTextPosition textPosition;
-		public final AbstractConfigBase dhConfigType;
+		public final AbstractConfigBase<?> dhConfigType;
 
 		public static final Map<Gui, String> TEXT_BY_WIDGET = new HashMap<>();
 		public static final Map<Gui, DhButtonEntry> BUTTON_BY_WIDGET = new HashMap<>();
 
-
-
-		public DhButtonEntry(DhConfigScreen gui, AbstractConfigBase dhConfigType, Gui button, String text, GuiButton resetButton, GuiButton indexButton)
+		public DhButtonEntry(DhConfigScreen gui, AbstractConfigBase<?> dhConfigType, Gui button, String text, GuiButton resetButton, GuiButton indexButton)
 		{
 			TEXT_BY_WIDGET.put(button, text);
 			BUTTON_BY_WIDGET.put(button, this);
@@ -218,11 +214,11 @@ public class ClassicConfigGUI
 			this.resetButton = resetButton;
 			this.text = text;
 			this.indexButton = indexButton;
-
-			if (button != null) { this.children.add(button); }
-			if (resetButton != null) { this.children.add(resetButton); }
-			if (indexButton != null) { this.children.add(indexButton); }
-
+			
+			List<Gui> children = new ArrayList<>();
+			if (button != null) { children.add(button); }
+			if (resetButton != null) { children.add(resetButton); }
+			if (indexButton != null) { children.add(indexButton); }
 
 			EConfigCommentTextPosition textPosition = null;
 			if (this.dhConfigType instanceof ConfigUIComment)

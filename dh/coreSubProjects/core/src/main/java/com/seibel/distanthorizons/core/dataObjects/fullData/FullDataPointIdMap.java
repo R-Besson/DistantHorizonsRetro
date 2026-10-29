@@ -379,7 +379,7 @@ public class FullDataPointIdMap
 		
 		if (foundStartIndex == -1)
 		{
-			throw new DataCorruptedException("Failed to deserialize BiomeBlockStateEntry ["+input.toString()+"], unable to find separator.");
+			throw new DataCorruptedException("Failed to deserialize BiomeBlockStateEntry ["+ input +"], unable to find separator.");
 		}
 		
 		biomeString.clear();
@@ -412,16 +412,14 @@ public class FullDataPointIdMap
 	@Override
 	public boolean equals(Object other)
 	{
-		if (other == this)
-			return true;
+        return other == this;
 /*        if (!(other instanceof FullDataPointIdMap)) return false;
 		FullDataPointIdMap otherMap = (FullDataPointIdMap) other;
         if (entries.size() != otherMap.entries.size()) return false;
         for (int i=0; i<entries.size(); i++) {
             if (!entries.get(i).equals(otherMap.entries.get(i))) return false;
         }*/
-		return false;
-	}
+    }
 	
 	/** Only includes the base data in this object, not the mapping */
 	@Override

@@ -48,7 +48,7 @@ public class ThreadUtil
 		// ThreadPoolExecutor vs the more generic ExecutorService
 		return new ThreadPoolExecutor(/*corePoolSize*/ poolSize, /*maxPoolSize*/ poolSize,
 				0L, TimeUnit.MILLISECONDS,
-				new LinkedBlockingQueue<Runnable>(),
+			new LinkedBlockingQueue<>(),
 				new DhThreadFactory(name, priority, isDaemon));
 	}
 	

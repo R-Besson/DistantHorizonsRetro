@@ -140,7 +140,7 @@ public class LodBufferContainer implements AutoCloseable
 		//=============//
 		//region	
 		
-		CompletableFuture<Void> createFuture = new CompletableFuture<Void>();
+		CompletableFuture<Void> createFuture = new CompletableFuture<>();
 		RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("LodBufferContainer Setup", () ->
 		{
 			try
@@ -412,8 +412,7 @@ public class LodBufferContainer implements AutoCloseable
 	private static int vertexByteBufferToVertexCount(ByteBuffer buffer)
 	{
 		int size = buffer.limit() - buffer.position();
-		int vertexCount = size / LodQuadBuilder.BYTES_PER_VERTEX;
-		return vertexCount;
+        return size / LodQuadBuilder.BYTES_PER_VERTEX;
 	}
 	
 	/** can be used when debugging */

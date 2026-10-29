@@ -291,18 +291,18 @@ class DhConfigScreen extends DhScreen
 	private static void setupBooleanMenuOption(ConfigEntry<Boolean> booleanConfigEntry)
 	{
 		// For boolean
-		Function<Object, String> func = value -> (((Boolean) value ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + Translatable("distanthorizons.general."+((Boolean) value ? "true" : "false")));
+		Function<Object, String> func = value -> (((Boolean) value ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + Translatable("distanthorizons.general."+(((Boolean) value).toString())));
 
 		final ConfigGuiInfo configGuiInfo = ((ConfigGuiInfo) booleanConfigEntry.guiValue);
 
 		configGuiInfo.buttonOptionMap =
-			new AbstractMap.SimpleEntry<OnPressed, Function<Object, String>>(
+			new AbstractMap.SimpleEntry<>(
 				(button) ->
 				{
 					button.enabled = !booleanConfigEntry.apiIsOverriding();
-
+					
 					booleanConfigEntry.uiSetWithoutSaving(!booleanConfigEntry.get());
-
+					
 					button.displayString = func.apply(booleanConfigEntry.get());
 				}, func);
 	}
@@ -316,18 +316,18 @@ class DhConfigScreen extends DhScreen
 		Function<Object, String> getEnumTranslatableFunc = (value) -> Translatable(translatableEnumPrefix + value.toString());
 
 		configGuiInfo.buttonOptionMap =
-			new AbstractMap.SimpleEntry<OnPressed, Function<Object, String>>(
+			new AbstractMap.SimpleEntry<>(
 				(button) ->
 				{
 					// get the currently selected enum and enum index
 					int startingIndex = enumList.indexOf(enumConfigEntry.get());
 					Enum<?> enumValue = enumList.get(startingIndex);
-
+					
 					boolean shiftPressed = GuiScreen.isShiftKeyDown();
-
+					
 					// move forward or backwards depending on if the shift key is pressed
 					int index = shiftPressed ? startingIndex - 1 : startingIndex + 1;
-
+					
 					// wrap around to the other side of the array when necessary
 					if (index >= enumList.size())
 					{
@@ -337,13 +337,13 @@ class DhConfigScreen extends DhScreen
 					{
 						index = enumList.size() - 1;
 					}
-
-
+					
+					
 					// walk through the enums to find the next selectable one
 					while (index != startingIndex)
 					{
 						enumValue = enumList.get(index);
-
+						
 						// does enum have ignore attribute?
 						boolean selectable = !AnnotationUtil.doesEnumHaveAnnotation(enumValue, DisallowSelectingViaConfigGui.class);
 						if (selectable)
@@ -355,17 +355,17 @@ class DhConfigScreen extends DhScreen
 								selectable = showEnumFunc.shouldShowEnum(enumValue);
 							}
 						}
-
+						
 						if (selectable)
 						{
 							// this enum is a valid option
 							break;
 						}
-
-
+						
+						
 						// move forward or backwards depending on if the shift key is pressed
 						index = shiftPressed ? index - 1 : index + 1;
-
+						
 						// wrap around to the other side of the array when necessary
 						if (index >= enumList.size())
 						{
@@ -376,18 +376,18 @@ class DhConfigScreen extends DhScreen
 							index = enumList.size() - 1;
 						}
 					}
-
-
+					
+					
 					if (index == startingIndex)
 					{
 						// one of the enums should be selectable, this is a programmer error
 						enumValue = enumList.get(startingIndex);
 						LOGGER.warn("Enum [" + enumValue.getClass() + "] doesn't contain any values that should be selectable via the UI, sticking to the currently selected value [" + enumValue + "].");
 					}
-
-
+					
+					
 					enumConfigEntry.uiSetWithoutSaving(enumValue);
-
+					
 					button.enabled = !enumConfigEntry.apiIsOverriding();
 					button.displayString = getEnumTranslatableFunc.apply(enumConfigEntry.get());
 				}, getEnumTranslatableFunc);

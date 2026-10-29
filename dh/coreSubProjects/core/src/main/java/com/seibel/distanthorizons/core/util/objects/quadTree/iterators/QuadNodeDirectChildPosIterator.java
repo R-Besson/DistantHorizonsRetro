@@ -53,8 +53,7 @@ public class QuadNodeDirectChildPosIterator<T> implements LongIterator
 		
 		
 		int childIndex = this.childIndexIterator.next();
-		long sectionPos = DhSectionPos.getChildByIndex(this.parentNode.sectionPos, childIndex);
-		return sectionPos;
+        return DhSectionPos.getChildByIndex(this.parentNode.sectionPos, childIndex);
 	}
 	
 	

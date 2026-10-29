@@ -213,9 +213,8 @@ public class FullDataSourceV2
 				}
 			}
 		}
-		
-		FullDataSourceV2 fullDataSource = FullDataSourceV2.createWithData(legacyData.getPos(), legacyData.mapping, dataPoints, columnGenerationSteps, columnWorldCompressionMode);
-		return fullDataSource;
+
+        return FullDataSourceV2.createWithData(legacyData.getPos(), legacyData.mapping, dataPoints, columnGenerationSteps, columnWorldCompressionMode);
 	}
 	
 	public static FullDataSourceV2 createEmpty(long pos)

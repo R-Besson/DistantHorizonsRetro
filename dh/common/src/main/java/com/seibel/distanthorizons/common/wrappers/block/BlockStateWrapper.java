@@ -104,7 +104,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	@Nullable
 	public final IBlockState blockState;
 	/** technically final, but since it requires a method call to generate it can't be marked as such */
-	private String serialString;
+	private final String serialString;
 	private final int hashCode;
 	/** Should be between {@link LodUtil#BLOCK_FULLY_OPAQUE} and {@link LodUtil#BLOCK_FULLY_OPAQUE} */
 	private final int opacity;
@@ -942,7 +942,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 					continue;
 				}
 				String cleanedResourceLocation = blockResourceLocation.trim();
-				if (cleanedResourceLocation.length() == 0)
+				if (cleanedResourceLocation.isEmpty())
 				{
 					continue;
 				}

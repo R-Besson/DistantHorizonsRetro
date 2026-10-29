@@ -60,8 +60,7 @@ public class FullDataPayloadReceiver implements AutoCloseable
 		
 		try
 		{
-			FullDataSourceV2DTO dataSourceDto = INetworkObject.decodeToInstance(FullDataSourceV2DTO.CreateEmptyDataSourceForDecoding(), compositeByteBuffer);
-			return dataSourceDto;
+			return INetworkObject.decodeToInstance(FullDataSourceV2DTO.CreateEmptyDataSourceForDecoding(), compositeByteBuffer);
 		}
 		finally
 		{

@@ -72,7 +72,7 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 	// debugging values
 	private static volatile boolean debugThreadRunning = false;
 	private static long timeSinceLastDebugClear = 0L;
-	private static boolean logFullColumnInDebug = false;
+	private static final boolean logFullColumnInDebug = false;
 	private static DhApiVec3i currentDebugVec3i = new DhVec3i();
 	
 	

@@ -200,7 +200,7 @@ public class FullDataToRenderDataTransformer
 	{
 		// we can't do anything if the full data is missing or empty
 		if (fullDataColumn == null 
-			|| fullDataColumn.size() == 0)
+			|| fullDataColumn.isEmpty())
 		{
 			return;
 		}

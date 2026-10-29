@@ -178,16 +178,11 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 			return false;
 		}
 		
-		if (genPlan.surfaceGenEnabled
-			&& chunkGenMode == EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY)
-		{
-			// If surface gen is enabled, ignore any
-			// pre-existing chunks since empty/missing chunks will replace the surface
-			// generated terrain.
-			return false;
-		}
-		
-		return true;
+		// If surface gen is enabled, ignore any
+		// pre-existing chunks since empty/missing chunks will replace the surface
+		// generated terrain.
+		return !genPlan.surfaceGenEnabled
+			|| chunkGenMode != EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY;
 	}
 	
 	private @NotNull CompletableFuture<Void> generateChunksAsync(

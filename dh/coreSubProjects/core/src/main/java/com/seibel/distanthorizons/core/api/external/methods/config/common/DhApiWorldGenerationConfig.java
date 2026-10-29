@@ -46,7 +46,7 @@ public class DhApiWorldGenerationConfig implements IDhApiWorldGenerationConfig
 	@Deprecated
 	@Override
 	public IDhApiConfigValue<Boolean> enableDistantWorldGeneration()
-	{ return new DhApiConfigValue<EDhApiGeneratorPlan, Boolean>(Config.Common.WorldGenerator.generatorPlan, new ApiGeneratorModeToBoolConverter()); }
+	{ return new DhApiConfigValue<>(Config.Common.WorldGenerator.generatorPlan, new ApiGeneratorModeToBoolConverter()); }
 	@Override
 	public IDhApiConfigValue<EDhApiGeneratorPlan> GeneratorPlan()
 	{ return new DhApiConfigValue<>(Config.Common.WorldGenerator.generatorPlan); }

@@ -10,9 +10,6 @@ public enum EGlDhPixelFormat
 
 
 	private final int glFormat;
-	/** kept to document which GL version each format needs */
-	@SuppressWarnings("unused")
-	private final EGlVersion minimumGlVersion;
 	private final boolean isInteger;
 
 
@@ -20,7 +17,7 @@ public enum EGlDhPixelFormat
 	EGlDhPixelFormat(int glFormat, EGlVersion minimumGlVersion, boolean isInteger)
 	{
 		this.glFormat = glFormat;
-		this.minimumGlVersion = minimumGlVersion;
+		/** kept to document which GL version each format needs */
 		this.isInteger = isInteger;
 	}
 

@@ -74,7 +74,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	
 	
 	private final String connectionString;
-	private final String getConnectionString() { return this.connectionString; }
+	private String getConnectionString() { return this.connectionString; }
 	private final ConcurrentHashMap<Thread, Connection> connectionByThread = new ConcurrentHashMap<>();
 	
 	public final String databaseType;
@@ -611,7 +611,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 				
 				// wait a few moments for any last queries to finish
 				int waitCount = 0;
-				while (this.openClosables.size() != 0
+				while (!this.openClosables.isEmpty()
 					// wait up to 1 second for in-progress queries to finish (hopefully they'll finish in much less time then that)
 					&& waitCount < 10)
 				{
@@ -787,7 +787,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			String str = closableWrapper.wrappedClosable.getClass().getSimpleName();
 			if (closableWrapper.wrappedClosable instanceof ResultSet)
 			{
-				str += " @ " + closableWrapper.wrappedClosable.toString();
+				str += " @ " + closableWrapper.wrappedClosable;
 			}
 			else if (closableWrapper.wrappedClosable instanceof PreparedStatement)
 			{
@@ -801,7 +801,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			}
 			else
 			{
-				str += " @ " + closableWrapper.wrappedClosable.toString();
+				str += " @ " + closableWrapper.wrappedClosable;
 			}
 			
 			

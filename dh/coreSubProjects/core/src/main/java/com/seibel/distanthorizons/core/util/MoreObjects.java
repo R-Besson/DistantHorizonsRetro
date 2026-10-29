@@ -98,8 +98,6 @@ public final class MoreObjects {
 		private final String className;
 		private final ValueHolder holderHead = new ValueHolder();
 		private ValueHolder holderTail = holderHead;
-		private boolean omitNullValues = false;
-		private boolean omitEmptyValues = false;
 		
 		/** Use {@link MoreObjects#toStringHelper(Object)} to create an instance. */
 		private ToStringHelper(String className) {
@@ -122,7 +120,7 @@ public final class MoreObjects {
 		 */
 		
 		public ToStringHelper add(String name, boolean value) {
-			return addUnconditionalHolder(name, String.valueOf(value));
+			return addHolder(name, String.valueOf(value));
 		}
 		
 		/**
@@ -132,7 +130,7 @@ public final class MoreObjects {
 		 */
 		
 		public ToStringHelper add(String name, int value) {
-			return addUnconditionalHolder(name, String.valueOf(value));
+			return addHolder(name, String.valueOf(value));
 		}
 		
 		/**
@@ -142,32 +140,7 @@ public final class MoreObjects {
 		 */
 		
 		public ToStringHelper add(String name, long value) {
-			return addUnconditionalHolder(name, String.valueOf(value));
-		}
-
-		private static boolean isEmpty(Object value) {
-			// Put types estimated to be the most frequent first.
-			if (value instanceof CharSequence) {
-				return ((CharSequence) value).length() == 0;
-			} else if (value instanceof Collection) {
-				return ((Collection<?>) value).isEmpty();
-			} else if (value instanceof Map) {
-				return ((Map<?, ?>) value).isEmpty();
-			} else if (value instanceof java.util.Optional) {
-				return !((java.util.Optional<?>) value).isPresent();
-			} else if (value instanceof OptionalInt) {
-				return !((OptionalInt) value).isPresent();
-			} else if (value instanceof OptionalLong) {
-				return !((OptionalLong) value).isPresent();
-			} else if (value instanceof OptionalDouble) {
-				return !((OptionalDouble) value).isPresent();
-			} else if (value instanceof Optional) {
-				return !((Optional) value).isPresent();
-			} else if (value.getClass()
-				.isArray()) {
-				return Array.getLength(value) == 0;
-			}
-			return false;
+			return addHolder(name, String.valueOf(value));
 		}
 		
 		/**
@@ -182,30 +155,26 @@ public final class MoreObjects {
 		@Override
 		public String toString() {
 			// create a copy to keep it consistent in case value changes
-			boolean omitNullValuesSnapshot = omitNullValues;
-			boolean omitEmptyValuesSnapshot = omitEmptyValues;
 			String nextSeparator = "";
 			StringBuilder builder = new StringBuilder(32).append(className)
 				.append('{');
 			for (ValueHolder valueHolder = holderHead.next; valueHolder != null; valueHolder = valueHolder.next) {
 				Object value = valueHolder.value;
-				if (valueHolder instanceof UnconditionalValueHolder
-					|| (value == null ? !omitNullValuesSnapshot : (!omitEmptyValuesSnapshot || !isEmpty(value)))) {
-					builder.append(nextSeparator);
-					nextSeparator = ", ";
-					
-					if (valueHolder.name != null) {
-						builder.append(valueHolder.name)
-							.append('=');
-					}
-					if (value != null && value.getClass()
-						.isArray()) {
-						Object[] objectArray = { value };
-						String arrayString = Arrays.deepToString(objectArray);
-						builder.append(arrayString, 1, arrayString.length() - 1);
-					} else {
-						builder.append(value);
-					}
+				
+				builder.append(nextSeparator);
+				nextSeparator = ", ";
+				
+				if (valueHolder.name != null) {
+					builder.append(valueHolder.name)
+						.append('=');
+				}
+				if (value != null && value.getClass()
+					.isArray()) {
+					Object[] objectArray = { value };
+					String arrayString = Arrays.deepToString(objectArray);
+					builder.append(arrayString, 1, arrayString.length() - 1);
+				} else {
+					builder.append(value);
 				}
 			}
 			return builder.append('}')
@@ -225,33 +194,12 @@ public final class MoreObjects {
 			return this;
 		}
 		
-		private UnconditionalValueHolder addUnconditionalHolder() {
-			UnconditionalValueHolder valueHolder = new UnconditionalValueHolder();
-			holderTail = holderTail.next = valueHolder;
-			return valueHolder;
-		}
-		
-		private ToStringHelper addUnconditionalHolder(String name, Object value) {
-			UnconditionalValueHolder valueHolder = addUnconditionalHolder();
-			valueHolder.value = value;
-			valueHolder.name = checkNotNull(name);
-			return this;
-		}
-		
 		// Holder object for values that might be null and/or empty.
 		static class ValueHolder {
 			
 			String name;
 			Object value;
 			ValueHolder next;
-		}
-		
-		/**
-		 * Holder object for values that cannot be null or empty (will be printed unconditionally). This
-		 * helps to shortcut most calls to isEmpty(), which is important because the check for emptiness
-		 * is relatively expensive. Use a subtype so this also doesn't need any extra storage.
-		 */
-		private static final class UnconditionalValueHolder extends ValueHolder {
 		}
 	}
 	

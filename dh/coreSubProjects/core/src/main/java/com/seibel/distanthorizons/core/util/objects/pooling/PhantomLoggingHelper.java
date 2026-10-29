@@ -61,7 +61,7 @@ public class PhantomLoggingHelper
 			
 			stringBuilder.append(count).append(". ").append(stack).append("\n");
 		}
-		logger.warn(prefix+" Stacks: ["+ allocationStackTraceCountPairList.size()+"]\n" + stringBuilder.toString());
+		logger.warn(prefix+" Stacks: ["+ allocationStackTraceCountPairList.size()+"]\n" + stringBuilder);
 	}
 	
 	
@@ -100,7 +100,6 @@ public class PhantomLoggingHelper
 		private static final ThreadPoolExecutor CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("BasicPhantom Cleanup");
 		
 		
-		private final Class<?> parentClass;
 		private final PhantomReference<? extends BasicPhantomReference> phantomReference; 
 		
 		
@@ -110,13 +109,12 @@ public class PhantomLoggingHelper
 		//==============//
 		//region
 		
-		static { CLEANUP_THREAD.execute(() -> runPhantomReferenceCleanupLoop()); }
+		static { CLEANUP_THREAD.execute(BasicPhantomReference::runPhantomReferenceCleanupLoop); }
 		
 		public BasicPhantomReference(Class<?> parentClass)
 		{
-			this.parentClass = parentClass;
 			this.phantomReference = new PhantomReference<>(this, PHANTOM_REFERENCE_QUEUE);
-			PHANTOM_TO_PARENT_CLASS.put(this.phantomReference, this.parentClass);
+			PHANTOM_TO_PARENT_CLASS.put(this.phantomReference, parentClass);
 		}
 		
 		//endregion

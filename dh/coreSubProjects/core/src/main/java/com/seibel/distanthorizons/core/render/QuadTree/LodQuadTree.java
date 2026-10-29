@@ -1059,16 +1059,9 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		
 		
 		boolean generatorEnabled = this.fullDataSourceProvider.getGeneratorPlan().generationEnabled;
-		if (generatorEnabled)
-		{
-			// world gen tasks will need to be re-queued
-			// since all the render sections will already have been loaded
-			this.requeueAllRetrievalTasksRef.set(true);
-		}
-		else
-		{
-			this.requeueAllRetrievalTasksRef.set(false);
-		}
+		// world gen tasks will need to be re-queued
+		// since all the render sections will already have been loaded
+		this.requeueAllRetrievalTasksRef.set(generatorEnabled);
 	}
 	
 	/** Does nothing if the missing positions are already queued. */
@@ -1109,13 +1102,8 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		
 		// don't queue additional world gen requests if the file handler is busy
 		PriorityTaskPicker.Executor fileHandlerExecutor = ThreadPoolUtil.getFileHandlerExecutor();
-		if (fileHandlerExecutor == null
-			|| fileHandlerExecutor.getQueueSize() >= FullDataUpdatePropagatorV2.getMaxPropagateTaskCount() / 2)
-		{
-			return false;
-		}
-		
-		return true;
+		return fileHandlerExecutor != null
+			&& fileHandlerExecutor.getQueueSize() < FullDataUpdatePropagatorV2.getMaxPropagateTaskCount() / 2;
 	}
 	
 	//endregion world gen

@@ -346,7 +346,7 @@ public class LodDataBuilder
 			int bottomYBlockPos, boolean runAdditionalValidation) throws DataCorruptedException
 	{
 		if (topDownColumnDataPoints == null 
-			|| topDownColumnDataPoints.size() == 0)
+			|| topDownColumnDataPoints.isEmpty())
 		{
 			return new LongArrayList(0);
 		}

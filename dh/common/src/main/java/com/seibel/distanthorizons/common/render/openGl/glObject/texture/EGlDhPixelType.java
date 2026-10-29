@@ -10,16 +10,13 @@ public enum EGlDhPixelType
 
 
 	private final int glFormat;
-	/** kept to document which GL version each type needs */
-	@SuppressWarnings("unused")
-	private final EGlVersion minimumGlVersion;
-
-
-
+	
+	
+	
 	EGlDhPixelType(int glFormat, EGlVersion minimumGlVersion)
 	{
 		this.glFormat = glFormat;
-		this.minimumGlVersion = minimumGlVersion;
+		/** kept to document which GL version each type needs */
 	}
 
 

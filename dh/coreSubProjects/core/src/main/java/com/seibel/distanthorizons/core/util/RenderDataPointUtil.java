@@ -205,20 +205,17 @@ public class RenderDataPointUtil
 				LodUtil.assertNotReach("Trying to create datapoint with min Y [" + minY + "] greater than max Y [" + maxY + "]!");
 			}
 		}
-		
-		
-		long out = (long) (alpha >>> ALPHA_DOWNSIZE_SHIFT) << ALPHA_SHIFT
-				| (red & RED_MASK) << RED_SHIFT
-				| (green & GREEN_MASK) << GREEN_SHIFT
-				| (blue & BLUE_MASK) << BLUE_SHIFT
-				| (maxY & MAX_Y_MASK) << MAX_Y_SHIFT
-				| (minY & MIN_Y_MASK) << MIN_Y_SHIFT
-				| (lightBlock & BLOCK_LIGHT_MASK) << BLOCK_LIGHT_SHIFT
-				| (lightSky & SKY_LIGHT_MASK) << SKY_LIGHT_SHIFT
-				| (irisBlockMaterialId & IRIS_BLOCK_MATERIAL_ID_MASK) << IRIS_BLOCK_MATERIAL_ID_SHIFT
-				;
-		
-		return out;
+
+
+        return (long) (alpha >>> ALPHA_DOWNSIZE_SHIFT) << ALPHA_SHIFT
+		        | (red & RED_MASK) << RED_SHIFT
+		        | (green & GREEN_MASK) << GREEN_SHIFT
+		        | (blue & BLUE_MASK) << BLUE_SHIFT
+		        | (maxY & MAX_Y_MASK) << MAX_Y_SHIFT
+		        | (minY & MIN_Y_MASK) << MIN_Y_SHIFT
+		        | (lightBlock & BLOCK_LIGHT_MASK) << BLOCK_LIGHT_SHIFT
+		        | (lightSky & SKY_LIGHT_MASK) << SKY_LIGHT_SHIFT
+		        | (irisBlockMaterialId & IRIS_BLOCK_MATERIAL_ID_MASK) << IRIS_BLOCK_MATERIAL_ID_SHIFT;
 	}
 	
 	/** AKA the ending/top/highest Y value above {@link ILevelWrapper#getMinHeight()} ()} */

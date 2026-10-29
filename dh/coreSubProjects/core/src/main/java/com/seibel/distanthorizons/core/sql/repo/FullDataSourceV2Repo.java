@@ -823,10 +823,9 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				{
 					return 0L;
 				}
-				
-				
-				long chunkCount = result.getLong("ChunkCount");
-				return chunkCount;
+
+
+                return result.getLong("ChunkCount");
 			}
 		}
 		catch (SQLException e)

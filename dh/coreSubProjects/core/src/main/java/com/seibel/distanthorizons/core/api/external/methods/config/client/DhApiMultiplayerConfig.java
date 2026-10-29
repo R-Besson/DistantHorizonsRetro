@@ -34,6 +34,6 @@ public class DhApiMultiplayerConfig implements IDhApiMultiplayerConfig
 	
 	
 	public IDhApiConfigValue<EDhApiServerFolderNameMode> folderSavingMode()
-	{ return new DhApiConfigValue<EDhApiServerFolderNameMode, EDhApiServerFolderNameMode>(Config.Client.Advanced.Multiplayer.serverFolderNameMode); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Multiplayer.serverFolderNameMode); }
 	
 }

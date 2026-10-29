@@ -86,8 +86,7 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 		int blue = resultSet.getInt("ColorB");
 		
 		
-		BeaconBeamDTO dto = new BeaconBeamDTO(new DhBlockPos(posX, posY, posZ), new Color(red, green, blue));
-		return dto;
+		return new BeaconBeamDTO(new DhBlockPos(posX, posY, posZ), new Color(red, green, blue));
 	}
 	
 	private final String upsertSqlTemplate =

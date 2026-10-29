@@ -780,7 +780,7 @@ public class DhLightingEngine
 		private static final Queue<StableLightPosStack> lightArrayCache = new ArrayDeque<>();
 		
 		/** the index of the last item in the array, -1 if empty */
-		private int[] indexByLightLevel = new int[LodUtil.MAX_MC_LIGHT + 1];
+		private final int[] indexByLightLevel = new int[LodUtil.MAX_MC_LIGHT + 1];
 
 		/** x, y, z */
 		public static final int INTS_PER_LIGHT_POS = 3;

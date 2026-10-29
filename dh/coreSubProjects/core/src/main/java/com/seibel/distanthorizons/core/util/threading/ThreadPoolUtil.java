@@ -218,10 +218,7 @@ public class ThreadPoolUtil
 			// Don't run updates if there are chunks that need processing.
 			// This is especially important when running with Chunky.
 			int maxQueueSize = lodBuilderExecutor.getPoolSize() * 200;
-			if (lodBuilderExecutor.getQueueSize() > maxQueueSize)
-			{
-				return false;
-			}
+			return lodBuilderExecutor.getQueueSize() <= maxQueueSize;
 		}
 		
 		return true;
@@ -239,13 +236,8 @@ public class ThreadPoolUtil
 		double cameraSpeed = ClientApi.INSTANCE.getAvgCameraSpeed();
 		// stop these threads if moving a little bit slower than max elytra speed
 		double maxAllowedSpeed = (LodUtil.ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC - 10.0);
-		if (cameraSpeed > maxAllowedSpeed)
-		{
-			// pause if the user is moving too fast
-			return true;
-		}
-		
-		return false;
+		// pause if the user is moving too fast
+		return cameraSpeed > maxAllowedSpeed;
 	}
 	
 	private static boolean chunkBuilderOverloaded()
@@ -255,13 +247,8 @@ public class ThreadPoolUtil
 		// if this happens we want to limit other executors
 		// so these tasks can be hanlded.
 		PriorityTaskPicker.Executor ex = getChunkToLodBuilderExecutor();
-		if (ex != null
-			&& ex.getQueueSize() > 1000)
-		{
-			return true;
-		}
-		
-		return false;
+		return ex != null
+			&& ex.getQueueSize() > 1000;
 	}
 	
 	///endregion

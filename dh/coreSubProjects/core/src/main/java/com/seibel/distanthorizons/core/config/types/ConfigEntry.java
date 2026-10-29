@@ -40,8 +40,8 @@ import java.util.function.Consumer;
 public class ConfigEntry<T> extends AbstractConfigBase<T>
 {
 	private final String comment;
-	private T min;
-	private T max;
+	private final T min;
+	private final T max;
 	private final ArrayList<IConfigListener> listenerList;
 	private final String chatCommandName;
 	@Nullable
@@ -174,20 +174,15 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		}
 		
 		long timeSinceLastApiSet = (System.currentTimeMillis() - this.apiValueLastSetMs);
-		if (timeSinceLastApiSet < 500L)
-		{
-			// an API value was present very recently
-			
-			// This check is necessary to fix an issue where rendering mods may change
-			// an API option on a per-frame basis then disable it after the frame
-			// is over.
-			// Causing the UI to appear like the option can be changed,
-			// when it can't.
-			return true;
-		}
+		// an API value was present very recently
+		// This check is necessary to fix an issue where rendering mods may change
+		// an API option on a per-frame basis then disable it after the frame
+		// is over.
+		// Causing the UI to appear like the option can be changed,
+		// when it can't.
+		return timeSinceLastApiSet < 500L;
 		
 		// this option can be controlled like normal
-		return false;
 	}
 	
 	/** setting to null will allow the config to be used normally */
@@ -393,7 +388,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		private T tmpMax = null;
 		protected String tmpChatCommandName = null;
 		protected IShowEnumOptionFunc tmpShowEnumOptionFunc = null;
-		private boolean tmpUseApiOverwrite = true;
 		protected ArrayList<IConfigListener> tmpIConfigListener = new ArrayList<>();
 		
 		
@@ -412,11 +406,10 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return this;
 		}
 		
-		public Builder<T> setMinMax(T newMin, T newMax)
+		public void setMinMax(T newMin, T newMax)
 		{
 			this.tmpMin = newMin;
 			this.tmpMax = newMax;
-			return this;
 		}
 		
 		public Builder<T> setChatCommandName(String name)
@@ -443,12 +436,13 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		
 		public ConfigEntry<T> build()
 		{
+			boolean tmpUseApiOverwrite = true;
 			return new ConfigEntry<>(
 				this.tmpAppearance,
 				this.tmpComment, this.tmpChatCommandName, 
 				this.tmpShowEnumOptionFunc,
 				this.tmpValue, this.tmpMin, this.tmpMax,
-				this.tmpUseApiOverwrite, 
+				tmpUseApiOverwrite, 
 				this.tmpIConfigListener);
 		}
 		

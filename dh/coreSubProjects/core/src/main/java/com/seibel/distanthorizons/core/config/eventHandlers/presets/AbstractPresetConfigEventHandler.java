@@ -214,7 +214,7 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 			LOGGER.warn("Multiple potential preset options [" + StringUtil.join(", ", possiblePrestList) + "], defaulting to the first one.");
 		}
 		
-		if (possiblePrestList.size() == 0)
+		if (possiblePrestList.isEmpty())
 		{
 			// if no options are valid, return "CUSTOM"
 			possiblePrestList.add(this.getCustomPresetEnum());

@@ -304,9 +304,8 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 				: this.fullDataSourceProvider.getAdjForDirection(finalPos, direction.opposite()))
 		{
 			// neighbors only have (and are only read for) their edge facing this section
-			ColumnRenderSource columnRenderSource = FullDataToRenderDataTransformer.transformFullDataToRenderSource(
+			return FullDataToRenderDataTransformer.transformFullDataToRenderSource(
 				fullDataSource, this.clientLevelWrapper, (direction != null) ? direction.opposite() : null);
-			return columnRenderSource;
 		}
 		catch (Exception e)
 		{

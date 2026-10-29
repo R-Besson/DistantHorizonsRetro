@@ -119,7 +119,7 @@ public class DataMigratorV1 implements AutoCloseable
 				this.legacyDeletionCount = totalDeleteCount;
 				
 				ArrayList<String> unusedDataPosList = this.v1DataSourceProvider.repo.getUnusedDataSourcePositionStringList(50);
-				while (unusedDataPosList.size() != 0)
+				while (!unusedDataPosList.isEmpty())
 				{
 					unusedCount += unusedDataPosList.size();
 					this.legacyDeletionCount -= unusedDataPosList.size();

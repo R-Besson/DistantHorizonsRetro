@@ -112,7 +112,6 @@ public class ColumnBox
 		short maxX = (short) (minX + blockWidth);
 		short maxY = (short) (minY + yHeight);
 		short maxZ = (short) (minZ + blockWidth);
-		byte skyLightTop = skyLight;
 		byte skyLightBottom = RenderDataPointUtil.doesDataPointExist(bottomData) ? RenderDataPointUtil.getLightSky(bottomData) : LodUtil.MIN_MC_LIGHT;
 		
 		boolean transparencyEnabled = Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE;
@@ -184,14 +183,14 @@ public class ColumnBox
 					|| irisBlockMaterialId == EDhApiBlockMaterial.ILLUMINATED.index;
 				int cornerLights = selfLit
 					? BufferQuad.UNIFORM_CORNER_LIGHTS
-					: getSmoothTopCornerLights(adjData, maxY, skyLightTop, blockLight);
+					: getSmoothTopCornerLights(adjData, maxY, skyLight, blockLight);
 
 				builder.addQuadUp(
 					minX, maxY, minZ,
 					blockWidth,
 					ColorUtil.applyShade(color, clientLevelWrapper.getShade(EDhDirection.UP)), tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.UP),
 					irisBlockMaterialId,
-					skyLightTop, blockLight,
+					skyLight, blockLight,
 					cornerLights);
 			}
 		}

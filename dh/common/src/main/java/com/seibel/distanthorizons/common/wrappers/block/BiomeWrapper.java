@@ -184,8 +184,7 @@ public class BiomeWrapper implements IBiomeWrapper
 	public static IBiomeWrapper deserialize(String resourceLocationString, ILevelWrapper levelWrapper) throws IOException
 	{
 		// we need the final string for the concurrent hash map later
-		final String finalResourceStateString = resourceLocationString;
-
+		
 		if (resourceLocationString.equals(EMPTY_BIOME_STRING))
 		{
 			if (!emptyStringWarningLogged)
@@ -202,7 +201,7 @@ public class BiomeWrapper implements IBiomeWrapper
 		}
 
 		// single lookup, this is called for every biome read from the database
-		BiomeWrapper cachedWrapper = WRAPPER_BY_RESOURCE_LOCATION.get(finalResourceStateString);
+		BiomeWrapper cachedWrapper = WRAPPER_BY_RESOURCE_LOCATION.get(resourceLocationString);
 		if (cachedWrapper != null)
 		{
 			return cachedWrapper;
@@ -235,12 +234,12 @@ public class BiomeWrapper implements IBiomeWrapper
 			}
 			catch (Exception e)
 			{
-				throw new IOException("Failed to deserialize the string [" + finalResourceStateString + "] into a BiomeWrapper: " + e.getMessage(), e);
+				throw new IOException("Failed to deserialize the string [" + resourceLocationString + "] into a BiomeWrapper: " + e.getMessage(), e);
 			}
 		}
 		finally
 		{
-			WRAPPER_BY_RESOURCE_LOCATION.putIfAbsent(finalResourceStateString, foundWrapper);
+			WRAPPER_BY_RESOURCE_LOCATION.putIfAbsent(resourceLocationString, foundWrapper);
 		}
 	}
 

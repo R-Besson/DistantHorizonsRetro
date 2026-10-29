@@ -28,10 +28,10 @@ public class FullDataOcclusionCuller
 		LongArrayList posZColumn = dataSource.tryGetColumnAtRelPos(relX, relZ + 1);
 		LongArrayList negZColumn = dataSource.tryGetColumnAtRelPos(relX, relZ - 1);
 		
-		if (posXColumn == null || posXColumn.size() == 0
-			|| negXColumn == null || negXColumn.size() == 0
-			|| posZColumn == null || posZColumn.size() == 0
-			|| negZColumn == null || negZColumn.size() == 0)
+		if (posXColumn == null || posXColumn.isEmpty()
+			|| negXColumn == null || negXColumn.isEmpty()
+			|| posZColumn == null || posZColumn.isEmpty()
+			|| negZColumn == null || negZColumn.isEmpty())
 		{
 			// if any adjacent columns are empty then we can't
 			// cull this column, since at least one side will be open

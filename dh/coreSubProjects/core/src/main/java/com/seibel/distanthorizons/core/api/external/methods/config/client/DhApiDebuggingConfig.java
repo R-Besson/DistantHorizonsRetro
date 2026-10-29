@@ -34,18 +34,18 @@ public class DhApiDebuggingConfig implements IDhApiDebuggingConfig
 	
 	
 	public IDhApiConfigValue<EDhApiDebugRendering> debugRendering()
-	{ return new DhApiConfigValue<EDhApiDebugRendering, EDhApiDebugRendering>(Config.Client.Advanced.Debugging.debugRenderingColors); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.debugRenderingColors); }
 	
 	public IDhApiConfigValue<Boolean> debugKeybindings()
-	{ return new DhApiConfigValue<Boolean, Boolean>(Config.Client.Advanced.Debugging.enableDebugKeybindings); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.enableDebugKeybindings); }
 	
 	public IDhApiConfigValue<Boolean> renderWireframe()
-	{ return new DhApiConfigValue<Boolean, Boolean>(Config.Client.Advanced.Debugging.renderWireframe); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.renderWireframe); }
 	
 	public IDhApiConfigValue<Boolean> lodOnlyMode()
-	{ return new DhApiConfigValue<Boolean, Boolean>(Config.Client.Advanced.Debugging.lodOnlyMode); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.lodOnlyMode); }
 	
 	public IDhApiConfigValue<Boolean> debugWireframeRendering()
-	{ return new DhApiConfigValue<Boolean, Boolean>(Config.Client.Advanced.Debugging.DebugWireframe.enableRendering); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.DebugWireframe.enableRendering); }
 	
 }

@@ -295,7 +295,7 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 			for (ConfigEntry<Boolean> config : this.renderableListByConfig.keySet())
 			{
 				LinkedList<WeakReference<IDebugRenderable>> renderableList = this.renderableListByConfig.get(config);
-				if (config.get() && renderableList != null && renderableList.size() != 0)
+				if (config.get() && renderableList != null && !renderableList.isEmpty())
 				{
 					this.renderList(debugRenderer, renderableList);
 				}

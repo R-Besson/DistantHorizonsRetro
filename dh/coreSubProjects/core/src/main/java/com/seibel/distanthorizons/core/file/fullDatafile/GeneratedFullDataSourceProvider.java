@@ -56,7 +56,7 @@ import java.util.stream.IntStream;
 
 public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 implements IDebugRenderable
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();;
+	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	/** 
 	 * Having this number too high means we may end up
@@ -312,7 +312,7 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			return null;
 		}
 		
-		CompletableFuture<DataSourceRetrievalResult> worldGenFuture = this.queuedRetrievalFutureByPos.compute(genPos, (newGenPos, existingFuture) -> 
+		return this.queuedRetrievalFutureByPos.compute(genPos, (newGenPos, existingFuture) -> 
 		{
 			if (existingFuture != null)
 			{
@@ -323,7 +323,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			newFuture.whenComplete((result, throwable) -> this.onWorldGenTaskComplete(genPos, result, throwable));
 			return newFuture;
 		});
-		return worldGenFuture;
 	}
 	
 	@Override
@@ -408,7 +407,7 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			{
 				ByteArrayList columnGenStepArray = checkout.getByteArray(0, FullDataSourceV2.WIDTH*FullDataSourceV2.WIDTH);
 				this.repo.getColumnGenerationStepForPos(pos, columnGenStepArray);
-				if (columnGenStepArray.size() != 0)
+				if (!columnGenStepArray.isEmpty())
 				{
 					boolean positionFullyGenerated = true;
 					

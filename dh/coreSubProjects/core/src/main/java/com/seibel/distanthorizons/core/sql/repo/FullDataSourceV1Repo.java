@@ -123,8 +123,7 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 		else
 		{
 			Number resultNumber = (Number) resultMap.get("itemCount");
-			long count = resultNumber.longValue();
-			return count;
+			return resultNumber.longValue();
 		}
 	}
 	
@@ -197,8 +196,7 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 		{
 			// Number cast is necessary because the returned number can be an int or long
 			Number resultNumber = (Number) resultMap.get("unusedCount");
-			long count = resultNumber.longValue();
-			return count;
+            return resultNumber.longValue();
 		}
 		else
 		{

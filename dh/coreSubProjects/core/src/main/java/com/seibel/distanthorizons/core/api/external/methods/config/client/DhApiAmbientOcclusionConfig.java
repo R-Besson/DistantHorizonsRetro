@@ -35,6 +35,6 @@ public class DhApiAmbientOcclusionConfig implements IDhApiAmbientOcclusionConfig
 	
 	@Override
 	public IDhApiConfigValue<Boolean> enabled()
-	{ return new DhApiConfigValue<Boolean, Boolean>(Config.Client.Advanced.Graphics.enableSsao); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.enableSsao); }
 	
 }

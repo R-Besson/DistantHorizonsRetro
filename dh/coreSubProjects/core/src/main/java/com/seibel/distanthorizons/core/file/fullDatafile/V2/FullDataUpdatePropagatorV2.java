@@ -647,7 +647,7 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 		LongArrayList updatePosList = this.provider.repo.getChildPositionsToRegen(
 			targetBlockPos.getX(), targetBlockPos.getZ(), 
 			maxRegenBlockDistance, maxRegenTaskCount);
-		if (updatePosList.size() == 0)
+		if (updatePosList.isEmpty())
 		{
 			// no regen needed
 			return false;
@@ -697,7 +697,7 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 			return true;
 		}
 		
-		if (posToGen.size() == 0)
+		if (posToGen.isEmpty())
 		{
 			// position is already generated
 			this.provider.repo.setRegenerate(updatePos, false);

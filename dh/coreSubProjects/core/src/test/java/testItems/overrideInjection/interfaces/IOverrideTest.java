@@ -29,6 +29,6 @@ import com.seibel.distanthorizons.api.interfaces.override.IDhApiOverrideable;
  */
 public interface IOverrideTest extends IDhApiOverrideable
 {
-	public int getValue();
+	int getValue();
 	
 }

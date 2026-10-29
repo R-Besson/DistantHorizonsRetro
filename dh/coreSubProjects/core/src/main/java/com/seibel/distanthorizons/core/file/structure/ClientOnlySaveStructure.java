@@ -181,10 +181,10 @@ public class ClientOnlySaveStructure implements ISaveStructure
 				folderName = serverName + ", IP " + serverIpCleaned;
 				break;
 			case NAME_IP_PORT:
-				folderName = serverName + ", IP " + serverIpCleaned + (serverPortCleaned.length() != 0 ? ("-" + serverPortCleaned) : "");
+				folderName = serverName + ", IP " + serverIpCleaned + (!serverPortCleaned.isEmpty() ? ("-" + serverPortCleaned) : "");
 				break;
 			case NAME_IP_PORT_MC_VERSION:
-				folderName = serverName + ", IP " + serverIpCleaned + (serverPortCleaned.length() != 0 ? ("-" + serverPortCleaned) : "") + ", GameVersion " + serverMcVersion;
+				folderName = serverName + ", IP " + serverIpCleaned + (!serverPortCleaned.isEmpty() ? ("-" + serverPortCleaned) : "") + ", GameVersion " + serverMcVersion;
 				break;
 		}
 		

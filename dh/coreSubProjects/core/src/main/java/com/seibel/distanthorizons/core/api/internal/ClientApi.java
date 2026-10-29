@@ -465,15 +465,11 @@ public class ClientApi
 					//=============//
 					//region
 					
-					boolean updateCameraZoom = true;
-					if (DelayedAccessors.IRIS != null
-						&& DelayedAccessors.IRIS.isRenderingShadowPass())
-					{
-						// only update the zoom if we're rendering the player's camera
-						// if we update the zoom during the shadow pass it will cause flickering
-						// due to the conflicting zoom information.
-						updateCameraZoom = false;
-					}
+					boolean updateCameraZoom = DelayedAccessors.IRIS == null
+						|| !DelayedAccessors.IRIS.isRenderingShadowPass();
+					// only update the zoom if we're rendering the player's camera
+					// if we update the zoom during the shadow pass it will cause flickering
+					// due to the conflicting zoom information.
 					
 					if (updateCameraZoom)
 					{

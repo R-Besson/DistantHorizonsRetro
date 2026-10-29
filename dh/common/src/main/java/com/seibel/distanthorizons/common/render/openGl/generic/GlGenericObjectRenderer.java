@@ -371,7 +371,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			throw new IllegalArgumentException("Box group must be of type ["+ RenderableBoxGroup.class.getSimpleName()+"], type received: ["+(iBoxGroup != null ? iBoxGroup.getClass() : "NULL")+"].");
 		}
 		RenderableBoxGroup boxGroup = (RenderableBoxGroup) iBoxGroup;
-		if (boxGroup.size() != 0)
+		if (!boxGroup.isEmpty())
 		{
 			// trigger a box change to make sure the initial data is uploaded
 			boxGroup.triggerBoxChange();

@@ -56,7 +56,7 @@ public class DhApiFogConfig implements IDhApiFogConfig
 	@Deprecated
 	@Override
 	public IDhApiConfigValue<EDhApiFogDrawMode> drawMode()
-	{ return new DhApiConfigValue<Boolean, EDhApiFogDrawMode>(Config.Client.Advanced.Graphics.Fog.enableDhFog, new ApiFogDrawModeConverter()); }
+	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.enableDhFog, new ApiFogDrawModeConverter()); }
 	@Override
 	public IDhApiConfigValue<Boolean> enableDhFog()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.enableDhFog); }

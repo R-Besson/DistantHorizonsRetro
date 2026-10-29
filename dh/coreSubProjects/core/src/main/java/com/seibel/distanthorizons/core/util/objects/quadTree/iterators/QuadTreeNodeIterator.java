@@ -104,7 +104,7 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 	
 	
 	@Override
-	public boolean hasNext() { return this.iteratorNodeQueue.size() != 0; }
+	public boolean hasNext() { return !this.iteratorNodeQueue.isEmpty(); }
 	
 	@Override
 	public QuadNode<T> next()
@@ -113,7 +113,7 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 		{
 			throw new NoSuchElementException("Leaf detail level reached [" + this.leafDetailLevel + "].");
 		}
-		if (this.iteratorNodeQueue.size() == 0)
+		if (this.iteratorNodeQueue.isEmpty())
 		{
 			throw new NoSuchElementException();
 		}
@@ -125,7 +125,7 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 		
 		// the iterator queue should be fully populated for leaf values,
 		// for all values, it needs to be populated for each detail level
-		if (this.iteratorNodeQueue.size() == 0 
+		if (this.iteratorNodeQueue.isEmpty() 
 			&& !this.onlyReturnLeafValues)
 		{
 			// populate the next detail level list

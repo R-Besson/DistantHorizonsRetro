@@ -68,9 +68,8 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 	@Override
 	public int getStatus()
 	{
-		this.bind(); 
-		int status = LWJGL.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
-		return status;
+		this.bind();
+		return LWJGL.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
 	}
 	
 	@Override

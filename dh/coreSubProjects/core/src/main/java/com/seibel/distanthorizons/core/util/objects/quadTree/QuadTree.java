@@ -62,7 +62,7 @@ public class QuadTree<T>
 	 * defines how many blocks the center needs to move in blocks
 	 * before we check for out-of-bound nodes.
 	 */
-	private int blockDistanceForNodeClearing;
+	private final int blockDistanceForNodeClearing;
 	
 	
 	
@@ -252,7 +252,7 @@ public class QuadTree<T>
 				return null;
 			}
 			
-			rootQuadNode = new QuadNode<T>(rootPos, this.treeLeafDetailLevel);
+			rootQuadNode = new QuadNode<>(rootPos, this.treeLeafDetailLevel);
 			boolean successfullyAdded = this.topRingList.set(ringListPosX, ringListPosZ, rootQuadNode);
 			if (!successfullyAdded)
 			{
@@ -513,19 +513,18 @@ public class QuadTree<T>
 		
 		
 		@Override
-		public boolean hasNext() { return this.iteratorPosQueue.size() != 0; }
+		public boolean hasNext() { return !this.iteratorPosQueue.isEmpty(); }
 		
 		@Override
 		public long nextLong()
 		{
-			if (this.iteratorPosQueue.size() == 0)
+			if (this.iteratorPosQueue.isEmpty())
 			{
 				throw new NoSuchElementException();
 			}
-			
-			
-			long sectionPos = this.iteratorPosQueue.dequeueLong();
-			return sectionPos;
+
+
+            return this.iteratorPosQueue.dequeueLong();
 		}
 		
 		

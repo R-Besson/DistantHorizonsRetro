@@ -45,7 +45,6 @@ public class LodRequestModule implements Closeable
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	
-	private final IDhLevel level;
 	private final GeneratedFullDataSourceProvider.IOnWorldGenCompleteListener onWorldGenCompleteListener;
 	private final ThreadPoolExecutor tickerThread;
 	
@@ -68,12 +67,11 @@ public class LodRequestModule implements Closeable
 			Supplier<? extends AbstractLodRequestState> worldGenStateSupplier
 		)
 	{
-		this.level = level;
 		this.onWorldGenCompleteListener = onWorldGenCompleteListener;
 		this.dataSourceProvider = dataSourceProvider;
 		this.worldGenStateSupplier = worldGenStateSupplier;
 		
-		String levelId = this.level.getLevelWrapper().getDhIdentifier();
+		String levelId = level.getLevelWrapper().getDhIdentifier();
 		this.tickerThread = ThreadUtil.makeSingleDaemonThreadPool("Request Module Ticker ["+levelId+"]");
 		this.tickerThread.execute(this::tickLoop);
 	}

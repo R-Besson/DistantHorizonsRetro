@@ -34,11 +34,11 @@ public class DhApiMultiThreadingConfig implements IDhApiMultiThreadingConfig
 	
 	@Override
 	public IDhApiConfigValue<Integer> threadCount()
-	{ return new DhApiConfigValue<Integer, Integer>(Config.Common.MultiThreading.numberOfThreads); }
+	{ return new DhApiConfigValue<>(Config.Common.MultiThreading.numberOfThreads); }
 	
 	@Override
 	public IDhApiConfigValue<Double> threadRuntimeRatio()
-	{ return new DhApiConfigValue<Double, Double>(Config.Common.MultiThreading.threadRunTimeRatio); }
+	{ return new DhApiConfigValue<>(Config.Common.MultiThreading.threadRunTimeRatio); }
 	
 	
 	

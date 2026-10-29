@@ -210,13 +210,8 @@ public class DhLogger implements IConfigListener
 		}
 		
 		// has this logger run to many times this second already?
-		if (this.maxLogCountPerSecond > 0
-			&& this.logCountsThisSecondRef.get() >= this.maxLogCountPerSecond)
-		{
-			return false;
-		}
-		
-		return true;
+		return this.maxLogCountPerSecond <= 0
+			|| this.logCountsThisSecondRef.get() < this.maxLogCountPerSecond;
 	}
 	
 	

@@ -593,7 +593,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 			return "Wrapped{null}";
 		}
 
-		return "Wrapped{" + this.level.toString() + "@" + this.getDhIdentifier() + "}";
+		return "Wrapped{" + this.level + "@" + this.getDhIdentifier() + "}";
 	}
 
 	//endregion

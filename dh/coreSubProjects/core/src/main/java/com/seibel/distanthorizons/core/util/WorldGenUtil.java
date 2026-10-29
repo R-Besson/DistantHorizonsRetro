@@ -27,8 +27,7 @@ public class WorldGenUtil
 		DhBlockPos centerBlockPos = new DhChunkPos(centerChunkX, centerChunkZ).centerBlockPos();
 		int blockDistanceFromCenter = DhSectionPos.getChebyshevSignedBlockDistance(requestedPos, centerBlockPos);
 		int maxBlockRadius = maxChunkRadius * LodUtil.CHUNK_WIDTH;
-		boolean requestInRadius = (blockDistanceFromCenter <= maxBlockRadius);
-		return requestInRadius;
+        return (blockDistanceFromCenter <= maxBlockRadius);
 	}
 	
 	/** @return -1 for infinity */
@@ -61,19 +60,13 @@ public class WorldGenUtil
 			return false;
 		}
 		
-		if (Config.Common.WorldGenerator.generatorPlan.get().surfaceGenEnabled
-			&& Config.Common.WorldGenerator.chunkGeneratorMode.get() == EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY)
-		{
-			// Don't try re-generating pre-existing chunks
-			// since this will cause holes for missing/empty chunks.
-			
-			// In the future we may want to change this so it ignores empty chunks instead,
-			// but that may cause weird/un-intended behavior for worlds that have intentionally
-			// empty chunks.
-			return false;
-		}
-		
-		return true;
+		// Don't try re-generating pre-existing chunks
+		// since this will cause holes for missing/empty chunks.
+		// In the future we may want to change this so it ignores empty chunks instead,
+		// but that may cause weird/un-intended behavior for worlds that have intentionally
+		// empty chunks.
+		return !Config.Common.WorldGenerator.generatorPlan.get().surfaceGenEnabled
+			|| Config.Common.WorldGenerator.chunkGeneratorMode.get() != EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY;
 	}
 	
 	

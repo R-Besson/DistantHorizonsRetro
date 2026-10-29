@@ -86,7 +86,6 @@ public class CloudRenderHandler
 			= new IDhApiRenderableBoxGroup[CLOUD_LAYER_COUNT][(CLOUD_INSTANCE_RADIUS_COUNT * 2) + 1][(CLOUD_INSTANCE_RADIUS_COUNT * 2) + 1];
 	
 	private final IDhClientLevel level;
-	private final IDhGenericRenderer renderer;
 	/** only used by {@link #preRender} on the render thread */
 	private final DhVec3d cameraPosScratch = new DhVec3d();
 	
@@ -110,7 +109,6 @@ public class CloudRenderHandler
 	public CloudRenderHandler(IDhClientLevel level, IDhGenericRenderer renderer) 
 	{
 		this.level = level;
-		this.renderer = renderer;
 		
 		
 		
@@ -159,7 +157,6 @@ public class CloudRenderHandler
 				{
 					// start a new box in Z direction
 					int startZ = z;
-					int startX = x;
 					int endZ = startZ;
 					int endX = x+1;
 					
@@ -184,7 +181,7 @@ public class CloudRenderHandler
 					// merge in the X direction //
 					//==========================//
 					
-					for (int currentX = startX + 1; currentX < textureWidth; currentX++)
+					for (int currentX = x + 1; currentX < textureWidth; currentX++)
 					{
 						boolean canMergeInXDir = true;
 						
@@ -227,7 +224,7 @@ public class CloudRenderHandler
 					
 					// endZ contains the last cloud index
 					// so the cloud now goes from startZ to endZ (inclusive)
-					int minXBlockPos = startX * CLOUD_BOX_WIDTH;
+					int minXBlockPos = x * CLOUD_BOX_WIDTH;
 					int minZBlockPos = startZ * CLOUD_BOX_WIDTH;
 					int maxXBlockPos = endX * CLOUD_BOX_WIDTH;
 					int maxZBlockPos = endZ * CLOUD_BOX_WIDTH;
@@ -298,7 +295,7 @@ public class CloudRenderHandler
 						y, x, z);
 					boxGroup.setPreRenderFunc((renderParam) -> this.preRender(renderParam, cloudParams));
 					
-					this.renderer.add(boxGroup);
+					renderer.add(boxGroup);
 					this.boxGroupByOffset[y][x + CLOUD_INSTANCE_RADIUS_COUNT][z + CLOUD_INSTANCE_RADIUS_COUNT] = boxGroup;
 				}
 			}

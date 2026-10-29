@@ -78,8 +78,7 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 		int chunkHash = resultSet.getInt("ChunkHash");
 		
 		
-		ChunkHashDTO dto = new ChunkHashDTO(new DhChunkPos(posX, posZ), chunkHash);
-		return dto;
+		return new ChunkHashDTO(new DhChunkPos(posX, posZ), chunkHash);
 	}
 	
 	private final String upsertSqlTemplate =

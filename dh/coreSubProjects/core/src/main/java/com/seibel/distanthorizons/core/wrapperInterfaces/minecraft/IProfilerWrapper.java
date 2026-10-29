@@ -34,10 +34,9 @@ public interface IProfilerWrapper extends IBindable
 	//region
 	
 	/** used to auto-pop blocks to prevent accidentally unevenly pushing/popping */
-	public static interface IProfileBlock extends AutoCloseable
+	interface IProfileBlock extends AutoCloseable
 	{
-		@Override
-		public void close();
+		@Override void close();
 	}
 	
 	//endregion
