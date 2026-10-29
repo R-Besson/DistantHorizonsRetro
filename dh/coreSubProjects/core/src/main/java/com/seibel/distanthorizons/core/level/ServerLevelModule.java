@@ -27,17 +27,13 @@ import com.seibel.distanthorizons.core.generation.queues.IFullDataSourceRetrieva
 import com.seibel.distanthorizons.core.generation.queues.WorldGenerationQueue;
 import com.seibel.distanthorizons.core.generation.queues.AbstractLodRequestState;
 import com.seibel.distanthorizons.core.generation.queues.LodRequestModule;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.WorldGeneratorInjector;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.io.IOException;
 import java.sql.SQLException;
 
 public class ServerLevelModule implements AutoCloseable
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	private final IDhServerLevel parentServerLevel;
 	public final ISaveStructure saveStructure;
 	public final GeneratedFullDataSourceProvider fullDataFileHandler;

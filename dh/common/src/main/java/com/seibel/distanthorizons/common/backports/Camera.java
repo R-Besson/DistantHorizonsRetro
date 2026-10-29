@@ -26,20 +26,11 @@ public class Camera
 	private DhMat4f offsetModelViewMatrix = null;
 	private final Vector4f offset = new Vector4f(); // third person offset
 
-	/** 
-	 * Synchronized and returns a copy since this is called from both the
+	/**
+	 * Synchronized and fills the given vector since this is called from both the
 	 * render thread and DH's beacon culling thread.
 	 * If there's no camera entity (IE while leaving a world) the last position is returned.
 	 */
-	public synchronized Vector3d getUpdatedPos(EntityLivingBase entity, float partialTicks)
-	{
-		if (entity != null)
-		{
-			this.update(entity, partialTicks);
-		}
-		return new Vector3d(this.pos);
-	}
-	/** Same as {@link #getUpdatedPos(EntityLivingBase, float)}, but fills the given vector instead of allocating a copy. */
 	public synchronized void getUpdatedPos(EntityLivingBase entity, float partialTicks, DhVec3d output)
 	{
 		if (entity != null)
@@ -68,6 +59,4 @@ public class Camera
 		final double camZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks + offset.z;
 		this.pos.set(camX, camY, camZ);
 	}
-	
-	public synchronized Vector3d getPos() { return new Vector3d(this.pos); }
 }

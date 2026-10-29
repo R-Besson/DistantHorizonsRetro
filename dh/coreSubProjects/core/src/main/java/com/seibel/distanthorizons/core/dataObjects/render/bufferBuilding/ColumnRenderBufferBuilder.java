@@ -71,6 +71,7 @@ public class ColumnRenderBufferBuilder
 				&& DhSectionPos.getX(renderSource.pos) == Config.Client.Advanced.Debugging.ColumnBuilderDebugging.columnBuilderDebugXPos.get()
 				&& DhSectionPos.getZ(renderSource.pos) == Config.Client.Advanced.Debugging.ColumnBuilderDebugging.columnBuilderDebugZPos.get())
 			{
+				@SuppressWarnings("unused") // place a breakpoint here when debugging a specific column
 				int breakpoint = 0;
 			}
 			else

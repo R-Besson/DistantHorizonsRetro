@@ -99,21 +99,5 @@ public abstract class GlAbstractShaderRenderer
 	//endregion
 	
 	
-	//================//
-	// base overrides //
-	//================//
-	//region
-	
-	public void free()
-	{
-		if (this.shader != null)
-		{
-			this.shader.free();
-		}
-	}
-	
-	// endregion
-	
-	
 	
 }

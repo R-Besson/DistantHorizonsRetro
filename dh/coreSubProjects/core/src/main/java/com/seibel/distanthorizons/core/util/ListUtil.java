@@ -5,22 +5,8 @@ import it.unimi.dsi.fastutil.chars.CharArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 
-import java.util.ArrayList;
-
 public class ListUtil
 {
-	/** Create list filled with null up to the size */
-	public static <T> ArrayList<T> createEmptyList(int size)
-	{
-		ArrayList<T> list = new ArrayList<T>();
-		for (int i = 0; i < size; i++)
-		{
-			list.add(null);	
-		}
-		return list;
-	}
-	
-	
 	/**
 	 * Unlike {@link LongArrayList#ensureCapacity(int)} this method
 	 * will populate the list with zeros up to the given size 

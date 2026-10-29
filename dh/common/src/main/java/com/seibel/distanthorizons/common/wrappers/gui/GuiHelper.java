@@ -45,11 +45,6 @@ public class GuiHelper
 		return StatCollector.translateToLocalFormatted(text, args);
 	}
 
-	public static void SetX(GuiButton widget, int x)
-	{
-		widget.xPosition = x;
-	}
-
 	public static void SetY(GuiTextField textField, int y)
 	{
 		textField.yPosition = y;

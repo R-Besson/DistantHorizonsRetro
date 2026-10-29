@@ -42,22 +42,5 @@ public class ConfigUIButton extends AbstractConfigBase<Runnable>
 	 * (so it can halt the main process if it takes too long and isn't offloaded to another thread)
 	 */
 	public void runAction() { this.value.run(); }
-	
-	
-	
-	//=========//
-	// builder //
-	//=========//
-	
-	public static class Builder extends AbstractConfigBase.Builder<Runnable, Builder>
-	{
-		/** Appearance shouldn't be changed */
-		@Override
-		public Builder setAppearance(EConfigEntryAppearance newAppearance) { return this; }
-		
-		public ConfigUIButton build()
-		{ return new ConfigUIButton(this.tmpValue); }
-		
-	}
-	
+
 }

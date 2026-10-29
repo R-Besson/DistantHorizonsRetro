@@ -19,8 +19,6 @@
 
 package com.seibel.distanthorizons.common.render.openGl.util.vertexFormat;
 
-import org.lwjgl.opengl.GL11;
-
 /**
  * This object is used to build LodVertexFormats.
  * <p>
@@ -40,7 +38,7 @@ public class GlLodVertexFormatElement
 	private final int count;
 	private final int byteSize;
 	
-	public GlLodVertexFormatElement(int newIndex, GlLodVertexFormatElement.DataType newType, int newCount, boolean isPadding)
+	public GlLodVertexFormatElement(int newIndex, GlLodVertexFormatElement.DataType newType, int newCount)
 	{
 		this.dataType = newType;
 		this.index = newIndex;
@@ -48,52 +46,36 @@ public class GlLodVertexFormatElement
 		this.byteSize = newType.getSize() * this.count;
 	}
 	
-	public final GlLodVertexFormatElement.DataType getType()
-	{
-		return this.dataType;
-	}
-
 	public final int getByteSize()
 	{
 		return this.byteSize;
 	}
-	
-	
-	
+
+
+
 	public enum DataType
 	{
-		FLOAT(4, "Float", GL11.GL_FLOAT),
-		UBYTE(1, "Unsigned Byte", GL11.GL_UNSIGNED_BYTE),
-		BYTE(1, "Byte", GL11.GL_BYTE),
-		USHORT(2, "Unsigned Short", GL11.GL_UNSIGNED_SHORT),
-		SHORT(2, "Short", GL11.GL_SHORT),
-		UINT(4, "Unsigned Int", GL11.GL_UNSIGNED_INT),
-		INT(4, "Int", GL11.GL_INT);
-		
+		UBYTE(1, "Unsigned Byte"),
+		BYTE(1, "Byte"),
+		USHORT(2, "Unsigned Short");
+
 		private final int size;
 		private final String name;
-		private final int glType;
-		
-		DataType(int sizeInBytes, String newName, int openGlDataType)
+
+		DataType(int sizeInBytes, String newName)
 		{
 			this.size = sizeInBytes;
 			this.name = newName;
-			this.glType = openGlDataType;
 		}
-		
+
 		public int getSize()
 		{
 			return this.size;
 		}
-		
+
 		public String getName()
 		{
 			return this.name;
-		}
-		
-		public int getGlType()
-		{
-			return this.glType;
 		}
 	}
 	

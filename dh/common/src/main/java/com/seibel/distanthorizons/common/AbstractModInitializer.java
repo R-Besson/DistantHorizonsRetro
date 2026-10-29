@@ -168,23 +168,6 @@ public abstract class AbstractModInitializer
 		}
 	}
 	
-	/** 
-	 * Adds the accessor if any of the given IDs are found. <br>
-	 * Can be used when a mod has multiple potential IDs. 
-	 */
-	protected <T extends IModAccessor> void tryCreateModCompatAccessor(String[] modIdArray, Class<? super T> accessorClass, Supplier<T> accessorConstructor)
-	{
-		IModChecker modChecker = SingletonInjector.INSTANCE.get(IModChecker.class);
-		if (modChecker.isModLoaded(modIdArray))
-		{
-			//noinspection unchecked
-			ModAccessorInjector.INSTANCE.bind((Class<? extends IModAccessor>) accessorClass, accessorConstructor.get());
-		}
-		else
-		{
-			LOGGER.debug("Skipping mod compatibility accessor for: ["+ String.join(", ", modIdArray)+"]");
-		}
-	}
 	protected <T extends IModAccessor> void tryCreateModCompatAccessor(String modId, Class<? super T> accessorClass, Supplier<T> accessorConstructor)
 	{
 		IModChecker modChecker = SingletonInjector.INSTANCE.get(IModChecker.class);

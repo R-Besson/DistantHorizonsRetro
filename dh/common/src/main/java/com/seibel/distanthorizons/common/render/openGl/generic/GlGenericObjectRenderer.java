@@ -390,8 +390,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	@Override
 	public IDhApiRenderableBoxGroup remove(long id) { return this.boxGroupById.remove(id); }
 	
-	public void clear() { this.boxGroupById.clear(); }
-	
 	//endregion
 	
 	
@@ -407,6 +405,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
      *      and any objects rendered in this pass will have SSAO applied to them.
 	 */
 	@Override
+	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderEventParam, IProfilerWrapper profiler, boolean renderingWithSsao)
 	{
 		// generic rendering (both instanced and direct) is extremely unstable on Mac, so don't render anything
@@ -418,7 +417,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		
 		
 		// render setup //
-		try (IProfilerWrapper.IProfileBlock setup_profile = profiler.push("setup"))
+		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("setup"))
 		{
 			
 			this.init();
@@ -509,8 +508,8 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 				// render //
 				
 				profiler.popPush("rendering");
-				try (IProfilerWrapper.IProfileBlock namespace_profile = profiler.push(boxGroup.getResourceLocationNamespace());
-					IProfilerWrapper.IProfileBlock location_profile = profiler.push(boxGroup.getResourceLocationPath()))
+				try (IProfilerWrapper.IProfileBlock namespaceProfileBlock = profiler.push(boxGroup.getResourceLocationNamespace());
+					IProfilerWrapper.IProfileBlock pathProfileBlock =profiler.push(boxGroup.getResourceLocationPath()))
 				{
 					if (this.instancedRenderingAvailable)
 					{
@@ -561,12 +560,13 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	//=====================//
 	//region
 	
+	@SuppressWarnings({"try", "unused"})
 	private void renderBoxGroupInstanced(
 			IDhApiGenericObjectShaderProgram shaderProgram, DhApiRenderParam renderEventParam, 
 			RenderableBoxGroup boxGroup, DhVec3d camPos,
 			IProfilerWrapper profiler)
 	{
-		try (IProfilerWrapper.IProfileBlock render_profile = profiler.push("vertex setup"))
+		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("vertex setup"))
 		{
 			
 			// update instance data //

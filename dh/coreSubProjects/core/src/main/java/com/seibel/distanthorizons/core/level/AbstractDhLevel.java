@@ -269,8 +269,7 @@ public abstract class AbstractDhLevel implements IDhLevel
 	// beacon handling //
 	//=================//
 	//region
-	
-	@Override
+
 	public void updateBeaconBeamsForSectionPos(long sectionPos, List<BeaconBeamDTO> activeBeamList)
 	{
 		int minBlockX = DhSectionPos.getMinCornerBlockX(sectionPos);

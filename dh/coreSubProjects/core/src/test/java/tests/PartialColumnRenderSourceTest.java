@@ -17,7 +17,7 @@ public class PartialColumnRenderSourceTest
 		long pos = DhSectionPos.encode(DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL, 0, 0);
 
 		// leave data in every column of the pooled arrays
-		try (ColumnRenderSource full = ColumnRenderSource.createEmpty(pos, SLICE_COUNT, 0))
+		try (ColumnRenderSource full = ColumnRenderSource.createEmpty(pos, SLICE_COUNT))
 		{
 			for (int i = 0; i < full.renderDataContainer.size(); i++)
 			{
@@ -26,7 +26,7 @@ public class PartialColumnRenderSourceTest
 		}
 
 		// the west edge, like a neighbor to the east of the section being built
-		try (ColumnRenderSource partial = ColumnRenderSource.createEmptyPartial(pos, SLICE_COUNT, 0, 0, 1, 0, ColumnRenderSource.WIDTH);
+		try (ColumnRenderSource partial = ColumnRenderSource.createEmptyPartial(pos, SLICE_COUNT, 0, 1, 0, ColumnRenderSource.WIDTH);
 			ColumnRenderView view = ColumnRenderView.getPooled())
 		{
 			for (int z = 0; z < ColumnRenderSource.WIDTH; z++)

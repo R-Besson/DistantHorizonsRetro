@@ -52,21 +52,13 @@ public final class GlVertexPointer
 	
 	// named constructors //
 	
-	public static GlVertexPointer addFloatPointer(boolean normalized) { return new GlVertexPointer(1, GL11.GL_FLOAT, normalized, Float.BYTES); }
 	public static GlVertexPointer addVec2Pointer(boolean normalized) { return new GlVertexPointer(2, GL11.GL_FLOAT, normalized, Float.BYTES * 2); }
 	public static GlVertexPointer addVec3Pointer(boolean normalized) { return new GlVertexPointer(3, GL11.GL_FLOAT, normalized, Float.BYTES * 3); }
 	public static GlVertexPointer addVec4Pointer(boolean normalized) { return new GlVertexPointer(4, GL11.GL_FLOAT, normalized, Float.BYTES * 4); }
-	/** Always aligned to 4 bytes */
-	public static GlVertexPointer addUnsignedBytePointer(boolean normalized, boolean useInteger) { return new GlVertexPointer(1, GL11.GL_UNSIGNED_BYTE, normalized, 4, useInteger); }
 	/** aligned to 4 bytes */
 	public static GlVertexPointer addUnsignedBytesPointer(int elementCount, boolean normalized, boolean useInteger) 
 	{ return new GlVertexPointer(elementCount, GL11.GL_UNSIGNED_BYTE, normalized, _align(elementCount), useInteger); }
 	public static GlVertexPointer addUnsignedShortsPointer(int elementCount, boolean normalized, boolean useInteger) 
 	{ return new GlVertexPointer(elementCount, GL11.GL_UNSIGNED_SHORT, normalized, _align(elementCount * 2), useInteger); }
-	public static GlVertexPointer addShortsPointer(int elementCount, boolean normalized, boolean useInteger) { return new GlVertexPointer(elementCount, GL11.GL_SHORT, normalized, _align(elementCount * 2), useInteger); }
-	public static GlVertexPointer addIntPointer(boolean normalized, boolean useInteger) { return new GlVertexPointer(1, GL11.GL_INT, normalized, 4, useInteger); }
-	public static GlVertexPointer addIVec2Pointer(boolean normalized, boolean useInteger) { return new GlVertexPointer(2, GL11.GL_INT, normalized, 8, useInteger); }
-	public static GlVertexPointer addIVec3Pointer(boolean normalized, boolean useInteger) { return new GlVertexPointer(3, GL11.GL_INT, normalized, 12, useInteger); }
-	public static GlVertexPointer addIVec4Pointer(boolean normalized, boolean useInteger) { return new GlVertexPointer(4, GL11.GL_INT, normalized, 16, useInteger); }
-	
+
 }

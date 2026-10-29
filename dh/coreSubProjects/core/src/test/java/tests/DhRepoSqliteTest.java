@@ -19,12 +19,10 @@
 
 package tests;
 
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.sql.DatabaseUpdater;
 import com.seibel.distanthorizons.core.sql.repo.AbstractDhRepo;
 import com.seibel.distanthorizons.core.sql.repo.phantoms.AutoClosableTrackingWrapper;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,9 +42,7 @@ import java.util.concurrent.CompletableFuture;
  * Validates {@link AbstractDhRepo} is set up correctly.
  */
 public class DhRepoSqliteTest
-{
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+{	
 	public static String DATABASE_TYPE = "jdbc:sqlite";
 	public static String DB_FILE_NAME = "test.sqlite";
 	
@@ -93,8 +89,8 @@ public class DhRepoSqliteTest
 			
 			
 			// check that the update scripts aren't run multiple times
-			TestPrimaryKeyRepo altDataRepoOne = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
-			TestPrimaryKeyRepo altDataRepoTwo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
+			new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
+			new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
 			
 			
 			
@@ -349,6 +345,7 @@ public class DhRepoSqliteTest
 	
 	// can be uncommented to compare different update methods performance
 	//@Test
+	@SuppressWarnings("unused")
 	public void testBulkUpdatePerformance()
 	{
 		TestPrimaryKeyRepo primaryKeyRepo = null;

@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.dataObjects.render;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
 import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.RenderDataPointReducingList;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.AbstractPhantomArrayList;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
@@ -34,7 +33,6 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 
 import java.util.Arrays;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 /**
  * Stores the render data used to generate OpenGL buffers.
@@ -43,8 +41,6 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
  */
 public class ColumnRenderSource extends AbstractPhantomArrayList
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	/** measured in data columns */
 	public static final int WIDTH = 64;
 	
@@ -65,8 +61,7 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	 */
 	public int maxVerticalSliceCount;
 	public long pos;
-	public int yOffset;
-	
+
 	public final LongArrayList renderDataContainer;
 	/**
 	 * void data is a 2D array
@@ -91,8 +86,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	 * Index {@link BlockTextureRegistry#UNTEXTURED_ID} is always the flat "no texture" set.
 	 */
 	public final ShortArrayList texturePalette = new ShortArrayList();
-	
-	private boolean isEmpty = true;
 
 	/** the relative columns this source holds (max exclusive), see {@link #createEmptyPartial} */
 	public final int minX, maxX, minZ, maxZ;
@@ -104,28 +97,27 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	//==============//
 	//region
 	
-	public static ColumnRenderSource createEmpty(long pos, int maxVertSliceCount, int yOffset)
-	{ return new ColumnRenderSource(pos, maxVertSliceCount, yOffset, 0, WIDTH, 0, WIDTH); }
+	public static ColumnRenderSource createEmpty(long pos, int maxVertSliceCount)
+	{ return new ColumnRenderSource(pos, maxVertSliceCount, 0, WIDTH, 0, WIDTH); }
 	/**
 	 * Only holds the columns between the given relative positions (max exclusive),
 	 * reading any other column throws. <br>
 	 * Used for the neighbors of the section being built, which only need their edge facing it,
 	 * clearing the whole (pooled) data array for them took longer than building their edge.
 	 */
-	public static ColumnRenderSource createEmptyPartial(long pos, int maxVertSliceCount, int yOffset, int minX, int maxX, int minZ, int maxZ)
-	{ return new ColumnRenderSource(pos, maxVertSliceCount, yOffset, minX, maxX, minZ, maxZ); }
+	public static ColumnRenderSource createEmptyPartial(long pos, int maxVertSliceCount, int minX, int maxX, int minZ, int maxZ)
+	{ return new ColumnRenderSource(pos, maxVertSliceCount, minX, maxX, minZ, maxZ); }
 	/**
 	 * Creates an empty ColumnRenderSource.
 	 *
 	 * @param pos the relative position of the container
 	 * @param maxVertSliceCount the maximum vertical size of the container
 	 */
-	private ColumnRenderSource(long pos, int maxVertSliceCount, int yOffset, int minX, int maxX, int minZ, int maxZ)
+	private ColumnRenderSource(long pos, int maxVertSliceCount, int minX, int maxX, int minZ, int maxZ)
 	{
 		super(ARRAY_LIST_POOL, 1, 0, 2, 0, 0);
 
 		this.pos = pos;
-		this.yOffset = yOffset;
 
 		this.maxVerticalSliceCount = maxVertSliceCount;
 
@@ -289,40 +281,7 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	//region
 	
 	public byte getDataDetailLevel() { return (byte) (DhSectionPos.getDetailLevel(this.pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL); }
-	
-	public boolean isEmpty() { return this.isEmpty; }
-	public void markNotEmpty() { this.isEmpty = false; }
-	
-	/** can be used when debugging */
-	public boolean hasNonVoidDataPoints()
-	{
-		if (this.isEmpty)
-		{
-			return false;
-		}
-		
-		try (ColumnRenderView columnView = ColumnRenderView.getPooled())
-		{
-			for (int x = this.minX; x < this.maxX; x++)
-			{
-				for (int z = this.minZ; z < this.maxZ; z++)
-				{
-					this.populateColumnView(columnView, x, z);
-					for (int i = 0; i < columnView.size; i++)
-					{
-						long dataPoint = columnView.get(i);
-						if (!RenderDataPointUtil.hasZeroHeight(dataPoint))
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-		
-		return false;
-	}
-	
+
 	private int getDatapointIndex(int posX, int posZ, int verticalIndex)
 	{
 		return (posX * WIDTH * this.maxVerticalSliceCount)

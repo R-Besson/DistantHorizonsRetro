@@ -124,7 +124,7 @@ public class SessionConfig implements INetworkObject
 			commandName,
 			new Entry(
 				configEntry::get,
-				runnable -> new ConfigChangeListener<>(configEntry, ignored -> runnable.run()),
+				runnable -> new ConfigChangeListener<>(configEntry, newValue -> runnable.run()),
 				valueConstrainer
 			)
 		);
@@ -297,8 +297,9 @@ public class SessionConfig implements INetworkObject
 				{
 					changeListener.close();
 				}
-				catch (Exception ignored)
+				catch (Exception e)
 				{
+					// keep closing the remaining listeners
 				}
 			}
 			this.changeListeners.clear();

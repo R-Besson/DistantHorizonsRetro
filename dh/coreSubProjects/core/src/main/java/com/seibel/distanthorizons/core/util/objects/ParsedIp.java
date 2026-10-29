@@ -30,16 +30,8 @@ public class ParsedIp
 {
 	/** can be used to find numeric IPs, IE: "192.168.1.19" */
 	public static final String NUMERIC_IP_REGEX = "^[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*(:[0-9]*)?$";
-	
-	/**
-	 * Can be used to find if a numeric IP is a LAN IP
-	 *
-	 * Ip list source: <br>
-	 * <a href="https://networkengineering.stackexchange.com/questions/5825/why-192-168-for-local-addresses">...</a>
-	 */
-	public static final String LAN_IP_REGEX = "(10|172\\.16|192\\.168).*";
-	
-	
+
+
 	/** Examples: "192.168.1.19", "mc.hypixel.net", or "localhost" */
 	public final String ip;
 	/**
@@ -80,23 +72,7 @@ public class ParsedIp
 			port = null;
 		}
 	}
-	
-	public ParsedIp(String newIp, String newPort)
-	{
-		ip = newIp;
-		port = newPort;
-		isNumeric = ip.matches(NUMERIC_IP_REGEX);
-	}
-	
-	
-	
-	
-	/** Returns if this IP is for a Local Area Network connection */
-	public boolean isLan()
-	{
-		return ip.toLowerCase().equals("localhost") || ip.matches(LAN_IP_REGEX);
-	}
-	
+
 	@Override
 	public String toString()
 	{

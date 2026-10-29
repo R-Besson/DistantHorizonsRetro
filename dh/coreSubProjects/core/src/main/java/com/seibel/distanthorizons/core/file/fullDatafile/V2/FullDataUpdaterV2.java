@@ -39,7 +39,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 	
 	private final Set<IDataSourceUpdateListenerFunc<FullDataSourceV2>> dateSourceUpdateListenerSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	
-	private final String levelId;
 	private final AtomicBoolean isShutdownRef = new AtomicBoolean(false);
 	
 	private final FullDataSourceProviderV2 provider;
@@ -51,11 +50,9 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 	//=============//
 	//region
 	
-	public FullDataUpdaterV2(FullDataSourceProviderV2 provider, String levelId)
+	public FullDataUpdaterV2(FullDataSourceProviderV2 provider)
 	{
 		this.provider = provider;
-		this.levelId = levelId;
-		
 	}
 	
 	//endregion

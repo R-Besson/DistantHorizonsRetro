@@ -256,13 +256,14 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 	
 	
+	@SuppressWarnings({"try", "unused"})
 	public void save(TDTO dto)
 	{
 		try(PreparedStatement statement = this.createUpsertStatement(dto);
-			ResultSet result = this.query(statement))
+			ResultSet resultSet = this.query(statement))
 		{
 		}
-		catch (DbConnectionClosedException ignored)
+		catch (DbConnectionClosedException e)
 		{
 			// expected during shutdown
 		}
@@ -276,10 +277,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	
 	
 	public void delete(TDTO dto) { this.deleteWithKey(dto.getKey()); }
-	public void deleteWithKey(TKey key) 
+	@SuppressWarnings({"try", "unused"})
+	public void deleteWithKey(TKey key)
 	{
 		try (PreparedStatement statement = this.createDeleteStatementByKey(key);
-			ResultSet ignored = this.query(statement))
+			ResultSet resultSet =this.query(statement))
 		{
 			
 		}
@@ -290,11 +292,12 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 	
 	/** With great power comes great responsibility... */
-	public void deleteAll() 
-	{ 
+	@SuppressWarnings({"try", "unused"})
+	public void deleteAll()
+	{
 		String sql = "DELETE FROM " + this.getTableName();
 		try (PreparedStatement statement = this.createPreparedStatement(sql);
-			ResultSet ignored = this.query(statement))
+			ResultSet resultSet =this.query(statement))
 		{
 			
 		}

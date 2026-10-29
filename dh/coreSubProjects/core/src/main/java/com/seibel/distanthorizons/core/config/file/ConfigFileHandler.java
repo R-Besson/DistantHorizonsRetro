@@ -145,7 +145,10 @@ public class ConfigFileHandler
 				currentCfgVersion = (Integer) tmpNightConfig.get("_version");
 				tmpNightConfig.close();
 			}
-			catch (Exception ignored) { }
+			catch (Exception e)
+			{
+				// missing or unreadable version, assume the current one
+			}
 			
 			if (currentCfgVersion == ModInfo.CONFIG_FILE_VERSION)
 			{
@@ -245,8 +248,6 @@ public class ConfigFileHandler
 		workConfig.set(entry.getNameAndCategory(), ConfigTypeConverters.attemptToConvertToString(entry.getType(), entry.getTrueValue()));
 	}
 	
-	/** Loads an entry when only given the entry */
-	public void loadEntry(ConfigEntry<?> entry) { this.loadEntry(entry, this.nightConfig); }
 	/** Loads an entry */
 	@SuppressWarnings("unchecked")
 	public <T> void loadEntry(ConfigEntry<T> entry, CommentedFileConfig nightConfig)
@@ -297,8 +298,6 @@ public class ConfigFileHandler
 		}
 	}
 	
-	// Creates the comment for an entry when only given the entry
-	public void createComment(ConfigEntry<?> entry) { this.createComment(entry, this.nightConfig); }
 	// Creates a comment for an entry
 	public void createComment(ConfigEntry<?> entry, CommentedFileConfig nightConfig)
 	{
@@ -323,12 +322,6 @@ public class ConfigFileHandler
 	// nightconfig //
 	//=============//
 	
-	/**
-	 * Uses {@link ConfigFileHandler#nightConfig} to do {@link CommentedFileConfig#load()} but with error checking
-	 *
-	 * @apiNote This overwrites any value currently stored in the config
-	 */
-	public void loadNightConfig() { this.loadNightConfig(this.nightConfig); }
 	/**
 	 * Does {@link CommentedFileConfig#load()} but with error checking
 	 *

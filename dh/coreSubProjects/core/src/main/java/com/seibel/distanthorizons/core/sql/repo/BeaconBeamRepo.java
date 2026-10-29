@@ -19,14 +19,10 @@
 
 package com.seibel.distanthorizons.core.sql.repo;
 
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
-import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.sql.DbConnectionClosedException;
 import com.seibel.distanthorizons.core.sql.dto.BeaconBeamDTO;
-import com.seibel.distanthorizons.core.util.LodUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -36,12 +32,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	
 	
 	//=============//
@@ -142,19 +135,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 	//====================//
 	// additional methods //
 	//====================//
-	
-	public List<BeaconBeamDTO> getAllBeamsForPos(DhChunkPos chunkPos)
-	{
-		int minBlockX = chunkPos.getMinBlockX();
-		int minBlockZ = chunkPos.getMinBlockZ();
-		int maxBlockX = minBlockX + LodUtil.CHUNK_WIDTH;
-		int maxBlockZ = minBlockZ + LodUtil.CHUNK_WIDTH;
-		
-		return this.getAllBeamsInBlockPosRange(
-				minBlockX, maxBlockX,
-				minBlockZ, maxBlockZ
-		);
-	}
 	
 	public ArrayList<BeaconBeamDTO> getAllBeamsForPos(long pos)
 	{

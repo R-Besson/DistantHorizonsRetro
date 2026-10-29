@@ -18,9 +18,6 @@ public class TestBiomeWrapper implements IBiomeWrapper
 	public String getSerialString()
 	{ return this.name; }
 	
-	@Override public boolean isColdBiome()
-	{ return false; }
-	
 	@Override 
 	public Object getWrappedMcObject() 
 	{ return this; }

@@ -1,7 +1,5 @@
 package com.seibel.distanthorizons.core.util.objects.pooling;
 
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import it.unimi.dsi.fastutil.chars.CharArrayList;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,7 +13,6 @@ import java.util.concurrent.locks.StampedLock;
  */
 public class StringPool
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build(); 
 	public static final StringPool INSTANCE = new StringPool();
 	
 	private final TrieNode root = new TrieNode();
@@ -77,23 +74,6 @@ public class StringPool
 		// Get or set the string at the leaf node
 		return currentNode.getOrSetString(chars, offset, length);
 	}
-	
-	///endregion
-	
-	
-	
-	//================//
-	// helper methods //
-	//================//
-	///region
-	
-	public void clear() { this.root.clear(); }
-	
-	/**
-	 * Returns an approximate count of pooled strings.
-	 * Note: This is a best-effort count and may not be exact in concurrent scenarios.
-	 */
-	public long approximateSize() { return this.root.countStrings(); }
 	
 	///endregion
 	
@@ -223,65 +203,7 @@ public class StringPool
 		}
 		
 		///endregion
-		
-		
-		
-		//================//
-		// helper methods //
-		//================//
-		///region
-		
-		void clear()
-		{
-			long stamp = this.lock.writeLock();
-			try
-			{
-				if (this.children != null)
-				{
-					this.children.clear();
-				}
-				this.children = null;
-				this.value = null;
-			}
-			finally
-			{
-				this.lock.unlock(stamp);
-			}
-		}
-		
-		long countStrings()
-		{
-			long stamp = this.lock.tryOptimisticRead();
-			ConcurrentHashMap<Character, TrieNode> currentChildren = this.children;
-			String currentValue = this.value;
-			
-			if (!this.lock.validate(stamp))
-			{
-				stamp = this.lock.readLock();
-				try
-				{
-					currentChildren = this.children;
-					currentValue = this.value;
-				}
-				finally
-				{
-					this.lock.unlockRead(stamp);
-				}
-			}
-			
-			long count = currentValue != null ? 1 : 0;
-			if (currentChildren != null)
-			{
-				for (TrieNode child : currentChildren.values())
-				{
-					count += child.countStrings();
-				}
-			}
-			return count;
-		}
-		
-		///endregion
-		
+
 	}
 	
 	///endregion

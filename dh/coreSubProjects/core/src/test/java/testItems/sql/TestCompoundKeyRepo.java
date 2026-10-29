@@ -32,6 +32,7 @@ import java.sql.SQLException;
 public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompoundKeyDto>
 {
 	
+	@SuppressWarnings({"try", "unused"})
 	public TestCompoundKeyRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, TestCompoundKeyDto.class);
@@ -48,9 +49,9 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 				",PRIMARY KEY (XPos, ZPos)" +
 				");";
 		try (PreparedStatement createTableStatement = this.createPreparedStatement(createTableSql);
-			 ResultSet result = this.query(createTableStatement))
+			ResultSet resultSet = this.query(createTableStatement))
 		{
-			
+			// intentionally empty: executing the query creates the table
 		}
 	}
 	

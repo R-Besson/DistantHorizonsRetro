@@ -112,6 +112,7 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 	//region
 	
 	@Override
+	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams)
 	{
 		try(GLState state = new GLState())
@@ -135,21 +136,6 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 			GlDhSSAOApplyShader.INSTANCE.ssaoTexture = this.ssaoTexture;
 			GlDhSSAOApplyShader.INSTANCE.render(renderParams);
 		}
-	}
-	
-	//endregion
-	
-	
-	
-	//================//
-	// base overrides //
-	//================//
-	//region
-	
-	public void free()
-	{
-		GlDhSSAOShader.INSTANCE.free();
-		GlDhSSAOApplyShader.INSTANCE.free();
 	}
 	
 	//endregion

@@ -5,23 +5,18 @@ import com.seibel.distanthorizons.core.file.fullDatafile.V2.FullDataSourceProvid
 import com.seibel.distanthorizons.core.generation.tasks.DataSourceRetrievalResult;
 import com.seibel.distanthorizons.core.generation.tasks.ERetrievalResultState;
 import com.seibel.distanthorizons.core.level.DhClientLevel;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.multiplayer.client.AbstractFullDataNetworkRequestQueue;
 import com.seibel.distanthorizons.core.multiplayer.client.ClientNetworkState;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.render.renderer.IDebugRenderable;
-import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.WorldGenUtil;
 import com.seibel.distanthorizons.core.util.objects.RollingAverage;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.concurrent.*;
 
 public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQueue implements IFullDataSourceRetrievalQueue, IDebugRenderable
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	private long estimatedTotalChunkCount;
 	
 	private boolean canRegenerate = false;
@@ -49,8 +44,6 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 	
 	@Override
 	public byte lowestDataDetail() { return FullDataSourceProviderV2.ROOT_SECTION_DETAIL_LEVEL; }
-	@Override
-	public byte highestDataDetail() { return LodUtil.BLOCK_DETAIL_LEVEL; }
 	
 	@Override 
 	public String getRetrievalTypeName() { return "downloading LODs"; }

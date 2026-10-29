@@ -889,8 +889,6 @@ public class FullDataSourceV2DTO
 	
 	@Override 
 	public Long getKey() { return this.pos; }
-	@Override
-	public String getKeyDisplayString() { return DhSectionPos.toString(this.pos); }
 	
 	@Override
 	public String toString()

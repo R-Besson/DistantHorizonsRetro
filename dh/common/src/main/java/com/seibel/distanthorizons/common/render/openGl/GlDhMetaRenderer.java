@@ -41,12 +41,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	public static final DhLogger LOGGER = new DhLoggerBuilder()
 		.fileLevelConfig(Config.Common.Logging.logRendererEventToFile)
 		.build();
-	
-	public static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder()
-		.fileLevelConfig(Config.Common.Logging.logRendererEventToFile)
-		.maxCountPerSecond(4)
-		.build();
-	
+
 	public static final GlDhMetaRenderer INSTANCE = new GlDhMetaRenderer();
 	
 	

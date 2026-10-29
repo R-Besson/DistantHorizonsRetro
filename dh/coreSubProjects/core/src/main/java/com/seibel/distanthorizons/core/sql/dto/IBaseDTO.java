@@ -26,9 +26,7 @@ package com.seibel.distanthorizons.core.sql.dto;
 public interface IBaseDTO<TKey> extends AutoCloseable
 {
 	TKey getKey();
-	/** Can be used for keys that don't have a clean human readable toString() method. */
-	default String getKeyDisplayString() { return this.getKey().toString(); }
-	
+
 	// closing a DTO shouldn't have the possibility of throwing anything
 	@Override 
 	void close();

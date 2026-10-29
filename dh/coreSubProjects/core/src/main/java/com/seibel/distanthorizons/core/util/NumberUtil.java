@@ -19,9 +19,6 @@
 
 package com.seibel.distanthorizons.core.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Helps when working with numbers where the type is unknown.
  *
@@ -29,31 +26,6 @@ import java.util.Map;
  */
 public class NumberUtil
 {
-	// Is there no better way of doing this?
-	public static Map<Class<?>, Number> minValues = new HashMap<Class<?>, Number>()
-	{{
-		this.put(Byte.class, Byte.MIN_VALUE);
-		this.put(Short.class, Short.MIN_VALUE);
-		this.put(Integer.class, Integer.MIN_VALUE);
-		this.put(Long.class, Long.MIN_VALUE);
-		this.put(Double.class, Double.MIN_VALUE);
-		this.	put(Float.class, Float.MIN_VALUE);
-	}};
-	public static Map<Class<?>, Number> maxValues = new HashMap<Class<?>, Number>()
-	{{
-		this.put(Byte.class, Byte.MAX_VALUE);
-		this.put(Short.class, Short.MAX_VALUE);
-		this.put(Integer.class, Integer.MAX_VALUE);
-		this.put(Long.class, Long.MAX_VALUE);
-		this.put(Double.class, Double.MAX_VALUE);
-		this.put(Float.class, Float.MAX_VALUE);
-	}};
-	
-	
-	
-	public static Number getMinimum(Class<?> c) { return minValues.get(c); }
-	public static Number getMaximum(Class<?> c) { return maxValues.get(c); }
-	
 	/** Does a greater than (>) operator on any number */
 	public static boolean greaterThan(Number a, Number b)
 	{

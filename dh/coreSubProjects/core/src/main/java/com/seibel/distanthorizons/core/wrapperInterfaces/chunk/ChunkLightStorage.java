@@ -19,10 +19,8 @@
 
 package com.seibel.distanthorizons.core.wrapperInterfaces.chunk;
 
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +37,6 @@ import java.util.concurrent.locks.ReentrantLock;
 */
 public class ChunkLightStorage 
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
 	/** the minimum Y level in the chunk which this storage is storing light levels for (inclusive). */
 	public int minY;
 	/** the maximum Y level in the chunk which this storage is storing light levels for (exclusive). */
@@ -157,13 +152,7 @@ public class ChunkLightStorage
 		lightSection.set(x, y, z, lightLevel);
 	}
 	
-	public boolean isEmpty()
-	{
-		return this.lightSections == null
-			|| this.lightSections.length == 0;
-	}
-	
-	public void clear() 
+	public void clear()
 	{
 		if (this.lightSections != null)
 		{

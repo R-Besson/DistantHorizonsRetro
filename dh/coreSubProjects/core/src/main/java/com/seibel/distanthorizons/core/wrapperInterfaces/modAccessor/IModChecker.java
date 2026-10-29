@@ -21,8 +21,6 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor;
 
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 
-import java.io.File;
-
 /**
  * Checks if a mod is loaded
  *
@@ -31,24 +29,6 @@ import java.io.File;
  */
 public interface IModChecker extends IBindable
 {
-	/** @return true if any of the given IDs are loaded */
-	default boolean isModLoaded(String[] modIdArray)
-	{
-		for (int i = 0; i < modIdArray.length; i++)
-		{
-			String modId = modIdArray[i];
-			boolean loaded = this.isModLoaded(modId);
-			if (loaded)
-			{
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
 	/** Checks if a mod is loaded */
 	boolean isModLoaded(String modId);
-	
-	File modLocation(String modId);
 }

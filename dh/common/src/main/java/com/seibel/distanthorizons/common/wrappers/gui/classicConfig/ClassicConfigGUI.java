@@ -94,15 +94,11 @@ public class ClassicConfigGUI
 	{
 		public List<DhButtonEntry> children = new ArrayList<>();
 
-		FontRenderer textRenderer;
-
 		public ConfigListWidget(Minecraft minecraftClient, int canvasWidth, int canvasHeight, int topMargin, int botMargin, int itemSpacing)
 		{
 			super(minecraftClient, canvasWidth, canvasHeight, topMargin, canvasHeight - botMargin, itemSpacing);
 
 			this.field_148163_i = false;
-
-			this.textRenderer = minecraftClient.fontRendererObj;
 		}
 
 		@Override
@@ -371,8 +367,6 @@ public class ClassicConfigGUI
 
 		@Override
 		public void addOnScreenChangeListener(Runnable newListener) { this.onScreenChangeListenerList.add(newListener); }
-		@Override
-		public void removeOnScreenChangeListener(Runnable oldListener) { this.onScreenChangeListenerList.remove(oldListener); }
 
 	}
 

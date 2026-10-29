@@ -278,7 +278,7 @@ public class DhInternalServerGenerator
 				{
 					getChunkFutureList.get(i).join();
 				}
-				catch (RuntimeException ignored)
+				catch (RuntimeException e)
 				{
 					// already logged by the request's whenCompleteAsync
 				}

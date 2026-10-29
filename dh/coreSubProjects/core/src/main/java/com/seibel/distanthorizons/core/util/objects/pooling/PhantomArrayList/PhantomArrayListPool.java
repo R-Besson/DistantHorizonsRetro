@@ -101,11 +101,11 @@ public class PhantomArrayListPool
 	 */
 	private boolean clearLastPoolSizes = false;
 	
-	public final PhantomArrayListPoolStatTracker<ByteArrayList> bytePoolStatTracker = new PhantomArrayListPoolStatTracker<>("byte[]",    Byte.BYTES,      () -> new ByteArrayList(0));
-	public final PhantomArrayListPoolStatTracker<ShortArrayList> shortPoolStatTracker = new PhantomArrayListPoolStatTracker<>("short[]", Short.BYTES,     () -> new ShortArrayList(0));
-	public final PhantomArrayListPoolStatTracker<LongArrayList> longPoolStatTracker = new PhantomArrayListPoolStatTracker<>("long[]",    Long.BYTES,      () -> new LongArrayList(0));
-	public final PhantomArrayListPoolStatTracker<CharArrayList> charPoolStatTracker = new PhantomArrayListPoolStatTracker<>("char[]",    Character.BYTES, () -> new CharArrayList(0));
-	public final PhantomArrayListPoolStatTracker<ByteBufferCheckoutWrapper> byteBufferPoolStatTracker = new PhantomArrayListPoolStatTracker<>("ByteBuffer",    Byte.BYTES, () -> new ByteBufferCheckoutWrapper());
+	public final PhantomArrayListPoolStatTracker<ByteArrayList> bytePoolStatTracker = new PhantomArrayListPoolStatTracker<>(Byte.BYTES,      () -> new ByteArrayList(0));
+	public final PhantomArrayListPoolStatTracker<ShortArrayList> shortPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Short.BYTES,     () -> new ShortArrayList(0));
+	public final PhantomArrayListPoolStatTracker<LongArrayList> longPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Long.BYTES,      () -> new LongArrayList(0));
+	public final PhantomArrayListPoolStatTracker<CharArrayList> charPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Character.BYTES, () -> new CharArrayList(0));
+	public final PhantomArrayListPoolStatTracker<ByteBufferCheckoutWrapper> byteBufferPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Byte.BYTES, () -> new ByteBufferCheckoutWrapper());
 	
 	public final PhantomArrayListPoolStatTracker<?>[] poolStatTrackers = new PhantomArrayListPoolStatTracker[]
 	{
@@ -153,7 +153,6 @@ public class PhantomArrayListPool
 	//==============//
 	
 	public PhantomArrayListCheckout checkoutByteArrays(int count) { return this.checkoutArrays(count, 0, 0, 0, 0); }
-	public PhantomArrayListCheckout checkoutShortArrays(int count) { return this.checkoutArrays(0, count, 0, 0, 0); }
 	public PhantomArrayListCheckout checkoutLongArrays(int count) { return this.checkoutArrays(0, 0, count, 0, 0); }
 	public PhantomArrayListCheckout checkoutCharArrays(int count) { return this.checkoutArrays(0, 0, 0, count, 0); }
 	public PhantomArrayListCheckout checkoutByteBuffers(int count) { return this.checkoutArrays(0, 0, 0, 0, count); }

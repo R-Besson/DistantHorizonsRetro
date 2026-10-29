@@ -126,6 +126,7 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 	//region
 	
 	@Override
+	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams)
 	{
 		int depthTextureId = GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId();
@@ -139,8 +140,8 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 		
 		
 		IProfilerWrapper profiler = MC_CLIENT.getProfiler();
-		try (IProfilerWrapper.IProfileBlock fade_profile = profiler.push("DH-Vanilla Fade");
-			GLState mcState = new GLState())
+		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("DH-Vanilla Fade");
+			GLState state = new GLState())
 		{
 			this.init();
 			
@@ -174,21 +175,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 		{
 			LOGGER.error("Unexpected error during fade render, error: [" + e.getMessage() + "].", e);
 		}
-	}
-	
-	//endregion
-	
-	
-	
-	//================//
-	// base overrides // 
-	//================//
-	//region
-	
-	public void free()
-	{
-		GlDhVanillaFadeShader.INSTANCE.free();
-		GlDhFarFadeApplyShader.INSTANCE.free();
 	}
 	
 	//endregion

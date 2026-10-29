@@ -17,8 +17,6 @@ import java.util.function.Supplier;
  */
 public final class PhantomArrayListPoolStatTracker<T>
 {
-	/** display label used in logs and debug screens (e.g. "byte", "short") */
-	public final String typeName;
 	/** size of one element in bytes, used for memory-usage estimates */
 	public final long elementSizeInBytes;
 	private final Supplier<T> emptyListCreatorFunc;
@@ -44,9 +42,8 @@ public final class PhantomArrayListPoolStatTracker<T>
 	//=============//
 	//region
 	
-	public PhantomArrayListPoolStatTracker(String typeName, long elementSizeInBytes, Supplier<T> emptyListCreatorFunc)
+	public PhantomArrayListPoolStatTracker(long elementSizeInBytes, Supplier<T> emptyListCreatorFunc)
 	{
-		this.typeName = typeName;
 		this.elementSizeInBytes = elementSizeInBytes;
 		this.emptyListCreatorFunc = emptyListCreatorFunc;
 	}

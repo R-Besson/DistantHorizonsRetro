@@ -1,21 +1,16 @@
 package com.seibel.distanthorizons.lwjgl.lwjgl2;
 
 import com.seibel.distanthorizons.lwjgl.AbstractMemoryStack;
-import org.lwjgl.BufferUtils;
-import com.seibel.distanthorizons.lwjgl.IDebugMessageHandler;
 import com.seibel.distanthorizons.lwjgl.ILWJGLService;
 import com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryStack;
 import com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities;
-import com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer;
 import com.seibel.distanthorizons.lwjgl.EGLExtension;
 import com.seibel.distanthorizons.lwjgl.EGLFeature;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.APPLEVertexArrayObject;
 import org.lwjgl.opengl.ARBBufferStorage;
-import org.lwjgl.opengl.ARBTimerQuery;
 import org.lwjgl.opengl.ARBVertexArrayObject;
 import org.lwjgl.opengl.ContextCapabilities;
 import org.lwjgl.opengl.EXTGpuShader4;
@@ -31,12 +26,8 @@ import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GL43;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.GLSync;
-import org.lwjgl.opengl.KHRDebug;
 
-import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -47,25 +38,17 @@ import java.nio.IntBuffer;
 public class LWJGL2Service implements ILWJGLService
 {
 	private static final Logger LOGGER = LogManager.getLogger("DistantHorizons/LWJGL2Service");
-	private static final LWJGL2DebugSupport debugSupport = new LWJGL2DebugSupport();
-	
+
 	private final VAOMode vaoMode;
-	private final TimerQueryMode timerQueryMode;
-	private final DebugMode debugMode;
 	private final VertexAttribIMode vertexAttribIMode;
-	private final Long2ObjectOpenHashMap<GLSync> syncObjects = new Long2ObjectOpenHashMap<GLSync>();
-	
-	
-	
+
+
+
 	private LWJGL2Service(
-		VAOMode vaoMode, 
-		TimerQueryMode timerQueryMode, 
-		DebugMode debugMode, 
-		VertexAttribIMode vertexAttribIMode) 
-	{ 
+		VAOMode vaoMode,
+		VertexAttribIMode vertexAttribIMode)
+	{
 		this.vaoMode = vaoMode;
-		this.timerQueryMode = timerQueryMode;
-		this.debugMode = debugMode;
 		this.vertexAttribIMode = vertexAttribIMode;
 	}
 	
@@ -101,48 +84,6 @@ public class LWJGL2Service implements ILWJGLService
 		public abstract int gen();
 		public abstract void delete(int array);
 		public abstract void bind(int array);
-	}
-	
-	private enum TimerQueryMode
-	{
-		CORE
-		{
-			@Override public void queryCounter(int id, int target) { GL33.glQueryCounter(id, target); }
-			@Override public long getQueryObjectui64(int id, int pname) { return GL33.glGetQueryObjectui64(id, pname); }
-		},
-		ARB
-		{
-			@Override public void queryCounter(int id, int target) { ARBTimerQuery.glQueryCounter(id, target); }
-			@Override public long getQueryObjectui64(int id, int pname) { return ARBTimerQuery.glGetQueryObjectui64(id, pname); }
-		},
-		NONE
-		{
-			@Override public void queryCounter(int id, int target) { /* no-op */ }
-			@Override public long getQueryObjectui64(int id, int pname) { return 0L; }
-		};
-		
-		public abstract void queryCounter(int id, int target);
-		public abstract long getQueryObjectui64(int id, int pname);
-	}
-	
-	private enum DebugMode
-	{
-		KHR
-		{
-			@Override public void objectLabel(int identifier, int name, CharSequence label) { KHRDebug.glObjectLabel(identifier, name, label); }
-			@Override public void pushDebugGroup(int source, int id, CharSequence message) { KHRDebug.glPushDebugGroup(source, id, message); }
-			@Override public void popDebugGroup() { KHRDebug.glPopDebugGroup(); }
-		},
-		NONE
-		{
-			@Override public void objectLabel(int identifier, int name, CharSequence label) { /* no-op */ }
-			@Override public void pushDebugGroup(int source, int id, CharSequence message) { /* no-op */ }
-			@Override public void popDebugGroup() { /* no-op */ }
-		};
-		
-		public abstract void objectLabel(int identifier, int name, CharSequence label);
-		public abstract void pushDebugGroup(int source, int id, CharSequence message);
-		public abstract void popDebugGroup();
 	}
 	
 	private enum VertexAttribIMode
@@ -198,32 +139,7 @@ public class LWJGL2Service implements ILWJGLService
 		{
 			vaoMode = VAOMode.NONE;
 		}
-		
-		TimerQueryMode timerQueryMode;
-		if (caps.OpenGL33)
-		{
-			timerQueryMode = TimerQueryMode.CORE;
-		}
-		else if (caps.GL_ARB_timer_query)
-		{
-			timerQueryMode = TimerQueryMode.ARB;
-		}
-		else
-		{
-			timerQueryMode = TimerQueryMode.NONE;
-			LOGGER.warn("ARB_timer_query extension not available - GPU profiling will be disabled");
-		}
-		
-		DebugMode debugMode;
-		if (caps.GL_KHR_debug || caps.OpenGL43)
-		{
-			debugMode = DebugMode.KHR;
-		}
-		else
-		{
-			debugMode = DebugMode.NONE;
-		}
-		
+
 		VertexAttribIMode vertexAttribIMode;
 		if (caps.OpenGL30)
 		{
@@ -238,7 +154,7 @@ public class LWJGL2Service implements ILWJGLService
 			vertexAttribIMode = VertexAttribIMode.NONE;
 		}
 		
-		return new LWJGL2Service(vaoMode, timerQueryMode, debugMode, vertexAttribIMode);
+		return new LWJGL2Service(vaoMode, vertexAttribIMode);
 	}
 	
 	
@@ -344,12 +260,6 @@ public class LWJGL2Service implements ILWJGLService
 		}
 	}
 	
-	@Override
-	public int getPointerSize()
-	{
-		return Pointer.POINTER_SIZE;
-	}
-	
 	// ===================== BUFFER OPERATIONS =====================
 	
 	@Override
@@ -383,21 +293,6 @@ public class LWJGL2Service implements ILWJGLService
 	}
 	
 	@Override
-	public void glBufferData(int target, long size, long data, int usage)
-	{
-		// LWJGL2 nglBufferData has different signature - wrap the pointer
-		if (data == 0)
-		{
-			GL15.glBufferData(target, size, usage);
-		}
-		else
-		{
-			ByteBuffer buf = MemoryUtilities.memByteBuffer(data, (int) size);
-			GL15.glBufferData(target, buf, usage);
-		}
-	}
-	
-	@Override
 	public void glBufferData(int target, int[] data, int usage)
 	{
 		IntBuffer buf = MemoryUtilities.memAllocInt(data.length);
@@ -416,12 +311,6 @@ public class LWJGL2Service implements ILWJGLService
 	}
 	
 	@Override
-	public void glBufferStorage(int target, long size, int flags)
-	{
-		ARBBufferStorage.glBufferStorage(target, size, flags);
-	}
-	
-	@Override
 	public void glBufferStorage(int target, ByteBuffer bb, int flags)
 	{
 		ARBBufferStorage.glBufferStorage(target, bb, flags);
@@ -432,50 +321,7 @@ public class LWJGL2Service implements ILWJGLService
 	{
 		GL15.glBufferSubData(target, size, data);
 	}
-	
-	@Override
-	public ByteBuffer glMapBufferRange(int target, long offset, long length, int flags)
-	{
-		return GL30.glMapBufferRange(target, offset, length, flags, null);
-	}
-	
-	@Override
-	public long nglMapBuffer(int target, int access)
-	{
-		ByteBuffer buf = GL15.glMapBuffer(target, access, null);
-		return buf != null ? MemoryUtilities.memAddress(buf) : 0L;
-	}
-	
-	@Override
-	public ByteBuffer glMapBuffer(int target, int access)
-	{
-		return GL15.glMapBuffer(target, access, null);
-	}
-	
-	@Override
-	public void glUnmapBuffer(int target)
-	{
-		GL15.glUnmapBuffer(target);
-	}
-	
-	@Override
-	public void glFlushMappedBufferRange(int target, long offset, long length)
-	{
-		GL30.glFlushMappedBufferRange(target, offset, length);
-	}
-	
-	@Override
-	public void glCopyBufferSubData(int readTarget, int writeTarget, long readOffset, long writeOffset, long size)
-	{
-		GL31.glCopyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size);
-	}
-	
-	@Override
-	public void glBindBufferBase(int target, int index, int buffer)
-	{
-		GL30.glBindBufferBase(target, index, buffer);
-	}
-	
+
 	@Override
 	public void glBindVertexBuffer(int bindingindex, int buffer, int offset, int stride)
 	{
@@ -556,12 +402,6 @@ public class LWJGL2Service implements ILWJGLService
 	public int glCreateShader(int type)
 	{
 		return GL20.glCreateShader(type);
-	}
-	
-	@Override
-	public void glShaderSource(int shader, CharSequence source)
-	{
-		GL20.glShaderSource(shader, source);
 	}
 	
 	@Override
@@ -646,57 +486,27 @@ public class LWJGL2Service implements ILWJGLService
 	{
 		GL20.glBindAttribLocation(program, index, name);
 	}
-	
-	@Override
-	public void glBindFragDataLocation(int program, int colorNumber, CharSequence name)
-	{
-		GL30.glBindFragDataLocation(program, colorNumber, name);
-	}
-	
+
 	// ===================== UNIFORM OPERATIONS =====================
-	
+
 	@Override
 	public int glGetUniformLocation(int program, CharSequence name)
 	{
 		return GL20.glGetUniformLocation(program, name);
 	}
-	
-	@Override
-	public int glGetUniformBlockIndex(int program, CharSequence name)
-	{
-		return GL31.glGetUniformBlockIndex(program, name);
-	}
-	
-	@Override
-	public void glUniformBlockBinding(int program, int blockIndex, int blockBinding)
-	{
-		GL31.glUniformBlockBinding(program, blockIndex, blockBinding);
-	}
-	
+
 	@Override
 	public void glUniform1f(int location, float v0)
 	{
 		GL20.glUniform1f(location, v0);
 	}
-	
+
 	@Override
 	public void glUniform1i(int location, int v0)
 	{
 		GL20.glUniform1i(location, v0);
 	}
-	
-	@Override
-	public void glUniform1fv(int location, FloatBuffer value)
-	{
-		GL20.glUniform1(location, value);
-	}
-	
-	@Override
-	public void glUniform2i(int location, int v0, int v1)
-	{
-		GL20.glUniform2i(location, v0, v1);
-	}
-	
+
 	@Override
 	public void glUniform2f(int location, int v0, int v1)
 	{
@@ -714,69 +524,13 @@ public class LWJGL2Service implements ILWJGLService
 	{
 		GL20.glUniform3i(location, v0, v1, v2);
 	}
-	
-	@Override
-	public void glUniform3fv(int location, FloatBuffer value)
-	{
-		GL20.glUniform3(location, value);
-	}
-	
-	@Override
-	public void glUniform3fv(int location, float[] value)
-	{
-		if (value.length == 3)
-		{
-			// fast path: single vec3
-			GL20.glUniform3f(location, value[0], value[1], value[2]);
-			return;
-		}
-		
-		if (value.length % 3 != 0)
-			throw new IllegalArgumentException("Array length must be multiple of 3");
-		
-		// general path: multiple vec3s
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(value.length);
-		buffer.put(value).flip();
-		GL20.glUniform3(location, buffer);
-	}
-	
+
 	@Override
 	public void glUniform4f(int location, float v0, float v1, float v2, float v3)
 	{
 		GL20.glUniform4f(location, v0, v1, v2, v3);
 	}
-	
-	@Override
-	public void glUniform4fv(int location, FloatBuffer value)
-	{
-		GL20.glUniform4(location, value);
-	}
-	
-	@Override
-	public void glUniform4fv(int location, float[] value)
-	{
-		if (value.length == 4)
-		{
-			// fast path: single vec4
-			GL20.glUniform4f(location, value[0], value[1], value[2], value[3]);
-			return;
-		}
-		
-		if (value.length % 4 != 0)
-			throw new IllegalArgumentException("Array length must be multiple of 4");
-		
-		// general path: multiple vec4s
-		FloatBuffer buffer = BufferUtils.createFloatBuffer(value.length);
-		buffer.put(value).flip();
-		GL20.glUniform4(location, buffer);
-	}
-	
-	@Override
-	public void glUniformMatrix3fv(int location, boolean transpose, FloatBuffer value)
-	{
-		GL20.glUniformMatrix3(location, transpose, value);
-	}
-	
+
 	@Override
 	public void glUniformMatrix4fv(int location, boolean transpose, FloatBuffer value)
 	{
@@ -796,207 +550,47 @@ public class LWJGL2Service implements ILWJGLService
 	}
 	
 	// ===================== DRAW OPERATIONS =====================
-	
-	@Override
-	public void glDrawElementsBaseVertex(int mode, int count, int type, long indices, int basevertex)
-	{
-		GL32.glDrawElementsBaseVertex(mode, count, type, indices, basevertex);
-	}
-	
+
 	@Override
 	public void glDrawElementsInstanced(int mode, int count, int type, int indices, int instancecount)
 	{
 		GL31.glDrawElementsInstanced(mode, count, type, indices, instancecount);
 	}
-	
-	@Override
-	public void glMultiDrawElementsBaseVertex(int mode, long pCount, int type, long pIndices, int drawcount, long pBaseVertex)
-	{
-		// Must emulate using a loop on LWJGL2. Sad! But there is no better way until we start writing our own
-		// native code, because LWJGL2 doesn't allow us to call arbitrary functions by name like LWJGL3 does.
-		for (int i = 0; i < drawcount; i++)
-		{
-			int count = MemoryUtilities.memGetInt(pCount + (long) i * 4);
-			if (count > 0)
-			{
-				long indices = MemoryUtilities.memGetAddress(pIndices + (long) i * Pointer.POINTER_SIZE);
-				int baseVertex = MemoryUtilities.memGetInt(pBaseVertex + (long) i * 4);
-				GL32.glDrawElementsBaseVertex(mode, count, type, indices, baseVertex);
-			}
-		}
-	}
-	
-	@Override
-	public void glMultiDrawElementsIndirect(int mode, int type, long indirect, int drawcount, int stride)
-	{
-		GL43.glMultiDrawElementsIndirect(mode, type, indirect, drawcount, stride);
-	}
-	
+
 	// ===================== SYNC OPERATIONS =====================
-	
-	@Override
-	public long glFenceSync(int condition, int flags)
-	{
-		GLSync sync = GL32.glFenceSync(condition, flags);
-		long pointer = sync.getPointer();
-		syncObjects.put(pointer, sync);
-		return pointer;
-	}
-	
-	@Override
-	public int glClientWaitSync(long sync, int flags, long timeout)
-	{
-		return GL32.glClientWaitSync(syncObjects.get(sync), flags, timeout);
-	}
-	
-	@Override
-	public int glGetSynci(long sync, int pname, IntBuffer length)
-	{
-		// LWJGL2 glGetSynci doesn't take length buffer - it returns single value directly
-		int result = GL32.glGetSynci(syncObjects.get(sync), pname);
-		if (length != null)
-		{
-			length.put(0, 1); // Always returns single value
-		}
-		return result;
-	}
-	
-	@Override
-	public void glWaitSync(long sync, int flags, long timeout)
-	{
-		GL32.glWaitSync(syncObjects.get(sync), flags, timeout);
-	}
-	
-	@Override
-	public void glDeleteSync(long sync)
-	{
-		GLSync obj = syncObjects.remove(sync);
-		if (obj == null) return;
-		GL32.glDeleteSync(obj);
-	}
-	
+
 	@Override
 	public void glFlush()
 	{
 		GL11.glFlush();
 	}
-	
-	// ===================== QUERY OPERATIONS =====================
-	
-	@Override
-	public int glGenQueries()
-	{
-		return GL15.glGenQueries();
-	}
-	
-	@Override
-	public void glDeleteQueries(int query)
-	{
-		GL15.glDeleteQueries(query);
-	}
-	
-	@Override
-	public void glQueryCounter(int id, int target)
-	{
-		timerQueryMode.queryCounter(id, target);
-	}
-	
-	@Override
-	public long glGetQueryObjectui64(int id, int pname)
-	{
-		return timerQueryMode.getQueryObjectui64(id, pname);
-	}
-	
-	// ===================== DEBUG OPERATIONS =====================
-	
-	@Override
-	public PrintStream getDebugStream() { return System.err; }
-	
-	@Override
-	public int setupDebugCallback(IDebugMessageHandler handler)
-	{
-		return debugSupport.setupDebugCallback(handler);
-	}
-	
-	@Override
-	public void disableDebugCallback()
-	{
-		debugSupport.disableDebugCallback();
-	}
-	
-	@Override
-	public void glObjectLabel(int identifier, int name, CharSequence label)
-	{
-		debugMode.objectLabel(identifier, name, label);
-	}
-	
-	@Override
-	public void glPushDebugGroup(int source, int id, CharSequence message)
-	{
-		debugMode.pushDebugGroup(source, id, message);
-	}
-	
-	@Override
-	public void glPopDebugGroup()
-	{
-		debugMode.popDebugGroup();
-	}
-	
+
 	// ===================== TEXTURE OPERATIONS =====================
-	
+
 	@Override
 	public int glGenTextures()
 	{
 		return GL11.glGenTextures();
 	}
-	
-	@Override
-	public void glGenTextures(int[] textures)
-	{
-		IntBuffer buf = MemoryUtilities.memAllocInt(textures.length);
-		GL11.glGenTextures(buf);
-		buf.get(textures);
-		MemoryUtilities.memFree(buf);
-	}
-	
+
 	@Override
 	public void glDeleteTextures(int texture)
 	{
 		GL11.glDeleteTextures(texture);
 	}
-	
-	@Override
-	public void glDeleteTextures(int[] textures)
-	{
-		IntBuffer buf = (IntBuffer) MemoryUtilities.memAllocInt(textures.length).put(textures).flip();
-		GL11.glDeleteTextures(buf);
-		MemoryUtilities.memFree(buf);
-	}
-	
+
 	@Override
 	public void glBindTexture(int target, int texture)
 	{
 		GL11.glBindTexture(target, texture);
 	}
-	
+
 	@Override
 	public void glActiveTexture(int texture)
 	{
 		GL13.glActiveTexture(texture);
 	}
-	
-	@Override
-	public int glGetTexLevelParameteri(int target, int level, int pname)
-	{
-		return GL11.glGetTexLevelParameteri(target, level, pname);
-	}
-	
-	@Override
-	public void glCopyTexSubImage2D(int target, int level, int xoffset, int yoffset, int x, int y, int width, int height)
-	{
-		GL11.glCopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
-	}
-	
+
 	@Override
 	public void glPixelStorei(int pname, int param)
 	{
@@ -1187,31 +781,11 @@ public class LWJGL2Service implements ILWJGLService
 	}
 	
 	@Override
-	public int glGetError()
-	{
-		return GL11.glGetError();
-	}
-	
-	@Override
 	public void glColor4f(float v, float v1, float v2, float v3)
 	{
 		GL11.glColor4f(v, v1, v2, v3);
 	}
-	
-	// ===================== COMPATIBILITY PROFILE (GL1.x) =====================
-	
-	@Override
-	public void glMatrixMode(int mode)
-	{
-		GL11.glMatrixMode(mode);
-	}
-	
-	@Override
-	public void glLoadMatrixf(FloatBuffer m)
-	{
-		GL11.glLoadMatrix(m);
-	}
-	
+
 	// ===================== Fog =========================
 	
 	@Override
@@ -1254,219 +828,18 @@ public class LWJGL2Service implements ILWJGLService
 	{
 		return GL11.glGetString(pname);
 	}
-	
-	@Override
-	public int glGetAttribLocation(int program, CharSequence name)
-	{
-		return GL20.glGetAttribLocation(program, name);
-	}
-	
+
 	// ===================== MEMORY STACK OPERATIONS =====================
-	
+
 	@Override
 	public AbstractMemoryStack stackPush()
 	{
 		return new LWJGL2MemoryStack(MemoryStack.stackPush());
 	}
-	
+
 	// ===================== NATIVE MEMORY OPERATIONS =====================
-	
-	@Override
-	public long nmemAlloc(long size)
-	{
-		return MemoryUtilities.nmemAlloc(size);
-	}
-	
-	@Override
-	public long nmemCalloc(long count, long size)
-	{
-		return MemoryUtilities.nmemCalloc(count, size);
-	}
-	
-	@Override
-	public long nmemAlignedAlloc(long alignment, long size)
-	{
-		// Ported from FalsePattern's lwjgl2-celeritas LegacyMemoryAdapter
-		int required = 8;
-		alignment = Math.max(alignment, 8);
-		long prefixLength = Math.max(alignment, required) + required;
-		long capacity = size + prefixLength;
-		long addr = MemoryUtilities.nmemAlloc(capacity);
-		if (addr == 0) return 0;
-		long shiftBy = alignment - (addr % alignment);
-		if (shiftBy < required)
-		{
-			shiftBy += alignment;
-		}
-		long finalAddr = addr + shiftBy;
-		MemoryUtilities.memPutLong(finalAddr - 8, addr);
-		return finalAddr;
-	}
-	
-	@Override
-	public long nmemRealloc(long ptr, long size)
-	{
-		return MemoryUtilities.nmemRealloc(ptr, size);
-	}
-	
-	@Override
-	public void nmemFree(long ptr)
-	{
-		MemoryUtilities.nmemFree(ptr);
-	}
-	
-	@Override
-	public void nmemAlignedFree(long ptr)
-	{
-		if (ptr == 0) return;
-		long realAddr = MemoryUtilities.memGetLong(ptr - 8);
-		MemoryUtilities.nmemFree(realAddr);
-	}
-	
-	@Override
-	public ByteBuffer memAlloc(int size)
-	{
-		return MemoryUtilities.memAlloc(size);
-	}
-	
-	@Override
-	public ByteBuffer memCalloc(int size)
-	{
-		return MemoryUtilities.memCalloc(size);
-	}
-	
-	@Override
-	public ByteBuffer memRealloc(ByteBuffer buffer, int size)
-	{
-		return MemoryUtilities.memRealloc(buffer, size);
-	}
-	
-	@Override
-	public void memFree(Buffer buffer)
-	{
-		MemoryUtilities.memFree(buffer);
-	}
-	
-	@Override
-	public ByteBuffer memByteBuffer(long address, int capacity)
-	{
-		return MemoryUtilities.memByteBuffer(address, capacity);
-	}
-	
-	@Override
-	public long memAddress(Buffer buffer)
-	{
-		return MemoryUtilities.memAddress(buffer);
-	}
-	
-	@Override
-	public long memAddress(Buffer buffer, int position)
-	{
-		if (buffer == null)
-		{
-			return position;
-		}
-		return MemoryUtilities.memAddress0(buffer) + position;
-	}
-	
-	@Override
-	public void memSet(long address, int value, long bytes)
-	{
-		MemoryUtilities.memSet(address, value, bytes);
-	}
-	
-	@Override
-	public void memCopy(long src, long dst, long bytes)
-	{
-		MemoryUtilities.memCopy(src, dst, bytes);
-	}
-	
-	@Override
-	public void memCopy(ByteBuffer src, ByteBuffer dst)
-	{
-		MemoryUtilities.memCopy(src, dst);
-	}
-	
-	@Override
-	public void memPutByte(long address, byte value)
-	{
-		MemoryUtilities.memPutByte(address, value);
-	}
-	
-	@Override
-	public void memPutShort(long address, short value)
-	{
-		MemoryUtilities.memPutShort(address, value);
-	}
-	
-	@Override
-	public void memPutInt(long address, int value)
-	{
-		MemoryUtilities.memPutInt(address, value);
-	}
-	
-	@Override
-	public void memPutFloat(long address, float value)
-	{
-		MemoryUtilities.memPutFloat(address, value);
-	}
-	
-	@Override
-	public void memPutLong(long address, long value)
-	{
-		MemoryUtilities.memPutLong(address, value);
-	}
-	
-	@Override
-	public void memPutAddress(long address, long value)
-	{
-		MemoryUtilities.memPutAddress(address, value);
-	}
-	
-	@Override
-	public byte memGetByte(long address)
-	{
-		return MemoryUtilities.memGetByte(address);
-	}
-	
-	@Override
-	public short memGetShort(long address)
-	{
-		return MemoryUtilities.memGetShort(address);
-	}
-	
-	@Override
-	public int memGetInt(long address)
-	{
-		return MemoryUtilities.memGetInt(address);
-	}
-	
-	@Override
-	public float memGetFloat(long address)
-	{
-		return MemoryUtilities.memGetFloat(address);
-	}
-	
-	@Override
-	public long memGetLong(long address)
-	{
-		return MemoryUtilities.memGetLong(address);
-	}
-	
-	@Override
-	public long memGetAddress(long address)
-	{
-		return MemoryUtilities.memGetAddress(address);
-	}
-	
-	@Override
-	public ByteBuffer memSlice(ByteBuffer buffer, int offset, int capacity)
-	{
-		long address = MemoryUtilities.memAddress(buffer) + offset;
-		return MemoryUtilities.memByteBuffer(address, capacity);
-	}
-	
-	@Override
+
+    @Override
 	public boolean isRunningOnRenderThread()
 	{
 		try

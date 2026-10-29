@@ -38,13 +38,6 @@ public class ChunkPosQueue
 	
 	public boolean contains(DhChunkPos pos) { return this.updateDataByChunkPos.containsKey(pos); }
 	
-	public void clear()
-	{
-		this.updateDataByChunkPos.clear();
-		this.closestQueue.clear();
-		this.furthestQueue.clear();
-	}
-	
 	public void addItem(DhChunkPos pos, ChunkUpdateData updateData)
 	{
 		if (this.updateDataByChunkPos.containsKey(pos))

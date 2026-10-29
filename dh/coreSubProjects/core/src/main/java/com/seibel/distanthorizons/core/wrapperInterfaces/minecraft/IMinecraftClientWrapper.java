@@ -31,8 +31,7 @@ public interface IMinecraftClientWrapper extends IBindable
 	//======================//
 	// multiplayer handling //
 	//======================//
-	
-	boolean hasSinglePlayerServer();
+
 	boolean clientConnectedToDedicatedServer();
 	/** for use with the Replay mod */
 	boolean connectedToReplay();

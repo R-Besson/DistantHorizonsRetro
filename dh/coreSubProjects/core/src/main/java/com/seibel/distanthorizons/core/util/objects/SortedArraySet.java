@@ -39,13 +39,6 @@ public class SortedArraySet<E>
 		this.comparator = comparator;
 	}
 	
-	public SortedArraySet(Collection<? extends E> collection, Comparator<? super E> comparator)
-	{
-		this.comparator = comparator;
-		this.list.addAll(collection);
-		this.list.sort(comparator);
-	}
-	
 	
 	
 	//==============//

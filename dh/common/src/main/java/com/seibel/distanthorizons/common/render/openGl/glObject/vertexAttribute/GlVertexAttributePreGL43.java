@@ -101,72 +101,9 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 			}
 		}
 	}
-	
-	/** Requires both AbstractVertexAttribute and VertexBuffer to be bound */
-	@Override
-	public void bindBufferToBindingPoint(int buffer, int bindingPoint)
-	{
-		// make sure our buffer is bound before we bind the attributes
-		LWJGL.glBindBuffer(GL15.GL_ARRAY_BUFFER, buffer);
-		
-		int[] bindingPointIndexes = this.bindingPointsToIndex[bindingPoint];
-		
-		for (int bindingPointIndex : bindingPointIndexes)
-		{
-			LWJGL.glEnableVertexAttribArray(bindingPointIndex);
-		}
-		
-		for (int bindingPointIndex : bindingPointIndexes)
-		{
-			GlVertexPointer pointer = this.pointers[bindingPointIndex];
-			if (pointer == null)
-			{
-				continue;
-			}
-			
-			if (pointer.useInteger)
-			{
-				LWJGL.glVertexAttribIPointer(bindingPointIndex, pointer.elementCount, pointer.glType,
-						this.strideSize, this.pointersOffset[bindingPointIndex]);
-			}
-			else
-			{
-				LWJGL.glVertexAttribPointer(bindingPointIndex, pointer.elementCount, pointer.glType,
-						pointer.normalized, this.strideSize, this.pointersOffset[bindingPointIndex]);
-			}
-		}
-		
-	}
-	
-	
-	
-	//===========//
-	// unbinding //
-	//===========//
-	
-	/** Requires AbstractVertexAttribute to be bound */
-	@Override
-	public void unbindBuffersFromAllBindingPoint()
-	{
-		for (int i = 0; i < this.pointers.length; i++)
-		{
-			LWJGL.glDisableVertexAttribArray(i);
-		}
-	}
-	
-	/** Requires AbstractVertexAttribute to be bound */
-	@Override
-	public void unbindBuffersFromBindingPoint(int bindingPoint)
-	{
-		int[] bindingPointIndexes = this.bindingPointsToIndex[bindingPoint];
-		for (int bindingPointIndex : bindingPointIndexes)
-		{
-			LWJGL.glDisableVertexAttribArray(bindingPointIndex);
-		}
-	}
-	
-	
-	
+
+
+
 	//==========================//
 	// manual attribute setting //
 	//==========================//

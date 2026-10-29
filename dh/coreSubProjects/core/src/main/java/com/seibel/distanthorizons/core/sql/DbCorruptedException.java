@@ -8,11 +8,6 @@ import java.sql.SQLException;
  */
 public class DbCorruptedException extends SQLException
 {
-	public DbCorruptedException(String message) { super(message); }
-	public DbCorruptedException(String message, Throwable cause) { super(message, cause); }
-	public DbCorruptedException(Throwable cause) { super(cause); }
-	
-	
 	// helper methods //
 	
 	public static boolean isCorruptedException(SQLException e) 

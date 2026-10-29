@@ -20,7 +20,6 @@
 package com.seibel.distanthorizons.core.level;
 
 import com.google.common.cache.CacheBuilder;
-import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.eventHandlers.IgnoredDimensionCsvHandler;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
@@ -63,10 +62,7 @@ import java.util.concurrent.TimeUnit;
 public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	private static final DhLogger NETWORK_LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
-			.build();
-	
+
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	
 	public final ClientLevelModule clientside;
@@ -228,8 +224,7 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	// tick methods //
 	//==============//
 	//region
-	
-	@Override
+
 	public void clientTick()
 	{
 		try
@@ -354,7 +349,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	@Override
 	public void addDebugMenuStringsToList(List<String> messageList)
 	{
-		String o = MinecraftTextFormat.ORANGE;
 		String y = MinecraftTextFormat.YELLOW;
 		String g = MinecraftTextFormat.GREEN;
 		String r = MinecraftTextFormat.RED;
@@ -415,7 +409,10 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			{
 				this.sessionConfigListener.close();
 			}
-			catch (Exception ignored) { }
+			catch (Exception e)
+			{
+				// the level is closing anyway
+			}
 		}
 		
 		this.levelWrapper.setDhLevel(null);

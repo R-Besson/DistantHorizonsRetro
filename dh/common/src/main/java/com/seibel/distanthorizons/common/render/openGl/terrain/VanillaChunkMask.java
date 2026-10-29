@@ -325,8 +325,6 @@ public class VanillaChunkMask
 	public int getRadius() { return (this.textureId != 0) ? this.radius : 0; }
 	public int getCameraChunkX() { return this.cameraChunkX; }
 	public int getCameraChunkZ() { return this.cameraChunkZ; }
-	/** 0 if the mask hasn't been built yet */
-	public float getVanillaTerrainEndDistance() { return this.vanillaTerrainEndDistance; }
 
 	//endregion
 

@@ -31,8 +31,7 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
  */
 public interface IVersionConstants extends IBindable
 {
-	String getMinecraftVersion();
-	
+
 	EDhApiRenderingEngine getDefaultRenderingEngine();
 	
 }

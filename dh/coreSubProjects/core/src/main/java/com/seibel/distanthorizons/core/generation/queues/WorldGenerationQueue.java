@@ -694,7 +694,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	@Override public int getInProgressTaskCount() { return this.inProgressGenTasksByLodPos.size(); }
 	
 	@Override public byte lowestDataDetail() { return this.generator.getLargestDataDetailLevel(); }
-	@Override public byte highestDataDetail() { return this.generator.getSmallestDataDetailLevel(); }
 	
 	@Override public String getRetrievalTypeName() { return "generating chunks"; }
 	

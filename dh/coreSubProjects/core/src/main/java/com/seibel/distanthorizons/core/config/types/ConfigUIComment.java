@@ -60,10 +60,6 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 	// setters //
 	//=========//
 	
-	/** Appearance shouldn't be changed */
-	@Override
-	public void setAppearance(EConfigEntryAppearance newAppearance) { }
-	
 	/** Pointless to set the value */
 	@Override
 	public void set(String newValue) { }

@@ -58,13 +58,7 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	 * IE 0 = Block, 1 = 2x2 blocks, etc.
 	 */
 	byte lowestDataDetail();
-	/** 
-	 * The smallest numerical detail level. <br>
-	 * Detail level is absolute, not section;
-	 * IE 0 = Block, 1 = 2x2 blocks, etc.
-	 */
-	byte highestDataDetail();
-	
+
 	/** 
 	 * Returns a value like "downloading" or "generating" depending on how the LODs are being retrieved.
 	 * Used to make the progress message easier to understand.

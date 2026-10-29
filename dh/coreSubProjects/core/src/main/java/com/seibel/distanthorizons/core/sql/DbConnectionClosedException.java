@@ -8,11 +8,6 @@ import java.sql.SQLException;
  */
 public class DbConnectionClosedException extends SQLException
 {
-	public DbConnectionClosedException() { super("The database connection is closed."); }
-	public DbConnectionClosedException(String message) { super(message); }
-	public DbConnectionClosedException(String message, Throwable cause) { super(message, cause); }
-	public DbConnectionClosedException(Throwable cause) { super(cause); }
-
 
 	// helper methods //
 

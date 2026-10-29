@@ -65,23 +65,16 @@ public class DhBlockPos implements INetworkObject
 	}
 	public DhBlockPos() { this(0, 0, 0); }
 	public DhBlockPos(DhBlockPos pos) { this(pos.x, pos.y, pos.z); }
-	
-	public DhBlockPos(DhBlockPos2D pos, int y) { this(pos.x, y, pos.z); }
-	
-	
-	
+
+
+
 	//========//
 	// offset //
 	//========//
-	
-	/** creates a new {@link DhBlockPos} with the given offset from the current pos. */
-	public DhBlockPos createOffset(EDhDirection direction) { return this.mutateOrCreateOffset(direction.normal.x, direction.normal.y, direction.normal.z, null); }
+
 	/** if not null, mutates "mutablePos" so it matches the current pos after being offset. Otherwise creates a new {@link DhBlockPos}. */
 	public void mutateOffset(EDhDirection direction, @NotNull DhBlockPosMutable mutablePos) { this.mutateOrCreateOffset(direction.normal.x, direction.normal.y, direction.normal.z, mutablePos); }
-	
-	public DhBlockPos createOffset(int x, int y, int z) { return this.mutateOrCreateOffset(x,y,z, null); }
-	public void mutateOffset(int x, int y, int z, @NotNull DhBlockPosMutable mutablePos) { this.mutateOrCreateOffset(x, y, z, mutablePos); }
-	
+
 	protected DhBlockPos mutateOrCreateOffset(int x, int y, int z, @Nullable DhBlockPosMutable mutablePos) 
 	{
 		int newX = this.x + x;
@@ -146,29 +139,10 @@ public class DhBlockPos implements INetworkObject
 		// if the position is negative move it into the range 0 and 15
 		relPos = (relPos < 0) ? (relPos + LodUtil.CHUNK_WIDTH) : relPos;
 		return relPos;
-	}	
-	
-	
-	
-	//==========//
-	// distance //
-	//==========//
-	
-	/**
-	 * Can be used to quickly determine the rough distance between two points<Br>
-	 * or determine the taxi cab (manhattan) distance between two points. <Br><Br>
-	 *
-	 * Manhattan distance is equivalent to determining the distance between two street intersections,
-	 * where you can only drive along each street, instead of directly to the other point.
-	 */
-	public int getManhattanDistance(DhBlockPos otherPos)
-	{ return Math.abs(this.x - otherPos.x) + Math.abs(this.y - otherPos.y) + Math.abs(this.z - otherPos.z); }
-	/** @see DhBlockPos#getManhattanDistance(DhBlockPos) */
-	public int getManhattanDistance(DhBlockPos2D otherPos)
-	{ return Math.abs(this.x - otherPos.x) + Math.abs(this.z - otherPos.z); }
-	
-	
-	
+	}
+
+
+
 	//================//
 	// base overrides //
 	//================//

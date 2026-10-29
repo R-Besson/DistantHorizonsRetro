@@ -69,13 +69,6 @@ public interface INetworkObject
 				? decoder.get() 
 				: null;
 	}
-	default void readOptional(ByteBuf inputByteBuf, Runnable decoder)
-	{
-		if (inputByteBuf.readBoolean())
-		{
-			decoder.run();
-		}
-	}
 	
 	
 	// strings //
@@ -133,20 +126,7 @@ public interface INetworkObject
 		
 		return collection;
 	}
-	
-	default <TMap extends Map<K, V>, K, V> TMap readMap(ByteBuf inputByteBuf, TMap map, Supplier<K> keySupplier, Supplier<V> valueSupplier)
-	{
-		ArrayList<Map.Entry<K, V>> entryList = new ArrayList<>();
-		
-		this.readCollection(inputByteBuf, entryList, () -> new AbstractMap.SimpleEntry<>(keySupplier.get(), valueSupplier.get()));
-		for (Map.Entry<K, V> entry : entryList)
-		{
-			map.put(entry.getKey(), entry.getValue());
-		}
-		
-		return map;
-	}
-	
+
 	
 	
 	//================//

@@ -1,7 +1,6 @@
 package com.seibel.distanthorizons.forge17;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -32,9 +31,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 	// packet handling //
 	//=================//
 	//region
-	
-    public static void setPacketHandler(Consumer<AbstractNetworkMessage> consumer)
-    { setPacketHandler((player, message) -> consumer.accept(message)); }
 	
     public static void setPacketHandler(BiConsumer<IServerPlayerWrapper, AbstractNetworkMessage> consumer) 
     {

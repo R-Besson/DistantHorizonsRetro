@@ -73,8 +73,10 @@ public class PhantomLoggingHelper
 	
 	/**
 	 * Can be quickly added to a {@link AutoCloseable} implementing
-	 * class to confirm it's being properly closed.
+	 * class to confirm it's being properly closed. <br>
+	 * Debug tool, normally unused.
 	 */
+	@SuppressWarnings("unused")
 	public static class BasicPhantomReference implements AutoCloseable
 	{
 		private static final DhLogger LOGGER = new DhLoggerBuilder().build();

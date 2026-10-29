@@ -28,7 +28,6 @@ import com.seibel.distanthorizons.core.util.math.DhMat4f;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.seibel.distanthorizons.common.backports.BlockPos;
 import com.seibel.distanthorizons.common.backports.ChunkPos;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -117,9 +116,6 @@ public class McObjectConverter
 	//==================//
 	//region
 
-	public static BlockPos convert(DhBlockPos wrappedPos) { return new BlockPos(wrappedPos.getX(), wrappedPos.getY(), wrappedPos.getZ()); }
-
-	public static ChunkPos convert(DhChunkPos wrappedPos) { return new ChunkPos(wrappedPos.getX(), wrappedPos.getZ()); }
 	public static DhChunkPos convert(ChunkPos mcPos)
 	{
 		return new DhChunkPos(mcPos.x, mcPos.z);

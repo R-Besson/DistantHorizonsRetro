@@ -131,55 +131,7 @@ public class ClientOnlySaveStructure implements ISaveStructure
 	//================//
 	// helper methods //
 	//================//
-	
-	/** Returns true if the given folder holds valid Lod Dimension data */
-	private static ArrayList<File> getValidDhDimensionFolders(File potentialFolder)
-	{
-		ArrayList<File> subDimSaveFolders = new ArrayList<>();
-		
-		if (!potentialFolder.isDirectory())
-		{
-			// a valid level folder needs to be a folder
-			return subDimSaveFolders;
-		}
-		
-		
-		File[] potentialLevelFolders = potentialFolder.listFiles();
-		if (potentialLevelFolders != null)
-		{
-			// check each level folder
-			for (File potentialFile : potentialLevelFolders)
-			{
-				if (potentialFile.isDirectory())
-				{
-					// check if this is a valid DH level folder
-					File[] dataFolders = potentialFile.listFiles();
-					if (dataFolders != null)
-					{
-						boolean isValidDhLevelFolder = false;
-						for (File dataFolder : dataFolders)
-						{
-							// look for the DH database file
-							if (dataFolder.getName().equalsIgnoreCase(ISaveStructure.DATABASE_NAME))
-							{
-								isValidDhLevelFolder = true;
-								break;
-							}
-						}
-						
-						if (isValidDhLevelFolder)
-						{
-							subDimSaveFolders.add(potentialFile);
-						}
-					}
-				}
-			}
-		}
-		
-		return subDimSaveFolders;
-	}
-	
-	
+
 	private static File getSaveFolderByLevelId(String folderName, String dimensionName)
 	{
 		String path = MC_SHARED.getInstallationDirectory().getPath() + File.separatorChar

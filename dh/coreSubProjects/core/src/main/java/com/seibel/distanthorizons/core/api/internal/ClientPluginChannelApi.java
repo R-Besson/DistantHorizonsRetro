@@ -108,10 +108,8 @@ public class ClientPluginChannelApi
 		});
 	}
 	
-	public void onClientLevelUnload() { KEYED_CLIENT_LEVEL_MANAGER.clearKeyedLevel(); }
-	
-	
-	
+
+
 	//==========//
 	// shutdown //
 	//==========//

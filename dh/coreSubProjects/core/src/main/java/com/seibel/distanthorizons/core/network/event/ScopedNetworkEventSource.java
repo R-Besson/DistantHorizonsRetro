@@ -50,8 +50,7 @@ public final class ScopedNetworkEventSource extends AbstractNetworkEventSource
 	//==================//
 	// message handlers //
 	//==================//
-	
-	@Override
+
 	public <T extends AbstractNetworkMessage> void registerHandler(Class<T> handlerClass, Consumer<T> handlerImplementation)
 	{
 		if (this.isClosed)

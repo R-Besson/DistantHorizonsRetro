@@ -564,6 +564,7 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 	 * This method is here for debugging the repo and isn't intended for normal use.
 	 * The method need to be async because pausing the main thread with a breakpoint and hot swapping will crash the program
 	 */
+	@SuppressWarnings("unused")
 	public static void asyncDebugMethod(IDhApiLevelWrapper levelWrapper, int blockPosX, int blockPosY, int blockPosZ)
 	{
 		if (!debugThreadRunning)

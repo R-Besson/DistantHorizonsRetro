@@ -121,15 +121,12 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	private final boolean isIceBlock;
 	private final boolean allowsBeaconBeamPassage;
 	private final boolean renderTexture;
-	private final boolean useBottomTextureForSides;
-	private final boolean alwaysRasterizeTexture;
 	private final boolean isSolid;
 	private final boolean isLiquid;
 	private final boolean allowApiColorOverride;
 	private final boolean allowApiTextureOverride;
 	/** null if this block can't tint beacons */
 	private final Color beaconTintColor;
-	private final Color mapColor;
 
 
 
@@ -435,42 +432,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		}
 
 
-		// texture handling //
+		// texture ignoring //
 		{
-			// texture ignoring //
-			{
-				String dontTextureNamesCsv = Config.Client.Advanced.Graphics.Texture.blocksDontRenderTextureCsv.get();
-				this.renderTexture = !blockSerialInCsv(lowerCaseSerial, dontTextureNamesCsv);
-			}
-
-
-			// side texture ignoring //
-			{
-				// block tags aren't available, so only the block name list is checked
-				String sideBlockNamesCsv = Config.Client.Advanced.Graphics.Texture.blocksDontUseSideTextureCsv.get();
-				this.useBottomTextureForSides = blockSerialInCsv(lowerCaseSerial, sideBlockNamesCsv);
-			}
-
-
-			// always raster texture //
-			{
-				String alwaysRasterNamesCsv = Config.Client.Advanced.Graphics.Texture.blocksAlwaysRasterizeTextureCsv.get();
-				this.alwaysRasterizeTexture = blockSerialInCsv(lowerCaseSerial, alwaysRasterNamesCsv);
-			}
-		}
-
-
-		// map color //
-		{
-			if (this.blockState != null)
-			{
-				int mcColor = this.blockState.getMaterial().getMaterialMapColor().colorValue;
-				this.mapColor = ColorUtil.toColorObjRGB(mcColor);
-			}
-			else
-			{
-				this.mapColor = new Color(0, 0, 0, 0);
-			}
+			String dontTextureNamesCsv = Config.Client.Advanced.Graphics.Texture.blocksDontRenderTextureCsv.get();
+			this.renderTexture = !blockSerialInCsv(lowerCaseSerial, dontTextureNamesCsv);
 		}
 
 
@@ -1147,13 +1112,16 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	@Override public boolean isIceBlock() { return this.isIceBlock; }
 	@Override public boolean isBeaconTintBlock() { return this.beaconTintColor != null; }
 	@Override public boolean allowsBeaconBeamPassage() { return this.allowsBeaconBeamPassage; }
-	@Override public boolean allowApiColorOverride() { return this.allowApiColorOverride; }
-	@Override public boolean allowApiTextureOverride() { return this.allowApiTextureOverride; }
-	@Override public boolean renderTexture() { return this.renderTexture; }
-	@Override public boolean useBottomTextureForSides() { return this.useBottomTextureForSides; }
-	@Override public boolean alwaysRasterizeTexture() { return this.alwaysRasterizeTexture; }
+	/** if true this block can have its color overridden by the API's block color override event */
+	public boolean allowApiColorOverride() { return this.allowApiColorOverride; }
+	/** if true this block can have its texture overridden by the API's block texture override event */
+	public boolean allowApiTextureOverride() { return this.allowApiTextureOverride; }
+	/**
+	 * Some blocks don't pull their texture properly (like bamboo).
+	 * In those cases it's best to just render their base color.
+	 */
+	public boolean renderTexture() { return this.renderTexture; }
 
-	@Override public Color getMapColor() { return this.mapColor; }
 	@Override public Color getBeaconTintColor() { return this.beaconTintColor; }
 
 	@Override public byte getMaterialId() { return this.blockMaterialId; }

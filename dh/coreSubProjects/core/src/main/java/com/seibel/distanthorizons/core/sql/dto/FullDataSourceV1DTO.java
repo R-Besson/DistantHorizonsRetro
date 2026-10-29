@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.sql.dto;
 
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGenerationStep;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV1;
-import com.seibel.distanthorizons.core.pos.DhSectionPos;
 
 /**
  * Handles storing{@link FullDataSourceV1}'s in the database.
@@ -29,15 +28,8 @@ import com.seibel.distanthorizons.core.pos.DhSectionPos;
 public class FullDataSourceV1DTO implements IBaseDTO<Long>
 {
 	public long pos;
-	public int checksum;
 	public byte dataDetailLevel;
-	public EDhApiWorldGenerationStep worldGenStep;
-	
-	// Loader stuff //
-	/** indicates what data is held in this file, this is generally the data's name */
-	public String dataType;
-	public byte binaryDataFormatVersion;
-	
+
 	public final byte[] dataArray;
 	
 	
@@ -48,14 +40,11 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 	
 	public FullDataSourceV1DTO(long pos, int checksum, byte dataDetailLevel, EDhApiWorldGenerationStep worldGenStep, String dataType, byte binaryDataFormatVersion, byte[] dataArray)
 	{
+		// the checksum, world gen step, data type and format version
+		// are read from the database but not needed by the V1 migration
 		this.pos = pos;
-		this.checksum = checksum;
 		this.dataDetailLevel = dataDetailLevel;
-		this.worldGenStep = worldGenStep;
-		
-		this.dataType = dataType;
-		this.binaryDataFormatVersion = binaryDataFormatVersion;
-		
+
 		this.dataArray = dataArray;
 	}
 	
@@ -67,8 +56,6 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 	
 	@Override
 	public Long getKey() { return this.pos; }
-	@Override
-	public String getKeyDisplayString() { return DhSectionPos.toString(this.pos); }
 	
 	@Override 
 	public void close()

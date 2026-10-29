@@ -76,10 +76,6 @@ public class FullDataToRenderDataTransformer
 	//==============================//
 	//region
 	
-	@Nullable
-	public static ColumnRenderSource transformFullDataToRenderSource(
-			@Nullable FullDataSourceV2 fullDataSource, @Nullable IClientLevelWrapper levelWrapper)
-	{ return transformFullDataToRenderSource(fullDataSource, levelWrapper, null); }
 	/**
 	 * @param onlyEdge if not null only the columns along this edge are transformed and held by the returned source
 	 *                 (IE a neighbor of the section being built, see {@link FullDataMinMaxPosUtil#getEncodedMinMaxPos})
@@ -153,13 +149,12 @@ public class FullDataToRenderDataTransformer
 		
 		
 		
-		final ColumnRenderSource columnSource = ColumnRenderSource.createEmptyPartial(pos, maxVertSliceCount, levelWrapper.getMinHeight(), minX, maxX, minZ, maxZ);
+		final ColumnRenderSource columnSource = ColumnRenderSource.createEmptyPartial(pos, maxVertSliceCount, minX, maxX, minZ, maxZ);
 		if (fullDataSource.isEmpty)
 		{
 			return columnSource;
 		}
-		
-		columnSource.markNotEmpty();
+
 		int baseX = DhSectionPos.getMinCornerBlockX(pos);
 		int baseZ = DhSectionPos.getMinCornerBlockZ(pos);
 		

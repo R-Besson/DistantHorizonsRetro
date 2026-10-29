@@ -107,7 +107,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	//=============//
 	//region
 	
-	public FullDataSourceProviderV2(IDhLevel level, ISaveStructure saveStructure) throws SQLException, IOException { this(level, saveStructure, null); }
 	public FullDataSourceProviderV2(IDhLevel level, ISaveStructure saveStructure, @Nullable File saveDirOverride) throws SQLException, IOException
 	{
 		this.saveDir = (saveDirOverride == null) ? saveStructure.getSaveFolder(level.getLevelWrapper()) : saveDirOverride;
@@ -118,7 +117,7 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 		this.levelId = this.levelWrapper.getDhIdentifier();
 		
-		this.dataUpdater = new FullDataUpdaterV2(this, this.levelId);
+		this.dataUpdater = new FullDataUpdaterV2(this);
 		this.updatePropagator = new FullDataUpdatePropagatorV2(this, this.dataUpdater, this.level);
 		this.dataMigratorV1 = new DataMigratorV1(this.dataUpdater, this.level, this.levelId, this.saveDir);
 		
@@ -371,17 +370,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	public EDhApiGeneratorPlan getGeneratorPlan() { return Config.Common.WorldGenerator.generatorPlan.get(); }
 	
 	/**
-	 * Returns true if this provider can generate or retrieve
-	 * {@link FullDataSourceV2}'s that aren't currently in the database.
-	 */
-	public boolean canRetrieveMissingDataSources() 
-	{ 
-		// the base handler just handles basic reading/writing
-		// to the database and as such can't retrieve anything else.
-		return false; 
-	}
-	
-	/**
 	 * Returns false if this provider isn't accepting new requests,
 	 * this can be due to having a full queue or some other
 	 * limiting factor. <br><br>
@@ -428,8 +416,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 	/** @see IFullDataSourceRetrievalQueue#canRetrievePos */
 	public boolean canRetrievePos(long pos, DhBlockPos2D centerPos) { return true; }
-
-	public void clearRetrievalQueue() { }
 	
 	/** Can be used to display how many total chunk retrieval requests should be available. */
 	public void setEstimatedRemainingRetrievalChunkCount(long newCount) { }

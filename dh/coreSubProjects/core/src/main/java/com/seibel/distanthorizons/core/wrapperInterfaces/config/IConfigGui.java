@@ -26,6 +26,5 @@ public interface IConfigGui extends IBindable
 {
 	
 	void addOnScreenChangeListener(Runnable newListener);
-	void removeOnScreenChangeListener(Runnable oldListener);
 	
 }

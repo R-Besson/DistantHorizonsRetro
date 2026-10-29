@@ -62,7 +62,6 @@ public class FullDataPointUtil
 	
 	
 	public static final long ID_MASK = Integer.MAX_VALUE;
-	public static final long INVERSE_ID_MASK = ~ID_MASK;
 	public static final int HEIGHT_MASK = (int) Math.pow(2, HEIGHT_WIDTH) - 1;
 	public static final int MIN_Y_MASK = (int) Math.pow(2, MIN_Y_WIDTH) - 1;
 	public static final int SKY_LIGHT_MASK = (int) Math.pow(2, SKY_LIGHT_WIDTH) - 1;
@@ -192,7 +191,9 @@ public class FullDataPointUtil
 	// helper methods //
 	//================//
 	//region
-	
+
+	/** useful when debugging */
+	@SuppressWarnings("unused")
 	public static String toString(long data) { return "[ID:" + getId(data) + ",Y:" + getBottomY(data) + ",Height:" + getHeight(data) + ",BlockLight:" + getBlockLight(data) + ",SkyLight:" + getSkyLight(data) + "]"; }
 	
 	/** Remaps the biome/blockState ID of the given datapoint */

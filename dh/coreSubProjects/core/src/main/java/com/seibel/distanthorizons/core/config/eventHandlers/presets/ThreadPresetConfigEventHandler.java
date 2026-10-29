@@ -24,9 +24,7 @@ import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.ConfigPresetOptions;
 import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.util.MathUtil;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,8 +34,6 @@ import java.util.List;
 public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHandler<EDhApiThreadPreset>
 {
 	public static final ThreadPresetConfigEventHandler INSTANCE = new ThreadPresetConfigEventHandler();
-	
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	
 	public static int getDefaultThreadCount() { return getThreadCountByPercent(0.5); }

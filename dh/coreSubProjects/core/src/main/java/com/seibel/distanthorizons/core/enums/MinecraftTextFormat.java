@@ -4,8 +4,10 @@ package com.seibel.distanthorizons.core.enums;
  * might be deprecated in the future? in that case we'll probably want a wrapper 
  * function to handle colors for new MC versions
  * <br><br>
- * source: https://minecraft.wiki/w/Formatting_codes
+ * source: https://minecraft.wiki/w/Formatting_codes <br>
+ * The full code table is kept even though not every code is used.
  */
+@SuppressWarnings("unused")
 public class MinecraftTextFormat
 {
 	public static final String BLACK = "\u00A70";

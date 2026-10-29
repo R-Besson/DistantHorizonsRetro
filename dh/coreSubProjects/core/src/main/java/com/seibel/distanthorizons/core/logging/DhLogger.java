@@ -230,6 +230,7 @@ public class DhLogger implements IConfigListener
 	public void warn(String str, Object... param){ this.log(Level.WARN, str, param); }
 	public void info(String str, Object... param) { this.log(Level.INFO, str, param); }
 	public void debug(String str, Object... param) { this.log(Level.DEBUG, str, param); }
+	@SuppressWarnings("unused") // kept so every log level has a method
 	public void trace(String str, Object... param) { this.log(Level.TRACE, str, param); }
 	
 	public void log(Level level, String str, Object... param)

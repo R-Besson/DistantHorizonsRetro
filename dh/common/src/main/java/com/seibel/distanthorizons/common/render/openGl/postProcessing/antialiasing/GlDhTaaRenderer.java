@@ -135,9 +135,10 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 	//region
 	
 	@Override
+	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams)
 	{
-		// GLState restores the GL state afterwards, MC doesn't set every GL state it needs before the next rendering step
+		// GLState restores the GL state afterward, MC doesn't set every GL state it needs before the next rendering step
 		try (GLState state = new GLState())
 		{
 			this.init();
@@ -184,21 +185,6 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 			this.textureAIsHistory = !this.textureAIsHistory;
 			
 		}
-	}
-	
-	//endregion
-	
-	
-	
-	//================//
-	// base overrides //
-	//================//
-	//region
-	
-	public void free()
-	{
-		GlDhTaaShader.INSTANCE.free();
-		GlDhTaaSharpenShader.INSTANCE.free();
 	}
 	
 	//endregion

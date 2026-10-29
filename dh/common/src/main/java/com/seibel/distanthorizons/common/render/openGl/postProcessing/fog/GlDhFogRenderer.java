@@ -112,9 +112,10 @@ public class GlDhFogRenderer implements IDhFogRenderer
 	//region
 	
 	@Override
+	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams, DhApiFogRenderParam fogRenderParams)
 	{
-		// GLState restores the GL state afterwards, MC doesn't set every GL state it needs before the next rendering step
+		// GLState restores the GL state afterward, MC doesn't set every GL state it needs before the next rendering step
 		try (GLState state = new GLState())
 		{
 			this.init();
@@ -136,21 +137,6 @@ public class GlDhFogRenderer implements IDhFogRenderer
 			GlDhFogApplyShader.INSTANCE.fogTexture = this.fogTexture;
 			GlDhFogApplyShader.INSTANCE.render(renderParams);
 		}
-	}
-	
-	//endregion
-	
-	
-	
-	//================//
-	// base overrides //
-	//================//
-	//region
-	
-	public void free()
-	{
-		GlDhFogShader.INSTANCE.free();
-		GlDhFogApplyShader.INSTANCE.free();
 	}
 	
 	//endregion

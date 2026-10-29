@@ -23,46 +23,6 @@ public class IndexBufferBuilder
 		
 		return buffer;
 	}
-	private static void buildBufferByte(int quadCount, ByteBuffer buffer)
-	{
-		for (int i = 0; i < quadCount; i++)
-		{
-			int vIndex = i * 4;
-			// First triangle
-			buffer.put((byte) (vIndex));
-			buffer.put((byte) (vIndex + 1));
-			buffer.put((byte) (vIndex + 2));
-			// Second triangle
-			buffer.put((byte) (vIndex + 2));
-			buffer.put((byte) (vIndex + 3));
-			buffer.put((byte) (vIndex));
-		}
-		if (buffer.hasRemaining())
-		{
-			throw new IllegalStateException("QuadElementBuffer is not full somehow after building");
-		}
-		buffer.rewind();
-	}
-	private static void buildBufferShort(int quadCount, ByteBuffer buffer)
-	{
-		for (int i = 0; i < quadCount; i++)
-		{
-			int vIndex = i * 4;
-			// First triangle
-			buffer.putShort((short) (vIndex));
-			buffer.putShort((short) (vIndex + 1));
-			buffer.putShort((short) (vIndex + 2));
-			// Second triangle
-			buffer.putShort((short) (vIndex + 2));
-			buffer.putShort((short) (vIndex + 3));
-			buffer.putShort((short) (vIndex));
-		}
-		if (buffer.hasRemaining())
-		{
-			throw new IllegalStateException("QuadElementBuffer is not full somehow after building");
-		}
-		buffer.rewind();
-	}
 	private static void buildBufferInt(int quadCount, ByteBuffer buffer)
 	{
 		for (int i = 0; i < quadCount; i++)

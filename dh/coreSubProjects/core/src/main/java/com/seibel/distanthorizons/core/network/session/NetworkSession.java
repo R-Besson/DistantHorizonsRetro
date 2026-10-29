@@ -6,7 +6,6 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.network.event.AbstractNetworkEventSource;
 import com.seibel.distanthorizons.core.network.event.internal.CloseInternalEvent;
-import com.seibel.distanthorizons.core.network.event.internal.ProtocolErrorInternalEvent;
 import com.seibel.distanthorizons.core.network.messages.AbstractNetworkMessage;
 import com.seibel.distanthorizons.core.network.messages.AbstractTrackableMessage;
 import com.seibel.distanthorizons.core.network.messages.base.CloseReasonMessage;
@@ -56,16 +55,6 @@ public class NetworkSession extends AbstractNetworkEventSource
 		{
 			this.close(new SessionClosedException(msg.reason));
 		});
-		
-		this.registerHandler(ProtocolErrorInternalEvent.class, event ->
-		{
-			if (event.replyWithCloseReason)
-			{
-				this.sendMessage(new CloseReasonMessage("Internal error on other side"));
-			}
-			
-			this.close(event.reason);
-		});
 	}
 	
 	
@@ -96,8 +85,7 @@ public class NetworkSession extends AbstractNetworkEventSource
 			this.close(e);
 		}
 	}
-	
-	@Override
+
 	public <T extends AbstractNetworkMessage> void registerHandler(Class<T> handlerClass, Consumer<T> handlerImplementation)
 	{
 		if (this.closeReason.get() != null)
@@ -168,7 +156,10 @@ public class NetworkSession extends AbstractNetworkEventSource
 		{
 			this.handleMessage(new CloseInternalEvent());
 		}
-		catch (Throwable ignored) { }
+		catch (Throwable e)
+		{
+			// the session is closing anyway
+		}
 		
 		super.close();
 	}

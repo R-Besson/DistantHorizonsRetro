@@ -19,8 +19,6 @@
 
 package com.seibel.distanthorizons.core.util.objects.quadTree;
 
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.render.QuadTree.LodQuadTree;
@@ -41,8 +39,6 @@ import java.util.function.LongConsumer;
  */
 public class QuadTree<T>
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	
 	
 	/** 
@@ -169,7 +165,6 @@ public class QuadTree<T>
 	 *
 	 */
 	public int ringListWidth() { return 3; }
-	public int ringListHalfWidth() { return 1; }
 	public int diameterInBlocks() { return this.diameterInBlocks; }
 	
 	//endregion
@@ -319,28 +314,7 @@ public class QuadTree<T>
 						rect1MinZ < rect2MaxZ &&
 						rect1MaxZ > rect2MinZ;
 	}
-	
-	
-	public int getNonNullChildCountAtPos(long pos) { return this.getChildCountAtPos(pos, false); }
-	public int getChildCountAtPos(long pos, boolean includeNullValues)
-	{
-		int childCount = 0;
-		for (int i = 0; i < 4; i++)
-		{
-			long childPos = DhSectionPos.getChildByIndex(pos, i);
-			if (this.isSectionPosInBounds(childPos))
-			{
-				T value = this.getValue(childPos);
-				if (includeNullValues || value != null)
-				{
-					childCount++;
-				}
-			}
-		}
-		
-		return childCount;
-	}
-	
+
 	//endregion
 	
 	
@@ -476,8 +450,6 @@ public class QuadTree<T>
 	// base methods //
 	//==============//
 	//region
-	
-	public boolean isEmpty() { return this.nodeCount() == 0; } // this should be rewritten to short-circuit
 	
 	@Override
 	public String toString() 

@@ -3128,7 +3128,9 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
             try {
                 field.setAccessible(true);
                 return (sun.misc.Unsafe) field.get(null);
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                // inaccessible, fall through to the error below
+            }
             break;
         }
 

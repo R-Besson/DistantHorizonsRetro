@@ -22,8 +22,6 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.minecraft;
 import java.awt.Color;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiDepthDirection;
-import com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState;
-import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.ILightMapWrapper;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
@@ -42,25 +40,8 @@ import org.jetbrains.annotations.Nullable;
 public interface IMinecraftRenderWrapper extends IBindable
 {
 	DhVec3f getLookAtVector();
-	
-	boolean playerHasBlindingEffect();
-	
+
 	/**
-	 * percentage of time into the current client tick. <br><br>
-	 *
-	 * Can be converted to a millisecond frametime 
-	 * (IE time between frames in milliseconds) using the formula: <br>
-	 * <code>
-	 * (partialTickTime/20*1000)
-	 * </code> <br>
-	 * IE 60 FPS = 16.6 MS <br>
-	 *
-	 * @link https://fpstoms.com/
-	 * @see DhRenderState#partialTickTime
-	 */
-	float getPartialTickTime();
-	
-	/** 
 	 * When other mods are present and
 	 * this method is called outside the render thread
 	 * this may return undesirable positions.
@@ -96,8 +77,6 @@ public interface IMinecraftRenderWrapper extends IBindable
 	
 	boolean mcRendersToFrameBuffer();
 	boolean runningLegacyOpenGL();
-	/** Returns the Graphics API Minecraft is currently using for rendering */
-	EDhApiRenderingApi getMcRenderingApi();
 	EDhApiDepthDirection getMcDepthDirection();
 	
 	/** @return -1 if no valid framebuffer is available yet */

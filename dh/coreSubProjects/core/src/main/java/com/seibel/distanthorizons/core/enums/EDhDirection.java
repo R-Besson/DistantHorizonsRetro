@@ -33,17 +33,17 @@ import com.seibel.distanthorizons.core.util.math.DhVec3i;
 public enum EDhDirection
 {
 	/** negative Y */
-	DOWN("down", EDhDirection.AxisDirection.NEGATIVE, EDhDirection.Axis.Y, new DhVec3i(0, -1, 0), -1, 0),
+	DOWN("down", EDhDirection.Axis.Y, new DhVec3i(0, -1, 0), -1, 0),
 	/** positive Y */
-	UP("up", EDhDirection.AxisDirection.POSITIVE, EDhDirection.Axis.Y, new DhVec3i(0, 1, 0), -1, 1),
+	UP("up", EDhDirection.Axis.Y, new DhVec3i(0, 1, 0), -1, 1),
 	/** negative Z */
-	NORTH("north", EDhDirection.AxisDirection.NEGATIVE, EDhDirection.Axis.Z, new DhVec3i(0, 0, -1), 0, 2),
+	NORTH("north", EDhDirection.Axis.Z, new DhVec3i(0, 0, -1), 0, 2),
 	/** positive Z */
-	SOUTH("south", EDhDirection.AxisDirection.POSITIVE, EDhDirection.Axis.Z, new DhVec3i(0, 0, 1), 1, 3),
+	SOUTH("south", EDhDirection.Axis.Z, new DhVec3i(0, 0, 1), 1, 3),
 	/** negative X */
-	WEST("west", EDhDirection.AxisDirection.NEGATIVE, EDhDirection.Axis.X, new DhVec3i(-1, 0, 0), 2, 4),
+	WEST("west", EDhDirection.Axis.X, new DhVec3i(-1, 0, 0), 2, 4),
 	/** positive X */
-	EAST("east", EDhDirection.AxisDirection.POSITIVE, EDhDirection.Axis.X, new DhVec3i(1, 0, 0), 3, 5);
+	EAST("east", EDhDirection.Axis.X, new DhVec3i(1, 0, 0), 3, 5);
 	
 	
 	/** Up, Down, West, East, North, South */
@@ -68,7 +68,6 @@ public enum EDhDirection
 	
 	public final String name;
 	public final EDhDirection.Axis axis;
-	public final EDhDirection.AxisDirection axisDirection;
 	public final DhVec3i normal;
 	/** -1 if not a {@link EDhDirection#CARDINAL_COMPASS} direction */
 	public final int compassIndex;
@@ -81,11 +80,10 @@ public enum EDhDirection
 	// constructor //
 	//=============//
 		
-	EDhDirection(String name, EDhDirection.AxisDirection axisDirection, EDhDirection.Axis axis, DhVec3i normal, int compassIndex, int faceIndex)
+	EDhDirection(String name, EDhDirection.Axis axis, DhVec3i normal, int compassIndex, int faceIndex)
 	{
 		this.name = name;
 		this.axis = axis;
-		this.axisDirection = axisDirection;
 		this.normal = normal;
 		this.compassIndex = compassIndex;
 		this.faceIndex = faceIndex;
@@ -200,52 +198,11 @@ public enum EDhDirection
 		// methods //
 		//=========//
 		
-		public boolean isVertical() { return this == Y; }
 		public boolean isHorizontal() { return this == X || this == Z; }
 		
 		@Override
 		public String toString() { return this.name; }
 		
 	}
-	
-	/**
-	 * POSITIVE <br>
-	 * NEGATIVE <br>
-	 */
-	public enum AxisDirection
-	{
-		POSITIVE(1, "Towards positive"),
-		NEGATIVE(-1, "Towards negative");
-		
-		public final int step;
-		public final String name;
-		
-		
-		
-		//=============//
-		// constructor //
-		//=============//
-		
-		AxisDirection(int newStep, String newName)
-		{
-			this.step = newStep;
-			this.name = newName;
-		}
-		
-		
-		
-		//=========//
-		// methods //
-		//=========//
-		
-		public EDhDirection.AxisDirection opposite() 
-		{ return (this == POSITIVE) ? NEGATIVE : POSITIVE; }
-		
-		@Override
-		public String toString() { return this.name; }
-		
-		
-		
-	}
-	
+
 }

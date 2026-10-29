@@ -78,12 +78,6 @@ public abstract class GlAbstractVertexAttribute
 	
 	/** Requires both AbstractVertexAttribute and VertexBuffer to be bound */
 	public abstract void bindBufferToAllBindingPoints(int buffer);
-	/** Requires both AbstractVertexAttribute and VertexBuffer to be bound */
-	public abstract void bindBufferToBindingPoint(int buffer, int bindingPoint);
-	/** Requires both AbstractVertexAttribute to be bound */
-	public abstract void unbindBuffersFromAllBindingPoint();
-	/** Requires both AbstractVertexAttribute to be bound */
-	public abstract void unbindBuffersFromBindingPoint(int bindingPoint);
 	/** Requires both AbstractVertexAttribute to be bound */
 	public abstract void setVertexAttribute(int bindingPoint, int attributeIndex, GlVertexPointer attribute);
 	/** Requires both AbstractVertexAttribute to be bound */

@@ -651,10 +651,10 @@ class DhConfigScreen extends DhScreen
 		);
 		super.drawScreen(mouseX, mouseY, delta);
 
-		this.renderTooltip(mouseX, mouseY, delta);
+		this.renderTooltip(mouseX, mouseY);
 	}
 
-	private void renderTooltip(int mouseX, int mouseY, float delta)
+	private void renderTooltip(int mouseX, int mouseY)
 	{
 		Gui hoveredWidget = this.configListWidget.getHoveredButton(mouseX, mouseY);
 		if (hoveredWidget == null)

@@ -42,7 +42,6 @@ import com.seibel.distanthorizons.core.util.objects.Pair;
 import com.seibel.distanthorizons.core.util.objects.RollingAverage;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 import com.seibel.distanthorizons.core.world.IDhClientWorld;
-import com.seibel.distanthorizons.core.wrapperInterfaces.IVersionConstants;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
@@ -86,7 +85,6 @@ public class ClientApi
 	
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
-	private static final IVersionConstants VERSION_CONSTANTS = SingletonInjector.INSTANCE.get(IVersionConstants.class);
 	
 	/** Delayed accessing is necessary since this object will be created before the mod accessors are bound. */
 	private static class DelayedAccessors 
@@ -132,8 +130,6 @@ public class ClientApi
 	
 	public boolean rendererDisabledBecauseOfExceptions = false;
 	
-	/** Holds any levels that were loaded before the {@link ClientApi#onClientOnlyConnected} was fired. */
-	public final HashSet<IClientLevelWrapper> waitingClientLevels = new HashSet<>();
 	/** Holds any chunks that were found before the client levels are loaded. */
 	public final Map<Pair<IClientLevelWrapper, DhChunkPos>, IChunkWrapper> waitingChunkByClientLevelAndPos = new ConcurrentHashMap<>();
 	
@@ -348,10 +344,11 @@ public class ClientApi
 	 */
 	public void renderDeferredLodsForShaders() { this.renderLodLayer(true); }
 	
+	@SuppressWarnings({"try", "unused"})
 	private void renderLodLayer(boolean renderingDeferredLayer)
 	{
 		IProfilerWrapper profiler = MC_CLIENT.getProfiler();
-		try (IProfilerWrapper.IProfileBlock dhRender_profile = profiler.push("DH-RenderLevel"))
+		try (IProfilerWrapper.IProfileBlock profileBlock =profiler.push("DH-RenderLevel"))
 		{
 			
 			
@@ -364,7 +361,7 @@ public class ClientApi
 			// only run these tasks once per frame
 			if (!renderingDeferredLayer)
 			{
-				try (IProfilerWrapper.IProfileBlock renderTask_profile = profiler.push("DH render thread tasks"))
+				try (IProfilerWrapper.IProfileBlock renderTasksProfileBlock = profiler.push("DH render thread tasks"))
 				{
 					//===============//
 					// chat messages //

@@ -130,13 +130,6 @@ public class BiomeWrapper implements IBiomeWrapper
 	}
 
 	@Override
-	public boolean isColdBiome()
-	{
-		// https://minecraft.wiki/w/Biome#Temperature
-		return this.biome.temperature < 0.1f;
-	}
-
-	@Override
 	public String getSerialString() { return this.serialString; }
 
 	@Override

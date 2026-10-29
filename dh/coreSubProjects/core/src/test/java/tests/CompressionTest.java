@@ -36,6 +36,7 @@ import java.io.*;
  * 2. Point the {@link CompressionTest#TEST_DIR} variable to the world's "data" folder.
  * 3. Add @Test to the compressors you want to compare and run the tests like normal
  */
+@SuppressWarnings("unused") // manual benchmark, see above
 public class CompressionTest
 {
 	public static String TEST_DIR = "C:/Users/James_Seibel/Desktop/DH Files/test files";

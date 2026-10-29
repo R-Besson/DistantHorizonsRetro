@@ -5,8 +5,6 @@ package com.seibel.distanthorizons.common.backports;
  */
 public class ChunkPos
 {
-    private static final long INT_MASK = (1L << Integer.SIZE) - 1;
-	
     public final int x;
     public final int z;
 	
@@ -22,36 +20,9 @@ public class ChunkPos
         this.x = x;
         this.z = z;
     }
-	
-	public ChunkPos(BlockPos pos)
-	{
-		this.x = pos.getX() >> 4;
-		this.z = pos.getZ() >> 4;
-	}
-	
-	public ChunkPos(long pos)
-	{
-		this.x = (int) pos;
-		this.z = (int) (pos >> 32);
-	}
-	
+
 	//endregion
-	
-	
-	
-	//=========//
-	// getters //
-	//=========//
-	//region
-	
-	public static int getPackedX(long pos) { return (int) pos; }
-	public static int getPackedZ(long pos) { return (int) (pos >>> 32); }
-	
-	public long toLong() { return toLong(this.x, this.z); }
-	public static long toLong(int x, int z) { return (long) x & INT_MASK | ((long) z & INT_MASK) << 32; }
-	
-	//endregion
-	
+
 	
 	
 	//================//

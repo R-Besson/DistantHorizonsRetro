@@ -122,13 +122,7 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 			|| this.ignoredChunkPosSet.contains(pos)	
 			|| this.preUpdateQueue.contains(pos); 
 	}
-	
-	public void clear()
-	{
-		this.updateQueue.clear();
-		this.preUpdateQueue.clear();
-		this.ignoredChunkPosSet.clear();
-	}
+
 	public int getQueuedCount() { return this.updateQueue.getQueuedCount() + this.preUpdateQueue.getQueuedCount(); }
 	
 	public boolean updateQueuesEmpty()
@@ -293,8 +287,9 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 					Thread.sleep(DEBOUNCE_WAIT_DELAY_MS);
 				}
 			}
-			catch (InterruptedException ignored)
+			catch (InterruptedException e)
 			{
+				// restore the flag so the thread loop exits
 				Thread.currentThread().interrupt();
 			}
 			catch (Exception e)

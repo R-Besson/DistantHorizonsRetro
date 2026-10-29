@@ -77,7 +77,6 @@ public abstract class AbstractConfigBase<T>
 	public void set(T newValue) { this.value = newValue; }
 	
 	public EConfigEntryAppearance getAppearance() { return this.appearance; }
-	public void setAppearance(EConfigEntryAppearance newAppearance) { this.appearance = newAppearance; }
 	
 	
 	public String getCategory() { return this.category; }

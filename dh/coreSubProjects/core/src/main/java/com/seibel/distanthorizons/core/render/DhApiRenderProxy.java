@@ -32,7 +32,6 @@ import com.seibel.distanthorizons.core.level.IDhClientLevel;
 import com.seibel.distanthorizons.core.level.IDhLevel;
 import com.seibel.distanthorizons.core.util.RenderUtil;
 import com.seibel.distanthorizons.core.world.AbstractDhWorld;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,9 +44,7 @@ import org.jetbrains.annotations.Nullable;
 public class DhApiRenderProxy implements IDhApiRenderProxy
 {
 	public static final DhApiRenderProxy INSTANCE = new DhApiRenderProxy();
-	
-	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
-	
+
 	private boolean deferTransparentRendering = false;
 	
 	private static AbstractDhRenderApiDefinition renderApiDef = null;

@@ -9,8 +9,6 @@ import java.lang.reflect.Method;
 public final class LWJGLServiceProvider 
 {
     public static final ILWJGLService LWJGL = createInstance();
-    public static final int POINTER_SIZE = LWJGL.getPointerSize();
-    public static final long NULL = 0L;
 
 	
 	

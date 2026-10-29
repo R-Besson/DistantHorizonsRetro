@@ -1,7 +1,5 @@
 package com.seibel.distanthorizons.core.util.delayedSaveCache;
 
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
@@ -14,10 +12,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamDTO, DelayedBeaconSaveCache.BeaconSaveObjContainer>
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder()
-		.name(DelayedBeaconSaveCache.class.getSimpleName())
-		.build();
-	
 	private final @NotNull ISaveBeaconsFunc saveBeaconsFunc;
 	
 	

@@ -955,14 +955,8 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		return RenderDataPointUtil.getYMax(data) - RenderDataPointUtil.getYMin(data);
 	}
 	
-	public int getRed(int index) { return RenderDataPointUtil.getRed(this.getData(index)); }
-	public int getGreen(int index) { return RenderDataPointUtil.getGreen(this.getData(index)); }
-	public int getBlue(int index) { return RenderDataPointUtil.getBlue(this.getData(index)); }
 	public int getAlpha(int index) { return RenderDataPointUtil.getAlpha(this.getData(index)); }
-	
-	public int getBlockLight(int index) { return RenderDataPointUtil.getLightBlock(this.getData(index)); }
-	public int getSkyLight(int index) { return RenderDataPointUtil.getLightSky(this.getData(index)); }
-	
+
 	
 	
 	//=========//
@@ -1004,39 +998,8 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	{
 		this.data.set(index, (this.data.getLong(index) & ~RenderDataPointUtil.MIN_Y_SHIFTED_MASK) | ((minY & RenderDataPointUtil.MIN_Y_MASK) << RenderDataPointUtil.MIN_Y_SHIFT));
 	}
-	public void setMaxY(int index, int maxY) 
-	{
-		this.data.set(index, (this.data.getLong(index) & ~RenderDataPointUtil.MAX_Y_SHIFTED_MASK) | ((maxY & RenderDataPointUtil.MAX_Y_MASK) << RenderDataPointUtil.MAX_Y_SHIFT));
-	}
 
-	public void setRed(int index, int red) 
-	{
-		this.data.set(index, (this.data.getLong(index) & ~(RenderDataPointUtil.RED_MASK << RenderDataPointUtil.RED_SHIFT)) | ((red & RenderDataPointUtil.RED_MASK) << RenderDataPointUtil.RED_SHIFT));
-	}
-	public void setGreen(int index, int green) 
-	{
-		this.data.set(index, (this.data.getLong(index) & ~(RenderDataPointUtil.GREEN_MASK << RenderDataPointUtil.GREEN_SHIFT)) | ((green & RenderDataPointUtil.GREEN_MASK) << RenderDataPointUtil.GREEN_SHIFT));
-	}
 
-	public void setBlue(int index, int blue) {
-		this.data.set(index, (this.data.getLong(index) & ~(RenderDataPointUtil.BLUE_MASK << RenderDataPointUtil.BLUE_SHIFT)) | ((blue & RenderDataPointUtil.BLUE_MASK) << RenderDataPointUtil.BLUE_SHIFT));
-	}
-	public void setAlpha(int index, int alpha) 
-	{
-		alpha >>>= RenderDataPointUtil.ALPHA_DOWNSIZE_SHIFT;
-		this.data.set(index, (this.data.getLong(index) & ~(RenderDataPointUtil.ALPHA_MASK << RenderDataPointUtil.ALPHA_SHIFT)) | ((alpha & RenderDataPointUtil.ALPHA_MASK) << RenderDataPointUtil.ALPHA_SHIFT));
-	}
-	
-	public void setBlockLight(int index, int blockLight) 
-	{
-		this.data.set(index, (this.data.getLong(index) & ~(RenderDataPointUtil.BLOCK_LIGHT_MASK << RenderDataPointUtil.BLOCK_LIGHT_SHIFT)) | ((blockLight & RenderDataPointUtil.BLOCK_LIGHT_MASK) << RenderDataPointUtil.BLOCK_LIGHT_SHIFT));
-	}
-	public void setSkyLight(int index, int skyLight) 
-	{
-		this.data.set(index, (this.data.getLong(index) & ~(RenderDataPointUtil.SKY_LIGHT_MASK << RenderDataPointUtil.SKY_LIGHT_SHIFT)) | ((skyLight & RenderDataPointUtil.SKY_LIGHT_MASK) << RenderDataPointUtil.SKY_LIGHT_SHIFT));
-	}
-	
-	
 	//================//
 	// helper methods //
 	//================//

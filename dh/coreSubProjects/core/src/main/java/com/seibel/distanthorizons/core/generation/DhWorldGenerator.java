@@ -30,22 +30,18 @@ import com.seibel.distanthorizons.core.dataObjects.transformers.LodDataBuilder;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.file.fullDatafile.V2.FullDataSourceProviderV2;
 import com.seibel.distanthorizons.core.level.IDhServerLevel;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.WorldGenUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IChunkGenerator;
-import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IRoughGenerator;
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IOverrideInjector;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -61,15 +57,11 @@ import java.util.function.Consumer;
 public class DhWorldGenerator implements IDhApiWorldGenerator
 {
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public final IServerLevelWrapper serverLevelWrapper;
-	public final IDhServerLevel serverLevel;
-	
+
 	public final IChunkGenerator chunkGenerator;
-	@Nullable
-	public final IRoughGenerator roughGenerator;
-	
+
 	
 	
 	//=============//
@@ -79,11 +71,9 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	
 	public DhWorldGenerator(IDhServerLevel serverLevel)
 	{
-		this.serverLevel = serverLevel;
 		this.serverLevelWrapper = serverLevel.getServerLevelWrapper();
 		
 		this.chunkGenerator = WRAPPER_FACTORY.createChunkGenerator(serverLevel);
-		this.roughGenerator = WRAPPER_FACTORY.createRoughGenerator(serverLevel, this.chunkGenerator);
 	}
 	
 	//endregion
@@ -167,24 +157,8 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 				resultConsumer);
 		}
 		
-		if (this.roughGenerator == null)
-		{
-			throw new NullPointerException("No rough generator provided, this Minecraft version probably doesn't support rough surface generation.");
-		}
-		
-		
-		
-		// we want something larger than a chunk,
-		// estimate the surface
-		return CompletableFuture.runAsync(() ->
-			this.roughGenerator.generateSurface(
-				chunkPosMinX, chunkPosMinZ,
-				posX, posZ, detailLevel,
-				pooledFullDataSource,
-				generatorMode,
-				resultConsumer
-			),
-		worldGeneratorThreadPool);
+		// 1.7.10 has no rough surface generator for areas larger than a chunk
+		throw new NullPointerException("No rough generator provided, this Minecraft version probably doesn't support rough surface generation.");
 	}
 	
 	/** @see WorldGenUtil#regenAllowed(FullDataSourceProviderV2)  */
@@ -300,11 +274,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	public void close()
 	{
 		this.chunkGenerator.close();
-		
-		if (this.roughGenerator != null)
-		{
-			this.roughGenerator.close();
-		}
 	}
 	
 	//endregion

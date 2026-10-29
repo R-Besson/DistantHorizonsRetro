@@ -32,9 +32,6 @@ public class GlDhDepthTexture
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 	
-	// For internal use by Iris for copying data. Do not use this in DH.
-	public GlDhDepthTexture(int id) { this.id = id; }
-	
 	public void resize(int width, int height, EGlDhDepthBufferFormat format)
 	{
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, this.getTextureId());

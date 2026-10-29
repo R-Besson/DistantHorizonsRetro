@@ -32,9 +32,7 @@ public enum EConfigEntryAppearance
 	/** Will only show the option in the UI. The option will be reverted on game restart */
 	ONLY_IN_GUI(true, false),
 	/** Only show the option in the file. There would be no way to access it using the UI */
-	ONLY_IN_FILE(false, true),
-	/** The option is only available via code. Generally this is only used for deprecated options. */
-	ONLY_IN_API(false, false);
+	ONLY_IN_FILE(false, true);
 	
 	/** Sets whether the option should show in the UI */
 	public final boolean showInGui;

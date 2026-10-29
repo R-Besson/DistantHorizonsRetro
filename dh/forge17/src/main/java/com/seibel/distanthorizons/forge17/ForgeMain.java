@@ -58,8 +58,6 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
     @Mod.Instance
     public static Object instance;
 
-    public static boolean isHodgePodgeInstalled = false;
-	
 	private Consumer<MinecraftServer> eventHandlerStartServer;
 	
 	//=============//

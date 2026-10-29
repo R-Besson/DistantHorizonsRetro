@@ -29,8 +29,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface IDhClientLevel extends IDhLevel
 {
-	void clientTick();
-	
 	@Nullable
 	IClientLevelWrapper getClientLevelWrapper();
 	

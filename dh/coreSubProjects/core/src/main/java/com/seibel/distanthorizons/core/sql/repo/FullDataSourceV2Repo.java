@@ -525,6 +525,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	public void setRegenerate(long pos, boolean regenerate)
 	{ this.setApplyToFlag(pos, regenerate, this.setRegenerateToChildrenSql); }
 	
+	@SuppressWarnings({"try", "unused"})
 	private void setApplyToFlag(long pos, boolean applyFlag, String sql)
 	{
 		try (PreparedStatement statement = this.createPreparedStatement(sql))
@@ -543,7 +544,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i++, DhSectionPos.getZ(pos));
 			
-			try (ResultSet result = this.query(statement))
+			try (ResultSet resultSet = this.query(statement))
 			{
 				
 			}
@@ -891,51 +892,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
-	private final String getTimestampForRangeSql =
-			"SELECT PosX, PosZ, LastModifiedUnixDateTime " +
-			"FROM " + this.getTableName() + " " +
-			"WHERE DetailLevel = ? " +
-			"AND PosX BETWEEN ? AND ? " +
-			"AND PosZ BETWEEN ? AND ?;";
-	public Map<Long, Long> getTimestampsForRange(byte detailLevel, int startPosX, int startPosZ, int endPosX, int endPosZ)
-	{
-		try(PreparedStatement preparedStatement = this.createPreparedStatement(this.getTimestampForRangeSql))
-		{
-			if (preparedStatement == null)
-			{
-				return new HashMap<>();
-			}
-			
-			
-			int i = 1;
-			preparedStatement.setInt(i++, detailLevel - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
-			preparedStatement.setInt(i++, startPosX);
-			preparedStatement.setInt(i++, endPosX - 1);
-			preparedStatement.setInt(i++, startPosZ);
-			preparedStatement.setInt(i++, endPosZ - 1);
-			
-			
-			try (ResultSet result = this.query(preparedStatement))
-			{
-				HashMap<Long, Long> returnMap = new HashMap<>();
-				while (result != null && result.next())
-				{
-					long key = DhSectionPos.encode(detailLevel, result.getInt("PosX"), result.getInt("PosZ"));
-					long value = result.getLong("LastModifiedUnixDateTime");
-					
-					returnMap.put(key, value);
-				}
-				
-				return returnMap;
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
-	
+
 	//endregion
 	
 	

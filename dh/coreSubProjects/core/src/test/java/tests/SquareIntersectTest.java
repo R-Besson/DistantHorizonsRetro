@@ -19,18 +19,14 @@
 
 package tests;
 
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import org.apache.logging.log4j.Level;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class SquareIntersectTest
-{
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+{	
 	static
 	{
 		// allow all logging levels

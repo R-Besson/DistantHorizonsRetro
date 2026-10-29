@@ -3,7 +3,6 @@ package com.seibel.distanthorizons.core.network.messages;
 import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.network.INetworkObject;
 import com.seibel.distanthorizons.core.network.session.NetworkSession;
-import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IServerPlayerWrapper;
 
 /** Any new implementing classes should be registered in {@link MessageRegistry} */
 public abstract class AbstractNetworkMessage implements INetworkObject
@@ -15,8 +14,6 @@ public abstract class AbstractNetworkMessage implements INetworkObject
 	private NetworkSession networkSession = null;
 	public NetworkSession getSession() { return this.networkSession; }
 	public void setSession(NetworkSession networkSession) { this.networkSession = networkSession; }
-	
-	public IServerPlayerWrapper serverPlayer() { return this.networkSession.serverPlayer; }
 	
 	
 	

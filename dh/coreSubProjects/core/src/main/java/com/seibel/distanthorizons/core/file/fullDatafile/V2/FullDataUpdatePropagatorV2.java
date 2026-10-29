@@ -167,8 +167,9 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 
 				this.tryQueueRegeneration(targetBlockPos);
 			}
-			catch (InterruptedException ignored)
+			catch (InterruptedException e)
 			{
+				// restore the flag so the thread loop exits
 				Thread.currentThread().interrupt();
 			}
 			catch (Exception e)

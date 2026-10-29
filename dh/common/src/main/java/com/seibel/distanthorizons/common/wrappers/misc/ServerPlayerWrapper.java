@@ -37,7 +37,7 @@ public class ServerPlayerWrapper implements IServerPlayerWrapper
 			// FML fires the logout event with a null net handler if the player was rejected during the mod list handshake
 			return null;
 		}
-		return serverPlayerWrapperMap.computeIfAbsent(netHandler, ignored -> new ServerPlayerWrapper(netHandler));
+		return serverPlayerWrapperMap.computeIfAbsent(netHandler, ServerPlayerWrapper::new);
 	}
 
 	private ServerPlayerWrapper(NetHandlerPlayServer connection)

@@ -19,11 +19,9 @@
 
 package com.seibel.distanthorizons.core.util;
 
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.threading.DhThreadFactory;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.concurrent.*;
 
@@ -35,8 +33,6 @@ import java.util.concurrent.*;
  */
 public class ThreadUtil
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	public static final String THREAD_NAME_PREFIX = ModInfo.THREAD_NAME_PREFIX;
 	
 	
@@ -56,21 +52,16 @@ public class ThreadUtil
 				new DhThreadFactory(name, priority, isDaemon));
 	}
 	
-	public static ThreadPoolExecutor makeThreadPool(int poolSize, Class<?> clazz, int priority) { return makeThreadPool(poolSize, clazz.getSimpleName(), priority, false); }
 	public static ThreadPoolExecutor makeThreadPool(int poolSize, String name) { return makeThreadPool(poolSize, name, Thread.NORM_PRIORITY, false); }
-	public static ThreadPoolExecutor makeThreadPool(int poolSize, Class<?> clazz) { return makeThreadPool(poolSize, clazz.getSimpleName(), Thread.NORM_PRIORITY, false); }
-	
-	
-	
+
+
+
 	//====================//
 	// single thread pool //
 	//====================//
-	
-	public static ThreadPoolExecutor makeSingleThreadPool(String name, int priority) { return makeThreadPool(1, name, priority, false); }
-	public static ThreadPoolExecutor makeSingleThreadPool(Class<?> clazz, int priority) { return makeThreadPool(1, clazz.getSimpleName(), priority, false); }
+
 	public static ThreadPoolExecutor makeSingleThreadPool(String name) { return makeThreadPool(1, name, Thread.NORM_PRIORITY, false); }
-	public static ThreadPoolExecutor makeSingleThreadPool(Class<?> clazz) { return makeThreadPool(1, clazz.getSimpleName(), Thread.NORM_PRIORITY, false); }
-	
+
 	public static ThreadPoolExecutor makeSingleDaemonThreadPool(String name) { return makeThreadPool(1, name, Thread.NORM_PRIORITY, true); }
 	
 }

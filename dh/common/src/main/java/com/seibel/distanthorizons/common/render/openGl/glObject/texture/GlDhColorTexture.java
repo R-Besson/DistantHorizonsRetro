@@ -1,7 +1,6 @@
 package com.seibel.distanthorizons.common.render.openGl.glObject.texture;
 
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
-import org.joml.Vector2i;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -17,8 +16,6 @@ public class GlDhColorTexture
 	private final EGlDhInternalTextureFormat internalFormat;
 	private final EGlDhPixelFormat format;
 	private final EGlDhPixelType type;
-	private int width;
-	private int height;
 
 	private boolean isValid;
 	/** AKA, the OpenGL name of this texture */
@@ -39,10 +36,7 @@ public class GlDhColorTexture
 		this.internalFormat = builder.internalFormat;
 		this.format = builder.format;
 		this.type = builder.type;
-		
-		this.width = builder.width;
-		this.height = builder.height;
-		
+
 		this.id = LWJGL.glGenTextures();
 		
 		boolean isPixelFormatInteger = builder.internalFormat.getPixelFormat().isInteger();
@@ -78,32 +72,13 @@ public class GlDhColorTexture
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, texture);
 		LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, this.internalFormat.getGlFormat(), width, height, 0, this.format.getGlFormat(), this.type.getGlFormat(), NULL_BUFFER);
 	}
-	
-	void resize(Vector2i textureScaleOverride) { this.resize(textureScaleOverride.x, textureScaleOverride.y); }
-	
-	// Package private, call CompositeRenderTargets#resizeIfNeeded instead.
-	public void resize(int width, int height)
-	{
-		this.throwIfInvalid();
-		
-		this.width = width;
-		this.height = height;
-		
-		this.resizeTexture(this.id, width, height);
-	}
-	
-	public EGlDhInternalTextureFormat getInternalFormat() { return this.internalFormat; }
-	
+
 	public int getTextureId()
 	{
 		this.throwIfInvalid();
 		return this.id;
 	}
-	
-	public int getWidth() { return this.width; }
-	
-	public int getHeight() { return this.height; }
-	
+
 	public void destroy()
 	{
 		this.throwIfInvalid();

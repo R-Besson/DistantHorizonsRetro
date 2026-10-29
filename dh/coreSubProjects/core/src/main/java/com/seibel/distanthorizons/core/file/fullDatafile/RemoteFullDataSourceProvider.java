@@ -28,11 +28,9 @@ import com.seibel.distanthorizons.core.generation.queues.RemoteWorldRetrievalQue
 import com.seibel.distanthorizons.core.generation.tasks.DataSourceRetrievalResult;
 import com.seibel.distanthorizons.core.level.IDhLevel;
 import com.seibel.distanthorizons.core.generation.queues.LodRequestModule;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.generation.tasks.ERetrievalResultState;
 import com.seibel.distanthorizons.core.multiplayer.client.SyncOnLoadRequestQueue;
 import com.seibel.distanthorizons.core.multiplayer.client.ClientNetworkState;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -48,8 +46,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvider
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	@Nullable
 	private final ClientNetworkState networkState;
 	@Nullable

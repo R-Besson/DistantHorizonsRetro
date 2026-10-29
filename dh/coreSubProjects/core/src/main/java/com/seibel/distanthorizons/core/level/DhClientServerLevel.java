@@ -70,8 +70,7 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	// tick methods //
 	//==============//
 	//region
-	
-	@Override
+
 	public void clientTick()
 	{
 		// only tick the level the player is currently in
@@ -131,7 +130,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	public void addDebugMenuStringsToList(List<String> messageList)
 	{
 		// header
-		String o = MinecraftTextFormat.ORANGE;
 		String y = MinecraftTextFormat.YELLOW;
 		String g = MinecraftTextFormat.GREEN;
 		String r = MinecraftTextFormat.RED;

@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.core.util.objects;
 
-import java.util.Arrays;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -64,23 +63,6 @@ public class RollingAverage
 			this.currentSize = Math.max(this.index+1, this.currentSize);
 			
 			this.lifetimeCount++;
-		}
-		finally
-		{
-			this.arrayLock.unlock();
-		}
-	}
-	
-	public void clear()
-	{
-		this.arrayLock.lock();
-		try
-		{
-			this.sum = 0;
-			this.index = 0;
-			this.currentSize = 0;
-			this.lifetimeCount = 0;
-			Arrays.fill(this.values, 0);
 		}
 		finally
 		{

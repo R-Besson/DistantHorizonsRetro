@@ -38,8 +38,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * 
+ * Manual benchmark, uncomment the @Test to run it.
  */
+@SuppressWarnings("unused")
 public class DataSourceUpdateSpeedTest
 {
 	//@Test

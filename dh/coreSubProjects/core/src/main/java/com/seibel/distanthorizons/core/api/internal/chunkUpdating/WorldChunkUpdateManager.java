@@ -1,8 +1,6 @@
 package com.seibel.distanthorizons.core.api.internal.chunkUpdating;
 
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.world.AbstractDhWorld;
 import com.seibel.distanthorizons.core.world.EWorldEnvironment;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
@@ -11,8 +9,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapp
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,14 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class WorldChunkUpdateManager
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	/** singleton since we only expect to have one world loaded at a time */
 	public static final WorldChunkUpdateManager INSTANCE = new WorldChunkUpdateManager();
-	
-	public static final Set<String> LOGGED_GET_ERROR_MESSAGES = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
-	
-	
+
+
 	/** 
 	 * Queues are only removed during world shutdown.
 	 * The assumption is that there will be a limited number of {@link ILevelWrapper}'s
@@ -112,15 +104,6 @@ public class WorldChunkUpdateManager
 				oldQueueManager = new ChunkUpdateQueueManager(newLevelWrapper.getDhIdentifier());
 				return oldQueueManager;
 			});
-	}
-	
-	public void processEachQueue()
-	{
-		this.updateQueueByLevelWrapper.forEach(
-			(ILevelWrapper levelWrapper, ChunkUpdateQueueManager updateManager) -> 
-		{
-			updateManager.processQueue();
-		});
 	}
 	
 	public int getTotalQueuedCount()

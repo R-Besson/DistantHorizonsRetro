@@ -73,7 +73,6 @@ public interface IDhLevel extends AutoCloseable, GeneratedFullDataSourceProvider
 		this.updateBeaconBeamsForChunkPos(chunkToUpdate.getChunkPos(), activeBeamList);
 	}
 	void updateBeaconBeamsForChunkPos(DhChunkPos chunkPos, List<BeaconBeamDTO> activeBeamList);
-	void updateBeaconBeamsForSectionPos(long sectionPos, List<BeaconBeamDTO> activeBeamList);
 	
 	/** @return null on server-only levels */
 	@Nullable

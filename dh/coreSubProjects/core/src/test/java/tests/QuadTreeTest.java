@@ -19,7 +19,6 @@
 
 package tests;
 
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
@@ -29,7 +28,6 @@ import com.seibel.distanthorizons.core.util.objects.quadTree.QuadNode;
 import com.seibel.distanthorizons.core.util.objects.quadTree.QuadTree;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.apache.logging.log4j.Level;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -41,9 +39,7 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class QuadTreeTest
-{
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+{	
 	
 	static
 	{
@@ -888,7 +884,7 @@ public class QuadTreeTest
 		// set
 		try
 		{
-			Integer previousValue = tree.setValue(pos, setValue);
+			tree.setValue(pos, setValue);
 		}
 		catch (Exception e)
 		{

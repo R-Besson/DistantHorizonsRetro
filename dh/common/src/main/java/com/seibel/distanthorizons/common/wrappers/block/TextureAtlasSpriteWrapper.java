@@ -159,24 +159,6 @@ public class TextureAtlasSpriteWrapper
 		return iconName != null && iconName.endsWith(CONNECTED_TEXTURE_SHEET_SUFFIX);
 	}
 
-	public static float getMinU(TextureAtlasSprite sprite)
-	{
-		return sprite.getMinU();
-	}
-	public static float getMaxU(TextureAtlasSprite sprite)
-	{
-		return sprite.getMaxU();
-	}
-
-	public static float getMinV(TextureAtlasSprite sprite)
-	{
-		return sprite.getMinV();
-	}
-	public static float getMaxV(TextureAtlasSprite sprite)
-	{
-		return sprite.getMaxV();
-	}
-
 
 
 	/**

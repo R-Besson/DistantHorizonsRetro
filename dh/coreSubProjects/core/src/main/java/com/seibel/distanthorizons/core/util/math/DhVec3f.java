@@ -64,49 +64,7 @@ public class DhVec3f extends DhApiVec3f
 	//==============//
 	// math methods //
 	//==============//
-	
-	public void mul(float scalar)
-	{
-		this.x *= scalar;
-		this.y *= scalar;
-		this.z *= scalar;
-	}
-	
-	public void mul(float x, float y, float z)
-	{
-		this.x *= x;
-		this.y *= y;
-		this.z *= z;
-	}
-	
-	public void clamp(float min, float max)
-	{
-		this.x = MathUtil.clamp(min, this.x, max);
-		this.y = MathUtil.clamp(min, this.y, max);
-		this.z = MathUtil.clamp(min, this.z, max);
-	}
-	
-	public void add(float x, float y, float z)
-	{
-		this.x += x;
-		this.y += y;
-		this.z += z;
-	}
-	
-	public void add(DhVec3f vector)
-	{
-		this.x += vector.x;
-		this.y += vector.y;
-		this.z += vector.z;
-	}
-	
-	public void subtract(DhVec3f vector)
-	{
-		this.x -= vector.x;
-		this.y -= vector.y;
-		this.z -= vector.z;
-	}
-	
+
 	public float dotProduct(DhVec3f vector) { return this.x * vector.x + this.y * vector.y + this.z * vector.z; }
 	
 	/** @return true if normalization had to be done */
@@ -126,36 +84,9 @@ public class DhVec3f extends DhApiVec3f
 			return true;
 		}
 	}
-	
-	public void crossProduct(DhVec3f vector)
-	{
-		float f = this.x;
-		float f1 = this.y;
-		float f2 = this.z;
-		float f3 = vector.x;
-		float f4 = vector.y;
-		float f5 = vector.z;
-		this.x = f1 * f5 - f2 * f4;
-		this.y = f2 * f3 - f * f5;
-		this.z = f * f4 - f1 * f3;
-	}
-	
-	public static float getManhattanDistance(DhApiVec3f a, DhApiVec3f b)
-	{
-		return Math.abs(a.x - b.x)
-				+ Math.abs(a.y - b.y)
-				+ Math.abs(a.z - b.z);
-	}
-	
-	public static double getDistance(DhApiVec3f a, DhApiVec3f b)
-	{
-		return Math.sqrt(Math.pow(a.x - b.x, 2)
-				+ Math.pow(a.y - b.y, 2)
-				+ Math.pow(a.z - b.z, 2));
-	}
-	
-	
-	
+
+
+
 	//==============//
 	// misc methods //
 	//==============//

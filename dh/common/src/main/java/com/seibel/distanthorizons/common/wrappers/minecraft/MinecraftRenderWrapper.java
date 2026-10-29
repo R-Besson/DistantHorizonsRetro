@@ -89,7 +89,6 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	 * Unless you really need to know if the player is blind,
 	 * use {@link MinecraftRenderWrapper#isFogStateSpecial()} or {@link IMinecraftRenderWrapper#isFogStateSpecial()} instead
 	 */
-	@Override
 	public boolean playerHasBlindingEffect()
 	{
 		if (MC.thePlayer == null)
@@ -110,7 +109,19 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 		return output;
 	}
 
-	@Override
+	/**
+	 * percentage of time into the current client tick. <br><br>
+	 *
+	 * Can be converted to a millisecond frametime
+	 * (IE time between frames in milliseconds) using the formula: <br>
+	 * <code>
+	 * (partialTickTime/20*1000)
+	 * </code> <br>
+	 * IE 60 FPS = 16.6 MS <br>
+	 *
+	 * @link https://fpstoms.com/
+	 * @see com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState#partialTickTime
+	 */
 	public float getPartialTickTime()
 	{
 		return Minecraft.getMinecraft().timer.renderPartialTicks;
@@ -182,7 +193,7 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 		return true;
 	}
 
-	@Override
+	/** Returns the Graphics API Minecraft is currently using for rendering */
 	public EDhApiRenderingApi getMcRenderingApi()
 	{
 		return EDhApiRenderingApi.OPEN_GL;

@@ -38,40 +38,7 @@ import com.google.common.base.Optional;
  */
 @GwtCompatible
 public final class MoreObjects {
-	
-	/**
-	 * Returns the first of two given parameters that is not {@code null}, if either is, or otherwise
-	 * throws a {@link NullPointerException}.
-	 *
-	 * <p>
-	 * To find the first non-null element in an iterable, use {@code Iterables.find(iterable,
-	 * Predicates.notNull())}. For varargs, use {@code Iterables.find(Arrays.asList(a, b, c, ...),
-	 * Predicates.notNull())}, static importing as necessary.
-	 *
-	 * <p>
-	 * <b>Note:</b> if {@code first} is represented as an {@link Optional}, this can be
-	 * accomplished with {@link Optional#or(Object) first.or(second)}. That approach also allows for
-	 * lazy evaluation of the fallback instance, using {@link Optional#or(Supplier)
-	 * first.or(supplier)}.
-	 *
-	 * <p>
-	 * <b>Java 9 users:</b> use {@code java.util.Objects.requireNonNullElse(first, second)}
-	 * instead.
-	 *
-	 * @return {@code first} if it is non-null; otherwise {@code second} if it is non-null
-	 * @throws NullPointerException if both {@code first} and {@code second} are null
-	 * @since 18.0 (since 3.0 as {@code Objects.firstNonNull()}).
-	 */
-	public static <T> T firstNonNull(T first, T second) {
-		if (first != null) {
-			return first;
-		}
-		if (second != null) {
-			return second;
-		}
-		throw new NullPointerException("Both parameters are null");
-	}
-	
+
 	/**
 	 * Creates an instance of {@link ToStringHelper}.
 	 *
@@ -119,34 +86,7 @@ public final class MoreObjects {
 			self.getClass()
 				.getSimpleName());
 	}
-	
-	/**
-	 * Creates an instance of {@link ToStringHelper} in the same manner as {@link
-	 * #toStringHelper(Object)}, but using the simple name of {@code clazz} instead of using an
-	 * instance's {@link Object#getClass()}.
-	 *
-	 * <p>
-	 * Note that in GWT, class names are often obfuscated.
-	 *
-	 * @param clazz the {@link Class} of the instance
-	 * @since 18.0 (since 7.0 as {@code Objects.toStringHelper()}).
-	 */
-	public static ToStringHelper toStringHelper(Class<?> clazz) {
-		return new ToStringHelper(clazz.getSimpleName());
-	}
-	
-	/**
-	 * Creates an instance of {@link ToStringHelper} in the same manner as {@link
-	 * #toStringHelper(Object)}, but using {@code className} instead of using an instance's {@link
-	 * Object#getClass()}.
-	 *
-	 * @param className the name of the instance type
-	 * @since 18.0 (since 7.0 as {@code Objects.toStringHelper()}).
-	 */
-	public static ToStringHelper toStringHelper(String className) {
-		return new ToStringHelper(className);
-	}
-	
+
 	/**
 	 * Support class for {@link MoreObjects#toStringHelper}.
 	 *
@@ -165,43 +105,10 @@ public final class MoreObjects {
 		private ToStringHelper(String className) {
 			this.className = checkNotNull(className);
 		}
-		
-		/**
-		 * Configures the {@link ToStringHelper} so {@link #toString()} will ignore properties with null
-		 * value. The order of calling this method, relative to the {@code add()}/{@code addValue()}
-		 * methods, is not significant.
-		 *
-		 * @since 18.0 (since 12.0 as {@code Objects.ToStringHelper.omitNullValues()}).
-		 */
-		
-		public ToStringHelper omitNullValues() {
-			omitNullValues = true;
-			return this;
-		}
-		
-		/**
-		 * Configures the {@link ToStringHelper} so {@link #toString()} will ignore properties with
-		 * empty values. The order of calling this method, relative to the {@code add()}/{@code
-		 * addValue()} methods, is not significant.
-		 *
-		 * <p>
-		 * <b>Note:</b> in general, code should assume that the string form returned by {@code
-		 * ToStringHelper} for a given object may change. In particular, the list of types which are
-		 * checked for emptiness is subject to change. We currently check {@code CharSequence}s, {@code
-		 * Collection}s, {@code Map}s, optionals (including Guava's), and arrays.
-		 *
-		 * @since 33.4.0
-		 */
-		
-		public ToStringHelper omitEmptyValues() {
-			omitEmptyValues = true;
-			return this;
-		}
-		
+
 		/**
 		 * Adds a name/value pair to the formatted output in {@code name=value} format. If {@code value}
-		 * is {@code null}, the string {@code "null"} is used, unless {@link #omitNullValues()} is
-		 * called, in which case this name/value pair will not be added.
+		 * is {@code null}, the string {@code "null"} is used.
 		 */
 		
 		public ToStringHelper add(String name, Object value) {
@@ -224,36 +131,6 @@ public final class MoreObjects {
 		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
 		 */
 		
-		public ToStringHelper add(String name, char value) {
-			return addUnconditionalHolder(name, String.valueOf(value));
-		}
-		
-		/**
-		 * Adds a name/value pair to the formatted output in {@code name=value} format.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
-		 */
-		
-		public ToStringHelper add(String name, double value) {
-			return addUnconditionalHolder(name, String.valueOf(value));
-		}
-		
-		/**
-		 * Adds a name/value pair to the formatted output in {@code name=value} format.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
-		 */
-		
-		public ToStringHelper add(String name, float value) {
-			return addUnconditionalHolder(name, String.valueOf(value));
-		}
-		
-		/**
-		 * Adds a name/value pair to the formatted output in {@code name=value} format.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
-		 */
-		
 		public ToStringHelper add(String name, int value) {
 			return addUnconditionalHolder(name, String.valueOf(value));
 		}
@@ -267,103 +144,7 @@ public final class MoreObjects {
 		public ToStringHelper add(String name, long value) {
 			return addUnconditionalHolder(name, String.valueOf(value));
 		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, Object)} instead and give value a
-		 * readable name.
-		 */
-		
-		public ToStringHelper addValue(Object value) {
-			return addHolder(value);
-		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, boolean)} instead and give value a
-		 * readable name.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.addValue()}).
-		 */
-		
-		public ToStringHelper addValue(boolean value) {
-			return addUnconditionalHolder(String.valueOf(value));
-		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, char)} instead and give value a
-		 * readable name.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.addValue()}).
-		 */
-		
-		public ToStringHelper addValue(char value) {
-			return addUnconditionalHolder(String.valueOf(value));
-		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, double)} instead and give value a
-		 * readable name.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.addValue()}).
-		 */
-		
-		public ToStringHelper addValue(double value) {
-			return addUnconditionalHolder(String.valueOf(value));
-		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, float)} instead and give value a
-		 * readable name.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.addValue()}).
-		 */
-		
-		public ToStringHelper addValue(float value) {
-			return addUnconditionalHolder(String.valueOf(value));
-		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, int)} instead and give value a
-		 * readable name.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.addValue()}).
-		 */
-		
-		public ToStringHelper addValue(int value) {
-			return addUnconditionalHolder(String.valueOf(value));
-		}
-		
-		/**
-		 * Adds an unnamed value to the formatted output.
-		 *
-		 * <p>
-		 * It is strongly encouraged to use {@link #add(String, long)} instead and give value a
-		 * readable name.
-		 *
-		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.addValue()}).
-		 */
-		
-		public ToStringHelper addValue(long value) {
-			return addUnconditionalHolder(String.valueOf(value));
-		}
-		
+
 		private static boolean isEmpty(Object value) {
 			// Put types estimated to be the most frequent first.
 			if (value instanceof CharSequence) {
@@ -437,12 +218,6 @@ public final class MoreObjects {
 			return valueHolder;
 		}
 		
-		private ToStringHelper addHolder(Object value) {
-			ValueHolder valueHolder = addHolder();
-			valueHolder.value = value;
-			return this;
-		}
-		
 		private ToStringHelper addHolder(String name, Object value) {
 			ValueHolder valueHolder = addHolder();
 			valueHolder.value = value;
@@ -454,12 +229,6 @@ public final class MoreObjects {
 			UnconditionalValueHolder valueHolder = new UnconditionalValueHolder();
 			holderTail = holderTail.next = valueHolder;
 			return valueHolder;
-		}
-		
-		private ToStringHelper addUnconditionalHolder(Object value) {
-			UnconditionalValueHolder valueHolder = addUnconditionalHolder();
-			valueHolder.value = value;
-			return this;
 		}
 		
 		private ToStringHelper addUnconditionalHolder(String name, Object value) {

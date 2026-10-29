@@ -75,13 +75,7 @@ public class ConfigCategory extends AbstractConfigBase<Class<?>>
 			this.tmpDestination = newDestination;
 			return this;
 		}
-		
-		public Builder setAppearance(EConfigEntryAppearance newAppearance)
-		{
-			this.tmpAppearance = newAppearance;
-			return this;
-		}
-		
+
 		public ConfigCategory build()
 		{
 			return new ConfigCategory(tmpAppearance, tmpValue, tmpDestination);

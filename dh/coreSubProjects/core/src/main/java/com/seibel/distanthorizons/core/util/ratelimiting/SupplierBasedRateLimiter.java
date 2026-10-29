@@ -29,7 +29,7 @@ public class SupplierBasedRateLimiter<TFailObject>
 	// constructor //
 	//=============//
 	
-	public SupplierBasedRateLimiter(Supplier<Integer> maxRateSupplier) { this(maxRateSupplier, ignored -> { }); }
+	public SupplierBasedRateLimiter(Supplier<Integer> maxRateSupplier) { this(maxRateSupplier, failContext -> { }); }
 	public SupplierBasedRateLimiter(Supplier<Integer> maxRateSupplier, Consumer<TFailObject> onFailureConsumer)
 	{
 		this.maxRateSupplier = maxRateSupplier;
@@ -59,7 +59,7 @@ public class SupplierBasedRateLimiter<TFailObject>
 	}
 	
 	/** can be used to prevent any locks from being acquired for one second */
-	public void acquireAll() { int ignored = this.acquireOrDrain(Integer.MAX_VALUE); }
+	public void acquireAll() { this.acquireOrDrain(Integer.MAX_VALUE); }
 	/** @return the number of locks acquired */
 	public int acquireOrDrain(int requestedPermits)
 	{

@@ -26,8 +26,9 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 		{
 			return Integer.parseInt(dimensionResourceLocation.substring(dimensionResourceLocation.indexOf(":")+1));
 		}
-		catch (NumberFormatException ignored)
+		catch (NumberFormatException e)
 		{
+			// not a numeric dimension ID
 			return null;
 		}
 	}

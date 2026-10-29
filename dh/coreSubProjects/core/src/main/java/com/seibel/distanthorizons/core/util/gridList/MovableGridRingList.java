@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.util.gridList;
 
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.coreapi.util.MathUtil;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -113,8 +112,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	//=====================//
 	//region
 	
-	/** see {@link MovableGridRingList#get(int, int)} for full documentation */
-	public T get(Pos2D pos) { return this.get(pos.getX(), pos.getY()); }
 	/** returns null if x,y is outside the grid */
 	public T get(int x, int y)
 	{
@@ -145,8 +142,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	}
 	
 	
-	/** see {@link MovableGridRingList#set(int, int, T)} for full documentation */
-	public boolean set(Pos2D pos, T item) { return this.set(pos.getX(), pos.getY(), item); }
 	/** returns false if x,y is outside the grid */
 	public boolean set(int x, int y, T item)
 	{
@@ -186,43 +181,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	//================//
 	//region
 	
-	/** see {@link MovableGridRingList#swap(int, int, T)} for full documentation */
-	public T swap(Pos2D pos, T item) { return this.swap(pos.getX(), pos.getY(), item); }
-	/** returns the input item if x,y is outside the grid */
-	public T swap(int x, int y, T item)
-	{
-		Pos2D min = this.minPosRef.get();
-		if (!this.inRangeAcquired(x, y, min))
-		{
-			return item;
-		}
-		
-		this.moveLock.readLock().lock();
-		try
-		{
-			Pos2D newMin = this.minPosRef.get();
-			// Use EXACT compare here
-			if (min != newMin)
-			{
-				if (!this.inRangeAcquired(x, y, newMin))
-				{
-					return item;
-				}
-			}
-			return this.swapUnsafe(x, y, item);
-		}
-		finally
-		{
-			this.moveLock.readLock().unlock();
-		}
-	}
-	
-	
-	/** see {@link MovableGridRingList#remove(int, int)} for full documentation */
-	public T remove(Pos2D pos) { return this.remove(pos.getX(), pos.getY()); }
-	/** remove and return the item at x,y; returns null if the x,y are outside the grid */
-	public T remove(int x, int y) { return this.swap(x, y, null); }
-	
 	
 	
 	/** see {@link MovableGridRingList#clear(Consumer)} for full documentation */
@@ -258,11 +216,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			this.moveLock.writeLock().unlock();
 		}
 	}
-	
-	
-	
-	/** see {@link MovableGridRingList#moveTo(int, int, Consumer)} for full documentation */
-	public boolean moveTo(int newCenterX, int newCenterY) { return this.moveTo(newCenterX, newCenterY, null); }
 	
 	public boolean moveTo(int newCenterX, int newCenterY, Consumer<? super T> removedItemConsumer) { return this.moveTo(newCenterX, newCenterY, removedItemConsumer, null); }
 	/** Returns true if the grid was successfully moved, false otherwise */
@@ -345,35 +298,16 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	//region
 	
 	public Pos2D getCenter() { return new Pos2D(this.minPosRef.get().getX() + this.halfWidth, this.minPosRef.get().getY() + this.halfWidth); }
-	
-	public Pos2D getMinPosInRange() { return this.minPosRef.get(); }
-	public Pos2D getMaxPosInRange() { return new Pos2D(this.minPosRef.get().getX() + this.width - 1, this.minPosRef.get().getY() + this.width - 1); }
-	
-	public int getWidth() { return this.width; }
-	public int getHalfWidth() { return this.halfWidth; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	//region
-	
-	/**
-	 * Warning: Be careful with race conditions!
-	 * The grid may move after this query!
-	 */
-	public boolean inRange(int x, int y)
-	{
-		Pos2D minPos = this.minPosRef.get();
-		return (x >= minPos.getX()
-				&& x < minPos.getX() + this.width
-				&& y >= minPos.getY()
-				&& y < minPos.getY() + this.width);
-	}
-	
+
 	private boolean inRangeAcquired(int x, int y, Pos2D min)
 	{
 		return (x >= min.getX()
@@ -394,51 +328,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	// iterators //
 	//===========//
 	//region
-	
-	/** Will pass in null entries */
-	public void forEachPos(BiConsumer<? super T, Pos2D> consumer)
-	{
-		this.moveLock.readLock().lock();
-		try
-		{
-			Pos2D min = this.minPosRef.get();
-			for (int x = min.getX(); x < min.getX() + this.width; x++)
-			{
-				for (int y = min.getY(); y < min.getY() + this.width; y++)
-				{
-					T t = this.getUnsafe(x, y);
-					consumer.accept(t, new Pos2D(x, y));
-				}
-			}
-		}
-		finally
-		{
-			this.moveLock.readLock().unlock();
-		}
-	}
-	
-	/** Will skip null entries */
-	public void forEachOrdered(Consumer<? super T> consumer)
-	{
-		this.moveLock.readLock().lock();
-		try
-		{
-			Pos2D min = this.minPosRef.get();
-			for (Pos2D offset : this.ringPositionIteratorArray)
-			{
-				T item = this.getUnsafe(min.getX() + offset.getX(), min.getY() + offset.getY());
-				if (item != null)
-				{
-					consumer.accept(item);
-				}
-			}
-		}
-		finally
-		{
-			this.moveLock.readLock().unlock();
-		}
-	}
-	
+
 	/** Will pass in null entries */
 	public void forEachPosOrdered(BiConsumer<? super T, Pos2D> consumer)
 	{
@@ -474,27 +364,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		Pos2D p = this.minPosRef.get();
 		return this.getClass().getSimpleName() + "[" + (p.getX() + this.halfWidth) + "," + (p.getY() + this.halfWidth) + "] " + this.width + "*" + this.width + "[" + this.size() + "]";
 	}
-	
-	public String toDetailString()
-	{
-		StringBuilder str = new StringBuilder("\n");
-		int i = 0;
-		str.append(this);
-		str.append("\n");
-		for (T t : this)
-		{
-			
-			str.append(t != null ? t.toString() : "NULL");
-			str.append(", ");
-			i++;
-			if (i % this.width == 0)
-			{
-				str.append("\n");
-			}
-		}
-		return str.toString();
-	}
-	
+
 	//endregion
 	
 	
@@ -506,8 +376,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	
 	public static class Pos2D
 	{
-		public static final Pos2D ZERO = new Pos2D(0, 0);
-		
 		private final int x;
 		public int getX() { return this.x; }
 		
@@ -537,35 +405,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		//region
 		
 		public Pos2D add(Pos2D other) { return new Pos2D(this.x + other.x, this.y + other.y); }
-		public Pos2D subtract(Pos2D other) { return new Pos2D(this.x - other.x, this.y - other.y); }
-		public Pos2D subtract(int value) { return new Pos2D(this.x - value, this.y - value); }
-		
-		public double dist(Pos2D other) { return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2)); }
-		public long distSquared(Pos2D other) { return MathUtil.pow2((long) this.x - other.x) + MathUtil.pow2((long) this.y - other.y); }
-		
-		/**
-		 * Returns the maximum distance along either the X or Z axis <br><br>
-		 *
-		 * Example chebyshev distance between X and every point around it: <br>
-		 * <code>
-		 * 2 2 2 2 2 <br>
-		 * 2 1 1 1 2 <br>
-		 * 2 1 X 1 2 <br>
-		 * 2 1 1 1 2 <br>
-		 * 2 2 2 2 2 <br>
-		 * </code>
-		 */
-		public int chebyshevDist(Pos2D other) { return Math.max(Math.abs(this.x - other.x), Math.abs(this.y - other.y)); }
-		
-		/**
-		 * Can be used to quickly determine the rough distance between two points<Br>
-		 * or determine the taxi cab (manhattan) distance between two points. <Br><Br>
-		 *
-		 * Manhattan distance is equivalent to determining the distance between two street intersections,
-		 * where you can only drive along each street, instead of directly to the other point.
-		 */
-		public int manhattanDist(Pos2D other) { return Math.abs(this.x - other.x) + Math.abs(this.y - other.y); }
-		
+
 		//endregion
 		
 		

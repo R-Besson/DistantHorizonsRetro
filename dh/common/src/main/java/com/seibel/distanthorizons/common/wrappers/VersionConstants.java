@@ -43,13 +43,6 @@ public class VersionConstants implements IVersionConstants
 	// methods //
 	//=========//
 	//region
-	
-	@Override
-	public String getMinecraftVersion()
-	{
-		// hard-coded so dedicated servers don't need to load client classes to read it
-		return "1.7.10";
-	}
 
 	@Override
 	public EDhApiRenderingEngine getDefaultRenderingEngine()

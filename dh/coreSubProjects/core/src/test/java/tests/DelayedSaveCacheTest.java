@@ -21,8 +21,6 @@ package tests;
 
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.util.delayedSaveCache.DelayedDataSourceSaveCache;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import org.apache.logging.log4j.Level;
@@ -45,10 +43,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @see PooledDataSourceCheckoutTest
  */
+@SuppressWarnings("unused") // disabled test, see above
 public class DelayedSaveCacheTest
-{
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+{	
 	static
 	{
 		// allow all logging levels

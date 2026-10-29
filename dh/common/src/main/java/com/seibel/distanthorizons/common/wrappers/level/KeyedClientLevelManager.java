@@ -98,9 +98,8 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 		
 		return this.getServerKeyedLevel(clientLevel);
 	}
-	
-	@Override
-	public void clearKeyedLevel() 
+
+	public void clearKeyedLevel()
 	{ 
 		synchronized (this.keyedLevelsCache)
 		{

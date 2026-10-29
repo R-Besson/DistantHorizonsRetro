@@ -45,7 +45,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IVertexB
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IChunkGenerator;
-import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IRoughGenerator;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 
@@ -107,12 +106,6 @@ public class WrapperFactory implements IWrapperFactory
 		{
 			throw new IllegalArgumentException("The target level must be a server-side level.");
 		}
-	}
-
-	@Override
-	public IRoughGenerator createRoughGenerator(IDhLevel targetLevel, IChunkGenerator batchChunkGenerator)
-	{
-		return null;
 	}
 
 	@Override

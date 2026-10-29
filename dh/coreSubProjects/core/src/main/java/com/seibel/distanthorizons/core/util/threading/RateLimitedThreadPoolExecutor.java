@@ -21,8 +21,6 @@ package com.seibel.distanthorizons.core.util.threading;
 
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.concurrent.*;
 import java.util.function.Supplier;
@@ -33,8 +31,6 @@ import java.util.function.Supplier;
  */
 public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
 	public final ConfigEntry<Double> runTimeRatioConfig = Config.Common.MultiThreading.threadRunTimeRatio;
 	
 	/** When this thread started running its last task */

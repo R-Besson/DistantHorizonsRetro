@@ -100,81 +100,8 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 				dataByteArray);
 		return dto;
 	}
-	
-	private final String insertSqlTemplate =
-			"INSERT INTO "+this.getTableName() + "\n" +
-					"  (DhSectionPos, \n" +
-					"Checksum, DataVersion, DataDetailLevel, WorldGenStep, DataType, BinaryDataFormatVersion, \n" +
-					"Data) \n" +
-					"   VALUES( \n" +
-					"    ? \n" +
-					"   ,? ,? ,? ,? ,? ,? \n" +
-					"   ,? \n" +
-					// created/lastModified are automatically set by Sqlite
-					");";
-	public PreparedStatement createInsertStatement(FullDataSourceV1DTO dto) throws SQLException
-	{
-		PreparedStatement statement = this.createPreparedStatement(this.insertSqlTemplate);
-		if (statement == null)
-		{
-			return null;
-		}
-		
-		
-		int i = 1;
-		statement.setString(i++, serializeSectionPos(dto.pos));
-		
-		statement.setInt(i++, dto.checksum);
-		statement.setInt(i++, 0 /*dto.dataVersion*/);
-		statement.setByte(i++, dto.dataDetailLevel);
-		statement.setObject(i++, dto.worldGenStep);
-		statement.setString(i++, dto.dataType);
-		statement.setByte(i++, dto.binaryDataFormatVersion);
-		
-		statement.setObject(i++, dto.dataArray);
-		
-		return statement;
-	}
-	
-	private final String updateSqlTemplate =
-			"UPDATE "+this.getTableName()+" \n" +
-			"SET \n" +
-			"    Checksum = ? \n" +
-			"   ,DataVersion = ? \n" +
-			"   ,DataDetailLevel = ? \n" +
-			"   ,WorldGenStep = ? \n" +
-			"   ,DataType = ? \n" +
-			"   ,BinaryDataFormatVersion = ? \n" +
-			
-			"   ,Data = ? \n" +
-			
-			"   ,LastModifiedDateTime = CURRENT_TIMESTAMP \n" +
-			"WHERE DhSectionPos = ?";
-	public PreparedStatement createUpdateStatement(FullDataSourceV1DTO dto) throws SQLException
-	{
-		PreparedStatement statement = this.createPreparedStatement(this.updateSqlTemplate);
-		if (statement == null)
-		{
-			return null;
-		}
-		
-		
-		int i = 1;
-		statement.setInt(i++, dto.checksum);
-		statement.setInt(i++, 0 /*dto.dataVersion*/);
-		statement.setByte(i++, dto.dataDetailLevel);
-		statement.setObject(i++, dto.worldGenStep);
-		statement.setString(i++, dto.dataType);
-		statement.setByte(i++, dto.binaryDataFormatVersion);
-		
-		statement.setObject(i++, dto.dataArray);
-		
-		statement.setString(i++, serializeSectionPos(dto.pos));
-		
-		return statement;
-	}
-	
-	@Override 
+
+	@Override
 	public @Nullable PreparedStatement createUpsertStatement(FullDataSourceV1DTO dto) throws SQLException
 	{ throw new UnsupportedOperationException("V1 data shouldn't be inserted/updated"); }
 	

@@ -22,9 +22,6 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 	
 	public GlDhFramebuffer() { this.id = LWJGL.glGenFramebuffers(); }
 
-	/** For internal use by Iris, do not remove. */
-	public GlDhFramebuffer(int id) { this.id = id; }
-	
 	//endregion
 	
 	

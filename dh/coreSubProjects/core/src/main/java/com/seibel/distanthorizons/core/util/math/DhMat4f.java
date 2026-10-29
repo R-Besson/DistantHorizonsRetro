@@ -68,9 +68,7 @@ public class DhMat4f extends DhApiMat4f
 	public DhMat4f(FloatBuffer buffer) { this(buffer.array()); }
 	/** Expects the values of the input array to be in row major order (AKA rows then columns) */
 	public DhMat4f(float[] values) { super(values); }
-	
-	public DhMat4f(Matrix4fc sourceMatrix) { this.set(sourceMatrix); }
-	
+
 	public void set(Matrix4fc sourceMatrix)
 	{
 		// JOML matricies are stored transposed vs DH's matricies
@@ -119,23 +117,7 @@ public class DhMat4f extends DhApiMat4f
 	//=========//
 	// methods //
 	//=========//
-	
-	public static DhMat4f perspective(double fov, float widthHeightRatio, float nearClipPlane, float farClipPlane)
-	{
-		float f = (float) (1.0D / Math.tan(fov * ((float) Math.PI / 180F) / 2.0D));
-		DhMat4f matrix = new DhMat4f();
-		matrix.m00 = f / widthHeightRatio;
-		matrix.m11 = f;
-		matrix.m22 = (farClipPlane + nearClipPlane) / (nearClipPlane - farClipPlane);
-		matrix.m32 = -1.0F;
-		matrix.m23 = 2.0F * farClipPlane * nearClipPlane / (nearClipPlane - farClipPlane);
-		return matrix;
-	}
-	
-	/** originally "translate" from Minecraft's MatrixStack */
-	public void multiplyTranslationMatrix(double x, double y, double z)
-	{ multiply(createTranslateMatrix((float) x, (float) y, (float) z)); }
-	
+
 	public static DhMat4f createScaleMatrix(float x, float y, float z)
 	{
 		DhMat4f matrix = new DhMat4f();
@@ -164,45 +146,7 @@ public class DhMat4f extends DhApiMat4f
 	//===============//
 	// Forge methods //
 	//===============//
-	
-	public void add(DhApiMat4f other)
-	{
-		m00 += other.m00;
-		m01 += other.m01;
-		m02 += other.m02;
-		m03 += other.m03;
-		m10 += other.m10;
-		m11 += other.m11;
-		m12 += other.m12;
-		m13 += other.m13;
-		m20 += other.m20;
-		m21 += other.m21;
-		m22 += other.m22;
-		m23 += other.m23;
-		m30 += other.m30;
-		m31 += other.m31;
-		m32 += other.m32;
-		m33 += other.m33;
-	}
-	
-	public void multiplyBackward(DhApiMat4f other)
-	{
-		DhApiMat4f copy = other.copy();
-		copy.multiply(this);
-		this.set(copy);
-	}
-	
-	public void setTranslation(float x, float y, float z)
-	{
-		this.m00 = 1.0F;
-		this.m11 = 1.0F;
-		this.m22 = 1.0F;
-		this.m33 = 1.0F;
-		this.m03 = x;
-		this.m13 = y;
-		this.m23 = z;
-	}
-	
+
 	public DhMat4f copy() { return new DhMat4f(this); }
 	
 	

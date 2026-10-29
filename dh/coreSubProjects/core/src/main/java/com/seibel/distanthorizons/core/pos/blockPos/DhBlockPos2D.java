@@ -19,8 +19,6 @@
 
 package com.seibel.distanthorizons.core.pos.blockPos;
 
-import com.seibel.distanthorizons.coreapi.util.MathUtil;
-
 /** immutable */
 public class DhBlockPos2D
 {
@@ -57,11 +55,7 @@ public class DhBlockPos2D
 	//region
 	
 	public DhBlockPos2D add(DhBlockPos2D other) { return new DhBlockPos2D(this.x + other.x, this.z + other.z); }
-	
-	public DhBlockPos2D add(int offsetX, int offsetZ) { return new DhBlockPos2D(this.x + offsetX, this.z + offsetZ); }
-	
-	public DhBlockPos2D subtract(DhBlockPos2D other) { return new DhBlockPos2D(this.x - other.x, this.z - other.z); }
-	
+
 	//endregion
 	
 	
@@ -71,26 +65,8 @@ public class DhBlockPos2D
 	//==============//
 	//region
 	
-	public double dist(DhBlockPos2D other) { return this.dist(other.x, other.z); }
 	public double dist(int x, int z) { return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.z - z, 2)); }
-	
-	public long distSquared(DhBlockPos2D other) { return this.distSquared(other.x, other.z); }
-	public long distSquared(int x, int z) { return MathUtil.pow2((long) this.x - x) + MathUtil.pow2((long) this.z - z); }
-	
-	/**
-	 * Returns the maximum distance along either the X or Z axis <br><br>
-	 *
-	 * Example chebyshev distance between X and every point around it: <br>
-	 * <code>
-	 * 2 2 2 2 2 <br>
-	 * 2 1 1 1 2 <br>
-	 * 2 1 X 1 2 <br>
-	 * 2 1 1 1 2 <br>
-	 * 2 2 2 2 2 <br>
-	 * </code>
-	 */
-	public int chebyshevDist(DhBlockPos2D other) { return Math.max(Math.abs(this.x - other.x), Math.abs(this.z - other.z)); }
-	
+
 	/**
 	 * Can be used to quickly determine the rough distance between two points<Br>
 	 * or determine the taxi cab (manhattan) distance between two points. <Br><Br>

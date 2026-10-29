@@ -71,39 +71,9 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 			LWJGL.glBindVertexBuffer(i, buffer, 0, this.strideSize);
 		}
 	}
-	
-	/** Requires both AbstractVertexAttribute and VertexBuffer to be bound */
-	@Override
-	public void bindBufferToBindingPoint(int buffer, int bindingPoint)
-	{
-		LWJGL.glBindVertexBuffer(bindingPoint, buffer, 0, this.strideSize);
-	}
-	
-	
-	
-	//===========//
-	// unbinding //
-	//===========//
-	
-	/** Requires AbstractVertexAttribute to be bound */
-	@Override
-	public void unbindBuffersFromAllBindingPoint()
-	{
-		for (int i = 0; i < this.numberOfBindingPoints; i++)
-		{
-			LWJGL.glBindVertexBuffer(i, 0, 0, 0);
-		}
-	}
-	
-	/** Requires AbstractVertexAttribute to be bound */
-	@Override
-	public void unbindBuffersFromBindingPoint(int bindingPoint)
-	{
-		LWJGL.glBindVertexBuffer(bindingPoint, 0, 0, 0);
-	}
-	
-	
-	
+
+
+
 	//==========================//
 	// manual attribute setting //
 	//==========================//

@@ -20,10 +20,8 @@
 package com.seibel.distanthorizons.core.util;
 
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 
 
@@ -67,10 +65,8 @@ public class RenderDataPointUtil
 	// If there is a bug with color then it's probably caused by this.
 	
 	public static final boolean RUN_VALIDATION = ModInfo.IS_DEV_BUILD;
-	
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
+
+
 	public final static int EMPTY_DATA = 0;
 
 	// the maximum valid Y value is the maximum min y + world height.
@@ -111,13 +107,9 @@ public class RenderDataPointUtil
 	public final static long BLOCK_LIGHT_MASK = 0xF;
 	public final static long SKY_LIGHT_MASK = 0xF;
 	public final static long IRIS_BLOCK_MATERIAL_ID_MASK = 0xF;
-	public final static long COMPARE_SHIFT = 0b111;
 	
-	public final static long MAX_Y_SHIFTED_MASK = MAX_Y_MASK << MAX_Y_SHIFT;
 	public final static long MIN_Y_SHIFTED_MASK = MIN_Y_MASK << MIN_Y_SHIFT;
-	
-	public final static long VOID_SETTER = MAX_Y_SHIFTED_MASK | MIN_Y_SHIFTED_MASK;
-	
+
 	
 	
 	//========//
@@ -259,10 +251,7 @@ public class RenderDataPointUtil
 		long alpha = getAlpha(dataPoint);
 		return (int) (((dataPoint >>> COLOR_SHIFT) & COLOR_MASK) | (alpha << (ALPHA_SHIFT - COLOR_SHIFT)));
 	}
-	
-	/** Return (>0) if dataA should replace dataB, (0) if equal, (<0) if dataB should replace dataA */
-	public static int compareDatapointPriority(long dataA, long dataB) { return (int) ((dataA >> COMPARE_SHIFT) - (dataB >> COMPARE_SHIFT)); }
-	
+
 	/** This is used to convert a dataPoint to string (useful for the print function) */
 	@SuppressWarnings("unused")
 	public static String toString(long dataPoint)

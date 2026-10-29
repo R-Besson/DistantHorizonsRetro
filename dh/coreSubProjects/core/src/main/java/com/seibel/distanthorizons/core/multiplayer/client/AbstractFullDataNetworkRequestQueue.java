@@ -257,12 +257,14 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 				requestTask.future.complete(DataSourceRetrievalResult.CreateSuccess(dataSourceDto.pos, fullDataSource));
 			}
 		}
-		catch (SectionRequiresSplittingException ignored)
+		catch (SectionRequiresSplittingException e)
 		{
+			// the server wants smaller requests
 			requestTask.future.complete(DataSourceRetrievalResult.CreateSplit());
 		}
-		catch (SessionClosedException | CancellationException ignored)
+		catch (SessionClosedException | CancellationException e)
 		{
+			// expected when disconnecting
 			requestTask.future.cancel(false);
 		}
 		catch (RequestRejectedException e)
@@ -307,7 +309,11 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 	//=========================================//
 	// IFullDataSourceRetrievalQueue overrides //
 	//=========================================//
-	
+
+	// these implement IFullDataSourceRetrievalQueue for RemoteWorldRetrievalQueue,
+	// which IntelliJ doesn't detect since this class doesn't implement that interface itself
+
+	@SuppressWarnings("unused")
 	public void removeRetrievalRequestIf(DhSectionPos.IPrimitiveLongConsumer removeIf)
 	{
 		// remove tasks furthest
@@ -337,7 +343,8 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 			}
 		}
 	}
-	
+
+	@SuppressWarnings("unused")
 	public boolean requestPosExistsWhere(DhSectionPos.IPrimitiveLongConsumer returnTrueIf)
 	{
 		AtomicBoolean taskFound = new AtomicBoolean(false);

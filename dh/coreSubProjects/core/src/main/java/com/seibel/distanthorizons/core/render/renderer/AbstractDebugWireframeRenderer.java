@@ -2,14 +2,12 @@ package com.seibel.distanthorizons.core.render.renderer;
 
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.util.math.DhMat4f;
 import com.seibel.distanthorizons.core.util.math.DhVec3f;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,9 +24,7 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 	protected static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder()
 		.maxCountPerSecond(1)
 		.build();
-	
-	protected static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
-	
+
 	
 	protected final RendererLists rendererLists = new RendererLists();
 	protected final PriorityBlockingQueue<BoxParticle> particles = new PriorityBlockingQueue<>();

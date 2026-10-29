@@ -173,6 +173,8 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 			this.renderToMcTexture();
 		}
 	}
+	
+	@SuppressWarnings({"try", "unused"})
 	private void renderToFrameBuffer()
 	{
 		int targetFrameBuffer = MC_RENDER.getTargetFramebuffer();
@@ -216,6 +218,8 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		VanillaChunkMask.INSTANCE.bind();
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 	}
+	
+	@SuppressWarnings({"try", "unused"})
 	private void renderToMcTexture()
 	{
 		int targetColorTextureId = MC_RENDER.getGlColorTextureId();
@@ -235,8 +239,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		{
 			return;
 		}
-		
-		
 		
 		try (GLState state = new GLState())
 		{

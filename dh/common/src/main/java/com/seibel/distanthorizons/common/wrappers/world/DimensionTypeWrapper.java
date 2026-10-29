@@ -77,8 +77,6 @@ public class DimensionTypeWrapper implements IDimensionTypeWrapper
 		return dimensionTypeWrapper;
 	}
 
-	public static void clearMap() { DIMENSION_WRAPPER_BY_NAME.clear(); }
-
 
 
 	//=================//

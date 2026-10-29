@@ -45,8 +45,7 @@ public interface IChunkWrapper extends IBindable
 	
 	
 	DhChunkPos getChunkPos();
-	
-	default int getHeight() { return this.getExclusiveMaxBuildHeight() - this.getInclusiveMinBuildHeight(); }
+
 	/** inclusive (IE if returning -64 the min block can be placed at -64) */
 	int getInclusiveMinBuildHeight();
 	/** exclusive (IE if returning 320 the max block can be placed at 319) */
@@ -77,10 +76,8 @@ public interface IChunkWrapper extends IBindable
 	int getMinBlockZ();
 	
 	void setIsDhBlockLightCorrect(boolean isDhLightCorrect);
-	void setIsDhSkyLightCorrect(boolean isDhLightCorrect);
-	
+
 	boolean isDhBlockLightingCorrect();
-	boolean isDhSkyLightCorrect();
 	
 	
 	int getDhSkyLight(int relX, int relY, int relZ);
@@ -125,12 +122,12 @@ public interface IChunkWrapper extends IBindable
 		{
 			return;
 		}
-		
-		
+
+
 		// FIXME +1 is to handle the fact that LodDataBuilder adds +1 to all block lighting calculations, also done in the constructor
 		int minHeight = this.getInclusiveMinBuildHeight();
 		int maxHeight = this.getExclusiveMaxBuildHeight() + 1;
-		
+
 		if (x < 0 || x >= LodUtil.CHUNK_WIDTH
 				|| z < 0 || z >= LodUtil.CHUNK_WIDTH
 				|| y < minHeight || y > maxHeight)
@@ -148,12 +145,8 @@ public interface IChunkWrapper extends IBindable
 		{
 			return;
 		}
-		
-		
-		// FIXME +1 is to handle the fact that LodDataBuilder adds +1 to all block lighting calculations, also done in the constructor
-		int minHeight = this.getInclusiveMinBuildHeight();
-		int maxHeight = this.getExclusiveMaxBuildHeight() + 1;
-		
+
+
 		if (x < 0 || x >= LodUtil.CHUNK_WIDTH
 				|| z < 0 || z >= LodUtil.CHUNK_WIDTH)
 		{
@@ -161,55 +154,6 @@ public interface IChunkWrapper extends IBindable
 					"X/Z must be between 0 and 15 (inclusive).";
 			throw new IndexOutOfBoundsException(errorMessage);
 		}
-	}
-	
-	
-	/**
-	 * Converts a 3D position into a 1D array index. <br><br>
-	 *
-	 * Source: <br>
-	 * <a href="https://stackoverflow.com/questions/7367770/how-to-flatten-or-index-3d-array-in-1d-array">stackoverflow</a>
-	 */
-	default int relativeBlockPosToIndex(int xRel, int y, int zRel)
-	{
-		int yRel = y - this.getInclusiveMinBuildHeight();
-		return (zRel * LodUtil.CHUNK_WIDTH * this.getHeight()) + (yRel * LodUtil.CHUNK_WIDTH) + xRel;
-	}
-	
-	/**
-	 * Converts a 3D position into a 1D array index. <br><br>
-	 *
-	 * Source: <br>
-	 * <a href="https://stackoverflow.com/questions/7367770/how-to-flatten-or-index-3d-array-in-1d-array">stackoverflow</a>
-	 */
-	default DhBlockPos indexToRelativeBlockPos(int index)
-	{
-		final int zRel = index / (LodUtil.CHUNK_WIDTH * this.getHeight());
-		index -= (zRel * LodUtil.CHUNK_WIDTH * this.getHeight());
-		
-		final int y = index / LodUtil.CHUNK_WIDTH;
-		final int yRel = y + this.getInclusiveMinBuildHeight();
-		
-		final int xRel = index % LodUtil.CHUNK_WIDTH;
-		return new DhBlockPos(xRel, yRel, zRel);
-	}
-	
-	
-	/** This is a bad hash algorithm since it only uses the heightmap, but can be used for rough debugging. */
-	default int roughHashCode()
-	{
-		int hash = 31;
-		int primeMultiplier = 227;
-		
-		for (int x = 0; x < LodUtil.CHUNK_WIDTH; x++)
-		{
-			for (int z = 0; z < LodUtil.CHUNK_WIDTH; z++)
-			{
-				hash = (hash * primeMultiplier) + Integer.hashCode(this.getLightBlockingHeightMapValue(x, z));
-			}
-		}
-		
-		return hash;
 	}
 	
 	default int getBlockBiomeHashCode()

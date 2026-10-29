@@ -30,7 +30,6 @@ import com.seibel.distanthorizons.lwjgl.AbstractMemoryStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import com.seibel.distanthorizons.core.util.math.DhMat4f;
 import com.seibel.distanthorizons.core.util.math.DhVec3f;
 
 
@@ -140,29 +139,19 @@ public class GlShaderProgram
 	
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, boolean value) { LWJGL.glUniform1i(location, value ? 1 : 0); }
-	/** @see GlShaderProgram#setUniform(int, boolean) */
-	public void trySetUniform(int location, boolean value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, int value) { LWJGL.glUniform1i(location, value); }
-	/** @see GlShaderProgram#setUniform(int, int) */
-	public void trySetUniform(int location, int value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, float value) { LWJGL.glUniform1f(location, value); }
-	/** @see GlShaderProgram#setUniform(int, float) */
-	public void trySetUniform(int location, float value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, DhVec3f value) { LWJGL.glUniform3f(location, value.x, value.y, value.z); }
-	/** @see GlShaderProgram#setUniform(int, DhVec3f) */
-	public void trySetUniform(int location, DhVec3f value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, DhApiVec3i value) { LWJGL.glUniform3i(location, value.x, value.y, value.z); }
-	/** @see GlShaderProgram#setUniform(int, DhApiMat4f) */
-	public void trySetUniform(int location, DhApiVec3i value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, DhApiMat4f value)
 	{
@@ -196,10 +185,7 @@ public class GlShaderProgram
 		floatBuffer.put(bufferIndex(3, 3), matrix.m33);
 	}
 	private static int bufferIndex(int xIndex, int zIndex) { return (zIndex * 4) + xIndex; }
-	
-	/** @see GlShaderProgram#setUniform(int, DhApiMat4f) */
-	public void trySetUniform(int location, DhMat4f value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	/**
 	 * Converts the color's RGBA values into values between 0 and 1. <br>
 	 * Requires a bound ShaderProgram.
@@ -212,9 +198,7 @@ public class GlShaderProgram
 				value.getBlue()  / 256.0f, 
 				value.getAlpha() / 256.0f);
 	}
-	/** @see GlShaderProgram#setUniform(int, Color) */
-	public void trySetUniform(int location, Color value) { if (location != -1) { this.setUniform(location, value); } }
-	
+
 	//endregion
 	
 	

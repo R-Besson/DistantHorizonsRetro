@@ -448,11 +448,6 @@ public class CloudRenderHandler
 		
 		//endregion
 	}
-	/**
-	 * based on the OpenGL spec <br>
-	 * https://registry.khronos.org/OpenGL-Refpages/gl4/html/mix.xhtml
-	 */
-	private float mixColors(float x, float y, float a) { return x * (1 - a) + y * a; }
 	private boolean shouldCloudBeCulled(
 			float minPosX, float minPosY, float minPosZ,
 			CloudParams cloudParams, DhVec3d cameraPos)

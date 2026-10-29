@@ -95,15 +95,6 @@ public class DhLightingEngine
 	//================//
 	
 	/**
-	 * Populates both block and sky lighting. 
-	 * @see DhLightingEngine#lightChunk(IChunkWrapper, ArrayList, int, boolean, boolean) 
-	 */
-	public void lightChunk(
-			@NotNull IChunkWrapper centerChunk, @NotNull ArrayList<IChunkWrapper> nearbyChunkList,
-			int maxSkyLight)
-	{ this.lightChunk(centerChunk, nearbyChunkList, maxSkyLight, true, true); }
-	
-	/**
 	 * Only populates block lights. 
 	 * @see DhLightingEngine#lightChunk(IChunkWrapper, ArrayList, int, boolean, boolean) 
 	 */
@@ -291,10 +282,6 @@ public class DhLightingEngine
 		if (updateBlockLight)
 		{
 			centerChunk.setIsDhBlockLightCorrect(true);
-		}
-		if (updateSkyLight)
-		{
-			centerChunk.setIsDhSkyLightCorrect(true);
 		}
 		
 		return posIterations;

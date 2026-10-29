@@ -164,7 +164,9 @@ public class JarMain
 		// create the export file
 		try
 		{
-			boolean ignored = exportFile.mkdirs(); // we don't care if we're making new directories of if they already exist
+			// we don't care if we're making new directories of if they already exist
+			//noinspection ResultOfMethodCallIgnored
+			exportFile.mkdirs();
 			
 			if (exportFile.exists())
 			{

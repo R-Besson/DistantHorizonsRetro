@@ -74,7 +74,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	//======================//
 	//region
 
-	@Override
 	public boolean hasSinglePlayerServer()
 	{
 		return MINECRAFT.isSingleplayer();

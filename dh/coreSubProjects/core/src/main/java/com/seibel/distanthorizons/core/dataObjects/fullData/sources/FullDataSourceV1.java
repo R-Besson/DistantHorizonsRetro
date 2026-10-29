@@ -54,8 +54,11 @@ public class FullDataSourceV1
 	/** measured in dataPoints */
 	public static final int WIDTH = BitShiftUtil.powerOfTwo(SECTION_SIZE_OFFSET);
 	
+	/** documents the legacy binary format */
+	@SuppressWarnings("unused")
 	public static final byte DATA_FORMAT_VERSION = 3;
 	/** never used but should stay here. */
+	@SuppressWarnings("unused")
 	public static final String DATA_TYPE_NAME = "CompleteFullDataSource";
 	
 	/**
@@ -97,23 +100,13 @@ public class FullDataSourceV1
 	// setters and getters //
 	//=====================//
 	
-	public Long getKey() { return this.pos; }
-	public String getKeyDisplayString() { return DhSectionPos.toString(this.pos); }
-	
 	public long getPos() { return this.pos; }
-	
-	public void resizeDataStructuresForRepopulation(long pos)
-	{
-		// no data structures need to be changed, only the source's position 
-		this.pos = pos;
-	}
-	
+
 	public byte getDataDetailLevel() { return (byte) (DhSectionPos.getDetailLevel(this.pos) - SECTION_SIZE_OFFSET); }
 	
 	public boolean isEmpty() { return this.isEmpty; }
 	
 	
-	public long[] get(int index) { return this.get(index / WIDTH, index % WIDTH); }
 	public long[] get(int relativeX, int relativeZ)
 	{
 		int dataArrayIndex = (relativeX * WIDTH) + relativeZ;
@@ -133,20 +126,6 @@ public class FullDataSourceV1
 	//=================//
 	// stream handling // 
 	//=================//
-	
-	/**
-	 * Clears and then overwrites any data in this object with the data from the given file and stream.
-	 * This is expected to be used with an existing {@link FullDataSourceV1} and can be used in place of a constructor to reuse an existing {@link FullDataSourceV1} object.
-	 */
-	public void repopulateFromStream(FullDataSourceV1DTO dto, DhDataInputStream inputStream, IDhLevel level) throws IOException, InterruptedException, DataCorruptedException
-	{
-		// clear/overwrite the old data
-		this.resizeDataStructuresForRepopulation(dto.pos);
-		this.mapping.clear(dto.pos);
-		
-		// set the new data
-		this.populateFromStream(dto, inputStream, level);
-	}
 	
 	/**
 	 * Overwrites any data in this object with the data from the given file and stream.

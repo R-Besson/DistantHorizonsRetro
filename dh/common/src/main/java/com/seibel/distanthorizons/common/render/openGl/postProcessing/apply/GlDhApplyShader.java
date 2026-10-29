@@ -97,6 +97,8 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 			this.renderToMcTexture();
 		}
 	}
+	
+	@SuppressWarnings({"try", "unused"})
 	private void renderToFrameBuffer()
 	{
 		int targetFrameBuffer = MC_RENDER.getTargetFramebuffer();
@@ -104,7 +106,6 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 		{
 			return;
 		}
-		
 		
 		try (GLState state = new GLState())
 		{
@@ -135,6 +136,8 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, targetFrameBuffer);
 		
 	}
+	
+	@SuppressWarnings({"try", "unused"})
 	private void renderToMcTexture()
 	{
 		int targetColorTextureId = MC_RENDER.getGlColorTextureId();
@@ -154,8 +157,6 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 		{
 			return;
 		}
-		
-		
 		
 		try (GLState state = new GLState())
 		{

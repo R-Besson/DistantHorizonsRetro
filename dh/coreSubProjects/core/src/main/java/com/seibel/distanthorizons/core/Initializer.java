@@ -37,7 +37,6 @@ import com.seibel.distanthorizons.core.api.external.methods.data.DhApiTerrainDat
 import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSharedWrapper;
 import net.jpountz.lz4.LZ4FrameOutputStream;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.sqlite.SQLiteJDBCLoader;
@@ -55,9 +54,10 @@ public class Initializer
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 	
-	
+	private static void checkClass(String className) throws ClassNotFoundException {
+		Class.forName(className);
+	}
 	
 	public static void preConfigInit()
 	{
@@ -71,31 +71,24 @@ public class Initializer
 		// confirm that all referenced libraries are available to use
 		try
 		{
-			// if any library isn't present in the jar its class
-			// will throw an error (not an exception)
-			Class<?> lz4Compressor = LZ4FrameOutputStream.class;
-			Class<?> zstdCompressor = ZstdOutputStream.class;
+			Class.forName("net.jpountz.lz4.LZ4FrameOutputStream");
+			Class.forName("com.github.luben.zstd.ZstdOutputStream");
+			Class.forName("org.tukaani.xz.XZOutputStream");
+			Class.forName("com.electronwill.nightconfig.core.Config");
+			Class.forName("it.unimi.dsi.fastutil.longs.LongArrayList");
+			Class.forName("org.sqlite.SQLiteConnection");
+			Class.forName("org.sqlite.core.NativeDB");
 			
+			byte[] testCompressByteArray = new byte[1024];
+			
+			for (int i = 0; i < testCompressByteArray.length; i++)
 			{
-				byte[] testCompressByteArray = new byte[1024];
-				for (int i = 0; i < testCompressByteArray.length; i++)
-				{
-					testCompressByteArray[i] = (byte) (i % 126);
-				}
-				byte[] compressedBytes = com.github.luben.zstd.Zstd.compress(testCompressByteArray);
-				com.github.luben.zstd.Zstd.decompress(compressedBytes);
+				testCompressByteArray[i] = (byte) (i % 126);
 			}
+			byte[] compressedBytes = com.github.luben.zstd.Zstd.compress(testCompressByteArray);
+			com.github.luben.zstd.Zstd.decompress(compressedBytes, testCompressByteArray.length);
 			
-			Class<?> lzmaCompressor = XZOutputStream.class;
-			//Class<?> networking = ByteBuf.class;
-			Class<?> config = com.electronwill.nightconfig.core.Config.class;
-			Class<?> oldFastUtil = it.unimi.dsi.fastutil.longs.LongArrayList.class; // available in 8.2.1
-			//Class<?> newFastUtil = it.unimi.dsi.fastutil.ints.IntUnaryOperator.class; // available in 8.5.13
-			Class<?> sqliteJava = org.sqlite.SQLiteConnection.class;
-			Class<?> sqliteNative = org.sqlite.core.NativeDB.class;
-			
-			boolean sqliteLoaded = SQLiteJDBCLoader.initialize();
-			if (!sqliteLoaded)
+			if (!SQLiteJDBCLoader.initialize())
 			{
 				throw new RuntimeException("Failed to load SQLite native library. Hopefully SQLite logged a reason for this failure.");
 			}

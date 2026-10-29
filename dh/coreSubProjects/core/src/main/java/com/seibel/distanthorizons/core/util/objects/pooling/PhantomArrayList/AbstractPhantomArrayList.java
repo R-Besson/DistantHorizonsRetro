@@ -1,8 +1,5 @@
 package com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList;
 
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-
 import java.lang.ref.PhantomReference;
 
 /**
@@ -18,9 +15,7 @@ import java.lang.ref.PhantomReference;
  */
 public abstract class AbstractPhantomArrayList implements AutoCloseable
 {
-	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
+
 	private final PhantomArrayListPool phantomArrayListPool;
 	private final PhantomReference<AbstractPhantomArrayList> phantomReference;
 

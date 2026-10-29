@@ -63,6 +63,8 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 	public int uStrength;
 	public int uMinLight;
 	public int uBias;
+	/** never set (the sampler stays on unit 0), the lookup is kept since it throws if the shader loses the uniform */
+	@SuppressWarnings("unused")
 	public int uDhDepthTexture;
 	public int uFadeDistanceInBlocks;
 	public int uIsReverseZDepth;

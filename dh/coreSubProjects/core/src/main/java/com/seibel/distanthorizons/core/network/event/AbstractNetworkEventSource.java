@@ -125,14 +125,6 @@ public abstract class AbstractNetworkEventSource
 	
 	
 	//==================//
-	// abstract methods //
-	//==================//
-	
-	public abstract <T extends AbstractNetworkMessage> void registerHandler(Class<T> handlerClass, Consumer<T> handlerImplementation);
-	
-	
-	
-	//==================//
 	// message handlers //
 	//==================//
 	

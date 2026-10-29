@@ -35,7 +35,6 @@ import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.Abs
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.sql.dto.util.FullDataMinMaxPosUtil;
 import com.seibel.distanthorizons.core.util.*;
 import com.seibel.distanthorizons.core.util.objects.DataCorruptedException;
@@ -311,67 +310,6 @@ public class FullDataSourceV2
 		}
 		
 		return this.dataPoints[index];
-	}
-	
-	/** 
-	 * returns {@link FullDataPointUtil#EMPTY_DATA_POINT} if the given {@link DhBlockPos}
-	 * is outside this data source's boundaries.
-	 */
-	public long getDataPointAtBlockPos(int blockPosX, int blockPosY, int blockPosZ, int levelMinY)
-	{
-		long requestedPos = DhSectionPos.encode(LodUtil.BLOCK_DETAIL_LEVEL, blockPosX, blockPosZ);
-		
-		// stop if the requested blockPos is outside this datasource
-		{
-			long sectionPos =  DhSectionPos.encodeContaining(DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL, new DhBlockPos(blockPosX, blockPosY, blockPosZ));
-			if (!DhSectionPos.contains(this.pos, sectionPos))
-			{
-				return FullDataPointUtil.EMPTY_DATA_POINT;
-			}
-		}
-		
-		
-		// get the relative data source position
-		byte requestDetailLevel = (byte) (DhSectionPos.getDetailLevel(this.pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
-		long relativePos = DhSectionPos.getDhSectionRelativePositionForDetailLevel(requestedPos, requestDetailLevel);
-		
-		// get the data column
-		LongArrayList dataColumn = this.getColumnAtRelPos(DhSectionPos.getX(relativePos), DhSectionPos.getZ(relativePos));
-		if (dataColumn == null)
-		{
-			return FullDataPointUtil.EMPTY_DATA_POINT;
-		}
-		
-		
-		// search for a datapoint that contains the given block y position
-		int relBlockPosY = blockPosY - levelMinY;
-		long dataPoint;
-		for (int i = 0; i < dataColumn.size(); i++)
-		{
-			dataPoint = dataColumn.getLong(i);
-			
-			// we are looking for a specific datapoint,
-			// don't look at null ones
-			if (dataPoint == FullDataPointUtil.EMPTY_DATA_POINT)
-			{
-				continue;
-			}
-			
-			
-			
-			int bottomY = FullDataPointUtil.getBottomY(dataPoint);
-			int height = FullDataPointUtil.getHeight(dataPoint);
-			int topY = bottomY + height;
-			
-			// does this datapoint contain the requested Y position? 
-			if (bottomY <= relBlockPosY
-				&& relBlockPosY < topY) // blockPositions start from the bottom of the block, thus "<=" for bottomY, just "<" for topY
-			{
-				return dataPoint;
-			}
-		}
-		
-		return FullDataPointUtil.EMPTY_DATA_POINT;
 	}
 	
 	//endregion

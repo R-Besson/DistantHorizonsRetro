@@ -61,10 +61,6 @@ public class ConfigTypeConverters
 		return null;
 	}
 	
-	public static Object attemptToConvertToString(Object value)
-	{
-		return attemptToConvertToString(value.getClass(), value);
-	}
 	public static Object attemptToConvertToString(Class<?> clazz, Object value)
 	{
 		Class<?> convertablClass = isClassConvertable(clazz);
@@ -74,10 +70,6 @@ public class ConfigTypeConverters
 		return value;
 	}
 	
-	public static Object attemptToConvertFromString(Object value)
-	{
-		return attemptToConvertFromString(value.getClass(), value);
-	}
 	public static Object attemptToConvertFromString(Class<?> outputClass, Object value)
 	{
 		boolean valueNeedsConverting = (value == null || value.getClass().equals(String.class));
@@ -186,8 +178,6 @@ public class ConfigTypeConverters
 		@Override
 		public Map<String, Object> convertFromString(String str)
 		{
-			Map<String, Object> map = new HashMap<>();
-			
 			Config jsonObject = Config.inMemory();
 			try
 			{

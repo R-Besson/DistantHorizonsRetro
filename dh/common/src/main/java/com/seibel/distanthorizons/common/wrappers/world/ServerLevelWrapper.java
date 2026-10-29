@@ -194,8 +194,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	@Override
 	public EDhApiLevelType getLevelType() { return EDhApiLevelType.SERVER_LEVEL; }
 
-	public WorldServer getLevel() { return this.level; }
-
 	@Override
 	public boolean hasCeiling()
 	{

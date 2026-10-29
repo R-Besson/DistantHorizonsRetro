@@ -49,12 +49,7 @@ public class LodRenderer
 	public static final DhLogger LOGGER = new DhLoggerBuilder()
 			.fileLevelConfig(Config.Common.Logging.logRendererEventToFile)
 			.build();
-	
-	public static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logRendererEventToFile)
-			.maxCountPerSecond(4)
-			.build();
-	
+
 	private static final IMinecraftClientWrapper MC = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	
@@ -118,6 +113,7 @@ public class LodRenderer
 	public void renderDeferred(RenderParams renderParams, IProfilerWrapper profiler)
 	{ this.renderTerrain(renderParams, profiler, true); }
 	
+	@SuppressWarnings({"try", "unused"})
 	private void renderTerrain(RenderParams renderParams, IProfilerWrapper profiler, boolean runningDeferredPass)
 	{
 		//===============//
@@ -149,7 +145,7 @@ public class LodRenderer
 		//region
 		
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeRenderSetupEvent.class, renderParams.apiCopy);
-		try (IProfilerWrapper.IProfileBlock terrainRender_profile = profiler.push("LOD GL setup")) // starts the new profile block for most DH rendering
+		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("LOD GL setup")) // starts the new profile block for most DH rendering
 		{
 			
 			if (!this.renderersBound)

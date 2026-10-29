@@ -382,8 +382,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	@Override
 	public EDhApiLevelType getLevelType() { return EDhApiLevelType.CLIENT_LEVEL; }
 
-	public WorldClient getLevel() { return this.level; }
-
 	@Override
 	public boolean hasCeiling()
 	{

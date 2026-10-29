@@ -20,8 +20,6 @@
 package com.seibel.distanthorizons.core.wrapperInterfaces.block;
 
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
-import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockColorOverrideEvent;
-import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockTextureOverrideEvent;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 
@@ -91,38 +89,7 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	boolean isBeaconBaseBlock();
 	
 	boolean isIceBlock();
-	
-	/**
-	 * Some blocks don't pull their texture properly (like bamboo).
-	 * In those cases it's best to just render their base color.
-	 */
-	boolean renderTexture();
-	/**
-	 * some blocks like grass blocks should use their bottom texture to 
-	 * prevent incorrectly repeating the side texture on tall LODs. 
-	 */
-	boolean useBottomTextureForSides();
-	/**
-	 * Some blocks should be fully rasterized. <br>
-	 * Specifically this is done to fix Beacons top face rendering
-	 * as a single obsidian block when Iris is present. <br>
-	 * (Iris appears to change how unculled faces
-	 * are handled with beacons).
-	 */
-	boolean alwaysRasterizeTexture();
-	
-	/**
-	 * if true this block can have its color overridden
-	 * by {@link DhApiBlockColorOverrideEvent}
-	 */
-	boolean allowApiColorOverride();
-	/**
-	 * if true this block can have its texture overridden
-	 * by {@link DhApiBlockTextureOverrideEvent}
-	 */
-	boolean allowApiTextureOverride();
-	
-	Color getMapColor();
+
 	Color getBeaconTintColor();
 	
 }

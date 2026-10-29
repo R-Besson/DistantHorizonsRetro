@@ -237,8 +237,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 	
 	public static class ClientRenderState implements Closeable
 	{
-		private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-		
 		public final LodQuadTree quadtree;
 		public final RenderBufferHandler renderBufferHandler;
 		

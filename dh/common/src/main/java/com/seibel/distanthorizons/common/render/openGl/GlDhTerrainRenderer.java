@@ -57,7 +57,7 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 		this.getTerrainShaderProgram();
 		
 		this.terrainShaderProgram.tryInit();
-		this.terrainShaderProgram.render(renderEventParam, opaquePass, bufferContainers, profiler);
+		this.terrainShaderProgram.render(renderEventParam, opaquePass, bufferContainers);
 	}
 	
 	//endregion

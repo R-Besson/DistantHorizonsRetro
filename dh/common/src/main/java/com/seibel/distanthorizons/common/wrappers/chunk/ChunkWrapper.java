@@ -69,7 +69,6 @@ public class ChunkWrapper implements IChunkWrapper
 	private final ILevelWrapper wrappedLevel;
 
 	private boolean isDhBlockLightCorrect = false;
-	private boolean isDhSkyLightCorrect = false;
 
 	private ChunkLightStorage blockLightStorage;
 	private ChunkLightStorage skyLightStorage;
@@ -217,9 +216,6 @@ public class ChunkWrapper implements IChunkWrapper
 	// getters //
 	//=========//
 	//region
-
-	@Override
-	public int getHeight() { return (this.cubicSections != null) ? this.maxBuildHeight - this.minBuildHeight : 255; }
 
 	@Override
 	public int getInclusiveMinBuildHeight() { return this.minBuildHeight; }
@@ -484,9 +480,6 @@ public class ChunkWrapper implements IChunkWrapper
 	@Override
 	public DhChunkPos getChunkPos() { return this.chunkPos; }
 
-	public Chunk getChunk()
-	{ return this.chunk; }
-
 
 	@Override
 	public int getMinBlockX() { return this.chunkPos.getMinBlockX(); }
@@ -523,14 +516,10 @@ public class ChunkWrapper implements IChunkWrapper
 	//region
 
 	@Override
-	public void setIsDhSkyLightCorrect(boolean isDhLightCorrect) { this.isDhSkyLightCorrect = isDhLightCorrect; }
-	@Override
 	public void setIsDhBlockLightCorrect(boolean isDhLightCorrect) { this.isDhBlockLightCorrect = isDhLightCorrect; }
 
 	@Override
 	public boolean isDhBlockLightingCorrect() { return this.isDhBlockLightCorrect; }
-	@Override
-	public boolean isDhSkyLightCorrect() { return this.isDhSkyLightCorrect; }
 
 
 	@Override
@@ -554,7 +543,6 @@ public class ChunkWrapper implements IChunkWrapper
 		}
 		return this.blockLightStorage;
 	}
-	public void setBlockLightStorage(ChunkLightStorage lightStorage) { this.blockLightStorage = lightStorage; }
 	@Override
 	public void clearDhBlockLighting() { this.getBlockLightStorage().clear(); }
 
@@ -582,7 +570,6 @@ public class ChunkWrapper implements IChunkWrapper
 		}
 		return this.skyLightStorage;
 	}
-	public void setSkyLightStorage(ChunkLightStorage lightStorage) { this.skyLightStorage = lightStorage; }
 
 
 	/**

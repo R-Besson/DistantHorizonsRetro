@@ -46,8 +46,7 @@ public class ServerPlayerState implements Closeable
 	public final FullDataPayloadSender fullDataPayloadSender;
 	
 	private final ConcurrentHashMap<AbstractDhServerLevel, RateLimiterSet> rateLimiterSets = new ConcurrentHashMap<>();
-	public RateLimiterSet getRateLimiterSet(AbstractDhServerLevel level) { return this.rateLimiterSets.computeIfAbsent(level, ignored -> new RateLimiterSet()); }
-	public void clearRateLimiterSets() { this.rateLimiterSets.clear(); }
+	public RateLimiterSet getRateLimiterSet(AbstractDhServerLevel level) { return this.rateLimiterSets.computeIfAbsent(level, levelKey -> new RateLimiterSet()); }
 	
 	
 	//==============//

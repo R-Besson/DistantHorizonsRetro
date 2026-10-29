@@ -22,7 +22,6 @@ package com.seibel.distanthorizons.core.util.objects.quadTree;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.core.util.objects.quadTree.iterators.QuadNodeDirectChildIterator;
 import com.seibel.distanthorizons.core.util.objects.quadTree.iterators.QuadNodeDirectChildPosIterator;
 import com.seibel.distanthorizons.core.util.objects.quadTree.iterators.QuadTreeNodeIterator;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -313,7 +312,6 @@ public class QuadNode<T>
 	
 	/** positions can point to null children */
 	public LongIterator getChildPosIterator() { return new QuadNodeDirectChildPosIterator<>(this); }
-	public Iterator<QuadNode<T>> getChildNodeIterator() { return new QuadNodeDirectChildIterator<>(this); }
 	
 	
 	

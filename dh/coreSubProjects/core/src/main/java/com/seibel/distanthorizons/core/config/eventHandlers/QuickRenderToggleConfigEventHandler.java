@@ -26,22 +26,22 @@ import com.seibel.distanthorizons.core.config.Config;
 public class QuickRenderToggleConfigEventHandler
 {
 	public static QuickRenderToggleConfigEventHandler INSTANCE = new QuickRenderToggleConfigEventHandler();
-	
-	private final ConfigChangeListener<Boolean> quickRenderChangeListener;
-	private final ConfigChangeListener<EDhApiRendererMode> rendererModeChangeListener;
-	
-	
-	
-	/** private since we only ever need one handler at a time */
+
+
+
+	/**
+	 * private since we only ever need one handler at a time <br>
+	 * the listeners register themselves with their config entries
+	 */
 	private QuickRenderToggleConfigEventHandler()
 	{
-		this.quickRenderChangeListener = new ConfigChangeListener<>(Config.Client.quickEnableRendering,
+		new ConfigChangeListener<>(Config.Client.quickEnableRendering,
 				(val) -> {
 					Config.Client.Advanced.Debugging.rendererMode.set(Config.Client.quickEnableRendering.get()
 							? EDhApiRendererMode.DEFAULT
 							: EDhApiRendererMode.DISABLED);
 				});
-		this.rendererModeChangeListener = new ConfigChangeListener<>(Config.Client.Advanced.Debugging.rendererMode,
+		new ConfigChangeListener<>(Config.Client.Advanced.Debugging.rendererMode,
 				(val) -> {
 					Config.Client.quickEnableRendering.set(
 							Config.Client.Advanced.Debugging.rendererMode.get() != EDhApiRendererMode.DISABLED);

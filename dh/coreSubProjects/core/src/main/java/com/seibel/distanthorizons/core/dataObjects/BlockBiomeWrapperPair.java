@@ -1,8 +1,6 @@
 package com.seibel.distanthorizons.core.dataObjects;
 
 import com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap;
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
-import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 
@@ -19,8 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BlockBiomeWrapperPair
 {
-	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
-	
 	/** two levels are present so we don't need to use a key object */
 	private static final ConcurrentHashMap<IBlockStateWrapper, ConcurrentHashMap<IBiomeWrapper, BlockBiomeWrapperPair>> CACHED_PAIR_BY_BIOME_BY_BLOCK = new ConcurrentHashMap<>();
 	

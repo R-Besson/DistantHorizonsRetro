@@ -67,7 +67,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	
 	public final long pos;
 	
-	private final IDhClientLevel clientLevel;
 	private final IClientLevelWrapper clientLevelWrapper;
 	@WillNotClose
 	private final FullDataSourceProviderV2 fullDataSourceProvider;
@@ -116,7 +115,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	{
 		this.pos = pos;
 		this.quadTree = quadTree;
-		this.clientLevel = clientLevel;
 		this.clientLevelWrapper = clientLevel.getClientLevelWrapper();
 		this.fullDataSourceProvider = fullDataSourceProvider;
 		

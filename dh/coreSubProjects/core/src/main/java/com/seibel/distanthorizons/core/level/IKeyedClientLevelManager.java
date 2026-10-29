@@ -31,8 +31,7 @@ public interface IKeyedClientLevelManager extends IBindable
 	IServerKeyedClientLevel getServerKeyedLevel(IClientLevelWrapper levelWrapper);
 	/** Called when a client level is wrapped by a ServerKeyedClientLevel, for integration into mod internals. */
 	IServerKeyedClientLevel setServerKeyedLevel(IClientLevelWrapper clientLevel, String dimensionResource, String serverKey, String levelKey);
-	
-	void clearKeyedLevel();
+
 	boolean isEnabled();
 	void disable();
 	

@@ -28,8 +28,6 @@ import net.minecraft.world.WorldServer;
 
 public final class GlobalWorldGenParams
 {
-	public final IDhServerLevel dhServerLevel;
-
 	public final WorldServer mcServerLevel;
 
 
@@ -40,7 +38,6 @@ public final class GlobalWorldGenParams
 
 	public GlobalWorldGenParams(IDhServerLevel dhServerLevel)
 	{
-		this.dhServerLevel = dhServerLevel;
 		this.mcServerLevel = ((ServerLevelWrapper) dhServerLevel.getServerLevelWrapper()).getWrappedMcObject();
 	}
 

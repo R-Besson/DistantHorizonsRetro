@@ -90,7 +90,9 @@ public class DhThreadFactory implements ThreadFactory
 		}
 		return str.toString();
 	}
-	
+
+	/** useful when debugging */
+	@SuppressWarnings("unused")
 	public void dumpAllThreadStacks()
 	{
 		for (WeakReference<Thread> threadRef : this.threads)

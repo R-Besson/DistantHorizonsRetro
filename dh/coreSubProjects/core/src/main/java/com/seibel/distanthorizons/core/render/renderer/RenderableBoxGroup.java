@@ -13,7 +13,6 @@ import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.threading.PriorityTaskPicker;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IDhGenericObjectVertexBufferContainer;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,8 +30,7 @@ public class RenderableBoxGroup
 			implements IDhApiRenderableBoxGroup, Closeable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
+
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
 	
 	public static final AtomicInteger NEXT_ID_ATOMIC_INT = new AtomicInteger(0);
@@ -43,9 +41,6 @@ public class RenderableBoxGroup
 	
 	public final String resourceLocationNamespace;
 	public final String resourceLocationPath;
-	
-	/** If false the boxes will be positioned relative to the level's origin */
-	public final boolean positionBoxesRelativeToGroupOrigin;
 	
 	private final List<DhApiRenderableBox> boxList;
 	/** backup list which allows for uploading the boxes even it the main list is being modified on a different thread. */
@@ -172,7 +167,6 @@ public class RenderableBoxGroup
 		this.uploadBoxList = Collections.synchronizedList(new ArrayList<>(boxList));
 		
 		this.originBlockPos = originBlockPos;
-		this.positionBoxesRelativeToGroupOrigin = positionBoxesRelativeToGroupOrigin;
 	}
 	
 	//endregion

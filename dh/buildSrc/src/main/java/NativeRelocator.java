@@ -116,8 +116,9 @@ class NativeRelocator
 					Thread.sleep(100);
 				}
 			}
-			catch (Throwable ignored)
+			catch (Throwable e)
 			{
+				// the process output is only forwarded for convenience
 			}
 		});
 	}

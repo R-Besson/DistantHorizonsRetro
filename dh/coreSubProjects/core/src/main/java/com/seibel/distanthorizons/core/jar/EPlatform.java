@@ -27,38 +27,12 @@ package com.seibel.distanthorizons.core.jar;
  */
 public enum EPlatform
 {
-	WINDOWS("Windows", false),
-	LINUX("Linux", true),
-	MACOS("macOS", true),
-	BSD("BSD", true),
-	UNIX("Unix", true);
-	
-	public enum EArchitecture
-	{
-		X86(false),
-		X64(true),
-		ARM32(false),
-		ARM64(true);
-		
-		static final EArchitecture current;
-		final boolean is64Bit;
-		
-		static
-		{
-			String osArch = System.getProperty("os.arch");
-			boolean is64Bit = osArch.contains("64") || osArch.startsWith("armv8");
-			
-			current = osArch.startsWith("arm") || osArch.startsWith("aarch64")
-					? (is64Bit ? ARM64 : ARM32)
-					: (is64Bit ? X64 : X86);
-		}
-		
-		EArchitecture(boolean is64Bit)
-		{
-			this.is64Bit = is64Bit;
-		}
-	}
-	
+	WINDOWS("Windows"),
+	LINUX("Linux"),
+	MACOS("macOS"),
+	BSD("BSD"),
+	UNIX("Unix");
+
 	private static final EPlatform current;
 	
 	static
@@ -94,39 +68,25 @@ public enum EPlatform
 	}
 	
 	private final String name;
-	private final boolean isUnix;
-	
-	EPlatform(String name, boolean isUnix)
+
+	EPlatform(String name)
 	{
 		this.name = name;
-		this.isUnix = isUnix;
 	}
-	
+
 	/** Returns the platform name. */
 	public String getName()
 	{
 		return name;
 	}
-	
-	/** Returns weather the OS is Unix or Unix-Like OS */
-	public boolean isUnix()
-	{
-		return isUnix;
-	}
-	
+
 	/** Returns the platform on which the library is running. */
 	public static EPlatform get()
 	{
 		return current;
 	}
-	
-	/** Returns the architecture on which the library is running. */
-	public static EArchitecture getArchitecture()
-	{
-		return EArchitecture.current;
-	}
-	
-	
+
+
 	@Override
 	public String toString()
 	{

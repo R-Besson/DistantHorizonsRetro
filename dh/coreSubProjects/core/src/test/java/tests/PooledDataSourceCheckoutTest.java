@@ -35,6 +35,7 @@ import org.junit.Assert;
  * @see PhantomArrayListCheckout
  * @see DelayedSaveCacheTest
  */
+@SuppressWarnings("unused") // disabled test, uncomment the @Test to run it
 public class PooledDataSourceCheckoutTest
 {
 	

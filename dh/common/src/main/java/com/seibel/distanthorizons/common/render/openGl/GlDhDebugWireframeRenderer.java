@@ -26,8 +26,6 @@ import com.seibel.distanthorizons.common.render.openGl.glObject.shader.GlShaderP
 import com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute.GlAbstractVertexAttribute;
 import com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute.GlVertexPointer;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.util.math.DhMat4f;
@@ -46,8 +44,6 @@ import java.nio.ByteOrder;
 public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 {
 	public static GlDhDebugWireframeRenderer INSTANCE = new GlDhDebugWireframeRenderer();
-	
-	public static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	
