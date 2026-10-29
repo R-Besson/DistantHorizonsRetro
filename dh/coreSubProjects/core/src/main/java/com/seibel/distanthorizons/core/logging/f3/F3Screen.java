@@ -48,6 +48,7 @@ public class F3Screen
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	
 	public static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
+	private static final String JAVA_VERSION = System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + ")";
 	
 	
 	
@@ -104,6 +105,8 @@ public class F3Screen
 			messageList.add("Build: " + StringUtil.shortenString(ModJarInfo.Git_Commit, 8) + " (" + ModJarInfo.Git_Branch + ")");
 		}
 		
+		messageList.add("Java: " + JAVA_VERSION);
+
 		// render validation error
 		if (ClientApi.INSTANCE.lastRenderParamValidationMessage != null)
 		{
