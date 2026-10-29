@@ -21,6 +21,9 @@ dependencies {
 }
 
 java {
+    // only for the IDE language level, compilation uses options.release
+    sourceCompatibility = rootProject.dh_core_java_version as Integer
+    targetCompatibility = rootProject.dh_core_java_version as Integer
     withSourcesJar()
 }
 

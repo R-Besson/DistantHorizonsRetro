@@ -13,6 +13,12 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
 }
 
+java {
+    // only for the IDE language level, compilation uses options.release
+    sourceCompatibility = rootProject.dh_core_java_version as Integer
+    targetCompatibility = rootProject.dh_core_java_version as Integer
+}
+
 configurations {
     shadowedArtifact // Used by DH to specify that we want to implement the shadowed core JAR file instead of the regular JAR file
     shade
