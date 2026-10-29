@@ -141,7 +141,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 				{
 					try
 					{
-						boolean fileCreated = databaseFile.createNewFile();
+						databaseFile.createNewFile();
 					}
 					catch (IOException e)
 					{
@@ -279,7 +279,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	public void deleteWithKey(TKey key) 
 	{
 		try (PreparedStatement statement = this.createDeleteStatementByKey(key);
-			ResultSet result = this.query(statement))
+			ResultSet ignored = this.query(statement))
 		{
 			
 		}
@@ -294,7 +294,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	{ 
 		String sql = "DELETE FROM " + this.getTableName();
 		try (PreparedStatement statement = this.createPreparedStatement(sql);
-			ResultSet result = this.query(statement))
+			ResultSet ignored = this.query(statement))
 		{
 			
 		}

@@ -95,6 +95,11 @@ configurations {
     shadowMe.extendsFrom(coreProjects)
     implementation.extendsFrom(shadowMe)
 
+    // Shadow's minimize() only counts this module's own classes and this configuration's jars as used code,
+    // core and api have to be here so the fastutil classes only they use are kept
+    shadowMinimizeApi
+    shadowMinimizeApi.extendsFrom(coreProjects)
+
     common
     implementation.extendsFrom(common)
 
@@ -176,6 +181,8 @@ if (isNotCommonProject) {
 
     dependencies {
         shadowMe lwjgl3Classes
+        // loaded by name (see LWJGLServiceProvider), minimize() would strip them otherwise
+        shadowMinimizeApi lwjgl3Classes
     }
 
     processResources {
@@ -411,6 +418,33 @@ if (isNotCommonProject) {
         relocate "com.electronwill.nightconfig", "${librariesLocation}.electronwill.nightconfig"
 
         mergeServiceFiles()
+
+        // Native libraries for platforms Minecraft can't run on (LWJGL 3 has no natives for them),
+        // only the Windows, Linux (glibc), FreeBSD x64 and macOS builds LWJGL supports are kept.
+        // The AIX zstd library is never renamed (see the zstd NativeTransformer above) so it can't be loaded at all.
+        exclude "aix/**"
+        exclude "linux/ppc64/**"
+        exclude "linux/s390x/**"
+        exclude "linux/mips64/**"
+        exclude "linux/loongarch64/**"
+        exclude "linux/i386/**"
+        exclude "freebsd/i386/**"
+        exclude "net/jpountz/util/linux/s390x/**"
+        exclude "net/jpountz/util/linux/i386/**"
+        exclude "org/sqlite/native/Linux-Musl/**"
+        exclude "org/sqlite/native/Linux/x86/**"
+        exclude "org/sqlite/native/Linux/ppc64/**"
+        exclude "org/sqlite/native/Linux/armv6/**"
+        exclude "org/sqlite/native/FreeBSD/x86/**"
+        exclude "org/sqlite/native/FreeBSD/aarch64/**"
+        exclude "org/sqlite/native/Windows/armv7/**"
+
+        // Only the fastutil classes DH uses are bundled, the full library is over 16 MB.
+        // Nothing else is trimmed: SQLite, zstd and LZ4 are reached from native code and service files,
+        // DH's own code from mixins and reflection
+        minimize {
+            exclude { it.moduleGroup != "it.unimi.dsi" }
+        }
     }
 
     afterEvaluate {

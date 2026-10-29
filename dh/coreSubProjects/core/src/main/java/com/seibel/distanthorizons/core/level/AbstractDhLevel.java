@@ -70,9 +70,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 	protected final ConcurrentHashMap<Long, HashSet<DhChunkPos>> updatedChunkPosSetBySectionPos = new ConcurrentHashMap<>();
 	protected final ConcurrentHashMap<DhChunkPos, Integer> updatedChunkHashesByChunkPos = new ConcurrentHashMap<>();
 	
-	/** Will be null if clouds shouldn't be rendered for this level. */
-	@Nullable
-	protected CloudRenderHandler cloudRenderHandler;
 	
 	
 	
@@ -129,7 +126,8 @@ public abstract class AbstractDhLevel implements IDhLevel
 				String dimName = this.getLevelWrapper().getDimensionType().getName();
 				if (enabledCloudDimensions.contains(dimName))
 				{
-					this.cloudRenderHandler = new CloudRenderHandler((IDhClientLevel)this, genericRenderer);
+					// adds the clouds to the generic renderer, which keeps the handler alive through their render callbacks
+					new CloudRenderHandler((IDhClientLevel)this, genericRenderer);
 				}
 			}
 		}

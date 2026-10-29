@@ -30,7 +30,6 @@ import com.seibel.distanthorizons.core.config.types.enums.EConfigValidity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -125,9 +124,7 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	public boolean getAllowApiOverride() { return this.allowApiOverride; }
 	
 	public T getMin() { return this.min; }
-	public void setMin(T newMin) { this.min = newMin; }
 	public T getMax() { return this.max; }
-	public void setMax(T newMax) { this.max = newMax; }
 	
 	//endregion
 	
@@ -233,16 +230,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			this.listenerList.forEach(IConfigListener::onUiModify);
 		}
 	}
-	public void uiSet(T newValue)
-	{
-		this.set(newValue);
-		
-		synchronized (this.listenerList)
-		{
-			this.listenerList.forEach(IConfigListener::onUiModify);
-		}
-	}
-	
 	//endregion
 	
 	
@@ -310,15 +297,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			this.listenerList.remove(oldListener);
 		}
 	}
-	
-	public void clearListeners() 
-	{
-		synchronized (this.listenerList)
-		{
-			this.listenerList.clear();
-		}
-	}
-	
 	//endregion
 	
 	
@@ -328,8 +306,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	//====================//
 	//region
 	
-	/** Checks if this config's current value is valid */
-	public EConfigValidity getValidity() { return this.getValidity(this.value, this.min, this.max); }
 	/** Checks if the given value is valid */
 	public EConfigValidity getValidity(@Nullable T value) { return this.getValidity(value, this.min, this.max); }
 	/** Checks if the given value is valid */
@@ -388,8 +364,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	
 	/** This should normally not be called since set() automatically calls this */
 	public void save() { ConfigHandler.INSTANCE.configFileHandler.saveEntry(this); }
-	/** This should normally not be called except for special circumstances */
-	public void load() { ConfigHandler.INSTANCE.configFileHandler.loadEntry(this); }
 	
 	//endregion
 	
@@ -402,26 +376,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	
 	@Override 
 	public String toString() { return this.name + ": [" + this.get() + "]"; }
-	
-	public boolean equals(AbstractConfigBase<?> obj) 
-	{
-		return obj.getClass() == ConfigEntry.class 
-				&& this.equals((ConfigEntry<?>) obj); 
-	}
-	/** Is the value of this equal to another */
-	public boolean equals(ConfigEntry<?> obj)
-	{
-		// Can all of this just be "return this.value.equals(obj.value)"?
-		
-		if (Number.class.isAssignableFrom(this.value.getClass()))
-		{
-			return this.value == obj.value;
-		}
-		else
-		{
-			return this.value.equals(obj.value);
-		}
-	}
 	
 	//endregion
 	
@@ -465,18 +419,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return this;
 		}
 		
-		public Builder<T> setMin(T newMin)
-		{
-			this.tmpMin = newMin;
-			return this;
-		}
-		
-		public Builder<T> setMax(T newMax)
-		{
-			this.tmpMax = newMax;
-			return this;
-		}
-		
 		public Builder<T> setChatCommandName(String name)
 		{
 			this.tmpChatCommandName = name;
@@ -489,40 +431,14 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return this;
 		}
 		
-		public Builder<T> setUseApiOverwrite(boolean newUseApiOverwrite)
-		{
-			this.tmpUseApiOverwrite = newUseApiOverwrite;
-			return this;
-		}
-		
-		
-		
-		public Builder<T> replaceListeners(ArrayList<IConfigListener> newConfigListener)
-		{
-			this.tmpIConfigListener = newConfigListener;
-			return this;
-		}
-		
-		public Builder<T> addListeners(IConfigListener... newConfigListener)
-		{
-			this.tmpIConfigListener.addAll(Arrays.asList(newConfigListener));
-			return this;
-		}
-		
 		public Builder<T> addListener(IConfigListener newConfigListener)
 		{
 			this.tmpIConfigListener.add(newConfigListener);
 			return this;
 		}
 		
-		public Builder<T> clearListeners()
-		{
-			this.tmpIConfigListener.clear();
-			return this;
-		}
-		
-		
-		
+
+
 		// build //
 		
 		public ConfigEntry<T> build()
