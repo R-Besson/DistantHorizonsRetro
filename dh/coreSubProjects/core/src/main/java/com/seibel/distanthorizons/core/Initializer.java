@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.core;
 
-import com.github.luben.zstd.ZstdOutputStream;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderObjectFactory;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeRenderEvent;
 import com.seibel.distanthorizons.core.api.internal.ClientApi;
@@ -37,10 +36,8 @@ import com.seibel.distanthorizons.core.api.external.methods.data.DhApiTerrainDat
 import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
-import net.jpountz.lz4.LZ4FrameOutputStream;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.sqlite.SQLiteJDBCLoader;
-import org.tukaani.xz.XZOutputStream;
 
 import java.awt.*;
 import java.lang.management.GarbageCollectorMXBean;
@@ -54,10 +51,6 @@ public class Initializer
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-	
-	private static void checkClass(String className) throws ClassNotFoundException {
-		Class.forName(className);
-	}
 	
 	public static void preConfigInit()
 	{

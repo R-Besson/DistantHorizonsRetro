@@ -303,7 +303,7 @@ public class FullDataToRenderDataTransformer
 						// the same plant top as the render data was built with (see setRenderColumnView)
 						if (RenderDataPointUtil.getShape(renderData) == RenderDataPointUtil.SHAPE_CROSS)
 						{
-							block = block.getPlantTopWithBottom(getTouchingBlock(fullDataColumn, fullIndex + 1, FullDataPointUtil.getBottomY(fullData), false, fullDataSource.mapping), levelWrapper);
+							block = block.getPlantTopWithBottom(getTouchingBlock(fullDataColumn, fullIndex + 1, FullDataPointUtil.getBottomY(fullData), false, fullDataSource.mapping));
 						}
 
 						IBlockStateWrapper blockAbove = (materialId == EDhApiBlockMaterial.GRASS.index)
@@ -370,11 +370,11 @@ public class FullDataToRenderDataTransformer
 		// shapes are only drawn by 1 block wide LODs, wider LODs tint the leaves with the snow instead
 		boolean snowLayersOnLeavesAsHalves = fullDataSource.getDataDetailLevel() == 0;
 
-		final ObjectOpenHashSet<IBlockStateWrapper> blockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredBlocks(levelWrapper);
-		final ObjectOpenHashSet<IBlockStateWrapper> caveBlockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredCaveBlocks(levelWrapper);
-		final ObjectOpenHashSet<IBlockStateWrapper> waterSubsurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSubsurfaceReplacementBlocks(levelWrapper);
-		final ObjectOpenHashSet<IBlockStateWrapper> waterSurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSurfaceReplacementBlocks(levelWrapper);
-		final IBlockStateWrapper water = WRAPPER_FACTORY.getWaterBlockStateWrapper(levelWrapper);
+		final ObjectOpenHashSet<IBlockStateWrapper> blockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredBlocks();
+		final ObjectOpenHashSet<IBlockStateWrapper> caveBlockStatesToIgnore = WRAPPER_FACTORY.getRendererIgnoredCaveBlocks();
+		final ObjectOpenHashSet<IBlockStateWrapper> waterSubsurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSubsurfaceReplacementBlocks();
+		final ObjectOpenHashSet<IBlockStateWrapper> waterSurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSurfaceReplacementBlocks();
+		final IBlockStateWrapper water = WRAPPER_FACTORY.getWaterBlockStateWrapper();
 		
 		
 		// build snow block cache if needed
@@ -387,7 +387,7 @@ public class FullDataToRenderDataTransformer
 			for (int meta = 0; meta <= 2; meta++)
 			{
 				String serial = (meta == 0) ? "minecraft:snow_layer" : ("minecraft:snow_layer:" + meta);
-				IBlockStateWrapper snowLayer = WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault(serial, levelWrapper);
+				IBlockStateWrapper snowLayer = WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault(serial);
 
 				// a failed lookup returns air, which must not be treated as a snow layer
 				if (!snowLayer.isAir())
@@ -628,7 +628,7 @@ public class FullDataToRenderDataTransformer
 				if (isWaterSurfaceReplacement)
 				{
 					// replace the block with water
-					block = WRAPPER_FACTORY.getWaterBlockStateWrapper(levelWrapper);
+					block = WRAPPER_FACTORY.getWaterBlockStateWrapper();
 				}
 				
 				// sometimes a datapoint will be multiple blocks tall,
@@ -666,7 +666,7 @@ public class FullDataToRenderDataTransformer
 			{
 				// close LODs draw plants (IE tall grass, flowers) as crossed planes like MC,
 				// the block below keeps its own color and is lit by the air the plant is in
-				block = block.getPlantTopWithBottom(getTouchingBlock(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping), levelWrapper);
+				block = block.getPlantTopWithBottom(getTouchingBlock(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping));
 				int plantColor = ColorUtil.setAlpha(levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block), 255);
 				isColumnVoid = false;
 				long columnData = RenderDataPointUtil.createDataPoint(bottomY + blockHeight, bottomY, plantColor, skyLight, blockLight, block.getMaterialId(), RenderDataPointUtil.SHAPE_CROSS);

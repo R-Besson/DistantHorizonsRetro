@@ -10,10 +10,9 @@ public class NativeDialogUtil
 {
 	// TODO these string options should be replaced with an enum
 	/**
-	 * @param dialogType    the dialog type. One of:<br><table><tr><td>"ok"</td><td>"okcancel"</td><td>"yesno"</td><td>"yesnocancel"</td></tr></table>
 	 * @param iconType      the icon type. One of:<br><table><tr><td>"info"</td><td>"warning"</td><td>"error"</td><td>"question"</td></tr></table>
 	 */
-	public static void showDialog(String title, String message, String dialogType, String iconType)
+	public static void showDialog(String title, String message, String iconType)
 	{
 		// some dialog backends don't support the following characters
 		String unsafeCharsRegex = "['\"`]";

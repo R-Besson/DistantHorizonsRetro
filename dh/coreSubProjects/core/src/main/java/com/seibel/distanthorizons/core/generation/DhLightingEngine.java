@@ -189,8 +189,6 @@ public class DhLightingEngine
 						}
 					}
 					
-					
-					
 					//================//
 					// set sky lights //
 					//================//
@@ -200,21 +198,23 @@ public class DhLightingEngine
 					if (updateSkyLight 
 						&& maxSkyLight > 0)
 					{
+						@SuppressWarnings("unused")
 						IMutableBlockPosWrapper mcBlockPos = neighborChunk.getMutableBlockPosWrapper();
+						
 						IBlockStateWrapper previousBlockState = null;
 						
 						int maxY = neighborChunk.getMaxNonEmptyHeight();
 						int minY = neighborChunk.getInclusiveMinBuildHeight();
 						
-						// get the adjacent chunk's sky lights
+						// get the adjacent chunk's skylights
 						for (int relX = 0; relX < LodUtil.CHUNK_WIDTH; relX++) // relative block pos
 						{
 							for (int relZ = 0; relZ < LodUtil.CHUNK_WIDTH; relZ++)
 							{
-								// set each pos sky light all the way down until an opaque block is hit
+								// set each pos skylight all the way down until an opaque block is hit
 								for (int y = maxY; y >= minY; y--)
 								{
-									IBlockStateWrapper block = previousBlockState = neighborChunk.getBlockState(relX, y, relZ, mcBlockPos, previousBlockState);
+									IBlockStateWrapper block = previousBlockState = neighborChunk.getBlockState(relX, y, relZ, previousBlockState);
 									if (block != null && block.getLightOpacity() != LodUtil.BLOCK_FULLY_TRANSPARENT)
 									{
 										// keep moving down until we find a non-transparent block
@@ -374,7 +374,7 @@ public class DhLightingEngine
 					}
 					
 					
-					IBlockStateWrapper neighbourBlockState = neighbourChunk.getBlockState(relNeighbourBlockPos, mcBlockPos, previousBlockState);
+					IBlockStateWrapper neighbourBlockState = neighbourChunk.getBlockState(relNeighbourBlockPos, previousBlockState);
 					previousBlockState = neighbourBlockState;
 					
 					// Math.max(1, ...) is used so that the propagated light level always drops by at least 1, preventing infinite cycles.

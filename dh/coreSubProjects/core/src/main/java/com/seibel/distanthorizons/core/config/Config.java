@@ -1394,7 +1394,7 @@ public class Config
 						IMinecraftClientWrapper mcClient = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 						
 						LOGGER.info("Attempting to show tinyfd message box...");
-						mcClient.showDialog("Button pressed!", "UITester dialog", "ok", "info");
+						mcClient.showDialog("Button pressed!", "UITester dialog", "info");
 						LOGGER.info("dialog closed");
 					}
 					

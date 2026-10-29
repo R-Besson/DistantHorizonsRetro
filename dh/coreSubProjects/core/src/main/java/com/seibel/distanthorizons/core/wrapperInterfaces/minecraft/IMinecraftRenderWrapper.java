@@ -57,7 +57,7 @@ public interface IMinecraftRenderWrapper extends IBindable
 	 */
 	DhVec3d getCameraExactPosition(DhVec3d output);
 
-	Color getFogColor(float partialTicks);
+	Color getFogColor();
 	
 	/** Unless you really need to know if the player is blind, use {@link IMinecraftRenderWrapper#isFogStateSpecial()} instead */
 	boolean isFogStateSpecial();
@@ -90,9 +90,6 @@ public interface IMinecraftRenderWrapper extends IBindable
 	int getTargetFramebufferViewportHeight();
 	
 	/** Can return null if the given level hasn't had a light map assigned to it */
-	@Nullable
-	ILightMapWrapper getLightmapWrapper(@NotNull ILevelWrapper level);
-	
-	
+	ILightMapWrapper getLightmapWrapper();
 	
 }

@@ -52,7 +52,7 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 	//region
 	
 	@Override 
-	public void render(RenderParams renderEventParam, boolean opaquePass, SortedArraySet<LodBufferContainer> bufferContainers, IProfilerWrapper profiler)
+	public void render(RenderParams renderEventParam, boolean opaquePass, SortedArraySet<LodBufferContainer> bufferContainers)
 	{
 		this.getTerrainShaderProgram();
 		

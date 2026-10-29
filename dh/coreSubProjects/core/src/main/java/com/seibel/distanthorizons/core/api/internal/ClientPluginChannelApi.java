@@ -114,7 +114,9 @@ public class ClientPluginChannelApi
 	// shutdown //
 	//==========//
 	
+	@SuppressWarnings("unused")
 	private void onClose(CloseInternalEvent event) { this.reset(); }
+	
 	public void reset()
 	{
 		this.networkSession = null;

@@ -10,7 +10,7 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 public interface IDhMetaRenderer extends IBindable
 {
 	void runRenderPassSetup(RenderParams renderParams);
-	void runRenderPassCleanup(RenderParams renderParams);
+	void runRenderPassCleanup();
 	void copyToMcTexture(RenderParams renderParams);
 	void clearDhDepthAndColorTextures(RenderParams renderParams);
 	

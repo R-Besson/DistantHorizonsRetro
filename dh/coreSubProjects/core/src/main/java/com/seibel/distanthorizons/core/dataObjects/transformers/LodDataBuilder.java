@@ -119,7 +119,9 @@ public class LodDataBuilder
 		
 		try
 		{
+			@SuppressWarnings("unused")
 			IMutableBlockPosWrapper mcBlockPos = chunkWrapper.getMutableBlockPosWrapper();
+			
 			IBlockStateWrapper previousBlockState = null;
 			
 			DhApiChunkProcessingEvent.EventParam mutableChunkProcessedEventParam 
@@ -152,7 +154,7 @@ public class LodDataBuilder
 					}
 					
 					int lastY = exclusiveMaxBuildHeight;
-					IBiomeWrapper currentBiome = chunkWrapper.getBiome(relBlockX, lastY, relBlockZ);
+					IBiomeWrapper currentBiome = chunkWrapper.getBiome(relBlockX, relBlockZ);
 					IBlockStateWrapper currentBlockState = AIR;
 					int mappedId = dataSource.mapping.addIfNotPresentAndGetId(currentBiome, currentBlockState);
 					
@@ -169,7 +171,7 @@ public class LodDataBuilder
 					);
 					
 					// Go up until we reach open air or the world limit
-					IBlockStateWrapper topBlockState = previousBlockState = chunkWrapper.getBlockState(relBlockX, y, relBlockZ, mcBlockPos, previousBlockState);
+					IBlockStateWrapper topBlockState = previousBlockState = chunkWrapper.getBlockState(relBlockX, y, relBlockZ, previousBlockState);
 					while (!topBlockState.isAir() 
 							&& y < exclusiveMaxBuildHeight)
 					{
@@ -178,7 +180,7 @@ public class LodDataBuilder
 							// This is necessary in some edge cases with snow layers and some other blocks that may not appear in the height map but do block light.
 							// Interestingly this doesn't appear to be the case in the DhLightingEngine, if this same logic is added there the lighting breaks for the affected blocks.
 							y++;
-							topBlockState = previousBlockState = chunkWrapper.getBlockState(relBlockX, y, relBlockZ, mcBlockPos, previousBlockState);
+							topBlockState = previousBlockState = chunkWrapper.getBlockState(relBlockX, y, relBlockZ, previousBlockState);
 						}
 						catch (Exception e)
 						{
@@ -197,8 +199,8 @@ public class LodDataBuilder
 					boolean forceSingleBlock = false;
 					for (; y >= minBuildHeight; y--)
 					{
-						IBiomeWrapper newBiome = chunkWrapper.getBiome(relBlockX, y, relBlockZ);
-						IBlockStateWrapper newBlockState = previousBlockState = chunkWrapper.getBlockState(relBlockX, y, relBlockZ, mcBlockPos, previousBlockState);
+						IBiomeWrapper newBiome = chunkWrapper.getBiome(relBlockX, relBlockZ);
+						IBlockStateWrapper newBlockState = previousBlockState = chunkWrapper.getBlockState(relBlockX, y, relBlockZ, previousBlockState);
 						byte newBlockLight = (byte) chunkWrapper.getDhBlockLight(relBlockX, y + 1, relBlockZ);
 						byte newSkyLight = (byte) chunkWrapper.getDhSkyLight(relBlockX, y + 1, relBlockZ);
 						

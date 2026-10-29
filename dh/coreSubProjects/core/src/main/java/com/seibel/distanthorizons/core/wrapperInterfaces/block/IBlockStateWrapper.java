@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.block;
 
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 
 import java.awt.*;
 
@@ -62,7 +61,7 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	 *
 	 * @param blockBelow the block under this one, null if unknown
 	 */
-	default IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow, ILevelWrapper levelWrapper) { return this; }
+	default IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow) { return this; }
 
 	int getLightEmission();
 	

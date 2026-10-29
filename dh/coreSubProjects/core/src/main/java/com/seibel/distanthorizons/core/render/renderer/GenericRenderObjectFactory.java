@@ -61,10 +61,10 @@ public class GenericRenderObjectFactory implements IDhApiCustomRenderObjectFacto
 	
 	@Override 
 	public IDhApiRenderableBoxGroup createRelativePositionedGroup(String resourceLocation, DhApiVec3d originBlockPos, List<DhApiRenderableBox> boxList)
-	{ return new RenderableBoxGroup(resourceLocation, new DhApiVec3d(originBlockPos.x, originBlockPos.y, originBlockPos.z), boxList, true); }
+	{ return new RenderableBoxGroup(resourceLocation, new DhApiVec3d(originBlockPos.x, originBlockPos.y, originBlockPos.z), boxList); }
 	
 	@Override 
 	public IDhApiRenderableBoxGroup createAbsolutePositionedGroup(String resourceLocation, List<DhApiRenderableBox> boxList)
-	{ return new RenderableBoxGroup(resourceLocation, new DhApiVec3d(0, 0, 0), boxList, false); }
+	{ return new RenderableBoxGroup(resourceLocation, new DhApiVec3d(0, 0, 0), boxList); }
 	
 }

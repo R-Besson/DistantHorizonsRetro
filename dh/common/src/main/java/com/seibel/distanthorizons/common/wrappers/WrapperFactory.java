@@ -126,7 +126,7 @@ public class WrapperFactory implements IWrapperFactory
 			throw new ClassCastException("Invalid ["+IDhApiLevelWrapper.class.getSimpleName()+"] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type ["+ILevelWrapper.class.getName()+"].");
 		}
 
-		return BlockStateWrapper.deserialize(resourceLocationString, (ILevelWrapper)levelWrapper);
+		return BlockStateWrapper.deserialize(resourceLocationString);
 	}
 
 	@Override
@@ -143,21 +143,21 @@ public class WrapperFactory implements IWrapperFactory
 			throw new LodUtil.AssertFailureException("Unable to parse plains resource string ["+BiomeWrapper.PLAINS_RESOURCE_LOCATION_STRING+"], error:\n " + e.getMessage());
 		}
 	}
-
+	
 	@Override
-	public IBlockStateWrapper deserializeBlockStateWrapper(String str, ILevelWrapper levelWrapper) throws IOException { return BlockStateWrapper.deserialize(str, levelWrapper); }
+	public IBlockStateWrapper deserializeBlockStateWrapper(String str) throws IOException { return BlockStateWrapper.deserialize(str); }
 	@Override
 	public IBlockStateWrapper getAirBlockStateWrapper() { return BlockStateWrapper.AIR; }
 	@Override
-	public IBlockStateWrapper getWaterBlockStateWrapper(ILevelWrapper levelWrapper) { return BlockStateWrapper.getWaterBlockStateWrapper(levelWrapper); }
+	public IBlockStateWrapper getWaterBlockStateWrapper() { return BlockStateWrapper.getWaterBlockStateWrapper(); }
 	@Override
-	public ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks(ILevelWrapper levelWrapper) { return BlockStateWrapper.getRendererIgnoredBlocks(levelWrapper); }
+	public ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks() { return BlockStateWrapper.getRendererIgnoredBlocks(); }
 	@Override
-	public ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks(ILevelWrapper levelWrapper) { return BlockStateWrapper.getRendererIgnoredCaveBlocks(levelWrapper); }
+	public ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks() { return BlockStateWrapper.getRendererIgnoredCaveBlocks(); }
 	@Override
-	public ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks(ILevelWrapper levelWrapper) { return BlockStateWrapper.getWaterSubsurfaceReplacementBlocks(levelWrapper); }
+	public ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks() { return BlockStateWrapper.getWaterSubsurfaceReplacementBlocks(); }
 	@Override
-	public ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks(ILevelWrapper levelWrapper) { return BlockStateWrapper.getWaterSurfaceReplacementBlocks(levelWrapper); }
+	public ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks() { return BlockStateWrapper.getWaterSurfaceReplacementBlocks(); }
 
 	@Override
 	public void resetCachedIgnoredBlocksSets() { BlockStateWrapper.clearCachedIgnoreBlocks(); }
@@ -265,7 +265,7 @@ public class WrapperFactory implements IWrapperFactory
 	}
 
 
-	@Override public IVertexBufferWrapper createVboWrapper(String name) { return this.getRenderDefinition().createVboWrapper(name); }
+	@Override public IVertexBufferWrapper createVboWrapper() { return this.getRenderDefinition().createVboWrapper(); }
 	@Override public ILodContainerUniformBufferWrapper createLodContainerUniformWrapper() { return this.getRenderDefinition().createLodContainerUniformWrapper(); }
 	@Override public IDhGenericObjectVertexBufferContainer createGenericObjectVboContainer() { return this.getRenderDefinition().createGenericVboContainer(); }
 	@Override public IDhGenericRenderer createGenericRenderer() { return this.getRenderDefinition().createGenericRenderer(); }
@@ -323,10 +323,9 @@ public class WrapperFactory implements IWrapperFactory
 		{
 			throw new ClassCastException("Invalid ["+IDhApiLevelWrapper.class.getSimpleName()+"] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type ["+ILevelWrapper.class.getName()+"].");
 		}
-		ILevelWrapper coreLevelWrapper = (ILevelWrapper) levelWrapper;
-
-
-
+		
+		
+		
 		if (objectArray.length != 3
 			&& objectArray.length != 1)
 		{
@@ -361,7 +360,7 @@ public class WrapperFactory implements IWrapperFactory
 			);
 		}
 
-		return BlockStateWrapper.fromBlockState(fakeBlockState, coreLevelWrapper);
+		return BlockStateWrapper.fromBlockState(fakeBlockState);
 	}
 	/**
 	 * Note: when this is updated,

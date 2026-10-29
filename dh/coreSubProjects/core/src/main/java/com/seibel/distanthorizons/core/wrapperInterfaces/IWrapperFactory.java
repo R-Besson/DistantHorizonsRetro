@@ -63,16 +63,16 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 	}
 	
 	
-	IBlockStateWrapper deserializeBlockStateWrapper(String str, ILevelWrapper levelWrapper) throws IOException;
+	IBlockStateWrapper deserializeBlockStateWrapper(String str) throws IOException;
 	IBlockStateWrapper getAirBlockStateWrapper();
-	IBlockStateWrapper getWaterBlockStateWrapper(ILevelWrapper levelWrapper);
+	IBlockStateWrapper getWaterBlockStateWrapper();
 	/** Returns AIR if the deserialization fails */
-	default IBlockStateWrapper deserializeBlockStateWrapperOrGetDefault(String str, ILevelWrapper levelWrapper)
+	default IBlockStateWrapper deserializeBlockStateWrapperOrGetDefault(String str)
 	{
 		IBlockStateWrapper blockState;
 		try
 		{
-			blockState = this.deserializeBlockStateWrapper(str, levelWrapper);
+			blockState = this.deserializeBlockStateWrapper(str);
 		}
 		catch (IOException e)
 		{
@@ -87,15 +87,15 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 	 * Returns the set of {@link IBlockStateWrapper}'s that shouldn't be rendered. <br>
 	 * Generally this contains blocks like: air, barriers, light blocks, etc. 
 	 */
-	ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks(ILevelWrapper levelWrapper);
+	ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks();
 	/**
 	 * Returns the set of {@link IBlockStateWrapper}'s that shouldn't be rendered in caves. <br>
 	 * Generally this contains blocks like: air, rails, glow lichen, etc. 
 	 */
-	ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks(ILevelWrapper levelWrapper);
+	ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks();
 	
-	ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks(ILevelWrapper levelWrapper);
-	ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks(ILevelWrapper levelWrapper);
+	ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks();
+	ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks();
 	/** clears the cached values */
 	void resetCachedIgnoredBlocksSets();
 	
@@ -107,9 +107,7 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 	 */
 	IChunkWrapper createChunkWrapper(Object[] objectArray) throws ClassCastException;
 	
-	
-	
-	IVertexBufferWrapper createVboWrapper(String name);
+	IVertexBufferWrapper createVboWrapper();
 	ILodContainerUniformBufferWrapper createLodContainerUniformWrapper();
 	IDhGenericObjectVertexBufferContainer createGenericObjectVboContainer();
 	IDhGenericRenderer createGenericRenderer();

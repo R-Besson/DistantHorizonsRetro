@@ -34,7 +34,7 @@ public class FogRenderParamFactory
 	/** returns a cached object to reduce GC pressure */
 	public static DhApiBeforeFogRenderEvent.EventParam getRenderParam(RenderParams renderParams)
 	{
-		Color fogColor = getFogColor(renderParams.partialTicks);
+		Color fogColor = getFogColor();
 		
 		// far fog
 		EDhApiFogFalloff farFogFalloff = Config.Client.Advanced.Graphics.Fog.farFogFalloff.get();
@@ -90,7 +90,7 @@ public class FogRenderParamFactory
 		return EVENT_PARAM;
 	}
 	
-	private static Color getFogColor(float partialTicks)
+	private static Color getFogColor()
 	{
 		Color fogColor;
 		
@@ -102,7 +102,7 @@ public class FogRenderParamFactory
 		}
 		else
 		{
-			fogColor = MC_RENDER.getFogColor(partialTicks);
+			fogColor = MC_RENDER.getFogColor();
 		}
 		
 		return fogColor;

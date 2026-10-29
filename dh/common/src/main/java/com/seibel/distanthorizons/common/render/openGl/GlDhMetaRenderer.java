@@ -365,7 +365,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	//region
 	
 	@Override
-	public void runRenderPassCleanup(RenderParams renderParams)
+	public void runRenderPassCleanup()
 	{
 		// Restore GL states that vanilla expects
 		GLMC.glDepthFunc(previousDepthFunc);

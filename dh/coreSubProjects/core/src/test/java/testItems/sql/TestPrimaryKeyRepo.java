@@ -30,7 +30,7 @@ import java.sql.SQLException;
 
 public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto>
 {
-	
+	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public TestPrimaryKeyRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, TestSingleKeyDto.class);

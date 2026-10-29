@@ -213,6 +213,7 @@ public class JarMain
 		}
 	}
 	
+	@SuppressWarnings("unused") // unfinished export stub
 	private static void exportLodDataAtPosition(FullDataSourceV2Repo repo, File exportFile, long pos)
 	{
 		FullDataSourceV2DTO dto = repo.getByKey(pos);
@@ -226,10 +227,12 @@ public class JarMain
 		//  or exporting the mapping data as the raw string data it's stored as.
 
 	}
+	@SuppressWarnings("unused") // unfinished export stub
 	private static void exportAllAtDetailLevel(FullDataSourceV2Repo repo, File exportFile, byte detailLevel)
 	{
 		throw new UnsupportedOperationException("Method Not Implemented");
 	}
+	@SuppressWarnings("unused") // unfinished export stub
 	private static void exportEntireDatabase(FullDataSourceV2Repo repo, File exportFile)
 	{
 		throw new UnsupportedOperationException("Method Not Implemented");

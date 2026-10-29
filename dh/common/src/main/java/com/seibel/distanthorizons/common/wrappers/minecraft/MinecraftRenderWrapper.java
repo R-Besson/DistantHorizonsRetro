@@ -128,7 +128,7 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	}
 
 	@Override
-	public Color getFogColor(float partialTicks)
+	public Color getFogColor()
 	{
 		if (DelayedAccessors.ANGELICA != null)
 		{
@@ -282,7 +282,7 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	//region
 
 	@Override
-	public ILightMapWrapper getLightmapWrapper(@NotNull ILevelWrapper level) { return this.lightmapWrapper; }
+	public ILightMapWrapper getLightmapWrapper() { return this.lightmapWrapper; }
 
 	//endregion
 

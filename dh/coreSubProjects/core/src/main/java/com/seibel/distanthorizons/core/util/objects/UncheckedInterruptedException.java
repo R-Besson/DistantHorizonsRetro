@@ -23,15 +23,9 @@ import com.seibel.distanthorizons.core.util.ExceptionUtil;
 
 public class UncheckedInterruptedException extends RuntimeException
 {
-	public UncheckedInterruptedException()
-	{
-		super();
-	}
-
 	public static boolean isInterrupt(Throwable t)
 	{
 		Throwable unwrapped = ExceptionUtil.ensureUnwrap(t);
 		return unwrapped instanceof InterruptedException || unwrapped instanceof UncheckedInterruptedException;
 	}
-	
 }

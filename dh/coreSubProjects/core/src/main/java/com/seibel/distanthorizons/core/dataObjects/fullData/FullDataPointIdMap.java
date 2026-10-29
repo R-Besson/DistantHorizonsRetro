@@ -309,7 +309,7 @@ public class FullDataPointIdMap
 				IBiomeWrapper biome = WRAPPER_FACTORY.deserializeBiomeWrapperOrGetDefault(biomeString, levelWrapper);
 				
 				String blockStateString = StringPool.INSTANCE.getPooledString(blockCharList);
-				IBlockStateWrapper blockState = WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault(blockStateString, levelWrapper);
+				IBlockStateWrapper blockState = WRAPPER_FACTORY.deserializeBlockStateWrapperOrGetDefault(blockStateString);
 				
 				BlockBiomeWrapperPair newPair = BlockBiomeWrapperPair.get(blockState, biome);
 				map.blockBiomePairList.add(newPair);

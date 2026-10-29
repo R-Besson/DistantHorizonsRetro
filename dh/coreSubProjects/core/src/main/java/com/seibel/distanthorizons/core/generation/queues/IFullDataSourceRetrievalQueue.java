@@ -163,6 +163,8 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	long getRetrievalEstimatedRemainingChunkCount();
 	void setRetrievalEstimatedRemainingChunkCount(long newEstimate);
 
+	/** messageList is used by AbstractFullDataNetworkRequestQueue's implementation for RemoteWorldRetrievalQueue, IntelliJ doesn't detect that */
+	@SuppressWarnings("unused")
 	void addDebugMenuStringsToList(List<String> messageList);
 	
 	/** Can be used to determine roughly how fast the world generator is running. */

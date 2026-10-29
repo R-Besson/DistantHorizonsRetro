@@ -276,7 +276,7 @@ public class LodBufferContainer implements AutoCloseable
 			
 			if (vboWrappers[i] == null)
 			{
-				vboWrappers[i] = WRAPPER_FACTORY.createVboWrapper("distantHorizons:TerrainRenderer");
+				vboWrappers[i] = WRAPPER_FACTORY.createVboWrapper();
 			}
 		}
 	}

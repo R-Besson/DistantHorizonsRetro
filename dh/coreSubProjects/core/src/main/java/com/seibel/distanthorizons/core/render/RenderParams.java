@@ -82,7 +82,7 @@ public class RenderParams extends DhApiRenderParam
 			}
 		}
 		
-		this.lightmap = MC_RENDER.getLightmapWrapper(this.clientLevelWrapper);
+		this.lightmap = MC_RENDER.getLightmapWrapper();
 		
 		if (MC_CLIENT.playerExists())
 		{

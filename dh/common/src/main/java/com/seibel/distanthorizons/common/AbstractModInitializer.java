@@ -228,7 +228,7 @@ public abstract class AbstractModInitializer
 			}
 			catch (Exception e)
 			{
-				NativeDialogUtil.showDialog(ModInfo.READABLE_NAME, e.getMessage(), "ok", "error");
+				NativeDialogUtil.showDialog(ModInfo.READABLE_NAME, e.getMessage(), "error");
 				MinecraftClientWrapper.INSTANCE.crashMinecraft(e.getMessage(), e);
 				future.completeExceptionally(e);
 			}
@@ -284,7 +284,7 @@ public abstract class AbstractModInitializer
 			{
 				String irisUnsupportedMessage = "Iris doesn't support DH when using the ["+ EDhApiRenderingEngine.BLAZE_3D+"] rendering engine, this will need to be fixed on Iris end. As a temporary fix please change the rendering engine to ["+ EDhApiRenderingEngine.OPEN_GL+"] or ["+ EDhApiRenderingEngine.AUTO+"] in the DH config file.";
 				LOGGER.fatal(irisUnsupportedMessage);
-				NativeDialogUtil.showDialog(ModInfo.READABLE_NAME, irisUnsupportedMessage, "ok", "error");
+				NativeDialogUtil.showDialog(ModInfo.READABLE_NAME, irisUnsupportedMessage, "error");
 				
 				IMinecraftClientWrapper mc = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 				String errorMessage = "loading Distant Horizons. "+irisUnsupportedMessage;

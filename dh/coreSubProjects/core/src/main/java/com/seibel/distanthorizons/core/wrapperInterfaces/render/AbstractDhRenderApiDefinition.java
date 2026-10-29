@@ -103,7 +103,7 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 	 */
 	public abstract IDhGenericRenderer createGenericRenderer();
 	
-	public abstract IVertexBufferWrapper createVboWrapper(String name);
+	public abstract IVertexBufferWrapper createVboWrapper();
 	public abstract ILodContainerUniformBufferWrapper createLodContainerUniformWrapper();
 	public abstract IDhGenericObjectVertexBufferContainer createGenericVboContainer();
 	

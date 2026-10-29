@@ -228,7 +228,7 @@ public class LodRenderer
 				// opaque LODs
 				profiler.popPush("LOD Opaque");
 				
-				this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ true, profiler);
+				this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ true);
 				
 				// custom objects with SSAO
 				if (Config.Client.Advanced.Graphics.GenericRendering.enableGenericRendering.get())
@@ -256,7 +256,7 @@ public class LodRenderer
 					&& Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE)
 				{
 					profiler.popPush("LOD Transparent");
-					this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ false, profiler);
+					this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ false);
 				}
 				
 				// fog
@@ -347,7 +347,7 @@ public class LodRenderer
 				if (Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE)
 				{
 					profiler.popPush("LOD Transparent");
-					this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ false, profiler);
+					this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ false);
 					
 					
 					boolean cancelFogEvent = ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeFogRenderEvent.class, fogRenderEventParam);
@@ -370,7 +370,7 @@ public class LodRenderer
 			profiler.popPush("LOD cleanup");
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeRenderCleanupEvent.class, renderParams.apiCopy);
 			
-			this.metaRenderer.runRenderPassCleanup(renderParams);
+			this.metaRenderer.runRenderPassCleanup();
 		}
 	}
 	
@@ -383,7 +383,7 @@ public class LodRenderer
 	//===============//
 	//region
 	
-	private void renderTerrain(IDhTerrainRenderer terrainRenderer, RenderBufferHandler lodBufferHandler, RenderParams renderEventParam, boolean opaquePass, IProfilerWrapper profilerWrapper)
+	private void renderTerrain(IDhTerrainRenderer terrainRenderer, RenderBufferHandler lodBufferHandler, RenderParams renderEventParam, boolean opaquePass)
 	{
 		//===========//
 		// rendering //
@@ -392,7 +392,7 @@ public class LodRenderer
 		SortedArraySet<LodBufferContainer> lodBufferContainer = lodBufferHandler.getColumnRenderBuffers();
 		if (lodBufferContainer != null)
 		{
-			terrainRenderer.render(renderEventParam, opaquePass, lodBufferContainer, profilerWrapper);
+			terrainRenderer.render(renderEventParam, opaquePass, lodBufferContainer);
 		}
 	}
 	

@@ -328,7 +328,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 			return (int) cachedColor;
 		}
 
-		BlockStateWrapper dirtBlockWrapper = BlockStateWrapper.getDirtBlockStateWrapper(this);
+		BlockStateWrapper dirtBlockWrapper = BlockStateWrapper.getDirtBlockStateWrapper();
 		int color = this.getBlockColor(DhBlockPos.ZERO, BiomeWrapper.EMPTY_WRAPPER, null, dirtBlockWrapper);
 		this.cachedDirtColor = color;
 		return color;

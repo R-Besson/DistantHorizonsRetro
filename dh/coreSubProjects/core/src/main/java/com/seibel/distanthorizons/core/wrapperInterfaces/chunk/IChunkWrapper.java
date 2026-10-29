@@ -97,18 +97,17 @@ public interface IChunkWrapper extends IBindable
 	
 	default IBlockStateWrapper getBlockState(DhBlockPos pos) { return this.getBlockState(pos.getX(), pos.getY(), pos.getZ()); }
 	IBlockStateWrapper getBlockState(int relX, int relY, int relZ);
-	/** @see IChunkWrapper#getBlockState(int, int, int, IMutableBlockPosWrapper, IBlockStateWrapper)  */
-	default IBlockStateWrapper getBlockState(DhBlockPos pos, IMutableBlockPosWrapper mcBlockPos, IBlockStateWrapper guess) { return this.getBlockState(pos.getX(), pos.getY(), pos.getZ(), mcBlockPos, guess); }
+	/** @see #getBlockState(int, int, int, IBlockStateWrapper)  */
+	default IBlockStateWrapper getBlockState(DhBlockPos pos, IBlockStateWrapper guess) { return this.getBlockState(pos.getX(), pos.getY(), pos.getZ(), guess); }
 	/** 
 	 * Can be faster than {@link IChunkWrapper#getBlockState} in some cases
 	 * due to directly passing in several shared objects.
 	 */
-	IBlockStateWrapper getBlockState(int relX, int relY, int relZ, IMutableBlockPosWrapper mcBlockPos, IBlockStateWrapper guess);
+	IBlockStateWrapper getBlockState(int relX, int relY, int relZ, IBlockStateWrapper guess);
 	
 	IMutableBlockPosWrapper getMutableBlockPosWrapper();
 	
-	IBiomeWrapper getBiome(int relX, int relY, int relZ);
-	
+	IBiomeWrapper getBiome(int relX, int relZ);
 	
 	
 	//========================//
@@ -166,7 +165,9 @@ public interface IChunkWrapper extends IBindable
 		int minBuildHeight = this.getMinNonEmptyHeight();
 		int maxBuildHeight = this.getMaxNonEmptyHeight();
 		
+		@SuppressWarnings("unused")
 		IMutableBlockPosWrapper mcBlockPos = this.getMutableBlockPosWrapper();
+		
 		IBlockStateWrapper previousBlockState = null;
 		
 		
@@ -177,10 +178,10 @@ public interface IChunkWrapper extends IBindable
 			{
 				for (int y = minBuildHeight; y < maxBuildHeight; y+=2)
 				{
-					previousBlockState = this.getBlockState(x, y, z, mcBlockPos, previousBlockState);
+					previousBlockState = this.getBlockState(x, y, z, previousBlockState);
 					
 					hash = (hash * primeBlockMultiplier) + previousBlockState.hashCode();
-					hash = (hash * primeBiomeMultiplier) + this.getBiome(x, y, z).hashCode();
+					hash = (hash * primeBiomeMultiplier) + this.getBiome(x, z).hashCode();
 					hash = (hash * primeHeightMultiplier) + y;
 				}
 			}
@@ -192,19 +193,19 @@ public interface IChunkWrapper extends IBindable
 			for (int z = 0; z < LodUtil.CHUNK_WIDTH; z++)
 			{
 				int lightBlockingY = this.getLightBlockingHeightMapValue(x, z);
-				previousBlockState = this.getBlockState(x, lightBlockingY, z, mcBlockPos, previousBlockState);
+				previousBlockState = this.getBlockState(x, lightBlockingY, z, previousBlockState);
 				
 				hash = (hash * primeBlockMultiplier) + previousBlockState.hashCode();
-				hash = (hash * primeBiomeMultiplier) + this.getBiome(x, lightBlockingY, z).hashCode();
+				hash = (hash * primeBiomeMultiplier) + this.getBiome(x, z).hashCode();
 				hash = (hash * primeHeightMultiplier) + lightBlockingY;
 				
 				int solidY = this.getSolidHeightMapValue(x, z);
 				if (solidY != lightBlockingY)
 				{
-					previousBlockState = this.getBlockState(x, lightBlockingY, z, mcBlockPos, previousBlockState);
+					previousBlockState = this.getBlockState(x, lightBlockingY, z, previousBlockState);
 					
 					hash = (hash * primeBlockMultiplier) + previousBlockState.hashCode();
-					hash = (hash * primeBiomeMultiplier) + this.getBiome(x, solidY, z).hashCode();
+					hash = (hash * primeBiomeMultiplier) + this.getBiome(x, z).hashCode();
 					hash = (hash * primeHeightMultiplier) + solidY;
 				}
 			}

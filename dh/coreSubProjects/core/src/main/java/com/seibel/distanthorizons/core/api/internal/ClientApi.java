@@ -625,7 +625,7 @@ public class ClientApi
 							
 							testRenderer.render(RENDER_PARAMS);
 							
-							metaRenderer.runRenderPassCleanup(RENDER_PARAMS);
+							metaRenderer.runRenderPassCleanup();
 						}
 						else
 						{

@@ -150,8 +150,7 @@ public class RenderableBoxGroup
 	
 	public RenderableBoxGroup(
 			String resourceLocation, 
-			DhApiVec3d originBlockPos, List<DhApiRenderableBox> boxList, 
-			boolean positionBoxesRelativeToGroupOrigin) throws IllegalArgumentException
+			DhApiVec3d originBlockPos, List<DhApiRenderableBox> boxList) throws IllegalArgumentException
 	{
 		String[] splitResourceLocation =  resourceLocation.split(":");
 		if (splitResourceLocation.length != 2)

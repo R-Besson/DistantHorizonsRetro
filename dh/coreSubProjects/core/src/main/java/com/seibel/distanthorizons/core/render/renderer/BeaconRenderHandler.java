@@ -95,7 +95,7 @@ public class BeaconRenderHandler
 	// before render //
 	//===============//
 	//region
-	
+	@SuppressWarnings("unused")
 	private void beforeRender(DhApiRenderParam renderEventParam)
 	{
 		if (Config.Client.Advanced.Graphics.Culling.disableBeaconDistanceCulling.get())

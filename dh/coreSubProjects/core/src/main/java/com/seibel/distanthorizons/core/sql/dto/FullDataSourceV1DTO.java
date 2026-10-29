@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.core.sql.dto;
 
-import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGenerationStep;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV1;
 
 /**
@@ -38,7 +37,7 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 	// constructor //
 	//=============//
 	
-	public FullDataSourceV1DTO(long pos, int checksum, byte dataDetailLevel, EDhApiWorldGenerationStep worldGenStep, String dataType, byte binaryDataFormatVersion, byte[] dataArray)
+	public FullDataSourceV1DTO(long pos, byte dataDetailLevel, byte[] dataArray)
 	{
 		// the checksum, world gen step, data type and format version
 		// are read from the database but not needed by the V1 migration

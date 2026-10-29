@@ -30,7 +30,6 @@ import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
@@ -78,7 +77,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	//region
 
 	public static final String AIR_STRING = "AIR";
-	public static final BlockStateWrapper AIR = new BlockStateWrapper(null, null, null);
+	public static final BlockStateWrapper AIR = new BlockStateWrapper(null, null);
 
 	private static final String WATER_RESOURCE_LOCATION_STRING = "minecraft:water";
 	private static BlockStateWrapper waterBlock = null;
@@ -136,18 +135,18 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	//region
 
 
-	public static BlockStateWrapper fromBlockState(IBlockState blockState, ILevelWrapper levelWrapper)
-	{ return fromBlockState(blockState.getBlock(), blockState.getMeta(), levelWrapper); }
+	public static BlockStateWrapper fromBlockState(IBlockState blockState)
+	{ return fromBlockState(blockState.getBlock(), blockState.getMeta()); }
 
 	/**
 	 * Can be faster than BlockStateWrapper#fromBlockState(BlockState, ILevelWrapper)
 	 * in cases where the same block state is expected to be referenced multiple times.
 	 */
-	public static BlockStateWrapper fromBlockState(Block block, int meta, ILevelWrapper levelWrapper, IBlockStateWrapper guess)
+	public static BlockStateWrapper fromBlockState(Block block, int meta, IBlockStateWrapper guess)
 	{
 		if (guess == null)
 		{
-			return fromBlockState(block, meta, levelWrapper);
+			return fromBlockState(block, meta);
 		}
 
 
@@ -164,10 +163,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		{
 			return wrapperGuess;
 		}
-		return fromBlockState(block, meta, levelWrapper);
+		return fromBlockState(block, meta);
 	}
 
-	public static BlockStateWrapper fromBlockState(Block block, int meta, ILevelWrapper levelWrapper)
+	public static BlockStateWrapper fromBlockState(Block block, int meta)
 	{
 		// air is a special case
 		if (block == null
@@ -219,7 +218,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 
 			// create a wrapper specifically for the API event to use
-			BlockStateWrapper apiWrapper = new BlockStateWrapper(blockState, levelWrapper, null);
+			BlockStateWrapper apiWrapper = new BlockStateWrapper(blockState, null);
 			DhApiBlockStateWrapperCreatedEvent.EventParam eventParam = new DhApiBlockStateWrapperCreatedEvent.EventParam(apiWrapper);
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiBlockStateWrapperCreatedEvent.class, eventParam);
 
@@ -236,7 +235,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			else
 			{
 				// create a new wrapper using whatever overrides the API user set
-				BlockStateWrapper returnWrapper = new BlockStateWrapper(blockState, levelWrapper, eventParam);
+				BlockStateWrapper returnWrapper = new BlockStateWrapper(blockState, eventParam);
 				WRAPPER_BY_BLOCK_ID_AND_META.putIfAbsent(packedIdMeta, returnWrapper);
 				if (fastCacheIndex != -1)
 				{
@@ -258,7 +257,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		return (blockId << 4) | meta;
 	}
 
-	private BlockStateWrapper(@Nullable IBlockState blockState, ILevelWrapper levelWrapper, @Nullable DhApiBlockStateWrapperCreatedEvent.EventParam overrideEventParam)
+	private BlockStateWrapper(@Nullable IBlockState blockState, @Nullable DhApiBlockStateWrapperCreatedEvent.EventParam overrideEventParam)
 	{
 		this.blockState = blockState;
 		if (blockState != null && !isAir()) {
@@ -269,7 +268,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		} else {
 			this.wrappedMcObject = null;
 		}
-		this.serialString = serialize(blockState, levelWrapper);
+		this.serialString = serialize(blockState);
 		this.hashCode = Objects.hash(this.serialString);
 		String lowerCaseSerial = this.serialString.toLowerCase();
 
@@ -800,13 +799,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	//====================//
 	//region
 
-	/**
-	 * Each of the following methods require
-	 * a {@link ILevelWrapper} since {@link BlockStateWrapper#deserialize(String,ILevelWrapper)} also requires one.
-	 * This way the method won't accidentally be called before the deserialization can be completed.
-	 */
-
-	public static ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks(ILevelWrapper levelWrapper)
+	public static ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks()
 	{
 		// use the cached version if possible
 		if (rendererIgnoredBlocks != null)
@@ -816,10 +809,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		ObjectOpenHashSet<String> baseIgnoredBlock = new ObjectOpenHashSet<>();
 		baseIgnoredBlock.add(AIR_STRING);
-		rendererIgnoredBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.ignoredRenderBlockCsv, baseIgnoredBlock, levelWrapper);
+		rendererIgnoredBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.ignoredRenderBlockCsv, baseIgnoredBlock);
 		return rendererIgnoredBlocks;
 	}
-	public static ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks(ILevelWrapper levelWrapper)
+	public static ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks()
 	{
 		// use the cached version if possible
 		if (rendererIgnoredCaveBlocks != null)
@@ -829,10 +822,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		ObjectOpenHashSet<String> baseIgnoredBlock = new ObjectOpenHashSet<>();
 		baseIgnoredBlock.add(AIR_STRING);
-		rendererIgnoredCaveBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.ignoredRenderCaveBlockCsv, baseIgnoredBlock, levelWrapper);
+		rendererIgnoredCaveBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.ignoredRenderCaveBlockCsv, baseIgnoredBlock);
 		return rendererIgnoredCaveBlocks;
 	}
-	public static ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks(ILevelWrapper levelWrapper)
+	public static ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks()
 	{
 		// use the cached version if possible
 		if (waterSurfaceReplacementBlocks != null)
@@ -841,12 +834,12 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		}
 
 		ObjectOpenHashSet<String> baseIgnoredBlockResourceSet = new ObjectOpenHashSet<>();
-		waterSurfaceReplacementBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.waterSurfaceBlockReplacementCsv, baseIgnoredBlockResourceSet, levelWrapper);
+		waterSurfaceReplacementBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.waterSurfaceBlockReplacementCsv, baseIgnoredBlockResourceSet);
 		waterSurfaceReplacementBlocks.remove(AIR);
 
 		return waterSurfaceReplacementBlocks;
 	}
-	public static ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks(ILevelWrapper levelWrapper)
+	public static ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks()
 	{
 		// use the cached version if possible
 		if (waterSubsurfaceReplacementBlocks != null)
@@ -855,7 +848,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		}
 
 		ObjectOpenHashSet<String> baseIgnoredBlockResourceSet = new ObjectOpenHashSet<>();
-		waterSubsurfaceReplacementBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.waterSubSurfaceBlockReplacementCsv, baseIgnoredBlockResourceSet, levelWrapper);
+		waterSubsurfaceReplacementBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.waterSubSurfaceBlockReplacementCsv, baseIgnoredBlockResourceSet);
 		// air will be present if any invalid resource locations are present
 		// but we don't want to replace air with water, that'll cause monoliths
 		waterSubsurfaceReplacementBlocks.remove(AIR);
@@ -872,7 +865,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	//======================//
 	//region
 
-	public static BlockStateWrapper getWaterBlockStateWrapper(ILevelWrapper levelWrapper)
+	public static BlockStateWrapper getWaterBlockStateWrapper()
 	{
 		// use the cached version if possible
 		if (waterBlock != null)
@@ -880,7 +873,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			return waterBlock;
 		}
 
-		waterBlock = BlockStateWrapper.deserializeOrDefault(WATER_RESOURCE_LOCATION_STRING, levelWrapper);
+		waterBlock = BlockStateWrapper.deserializeOrDefault(WATER_RESOURCE_LOCATION_STRING);
 		if (waterBlock.equals(AIR))
 		{
 			LOGGER.warn("Failed to deserialize ["+WATER_RESOURCE_LOCATION_STRING+"], issues may occur.");
@@ -889,7 +882,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		return waterBlock;
 	}
 
-	public static BlockStateWrapper getDirtBlockStateWrapper(ILevelWrapper levelWrapper)
+	public static BlockStateWrapper getDirtBlockStateWrapper()
 	{
 		// use the cached version if possible
 		if (dirtBlock != null)
@@ -897,7 +890,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			return dirtBlock;
 		}
 
-		dirtBlock = BlockStateWrapper.deserializeOrDefault(DIRT_RESOURCE_LOCATION_STRING, levelWrapper);
+		dirtBlock = BlockStateWrapper.deserializeOrDefault(DIRT_RESOURCE_LOCATION_STRING);
 		if (dirtBlock.equals(AIR))
 		{
 			LOGGER.warn("Failed to deserialize ["+DIRT_RESOURCE_LOCATION_STRING+"], issues may occur.");
@@ -915,7 +908,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	//=====================//
 	//region
 
-	private static ObjectOpenHashSet<IBlockStateWrapper> getAllBlockWrappers(ConfigEntry<String> config, ObjectOpenHashSet<String> baseResourceLocations, ILevelWrapper levelWrapper)
+	private static ObjectOpenHashSet<IBlockStateWrapper> getAllBlockWrappers(ConfigEntry<String> config, ObjectOpenHashSet<String> baseResourceLocations)
 	{
 		// get the base blocks
 		ObjectOpenHashSet<String> blockStringList = new ObjectOpenHashSet<>();
@@ -931,11 +924,11 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			blockStringList.addAll(Arrays.asList(ignoreBlockCsv.split(",")));
 		}
 
-		return getAllBlockWrappers(blockStringList, levelWrapper);
+		return getAllBlockWrappers(blockStringList);
 	}
 	/** block names since MC 1.13 to their 1.7.10 names */
 	private static final Map<String, String> MODERN_BLOCK_NAME_ALIASES = Collections.singletonMap("minecraft:lily_pad", "minecraft:waterlily");
-	private static ObjectOpenHashSet<IBlockStateWrapper> getAllBlockWrappers(ObjectOpenHashSet<String> blockResourceLocationSet, ILevelWrapper levelWrapper)
+	private static ObjectOpenHashSet<IBlockStateWrapper> getAllBlockWrappers(ObjectOpenHashSet<String> blockResourceLocationSet)
 	{
 		// deserialize each of the given resource locations
 		ObjectOpenHashSet<IBlockStateWrapper> blockStateWrappers = new ObjectOpenHashSet<>();
@@ -957,12 +950,12 @@ public class BlockStateWrapper implements IBlockStateWrapper
 				cleanedResourceLocation = MODERN_BLOCK_NAME_ALIASES.getOrDefault(cleanedResourceLocation, cleanedResourceLocation);
 
 
-				BlockStateWrapper defaultBlockStateToIgnore = (BlockStateWrapper) deserialize(cleanedResourceLocation, levelWrapper);
+				BlockStateWrapper defaultBlockStateToIgnore = deserialize(cleanedResourceLocation);
 				blockStateWrappers.add(defaultBlockStateToIgnore);
 
 				if (defaultBlockStateToIgnore != AIR)
 				{
-					BlockStateWrapper newBlockToIgnore = BlockStateWrapper.fromBlockState(defaultBlockStateToIgnore.blockState, levelWrapper);
+					BlockStateWrapper newBlockToIgnore = BlockStateWrapper.fromBlockState(defaultBlockStateToIgnore.blockState);
 					blockStateWrappers.add(newBlockToIgnore);
 				}
 				else
@@ -1046,7 +1039,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	 * but is understood by {@link TextureAtlasSpriteWrapper#resolveFaceSprite} and FakeWorld.
 	 */
 	@Override
-	public IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow, ILevelWrapper levelWrapper)
+	public IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow)
 	{
 		if (this.blockState == null
 			|| !(this.blockState.getBlock() instanceof BlockDoublePlant)
@@ -1064,7 +1057,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			return this;
 		}
 
-		return fromBlockState(this.blockState.getBlock(), DOUBLE_PLANT_TOP_META | below.getMeta(), levelWrapper);
+		return fromBlockState(this.blockState.getBlock(), DOUBLE_PLANT_TOP_META | below.getMeta());
 	}
 	private static final int DOUBLE_PLANT_TOP_META = 8;
 
@@ -1135,7 +1128,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	//=======================//
 	//region
 
-	private static String serialize(IBlockState blockState, ILevelWrapper levelWrapper)
+	private static String serialize(IBlockState blockState)
 	{
 		if (blockState == null)
 		{
@@ -1152,11 +1145,11 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 
 	/** returns AIR if the given string can't be deserialized */
-	public static BlockStateWrapper deserializeOrDefault(String resourceStateString, ILevelWrapper levelWrapper)
+	public static BlockStateWrapper deserializeOrDefault(String resourceStateString)
 	{
 		try
 		{
-			return deserialize(resourceStateString, levelWrapper);
+			return deserialize(resourceStateString);
 		}
 		catch (IOException e)
 		{
@@ -1165,7 +1158,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	}
 
 	/** will only work if a level is currently loaded */
-	public static BlockStateWrapper deserialize(String resourceStateString, ILevelWrapper levelWrapper) throws IOException
+	public static BlockStateWrapper deserialize(String resourceStateString) throws IOException
 	{
 		// we need the final string for the concurrent hash map later
 		final String finalResourceStateString = resourceStateString;
@@ -1216,7 +1209,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 					meta = Integer.parseInt(metaString);
 				}
 
-				foundWrapper = fromBlockState(block, meta, levelWrapper);
+				foundWrapper = fromBlockState(block, meta);
 				return foundWrapper;
 			}
 			catch (Exception e)

@@ -182,7 +182,7 @@ public class ClientBlockStateColorCache
 	public ClientBlockStateColorCache(IBlockState blockState, IClientLevelWrapper clientLevelWrapper)
 	{
 		this.blockState = blockState;
-		this.blockStateWrapper = BlockStateWrapper.fromBlockState(blockState, clientLevelWrapper);
+		this.blockStateWrapper = BlockStateWrapper.fromBlockState(blockState);
 		this.clientLevelWrapper = clientLevelWrapper;
 
 		this.resolveColors();

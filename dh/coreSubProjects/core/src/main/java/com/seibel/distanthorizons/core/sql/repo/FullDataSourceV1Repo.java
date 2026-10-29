@@ -76,12 +76,13 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 	
 	@Override
 	@Nullable
+	@SuppressWarnings("unused")
 	public FullDataSourceV1DTO convertResultSetToDto(ResultSet resultSet) throws ClassCastException, SQLException
 	{
 		String posString = resultSet.getString("DhSectionPos");
 		Long pos = deserializeSectionPos(posString);
 		
-		// meta data
+		// metadata
 		int checksum = resultSet.getInt("Checksum");
 		byte dataDetailLevel = resultSet.getByte("DataDetailLevel");
 		String worldGenStepString = resultSet.getString("WorldGenStep");
@@ -93,12 +94,10 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 		// binary data
 		byte[] dataByteArray = resultSet.getBytes("Data");
 		
-		FullDataSourceV1DTO dto = new FullDataSourceV1DTO(
+		return new FullDataSourceV1DTO(
 				pos,
-				checksum, dataDetailLevel, worldGenStep,
-				dataType, binaryDataFormatVersion, 
-				dataByteArray);
-		return dto;
+                dataDetailLevel,
+                dataByteArray);
 	}
 
 	@Override

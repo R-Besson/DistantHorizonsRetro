@@ -397,7 +397,7 @@ public class ChunkWrapper implements IChunkWrapper
 
 
 	@Override
-	public IBiomeWrapper getBiome(int relX, int relY, int relZ)
+	public IBiomeWrapper getBiome(int relX, int relZ)
 	{
 		BiomeGenBase biome = this.biomeList[(relX * LodUtil.CHUNK_WIDTH) + relZ];
 		return BiomeWrapper.getBiomeWrapper(biome, this.wrappedLevel);
@@ -412,7 +412,7 @@ public class ChunkWrapper implements IChunkWrapper
 		{
 			final Block block = this.getBlock(relX, relY, relZ);
 			final int meta = this.getBlockMetadata(relX, relY, relZ);
-			return BlockStateWrapper.fromBlockState(block, meta, this.wrappedLevel);
+			return BlockStateWrapper.fromBlockState(block, meta);
 		}
 		catch (Exception e)
 		{
@@ -426,7 +426,7 @@ public class ChunkWrapper implements IChunkWrapper
 	}
 
 	@Override
-	public IBlockStateWrapper getBlockState(int relX, int relY, int relZ, IMutableBlockPosWrapper mcBlockPos, IBlockStateWrapper guess)
+	public IBlockStateWrapper getBlockState(int relX, int relY, int relZ, IBlockStateWrapper guess)
 	{
 		this.throwIndexOutOfBoundsIfRelativePosOutsideChunkBounds(relX, relY, relZ);
 
@@ -434,7 +434,7 @@ public class ChunkWrapper implements IChunkWrapper
 		{
 			final Block block = this.getBlock(relX, relY, relZ);
 			final int meta = this.getBlockMetadata(relX, relY, relZ);
-			return BlockStateWrapper.fromBlockState(block, meta, this.wrappedLevel, guess);
+			return BlockStateWrapper.fromBlockState(block, meta, guess);
 		}
 		catch (Exception e)
 		{
