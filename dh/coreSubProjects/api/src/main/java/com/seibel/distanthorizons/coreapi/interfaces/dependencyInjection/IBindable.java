@@ -38,7 +38,7 @@ public interface IBindable
 	 * doesn't have to be implemented.
 	 */
 	default void finishDelayedSetup() { }
-	
+
 	/**
 	 * Returns if this dependency has been setup yet. <Br> <Br>
 	 *
@@ -46,5 +46,5 @@ public interface IBindable
 	 * method doesn't have to be implemented and should always return true.
 	 */
 	default boolean getDelayedSetupComplete() { return true; }
-	
+
 }

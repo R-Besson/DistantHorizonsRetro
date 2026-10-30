@@ -28,24 +28,24 @@ import com.seibel.distanthorizons.core.config.api.DhApiConfigValue;
 public class DhApiDebuggingConfig implements IDhApiDebuggingConfig
 {
 	public static DhApiDebuggingConfig INSTANCE = new DhApiDebuggingConfig();
-	
+
 	private DhApiDebuggingConfig() { }
-	
-	
-	
+
+
+
 	public IDhApiConfigValue<EDhApiDebugRendering> debugRendering()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.debugRenderingColors); }
-	
+
 	public IDhApiConfigValue<Boolean> debugKeybindings()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.enableDebugKeybindings); }
-	
+
 	public IDhApiConfigValue<Boolean> renderWireframe()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.renderWireframe); }
-	
+
 	public IDhApiConfigValue<Boolean> lodOnlyMode()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.lodOnlyMode); }
-	
+
 	public IDhApiConfigValue<Boolean> debugWireframeRendering()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.DebugWireframe.enableRendering); }
-	
+
 }

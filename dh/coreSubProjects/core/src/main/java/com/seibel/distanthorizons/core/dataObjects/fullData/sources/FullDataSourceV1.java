@@ -40,27 +40,27 @@ import java.util.Arrays;
 /**
  * Formerly "CompleteFullDataSource". <br>
  * Should be fully populated, containing 1 data point for each column. <br><br>
- * 
+ *
  * Replaced by {@link FullDataSourceV2}.
- * 
+ *
  * @see FullDataPointUtil
  * @see FullDataSourceV2
  */
 public class FullDataSourceV1
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public static final byte SECTION_SIZE_OFFSET = DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
 	/** measured in dataPoints */
 	public static final int WIDTH = BitShiftUtil.powerOfTwo(SECTION_SIZE_OFFSET);
-	
+
 	/** documents the legacy binary format */
 	@SuppressWarnings("unused")
 	public static final byte DATA_FORMAT_VERSION = 3;
 	/** never used but should stay here. */
 	@SuppressWarnings("unused")
 	public static final String DATA_TYPE_NAME = "CompleteFullDataSource";
-	
+
 	/**
 	 * This is the byte put between different sections in the binary save file.
 	 * The presence and absence of this byte indicates if the file is correctly formatted.
@@ -68,25 +68,25 @@ public class FullDataSourceV1
 	private static final int DATA_GUARD_BYTE = 0xFFFFFFFF;
 	/** indicates the binary save file represents an empty data source */
 	private static final int NO_DATA_FLAG_BYTE = 0x00000001;
-	
-	
+
+
 	public final FullDataPointIdMap mapping;
 	public EDhApiWorldGenerationStep worldGenStep = EDhApiWorldGenerationStep.EMPTY;
-	
-	
+
+
 	/** A flattened 2D array (for the X and Z directions) containing an array for the Y direction. */
 	private final long[][] dataArrays;
-	
+
 	private final long pos;
-	
+
 	private boolean isEmpty = true;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public static FullDataSourceV1 createEmpty(long pos) { return new FullDataSourceV1(pos); }
 	private FullDataSourceV1(long pos)
 	{
@@ -94,39 +94,39 @@ public class FullDataSourceV1
 		this.mapping = new FullDataPointIdMap(pos);
 		this.pos = pos;
 	}
-	
-	
+
+
 	//=====================//
 	// setters and getters //
 	//=====================//
-	
+
 	public long getPos() { return this.pos; }
 
 	public byte getDataDetailLevel() { return (byte) (DhSectionPos.getDetailLevel(this.pos) - SECTION_SIZE_OFFSET); }
-	
+
 	public boolean isEmpty() { return this.isEmpty; }
-	
-	
+
+
 	public long[] get(int relativeX, int relativeZ)
 	{
 		int dataArrayIndex = (relativeX * WIDTH) + relativeZ;
 		if (dataArrayIndex >= this.dataArrays.length)
 		{
 			LodUtil.assertNotReach(
-					"FullDataArrayAccessor.get() called with a relative position that is outside the data source. \n" +
-							"given relative pos X: [" + relativeX + "] Z: [" + relativeZ + "]\n" +
-							"dataArrays.length: [" + this.dataArrays.length + "] dataArrayIndex: [" + dataArrayIndex + "].");
+				"FullDataArrayAccessor.get() called with a relative position that is outside the data source. \n" +
+					"given relative pos X: [" + relativeX + "] Z: [" + relativeZ + "]\n" +
+					"dataArrays.length: [" + this.dataArrays.length + "] dataArrayIndex: [" + dataArrayIndex + "].");
 		}
-		
+
 		return this.dataArrays[dataArrayIndex];
 	}
-	
-	
-	
+
+
+
 	//=================//
-	// stream handling // 
+	// stream handling //
 	//=================//
-	
+
 	/**
 	 * Overwrites any data in this object with the data from the given file and stream.
 	 * This is expected to be used with an empty {@link FullDataSourceV1} and functions similar to a constructor.
@@ -135,23 +135,23 @@ public class FullDataSourceV1
 	{
 		FullDataSourceSummaryData summaryData = this.readSourceSummaryInfo(dto, inputStream, level);
 		this.setSourceSummaryData(summaryData);
-		
-		
+
+
 		long[][] dataPoints = this.readDataPoints(summaryData.dataWidth, inputStream);
 		if (dataPoints == null)
 		{
 			return;
 		}
 		this.setDataPoints(dataPoints);
-		
-		
+
+
 		this.readIdMappings(this.mapping, inputStream, level.getLevelWrapper());
-		
+
 	}
-	
-	
+
+
 	// low level stream methods //
-	
+
 	/** unused, just here for reference as to how the data was written */
 	@Deprecated
 	public void writeSourceSummaryInfo(IDhLevel level, DhDataOutputStream outputStream) throws IOException
@@ -160,28 +160,28 @@ public class FullDataSourceV1
 		outputStream.writeInt(WIDTH);
 		outputStream.writeInt(level.getLevelWrapper().getMinHeight());
 		outputStream.writeByte(this.worldGenStep.value);
-		
+
 	}
 	public FullDataSourceSummaryData readSourceSummaryInfo(FullDataSourceV1DTO dto, DhDataInputStream inputStream, IDhLevel level) throws IOException
 	{
 		int dataDetail = inputStream.readInt();
 		if (dataDetail != dto.dataDetailLevel)
 		{
-			throw new IOException("Data level mismatch. Expected: ["+dto.dataDetailLevel+"], found ["+dataDetail+"].");
+			throw new IOException("Data level mismatch. Expected: [" + dto.dataDetailLevel + "], found [" + dataDetail + "].");
 		}
-		
+
 		int width = inputStream.readInt();
 		if (width != WIDTH)
 		{
 			throw new IOException("Section width mismatch: [" + width + "] != [" + WIDTH + "] (Currently only 1 section width is supported)");
 		}
-		
+
 		int minY = inputStream.readInt();
 		if (minY != level.getLevelWrapper().getMinHeight())
 		{
 			LOGGER.warn("Data minY mismatch: [" + minY + "] != [" + level.getLevelWrapper().getMinHeight() + "]. Will ignore data's y level");
 		}
-		
+
 		byte worldGenByte = inputStream.readByte();
 		EDhApiWorldGenerationStep worldGenStep = EDhApiWorldGenerationStep.fromValue(worldGenByte);
 		if (worldGenStep == null)
@@ -189,12 +189,12 @@ public class FullDataSourceV1
 			worldGenStep = EDhApiWorldGenerationStep.SURFACE;
 			LOGGER.warn("Missing WorldGenStep, defaulting to: " + worldGenStep.name());
 		}
-		
-		
+
+
 		return new FullDataSourceSummaryData(width, worldGenStep);
 	}
 	public void setSourceSummaryData(FullDataSourceSummaryData summaryData) { this.worldGenStep = summaryData.worldGenStep; }
-	
+
 	/** unused, just here for reference as to how the data was written */
 	@Deprecated
 	public boolean writeDataPoints(DhDataOutputStream outputStream) throws IOException
@@ -205,9 +205,9 @@ public class FullDataSourceV1
 			return false;
 		}
 		outputStream.writeInt(DATA_GUARD_BYTE);
-		
-		
-		
+
+
+
 		// Data array length
 		for (int x = 0; x < WIDTH; x++)
 		{
@@ -216,9 +216,9 @@ public class FullDataSourceV1
 				outputStream.writeInt(this.get(x, z).length);
 			}
 		}
-		
-		
-		
+
+
+
 		// Data array content (only on non-empty columns)
 		outputStream.writeInt(DATA_GUARD_BYTE);
 		for (int x = 0; x < WIDTH; x++)
@@ -235,8 +235,8 @@ public class FullDataSourceV1
 				}
 			}
 		}
-		
-		
+
+
 		return true;
 	}
 	public long[][] readDataPoints(int width, DhDataInputStream dataInputStream) throws IOException
@@ -252,9 +252,9 @@ public class FullDataSourceV1
 		{
 			throw new IOException("Invalid file format. Data Points guard byte expected: (no data) [" + NO_DATA_FLAG_BYTE + "] or (data present) [" + DATA_GUARD_BYTE + "], but found [" + dataPresentFlag + "].");
 		}
-		
-		
-		
+
+
+
 		long[][] dataPointArrays;
 		if (WIDTH == width) // attempt to use the existing dataArrays if possible
 		{
@@ -264,14 +264,14 @@ public class FullDataSourceV1
 		{
 			dataPointArrays = new long[width * width][];
 		}
-		
+
 		for (int x = 0; x < width; x++)
 		{
 			for (int z = 0; z < width; z++)
 			{
 				int requestedArrayLength = dataInputStream.readInt();
 				int arrayIndex = x * width + z;
-				
+
 				// attempt to use the existing dataArrays if possible
 				if (dataPointArrays[arrayIndex] == null || dataPointArrays[arrayIndex].length != requestedArrayLength)
 				{
@@ -284,16 +284,16 @@ public class FullDataSourceV1
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		// check if the array start flag is present
 		int arrayStartFlag = dataInputStream.readInt();
 		if (arrayStartFlag != DATA_GUARD_BYTE)
 		{
 			throw new IOException("invalid data length end guard");
 		}
-		
+
 		for (int xz = 0; xz < dataPointArrays.length; xz++) // x and z are combined
 		{
 			if (dataPointArrays[xz].length != 0)
@@ -304,20 +304,20 @@ public class FullDataSourceV1
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		return dataPointArrays;
 	}
 	public void setDataPoints(long[][] dataPoints)
 	{
 		LodUtil.assertTrue(this.dataArrays.length == dataPoints.length, "Data point array length mismatch.");
-		
+
 		this.isEmpty = false;
 		System.arraycopy(dataPoints, 0, this.dataArrays, 0, dataPoints.length);
 	}
-	
-	
+
+
 	/** unused, just here for reference as to how the data was written */
 	@Deprecated
 	public void writeIdMappings(DhDataOutputStream outputStream) throws IOException
@@ -332,16 +332,16 @@ public class FullDataSourceV1
 		{
 			throw new IOException("Invalid data content end guard for ID mapping");
 		}
-		
+
 		FullDataPointIdMap.deserialize(map, inputStream, this.pos, levelWrapper);
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	/**
 	 * This holds information that is relevant to the entire source and isn't stored in the data points. <br>
 	 * Example: minimum height, detail level, source type, etc.
@@ -350,14 +350,14 @@ public class FullDataSourceV1
 	{
 		public final int dataWidth;
 		public EDhApiWorldGenerationStep worldGenStep;
-		
-		
+
+
 		public FullDataSourceSummaryData(int dataWidth, EDhApiWorldGenerationStep worldGenStep)
 		{
 			this.dataWidth = dataWidth;
 			this.worldGenStep = worldGenStep;
 		}
-		
+
 	}
-	
+
 }

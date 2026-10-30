@@ -21,7 +21,7 @@ package com.seibel.distanthorizons.api.enums.worldGeneration;
 
 /**
  * DOWN_SAMPLED, <br>
- * 
+ *
  * EMPTY, <br>
  * STRUCTURE_START, <br>
  * STRUCTURE_REFERENCE, <br>
@@ -40,50 +40,51 @@ package com.seibel.distanthorizons.api.enums.worldGeneration;
  */
 public enum EDhApiWorldGenerationStep
 {
-	/** 
+	/**
 	 * Only used for server-side retrieval or other non-native data sources.
 	 * This denotes that the given datasource was created using lower quality LOD data from above it in the quad tree. <br>
-	 * 
+	 *
 	 * This isn't a valid option for queuing world generation.
 	 */
 	DOWN_SAMPLED(-1, "down_sampled"),
-	
+
 	EMPTY(0, "empty"),
 	STRUCTURE_START(1, "structure_start"),
 	STRUCTURE_REFERENCE(2, "structure_reference"),
 	BIOMES(3, "biomes"),
 	NOISE(4, "noise"),
-	
+
 	SURFACE(5, "surface"),
 	CARVERS(6, "carvers"),
 	LIQUID_CARVERS(7, "liquid_carvers"),
 	/**
-	 * replaced surface, carvers, and liquid carvers in MC 26.3+ 
-	 * @since API 7.1.0 
+	 * replaced surface, carvers, and liquid carvers in MC 26.3+
+	 *
+	 * @since API 7.1.0
 	 */
 	TERRAIN(7, "terrain"),
-	
+
 	FEATURES(8, "features"),
 	LIGHT(9, "light");
-	
-	
-	
+
+
+
 	/** used when serializing this enum. */
 	public final String name;
 	public final byte value;
-	
-	
-	EDhApiWorldGenerationStep(int value, String name) 
-	{ 
-		this.value = (byte) value; 
-		this.name = name; 
+
+
+	EDhApiWorldGenerationStep(int value, String name)
+	{
+		this.value = (byte) value;
+		this.name = name;
 	}
-	
-	
+
+
 	//=========//
 	// parsing //
 	//=========//
-	
+
 	/** @return null if the value doesn't correspond to a {@link EDhApiWorldGenerationStep}. */
 	public static EDhApiWorldGenerationStep fromValue(int value)
 	{
@@ -94,10 +95,10 @@ public enum EDhApiWorldGenerationStep
 				return genStep;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/** @return null if the value doesn't correspond to a {@link EDhApiWorldGenerationStep}. */
 	public static EDhApiWorldGenerationStep fromName(String name)
 	{
@@ -108,8 +109,8 @@ public enum EDhApiWorldGenerationStep
 				return genStep;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 }

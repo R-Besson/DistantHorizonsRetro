@@ -26,8 +26,8 @@ package com.seibel.distanthorizons.api.enums.config;
  * HIGH <br>
  * EXTREME <br>
  *
- * @since API 2.0.0
  * @version 2024-4-6
+ * @since API 2.0.0
  */
 public enum EDhApiHorizontalQuality
 {
@@ -40,16 +40,16 @@ public enum EDhApiHorizontalQuality
 	HIGH(2.2f, 16),
 	EXTREME(2.2f, 20),
 	;
-	
-	
-	
+
+
+
 	public final double quadraticBase;
 	public final int distanceUnitInBlocks;
-	
+
 	EDhApiHorizontalQuality(double quadraticBase, int distanceUnitInBlocks)
 	{
 		this.quadraticBase = quadraticBase;
 		this.distanceUnitInBlocks = distanceUnitInBlocks;
 	}
-	
+
 }

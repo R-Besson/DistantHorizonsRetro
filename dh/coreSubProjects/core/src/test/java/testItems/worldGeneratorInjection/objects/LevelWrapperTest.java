@@ -41,40 +41,40 @@ public class LevelWrapperTest implements IDhApiLevelWrapper
 {
 	@Override
 	public Object getWrappedMcObject() { return null; }
-	
+
 	@Override
 	public IDhApiDimensionTypeWrapper getDimensionType() { return null; }
 	@Override
 	public String getDimensionName() { return null; }
 	@Override
 	public String getDhIdentifier() { return null; }
-	
+
 	@Override
 	public EDhApiLevelType getLevelType() { return null; }
-	
+
 	@Override
 	public boolean hasCeiling() { return false; }
-	
+
 	@Override
 	public boolean hasSkyLight() { return false; }
-	
+
 	@Override
 	public int getMaxHeight() { return 0; }
-	
+
 	@Override
 	public int getMinHeight() { return IDhApiLevelWrapper.super.getMinHeight(); }
-	
-	@Override 
+
+	@Override
 	public IDhApiCustomRenderRegister getRenderRegister() { return null; }
-	
+
 	@Override
 	public File getDhSaveFolder()
 	{ return null; }
-	
-	@Override 
+
+	@Override
 	public DhApiResult<Color> getBlockColorPreApi(IDhApiBlockStateWrapper blockStateWrapper, IDhApiBiomeWrapper biomeWrapper, int blockWorldPosX, int blockWorldPosY, int blockWorldPosZ, IDhApiFullDataSource dataSource)
 	{ return DhApiResult.createFail("Not Implemented"); }
-	
-	
-	
+
+
+
 }

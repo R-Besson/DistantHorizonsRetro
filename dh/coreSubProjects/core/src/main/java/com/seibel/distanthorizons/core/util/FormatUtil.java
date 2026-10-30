@@ -7,10 +7,10 @@ public class FormatUtil
 	public static String formatEta(Duration duration)
 	{
 		return duration.toString()
-				.substring(2)
-				.replaceAll("(\\d[HMS])(?!$)", "$1 ")
-				.replaceAll("\\.\\d+", "")
-				.toLowerCase();
+			.substring(2)
+			.replaceAll("(\\d[HMS])(?!$)", "$1 ")
+			.replaceAll("\\.\\d+", "")
+			.toLowerCase();
 	}
-	
+
 }

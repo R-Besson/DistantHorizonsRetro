@@ -7,7 +7,12 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.config.IConfigGui;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiListExtended;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +38,8 @@ import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.SetY;
 public class ClassicConfigGUI
 {
 	public static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder()
-			.maxCountPerSecond(1)
-			.build();
+		.maxCountPerSecond(1)
+		.build();
 
 	public static final ConfigCoreInterface CONFIG_CORE_INTERFACE = new ConfigCoreInterface();
 
@@ -189,7 +194,7 @@ public class ClassicConfigGUI
 		public final Gui indexButton;
 
 		private final String text;
-		
+
 		@NotNull
 		private final EConfigCommentTextPosition textPosition;
 		public final AbstractConfigBase<?> dhConfigType;
@@ -209,16 +214,25 @@ public class ClassicConfigGUI
 			this.resetButton = resetButton;
 			this.text = text;
 			this.indexButton = indexButton;
-			
+
 			List<Gui> children = new ArrayList<>();
-			if (button != null) { children.add(button); }
-			if (resetButton != null) { children.add(resetButton); }
-			if (indexButton != null) { children.add(indexButton); }
+			if (button != null)
+			{
+				children.add(button);
+			}
+			if (resetButton != null)
+			{
+				children.add(resetButton);
+			}
+			if (indexButton != null)
+			{
+				children.add(indexButton);
+			}
 
 			EConfigCommentTextPosition textPosition = null;
 			if (this.dhConfigType instanceof ConfigUIComment)
 			{
-				textPosition = ((ConfigUIComment)this.dhConfigType).textPosition;
+				textPosition = ((ConfigUIComment) this.dhConfigType).textPosition;
 			}
 
 			if (textPosition == null)
@@ -288,33 +302,33 @@ public class ClassicConfigGUI
 					{
 						// text right justified aligned against the buttons
 						textXPos = this.gui.width
-								- translatedLength
-								- ConfigScreenConfigs.SPACE_BETWEEN_TEXT_AND_OPTION_FIELD
-								- ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN
-								- ConfigScreenConfigs.OPTION_FIELD_WIDTH
-								- ConfigScreenConfigs.BUTTON_WIDTH_SPACING
-								- ConfigScreenConfigs.RESET_BUTTON_WIDTH;
+							- translatedLength
+							- ConfigScreenConfigs.SPACE_BETWEEN_TEXT_AND_OPTION_FIELD
+							- ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN
+							- ConfigScreenConfigs.OPTION_FIELD_WIDTH
+							- ConfigScreenConfigs.BUTTON_WIDTH_SPACING
+							- ConfigScreenConfigs.RESET_BUTTON_WIDTH;
 					}
 					else if (this.textPosition == EConfigCommentTextPosition.CENTERED_OVER_BUTTONS)
 					{
 						// have button centered relative to a category button
 						textXPos = this.gui.width
-								- (translatedLength / 2)
-								- (ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH / 2)
-								- ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN;
+							- (translatedLength / 2)
+							- (ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH / 2)
+							- ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN;
 					}
 					else if (this.textPosition == EConfigCommentTextPosition.CENTER_OF_SCREEN)
 					{
 						// have button centered in the screen
 						textXPos = (this.gui.width / 2)
-								- (translatedLength / 2);
+							- (translatedLength / 2);
 					}
 					else
 					{
 						throw new UnsupportedOperationException("No text position render defined for [" + this.textPosition + "]");
 					}
 
-				textRenderer.drawString(
+					textRenderer.drawString(
 						this.text,
 						textXPos, y + 5,
 						0xFFFFFF);
@@ -323,7 +337,7 @@ public class ClassicConfigGUI
 			catch (Exception e)
 			{
 				// should prevent crashing the game if there's an issue
-				RATE_LIMITED_LOGGER.error("Unexpected gui rendering issue: ["+e.getMessage()+"]", e);
+				RATE_LIMITED_LOGGER.error("Unexpected gui rendering issue: [" + e.getMessage() + "]", e);
 			}
 		}
 

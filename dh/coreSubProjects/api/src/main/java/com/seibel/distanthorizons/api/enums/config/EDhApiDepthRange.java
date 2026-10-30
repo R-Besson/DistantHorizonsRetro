@@ -4,8 +4,8 @@ package com.seibel.distanthorizons.api.enums.config;
  * ZERO_TO_POS_ONE, <br>
  * NEG_ONE_TO_POS_ONE, <br>
  *
- * @since API 7.2.0
  * @version 2026-09-19
+ * @since API 7.2.0
  */
 public enum EDhApiDepthRange
 {
@@ -19,7 +19,7 @@ public enum EDhApiDepthRange
 	 * -1 can be close or far based on {@link EDhApiDepthDirection}
 	 */
 	NEG_ONE_TO_POS_ONE;
-	
-	
-	
+
+
+
 }

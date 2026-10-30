@@ -30,21 +30,21 @@ public abstract class GlAbstractShaderRenderer
 {
 	protected static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	protected static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	protected GlShaderProgram shader;
 	protected boolean init = false;
-	
-	
+
+
 	//=======//
 	// setup //
 	//=======//
 	//region
-	
-	protected GlAbstractShaderRenderer() {}
-	
+
+	protected GlAbstractShaderRenderer() { }
+
 	public void init()
 	{
 		if (this.init)
@@ -52,52 +52,52 @@ public abstract class GlAbstractShaderRenderer
 			return;
 		}
 		this.init = true;
-		
+
 		this.onInit();
 	}
-	
+
 	//endregion
-	
-	
+
+
 	//==================//
 	// abstract methods //
 	//==================//
 	//region
-	
-	protected void onInit() {}
-	
-	protected void onApplyUniforms(RenderParams renderParams) {}
-	
-	protected void onRender() {}
-	
+
+	protected void onInit() { }
+
+	protected void onApplyUniforms(RenderParams renderParams) { }
+
+	protected void onRender() { }
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// rendering //
 	//===========//
 	//region
-	
+
 	public void render(RenderParams renderParams)
 	{
 		this.init();
-		
+
 		this.shader.bind();
-		
+
 		this.onApplyUniforms(renderParams);
-		
+
 		int width = MC_RENDER.getTargetFramebufferViewportWidth();
 		int height = MC_RENDER.getTargetFramebufferViewportHeight();
 		GLMC.glViewport(0, 0, width, height);
-		
+
 		this.onRender();
-		
+
 		this.shader.unbind();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

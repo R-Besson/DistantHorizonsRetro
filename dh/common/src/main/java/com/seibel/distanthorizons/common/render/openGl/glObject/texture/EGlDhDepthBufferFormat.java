@@ -14,15 +14,15 @@ public enum EGlDhDepthBufferFormat
 	DEPTH_STENCIL(true),
 	DEPTH24_STENCIL8(true),
 	DEPTH32F_STENCIL8(true);
-	
-	
-	
+
+
+
 	private final boolean combinedStencil;
-	
+
 	EGlDhDepthBufferFormat(boolean combinedStencil) { this.combinedStencil = combinedStencil; }
-	
-	
-	
+
+
+
 	public int getGlInternalFormat()
 	{
 		switch (this)
@@ -44,12 +44,12 @@ public enum EGlDhDepthBufferFormat
 			case DEPTH32F_STENCIL8:
 				return GL30.GL_DEPTH32F_STENCIL8;
 		}
-		
+
 		throw new AssertionError("unreachable");
 	}
-	
+
 	public int getGlType() { return isCombinedStencil() ? GL30.GL_DEPTH_STENCIL : GL11.GL_DEPTH_COMPONENT; }
-	
+
 	public int getGlFormat()
 	{
 		switch (this)
@@ -68,10 +68,10 @@ public enum EGlDhDepthBufferFormat
 			case DEPTH32F_STENCIL8:
 				return GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
 		}
-		
+
 		throw new AssertionError("unreachable");
 	}
-	
+
 	public boolean isCombinedStencil() { return combinedStencil; }
-	
+
 }

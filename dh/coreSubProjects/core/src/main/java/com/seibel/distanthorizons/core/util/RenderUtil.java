@@ -44,27 +44,28 @@ public class RenderUtil
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-	
-	/** 
-	 * all speeds are measured in blocks per second 
-	 * 
+
+	/**
+	 * all speeds are measured in blocks per second
+	 *
 	 * @see LodUtil#ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC
 	 */
 	private static class DynamicOverdraw
 	{
 		public static final float MIN_SPEED = 10.0f; // a little faster than sprinting (7)
-		public static final float MAX_SPEED = (float)LodUtil.MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC;
+		public static final float MAX_SPEED = (float) LodUtil.MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC;
 		public static final float MIN_OVERDRAW_RATIO = 0.2f;
+
 	}
-	
-	
-	
+
+
+
 	//=====================//
 	// matrix manipulation //
 	//=====================//
 	//region
-	
+
 	/**
 	 * create and return a new projection matrix based on MC's modelView and projection matrices
 	 *
@@ -83,9 +84,9 @@ public class RenderUtil
 			// would just need to be far enough to prevent depth precision errors
 			nearClipDist = Math.min(nearClipDist, 7.5f);
 		}
-		
+
 		float farClipDist = RenderUtil.getFarClipPlaneDistanceInBlocks();
-		
+
 		// Create a copy of the current matrix, so it won't be modified.
 		updateMatrix.set(mcProjMat);
 
@@ -106,7 +107,7 @@ public class RenderUtil
 			return;
 		}
 
-		
+
 		// Set new far and near clip plane values.
 		if (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.FORWARD_Z)
 		{
@@ -117,7 +118,7 @@ public class RenderUtil
 			setClipPlanes(updateMatrix, farClipDist, nearClipDist, true);
 		}
 	}
-	
+
 	/**
 	 * Changes the values that store the clipping planes.
 	 * Formula for calculating matrix values is the same that OpenGL uses when making matrices.
@@ -131,16 +132,16 @@ public class RenderUtil
 		matrix.m22 = (zZeroToOne ? farClip : farClip + nearClip) / (nearClip - farClip);
 		matrix.m23 = (zZeroToOne ? farClip : farClip + farClip) * nearClip / (nearClip - farClip);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// near clip plane //
 	//=================//
 	//region
-	
+
 	public static float getNearClipPlaneInBlocks()
 	{
 		float overdraw = Config.Client.Advanced.Graphics.Culling.overdrawPrevention.get();
@@ -149,9 +150,9 @@ public class RenderUtil
 			// automatic mode,
 			// get overdraw based on vanilla render distance.
 			// At low render distances this hides the vanilla RD border
-			
+
 			int chunkRenderDistance = MC_RENDER.getRenderDistance();
-			
+
 			if (IRIS_ACCESSOR != null
 				&& IRIS_ACCESSOR.isShaderPackInUse())
 			{
@@ -187,8 +188,8 @@ public class RenderUtil
 			// since that will cause rendering issues
 			overdraw = MathUtil.clamp(0.05f, overdraw, 1.0f);
 		}
-		
-		
+
+
 		if (Config.Client.Advanced.Graphics.Culling.reduceOverdrawWithFastMovement.get())
 		{
 			double avgSpeed = ClientApi.INSTANCE.getAvgCameraSpeed();
@@ -197,24 +198,24 @@ public class RenderUtil
 				// if the player is moving fast enough,
 				// smoothly decrease the fade distance
 				// to give MC have a chance to load/generate.
-				
+
 				// convert the speed into a range of 0.0 - 1.0
-				float speedRange = (float)((DynamicOverdraw.MAX_SPEED - avgSpeed) / DynamicOverdraw.MAX_SPEED);
+				float speedRange = (float) ((DynamicOverdraw.MAX_SPEED - avgSpeed) / DynamicOverdraw.MAX_SPEED);
 				// if math.max isn't done here we could completely
 				// remove vanilla rendering at high speeds
 				speedRange = Math.max(speedRange, DynamicOverdraw.MIN_OVERDRAW_RATIO);
-				
+
 				overdraw *= speedRange;
 			}
 		}
-		
+
 		return getNearClipPlaneDistanceInBlocks(overdraw);
 	}
 	private static float getNearClipPlaneDistanceInBlocks(float overdrawPreventionPercent)
 	{
 		int chunkRenderDistance = MC_RENDER.getRenderDistance();
 		int vanillaBlockRenderedDistance = chunkRenderDistance * LodUtil.CHUNK_WIDTH;
-		
+
 		// Note: setting this to a number lower than 1.0 (ie 1 block)
 		// can cause distant clouds to flash due to depth buffer precision loss.
 		// This is not an issue when using Reverse Z depth.
@@ -226,8 +227,8 @@ public class RenderUtil
 		else
 		{
 			nearClipPlane = vanillaBlockRenderedDistance;
-			nearClipPlane *= overdrawPreventionPercent; 
-			
+			nearClipPlane *= overdrawPreventionPercent;
+
 			// the near clip plane should never be closer than 1 block,
 			// otherwise Z-fighting and other issues may occur
 			if (nearClipPlane < 1.0f)
@@ -235,15 +236,15 @@ public class RenderUtil
 				nearClipPlane = 1.0f;
 			}
 		}
-		
-		
+
+
 		float heightOverride = getHeightBasedNearClipOverrideBlockDistance();
 		if (heightOverride != -1.0f)
 		{
 			nearClipPlane = heightOverride;
 		}
-		
-		
+
+
 		// the player's FOV setting doesn't affect vanilla's render distance,
 		// so zoom mods (which lower the FOV) shouldn't push the near clip plane out,
 		// therefore the FOV never goes below 70 (MC's default).
@@ -252,11 +253,11 @@ public class RenderUtil
 		double fov = Math.max(70, getVerticalFovInDegrees(ClientApi.RENDER_STATE.mcProjectionMatrix));
 
 		double aspectRatio = (double) MC_RENDER.getTargetFramebufferViewportWidth() / MC_RENDER.getTargetFramebufferViewportHeight();
-		
+
 		// source: https://stackoverflow.com/questions/8101119/how-do-i-methodically-choose-the-near-clip-plane-distance-for-a-perspective-proj/8101234#8101234
 		return (float) (nearClipPlane
-				/ Math.sqrt(1d + MathUtil.pow2(Math.tan(fov / 180d * Math.PI / 2d))
-				* (MathUtil.pow2(aspectRatio) + 1d)));
+			/ Math.sqrt(1d + MathUtil.pow2(Math.tan(fov / 180d * Math.PI / 2d))
+			* (MathUtil.pow2(aspectRatio) + 1d)));
 	}
 	/**
 	 * m11 is 1/tan(fovY/2) and on the diagonal, so this works whether or not the matrix is transposed. <br>
@@ -311,7 +312,8 @@ public class RenderUtil
 
 	/**
 	 * Returns a new distance if the player is sufficiently far above the world.
-	 * @return -1 if no override is necessary 
+	 *
+	 * @return -1 if no override is necessary
 	 */
 	public static float getHeightBasedNearClipOverrideBlockDistance()
 	{
@@ -330,20 +332,20 @@ public class RenderUtil
 				return playerHeight - (levelMaxHeight + 1000);
 			}
 		}
-		
+
 		return -1.0f;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// far clip plane //
 	//================//
-	
+
 	//region
-	
+
 	public static float getFarClipPlaneDistanceInBlocks()
 	{
 		if (IRIS_ACCESSOR != null)
@@ -353,7 +355,7 @@ public class RenderUtil
 			// This is a hack so DH's far clip plane matches up with what Iris thinks it is,
 			// fixing projection/depth mapping.
 			// https://github.com/IrisShaders/Iris/issues/2534
-			
+
 			int lodChunkDist = DhApi.Delayed.configs.graphics().chunkRenderDistance().getValue();
 			int lodBlockDist = lodChunkDist * 16; /* 16 = chunk width in blocks */
 			// sqrt 2 to prevent the corners from being cut off
@@ -363,16 +365,16 @@ public class RenderUtil
 		{
 			// Current DH logic
 			// uses a farther depth to help when far above the world
-			
+
 			int lodChunkDist = Config.Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius.get();
 			int lodBlockDist = lodChunkDist * LodUtil.CHUNK_WIDTH;
 			// * 2 to prevent clipping when high above the world
 			return (lodBlockDist + LodUtil.REGION_WIDTH) * 2;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

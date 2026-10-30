@@ -11,21 +11,21 @@ import java.util.HashSet;
 /** holds adjacent chunks without having to create new Pos objects */
 public class AdjacentChunkHolder
 {
-	final IChunkWrapper[] chunkArray = new IChunkWrapper[9];		
-	
-	
+	final IChunkWrapper[] chunkArray = new IChunkWrapper[9];
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public AdjacentChunkHolder(IChunkWrapper centerWrapper) { this.chunkArray[4] = centerWrapper; }
-	
-	public AdjacentChunkHolder(IChunkWrapper centerWrapper, @NotNull ArrayList<IChunkWrapper> nearbyChunkList) 
-	{ 
+
+	public AdjacentChunkHolder(IChunkWrapper centerWrapper, @NotNull ArrayList<IChunkWrapper> nearbyChunkList)
+	{
 		this.chunkArray[4] = centerWrapper;
-		
+
 		DhChunkPos centerChunkPos = centerWrapper.getChunkPos();
-		
+
 		// generate the list of chunk pos we need,
 		// currently a 3x3 grid
 		HashSet<DhChunkPos> requestedAdjacentPositions = new HashSet<>(9);
@@ -37,7 +37,7 @@ public class AdjacentChunkHolder
 				requestedAdjacentPositions.add(adjacentPos);
 			}
 		}
-		
+
 		for (int chunkIndex = 0; chunkIndex < nearbyChunkList.size(); chunkIndex++) // using iterators in high traffic areas can cause GC issues due to allocating a bunch of iterators, use an indexed for-loop instead
 		{
 			IChunkWrapper chunk = nearbyChunkList.get(chunkIndex);
@@ -45,11 +45,11 @@ public class AdjacentChunkHolder
 			{
 				// remove the newly found position
 				requestedAdjacentPositions.remove(chunk.getChunkPos());
-				
+
 				// add the adjacent chunk
 				this.add(chunk);
 			}
-			
+
 			if (requestedAdjacentPositions.isEmpty())
 			{
 				// we found every chunk we needed, we don't need to keep iterating
@@ -57,30 +57,30 @@ public class AdjacentChunkHolder
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
-	
-	public void add(IChunkWrapper centerWrapper) 
+
+	public void add(IChunkWrapper centerWrapper)
 	{
 		DhChunkPos centerPos = this.chunkArray[4].getChunkPos();
 		DhChunkPos offsetPos = centerWrapper.getChunkPos();
-		
+
 		int offsetX = offsetPos.getX() - centerPos.getX();
 		if (offsetX < -1 || offsetX > 1)
 		{
 			return;
 		}
-		
+
 		int offsetZ = offsetPos.getZ() - centerPos.getZ();
 		if (offsetZ < -1 || offsetZ > 1)
 		{
 			return;
 		}
-		
+
 		// equivalent to 4 + offsetX + (offsetZ * 3).
 		this.chunkArray[4 + offsetX + offsetZ + (offsetZ << 1)] = centerWrapper;
 	}
@@ -95,23 +95,22 @@ public class AdjacentChunkHolder
 		{
 			return centerChunk;
 		}
-		
+
 		int offsetX = chunkX - centerPos.getX();
 		if (offsetX < -1 || offsetX > 1)
 		{
 			return null;
 		}
-		
+
 		int offsetZ = chunkZ - centerPos.getZ();
 		if (offsetZ < -1 || offsetZ > 1)
 		{
 			return null;
 		}
-		
+
 		// equivalent to 4 + offsetX + (offsetZ * 3).
 		return this.chunkArray[4 + offsetX + offsetZ + (offsetZ << 1)];
 	}
-	
-	
+
+
 }
-	

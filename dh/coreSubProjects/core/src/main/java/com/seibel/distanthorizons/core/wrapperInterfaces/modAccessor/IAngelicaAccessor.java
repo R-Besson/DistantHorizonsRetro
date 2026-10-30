@@ -27,16 +27,16 @@ import java.awt.*;
  */
 public interface IAngelicaAccessor extends IModAccessor
 {
-	
+
 	Color getFogColor();
-	
+
 	int getDepthTextureId();
-	
+
 	boolean canDoFadeShader();
 
 	/**
 	 * @return true if Angelica has built every section of this chunk from minSectionY to maxSectionY (inclusive),
-	 *         so its vanilla terrain is drawn, null if that can't be checked (IE a different Angelica version)
+	 * so its vanilla terrain is drawn, null if that can't be checked (IE a different Angelica version)
 	 */
 	Boolean isChunkBuilt(int chunkX, int chunkZ, int minSectionY, int maxSectionY);
 
@@ -50,7 +50,7 @@ public interface IAngelicaAccessor extends IModAccessor
 
 	/**
 	 * @return how far from the camera (in blocks) the shader pack dithers vanilla terrain out,
-	 *         showing the LODs past it, -1 if no shader pack is in use or it doesn't
+	 * showing the LODs past it, -1 if no shader pack is in use or it doesn't
 	 */
 	float getShaderPackVanillaTerrainDistance();
 

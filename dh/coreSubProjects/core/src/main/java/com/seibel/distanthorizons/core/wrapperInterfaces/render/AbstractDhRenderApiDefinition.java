@@ -10,7 +10,15 @@ import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRen
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IDhGenericObjectVertexBufferContainer;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.ILodContainerUniformBufferWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IVertexBufferWrapper;
-import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.*;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhAntiAliasRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhFarFadeRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhFogRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhGenericRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhSsaoRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTerrainRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTestTriangleRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhVanillaFadeRenderer;
 import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 
 public abstract class AbstractDhRenderApiDefinition implements IBindable
@@ -19,10 +27,10 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 	// getters //
 	//=========//
 	//region
-	
+
 	/** Used for debugging */
 	public abstract String getEngineName();
-	
+
 	private final boolean useSingleIbo = (EPlatform.get() != EPlatform.MACOS);
 	/**
 	 * Mac has a problem where binding an IBO that's longer than the VBO
@@ -32,30 +40,30 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 	 * is slower due to having to construct new IBOs.
 	 */
 	public boolean useSingleIbo() { return this.useSingleIbo; }
-	
+
 	public abstract EDhApiDepthDirection getDepthDirection();
 	public abstract EDhApiDepthRange getDepthRange();
 	public abstract EDhApiRenderingApi getRenderApi();
 	public abstract EDhApiRenderingEngine getRenderingEngine();
-	/** 
+	/**
 	 * Returns true if the current renderer
 	 * is calling the base rendering API's method calls. <br>
 	 * ie GL.drawArrays() for OpenGL. <Br><br>
 	 *
-	 * If DH is using Blaze3D (Mojang's rendering API) 
+	 * If DH is using Blaze3D (Mojang's rendering API)
 	 * this will return false.
 	 */
 	public abstract boolean isNativeRenderer();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//============//
 	// singletons //
 	//============//
 	//region
-	
+
 	public abstract IDhMetaRenderer getMetaRenderer();
 	public abstract IDhTerrainRenderer getTerrainRenderer();
 	public abstract IDhSsaoRenderer getSsaoRenderer();
@@ -65,8 +73,8 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 	public abstract AbstractDebugWireframeRenderer getDebugWireframeRenderer();
 	public abstract IDhVanillaFadeRenderer getVanillaFadeRenderer();
 	public abstract IDhTestTriangleRenderer getTestTriangleRenderer();
-	
-	/** 
+
+	/**
 	 * this will NOT run on the render thread.
 	 * Render thread setup tasks should be handled
 	 * during the first rendered frame.
@@ -74,7 +82,7 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 	public void bindRenderers()
 	{
 		SingletonInjector.INSTANCE.bind(AbstractDhRenderApiDefinition.class, this);
-		
+
 		SingletonInjector.INSTANCE.bind(IDhMetaRenderer.class, this.getMetaRenderer());
 		SingletonInjector.INSTANCE.bind(IDhTerrainRenderer.class, this.getTerrainRenderer());
 		SingletonInjector.INSTANCE.bind(IDhSsaoRenderer.class, this.getSsaoRenderer());
@@ -85,30 +93,30 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 		SingletonInjector.INSTANCE.bind(IDhVanillaFadeRenderer.class, this.getVanillaFadeRenderer());
 		SingletonInjector.INSTANCE.bind(IDhTestTriangleRenderer.class, this.getTestTriangleRenderer());
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// factories //
 	//===========//
 	//region
-	
+
 	// these methods are used by WrapperFactory
-	
-	/** 
+
+	/**
 	 * Generic renderers are created for each level they're used in
 	 * so we can't just define a single instance.
 	 */
 	public abstract IDhGenericRenderer createGenericRenderer();
-	
+
 	public abstract IVertexBufferWrapper createVboWrapper();
 	public abstract ILodContainerUniformBufferWrapper createLodContainerUniformWrapper();
 	public abstract IDhGenericObjectVertexBufferContainer createGenericVboContainer();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

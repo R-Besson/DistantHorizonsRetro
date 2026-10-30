@@ -116,4 +116,5 @@ public class PregenCommand extends AbstractDhCommand
 				sendMessage(sender, "Unknown subcommand: " + args[1]);
 		}
 	}
+
 }

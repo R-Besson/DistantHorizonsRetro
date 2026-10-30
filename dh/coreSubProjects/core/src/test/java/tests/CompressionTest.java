@@ -221,12 +221,12 @@ public class CompressionTest
 		}
 		finally
 		{
-			if(uncompressedRepo != null)
+			if (uncompressedRepo != null)
 			{
 				uncompressedRepo.close();
 			}
 
-			if(compressedRepo != null)
+			if (compressedRepo != null)
 			{
 				compressedRepo.close();
 			}

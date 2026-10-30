@@ -34,11 +34,11 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 	public TestPrimaryKeyRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, TestSingleKeyDto.class);
-		
+
 		// note: this should only ever be done with the test repo.
 		// All long term tables should be created using a sql Script.
-		String createTableSql = 
-				"CREATE TABLE IF NOT EXISTS "+this.getTableName()+"(\n" +
+		String createTableSql =
+			"CREATE TABLE IF NOT EXISTS " + this.getTableName() + "(\n" +
 				"Id INT NOT NULL PRIMARY KEY\n" +
 				"\n" +
 				",Value TEXT NULL\n" +
@@ -48,24 +48,24 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 		try (PreparedStatement createTableStatement = this.createPreparedStatement(createTableSql);
 			ResultSet result = this.query(createTableStatement))
 		{
-			
+
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public String getTableName() { return "Test"; }
 	@Override
 	protected String CreateParameterizedWhereString() { return "Id = ?"; }
-	
+
 	@Override
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, Integer id) throws SQLException
 	{
 		statement.setInt(index, id);
-    }
-	
-	
+	}
+
+
 	@Override
 	@Nullable
 	public TestSingleKeyDto convertResultSetToDto(ResultSet result) throws ClassCastException, SQLException
@@ -74,33 +74,33 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 		String value = result.getString("Value");
 		long longValue = result.getLong("LongValue");
 		byte byteValue = result.getByte("ByteValue");
-		
+
 		return new TestSingleKeyDto(id, value, longValue, byteValue);
 	}
-	
+
 	@Override
 	public PreparedStatement createUpsertStatement(TestSingleKeyDto dto) throws SQLException
 	{
-		String sql = 
-			"INSERT INTO "+this.getTableName()+" \n" +
-			"	(Id, Value, LongValue, ByteValue) \n" +
-			"VALUES(?,?,?,?) \n" +
-			"ON CONFLICT(Id) DO UPDATE SET\n" +
-			"     Value = excluded.Value \n" +
-			"    ,LongValue = excluded.LongValue \n" +
-			"    ,ByteValue = excluded.ByteValue \n";
+		String sql =
+			"INSERT INTO " + this.getTableName() + " \n" +
+				"	(Id, Value, LongValue, ByteValue) \n" +
+				"VALUES(?,?,?,?) \n" +
+				"ON CONFLICT(Id) DO UPDATE SET\n" +
+				"     Value = excluded.Value \n" +
+				"    ,LongValue = excluded.LongValue \n" +
+				"    ,ByteValue = excluded.ByteValue \n";
 		PreparedStatement statement = this.createPreparedStatement(sql);
-		
+
 		int i = 1; // post-increment for the win!
 		statement.setObject(i++, dto.id);
-		
+
 		statement.setObject(i++, dto.value);
 		statement.setObject(i++, dto.longValue);
 		statement.setObject(i, dto.byteValue);
-		
+
 		return statement;
 	}
-	
-	
-	
+
+
+
 }

@@ -16,18 +16,18 @@ public class FullDataPayloadSender implements AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final int TICK_RATE = 20;
-	
+
 	/** 1 Mebibyte minus 576 bytes for other info */
 	public static final int FULL_DATA_SPLIT_SIZE_IN_BYTES = 1_048_000;
-	
-	
+
+
 	private static final Timer UPLOAD_TIMER = TimerUtil.CreateTimer("FullDataPayloadSender");
 	private final TimerTask tickTimerTask = TimerUtil.createTimerTask(this::tick);
-	
+
 	private final NetworkSession session;
 	private final IntSupplier maxKBpsSupplier;
 	private final ConcurrentLinkedQueue<PendingTransfer> transferQueue = new ConcurrentLinkedQueue<>();
-	
+
 	private final SharedBandwidthLimit sharedBandwidthLimit;
 
 	/** stops a tick that's already running from re-registering this sender after it was closed */
@@ -41,7 +41,7 @@ public class FullDataPayloadSender implements AutoCloseable
 		this.sharedBandwidthLimit = sharedBandwidthLimit;
 		UPLOAD_TIMER.scheduleAtFixedRate(this.tickTimerTask, 0, 1000 / TICK_RATE);
 	}
-	
+
 	@Override
 	public void close()
 	{
@@ -49,13 +49,13 @@ public class FullDataPayloadSender implements AutoCloseable
 		this.tickTimerTask.cancel();
 		this.sharedBandwidthLimit.setSenderActive(this, false);
 	}
-	
-	
+
+
 	public void sendInChunks(FullDataPayload payload, Runnable sendFinalMessage)
 	{
 		this.transferQueue.add(new PendingTransfer(payload, sendFinalMessage));
 	}
-	
+
 	private void tick()
 	{
 		// only senders with something to send split the global bandwidth,
@@ -69,11 +69,11 @@ public class FullDataPayloadSender implements AutoCloseable
 
 		int bandwidthShare = this.sharedBandwidthLimit.getBandwidthShare();
 		int maxPlayerRate = Math.min(this.maxKBpsSupplier.getAsInt(), bandwidthShare);
-		
+
 		// + 1 to account for rounding errors on values of < 4
 		int bytesToSend = maxPlayerRate > 0
-				? (maxPlayerRate * 1000) / TICK_RATE + 1
-				: Integer.MAX_VALUE;
+			? (maxPlayerRate * 1000) / TICK_RATE + 1
+			: Integer.MAX_VALUE;
 
 		while (bytesToSend > 0)
 		{
@@ -82,15 +82,15 @@ public class FullDataPayloadSender implements AutoCloseable
 			{
 				return;
 			}
-			
+
 			int chunkSize = Math.min(Math.min(bytesToSend, FULL_DATA_SPLIT_SIZE_IN_BYTES), pendingTransfer.buffer.readableBytes());
 			boolean isFirstChunk = pendingTransfer.buffer.readerIndex() == 0;
-			
+
 			FullDataSplitMessage chunkMessage = new FullDataSplitMessage(pendingTransfer.bufferId, pendingTransfer.buffer.readSlice(chunkSize).retain(), isFirstChunk);
 			this.session.sendMessage(chunkMessage);
-			
+
 			bytesToSend -= chunkSize;
-			
+
 			if (pendingTransfer.buffer.readableBytes() == 0)
 			{
 				try
@@ -105,21 +105,21 @@ public class FullDataPayloadSender implements AutoCloseable
 			}
 		}
 	}
-	
-	
+
+
 	private static class PendingTransfer
 	{
 		public final int bufferId;
 		public final ByteBuf buffer;
 		public final Runnable sendFinalMessage;
-		
+
 		private PendingTransfer(FullDataPayload payload, Runnable sendFinalMessage)
 		{
 			this.bufferId = payload.dtoBufferId;
 			this.buffer = payload.dtoBuffer.duplicate().readerIndex(0);
 			this.sendFinalMessage = sendFinalMessage;
 		}
-		
+
 	}
-	
+
 }

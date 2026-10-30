@@ -30,12 +30,12 @@ import org.junit.Test;
  */
 public class ExampleCoreTest
 {
-	
+
 	@Test
 	public void DemoTest()
 	{
 		Assert.assertTrue("Example test 1", true);
 		Assert.assertFalse("Example test 2", false);
 	}
-	
+
 }

@@ -43,13 +43,13 @@ import java.util.concurrent.CompletableFuture;
  * A DH Level handles all DH-centric logic related to a given MC level.
  * A Level in this context is defined as a Minecraft dimension the player can play in
  * (IE the overworld, nether, end, etc.). <br><br>
- * 
+ *
  * This is different from a {@link ILevelWrapper}
  * in the following ways: <br>
  * - a DH level is created after a MC level is wrapped and passed into the {@link ClientApi} or {@link ServerApi} respectively <br>
  * - a DH level doesn't handle any MC level logic (IE getting the min/max world height) <br>
  * - a DH level keeps track of DH's database file paths and rendering <br>
- * 
+ *
  * @see ILevelWrapper
  * @see IDhClientLevel
  * @see IDhServerLevel
@@ -62,41 +62,41 @@ public interface IDhLevel extends AutoCloseable, GeneratedFullDataSourceProvider
 	 */
 	@NotNull
 	ILevelWrapper getLevelWrapper();
-	
+
 	/** @return 0 if no hash is known */
 	int getChunkHash(DhChunkPos pos);
 	void updateChunkAsync(IChunkWrapper chunk, int newChunkHash);
-	
+
 	default void updateBeaconBeamsForChunk(IChunkWrapper chunkToUpdate, ArrayList<IChunkWrapper> nearbyChunkList)
 	{
 		List<BeaconBeamDTO> activeBeamList = chunkToUpdate.getAllActiveBeacons(nearbyChunkList);
 		this.updateBeaconBeamsForChunkPos(chunkToUpdate.getChunkPos(), activeBeamList);
 	}
 	void updateBeaconBeamsForChunkPos(DhChunkPos chunkPos, List<BeaconBeamDTO> activeBeamList);
-	
+
 	/** @return null on server-only levels */
 	@Nullable
 	BeaconBeamRepo getBeaconBeamRepo();
-	
+
 	FullDataSourceProviderV2 getFullDataProvider();
-	
+
 	ISaveStructure getSaveStructure();
-	
+
 	CompletableFuture<Void> updateDataSourcesAsync(FullDataSourceV2 data);
-	
+
 	void addDebugMenuStringsToList(List<String> messageList);
-	
-	/** 
+
+	/**
 	 * Will return null if the renderer isn't set up yet. <br>
-	 * Not supported on the server-side. 
+	 * Not supported on the server-side.
 	 */
 	@Nullable
 	IDhGenericRenderer getGenericRenderer();
 	/**
 	 * Will return null if the renderer isn't set up yet. <br>
-	 * Not supported on the server-side. 
+	 * Not supported on the server-side.
 	 */
 	@Nullable
 	RenderBufferHandler getRenderBufferHandler();
-	
+
 }

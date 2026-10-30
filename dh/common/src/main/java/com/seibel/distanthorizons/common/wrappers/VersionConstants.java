@@ -25,20 +25,20 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.IVersionConstants;
 public class VersionConstants implements IVersionConstants
 {
 	public static final VersionConstants INSTANCE = new VersionConstants();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private VersionConstants() { }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
@@ -49,9 +49,9 @@ public class VersionConstants implements IVersionConstants
 	{
 		return EDhApiRenderingEngine.OPEN_GL;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

@@ -33,5 +33,5 @@ import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderProxy;
  */
 public abstract class DhApiBeforeDeferredRenderEvent extends DhApiBeforeRenderEvent
 {
-	
+
 }

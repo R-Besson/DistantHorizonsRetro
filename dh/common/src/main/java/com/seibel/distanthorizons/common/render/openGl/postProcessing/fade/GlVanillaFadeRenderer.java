@@ -38,47 +38,47 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles fading MC and DH together via {@link GlDhVanillaFadeShader} and {@link GlDhFarFadeApplyShader}. <br><br>
- * 
+ *
  * {@link GlDhVanillaFadeShader} - draws the Fade to a texture. <br>
  * {@link GlDhFarFadeApplyShader} - draws the Fade texture to MC's FrameBuffer. <br>
  */
 public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 {
 	public static GlVanillaFadeRenderer INSTANCE = new GlVanillaFadeRenderer();
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	private boolean init = false;
-	
+
 	private int width = -1;
 	private int height = -1;
 	private int fadeFramebuffer = -1;
-	
+
 	private int fadeTexture = -1;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private GlVanillaFadeRenderer() { }
-	
+
 	public void init()
 	{
 		if (this.init) return;
 		this.init = true;
-		
+
 		GlDhVanillaFadeShader.INSTANCE.init();
 		GlDhFarFadeApplyShader.INSTANCE.init();
 	}
-	
+
 	private void createFramebuffer(int width, int height)
 	{
 		if (this.fadeFramebuffer != -1)
@@ -86,11 +86,11 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 			LWJGL.glDeleteFramebuffers(this.fadeFramebuffer);
 			this.fadeFramebuffer = -1;
 		}
-		
+
 		this.fadeFramebuffer = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fadeFramebuffer);
-		
-		
+
+
 		// Applying the fade texture is only needed if MC is drawing to their own frame buffer,
 		// otherwise we can directly render to their texture
 		if (MC_RENDER.mcRendersToFrameBuffer())
@@ -100,7 +100,7 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 				GLMC.glDeleteTextures(this.fadeTexture);
 				this.fadeTexture = -1;
 			}
-			
+
 			this.fadeTexture = GL11.glGenTextures();
 			GLMC.glBindTexture(this.fadeTexture);
 			LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA16, width, height, 0, GL11.GL_RGBA, GL12.GL_UNSIGNED_SHORT_4_4_4_4, null);
@@ -113,16 +113,16 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 			LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, MC_RENDER.getGlColorTextureId(), 0);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
+
 	@Override
 	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams)
@@ -134,15 +134,15 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 			// trying to render fading may cause GL errors
 			return;
 		}
-		
-		
-		
+
+
+
 		IProfilerWrapper profiler = MC_CLIENT.getProfiler();
 		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("DH-Vanilla Fade");
 			GLState state = new GLState())
 		{
 			this.init();
-			
+
 			// resize the framebuffer if necessary
 			int width = MC_RENDER.getTargetFramebufferViewportWidth();
 			int height = MC_RENDER.getTargetFramebufferViewportHeight();
@@ -152,13 +152,13 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 				this.height = height;
 				this.createFramebuffer(width, height);
 			}
-			
-			
+
+
 			GlDhVanillaFadeShader.INSTANCE.frameBuffer = this.fadeFramebuffer;
 			GlDhVanillaFadeShader.INSTANCE.setProjectionMatrix(renderParams);
 			GlDhVanillaFadeShader.INSTANCE.setLevelMaxHeight(renderParams.clientLevelWrapper.getMaxHeight());
 			GlDhVanillaFadeShader.INSTANCE.render(renderParams);
-			
+
 			// Applying the fade texture is only needed if MC is drawing to their own frame buffer,
 			// otherwise we can directly render to their texture
 			if (MC_RENDER.mcRendersToFrameBuffer())
@@ -174,9 +174,9 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 			LOGGER.error("Unexpected error during fade render, error: [" + e.getMessage() + "].", e);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

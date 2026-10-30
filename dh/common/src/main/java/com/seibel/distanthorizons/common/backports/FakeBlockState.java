@@ -16,19 +16,19 @@ import java.util.Objects;
 public class FakeBlockState implements IBlockState
 {
 	private static final IRpleCommonAccessor RPLE_ACCESSOR = ModAccessorInjector.INSTANCE.get(IRpleCommonAccessor.class);
-	
+
 	public final Block block;
 	public final int meta;
 	/** also used as the hash code */
 	private final int idAndMeta;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public FakeBlockState(Block block, int meta) { this(block, meta, Block.getIdFromBlock(block)); }
 	public FakeBlockState(Block block, int meta, int blockId)
 	{
@@ -36,25 +36,25 @@ public class FakeBlockState implements IBlockState
 		this.meta = meta;
 		this.idAndMeta = packIdAndMeta(blockId, meta);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	@Override
 	public Material getMaterial() { return this.block.getMaterial(); }
-	
+
 	@Override
 	public Block getBlock() { return this.block; }
-	
+
 	@Override
 	public int getMeta() { return this.meta; }
-	
+
 	@Override
 	public int getLightValue() { return getLightEmission(this.block, this.meta); }
 	public static int getLightEmission(Block block, int meta)
@@ -63,21 +63,21 @@ public class FakeBlockState implements IBlockState
 		{
 			return RPLE_ACCESSOR.getColor(block, meta);
 		}
-		
+
 		return Math.min(block.getLightValue(), LodUtil.MAX_MC_LIGHT);
 	}
-	
+
 	public int getIdAndMeta() { return this.idAndMeta; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -85,18 +85,18 @@ public class FakeBlockState implements IBlockState
 		{
 			return false;
 		}
-		
+
 		FakeBlockState that = (FakeBlockState) obj;
-		return this.meta == that.meta 
+		return this.meta == that.meta
 			&& Objects.equals(this.block, that.block);
 	}
-	
+
 	@Override
 	public int hashCode() { return this.idAndMeta; }
 	public static int packIdAndMeta(int blockId, int meta) { return (blockId << 16) + meta; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

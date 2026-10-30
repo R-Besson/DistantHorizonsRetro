@@ -19,8 +19,8 @@
 
 package com.seibel.distanthorizons.api.interfaces.world;
 
-import com.seibel.distanthorizons.api.interfaces.IDhApiUnsafeWrapper;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiLevelType;
+import com.seibel.distanthorizons.api.interfaces.IDhApiUnsafeWrapper;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
@@ -42,10 +42,10 @@ import java.io.File;
 public interface IDhApiLevelWrapper extends IDhApiUnsafeWrapper
 {
 	IDhApiDimensionTypeWrapper getDimensionType();
-	
+
 	/** @since API 4.0.0 */
 	String getDimensionName();
-	
+
 	/**
 	 * Returns a string intended to uniquely identify this level.
 	 *
@@ -54,47 +54,48 @@ public interface IDhApiLevelWrapper extends IDhApiUnsafeWrapper
 	String getDhIdentifier();
 
 	EDhApiLevelType getLevelType();
-	
+
 	boolean hasCeiling();
-	
+
 	boolean hasSkyLight();
-	
-	/** 
+
+	/**
 	 * Deprecated, use {@link IDhApiLevelWrapper#getMaxHeight} instead. <br>
 	 * Returns the max block height of the level.
-	 * 
+	 *
 	 * @see IDhApiLevelWrapper#getMaxHeight
 	 */
 	@Deprecated
 	default int getHeight() { return this.getMaxHeight(); }
-	/** 
-	 * Returns the max block height of the level 
-	 * @since API 3.0.0 
+	/**
+	 * Returns the max block height of the level
+	 *
+	 * @since API 3.0.0
 	 */
 	int getMaxHeight();
-	
+
 	/**
 	 * Returns the lowest possible block position for the level.
 	 */
 	default int getMinHeight() { return 0; }
-	
-	/** 
+
+	/**
 	 * Will return null if called on the server,
 	 * or if called before the renderer has been set up.
-	 * 
+	 *
 	 * @since API 3.0.0
 	 */
 	IDhApiCustomRenderRegister getRenderRegister();
-	
+
 	/**
 	 * Returns the folder Distant Horizons uses to save
-	 * data associated with this level. 
+	 * data associated with this level.
 	 * Will return null if the level is not loaded.
 	 *
 	 * @since API 4.0.0
 	 */
 	File getDhSaveFolder();
-	
+
 	/**
 	 * Returns the color DH would use for the given block/biome
 	 * pair at the given world position before any API color overrides
@@ -102,10 +103,10 @@ public interface IDhApiLevelWrapper extends IDhApiUnsafeWrapper
 	 * API color overrides are ignored to prevent infinite
 	 * loops if this event is triggered inside said API override.
 	 * <br><br>
-	 * 
+	 *
 	 * Returns {@link DhApiResult#success} = false if {@link IDhApiLevelWrapper#getLevelType()} returns a {@link EDhApiLevelType#SERVER_LEVEL}
 	 * (server levels have no concept of textures or colors).
-	 * 
+	 *
 	 * @see DhApiBlockColorOverrideEvent
 	 * @since API 7.0.0
 	 */
@@ -114,7 +115,7 @@ public interface IDhApiLevelWrapper extends IDhApiUnsafeWrapper
 		IDhApiBiomeWrapper biomeWrapper,
 		int blockWorldPosX, int blockWorldPosY, int blockWorldPosZ,
 		IDhApiFullDataSource dataSource);
-	
-	
-	
+
+
+
 }

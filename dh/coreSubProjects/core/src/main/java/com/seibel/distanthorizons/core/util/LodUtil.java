@@ -32,22 +32,22 @@ public class LodUtil
 	 * Red, Orange, Yellow, Green, Cyan, Blue, Magenta, white, gray, black
 	 */
 	public static final int[] DEBUG_DETAIL_LEVEL_COLORS = new int[]{
-			ColorUtil.rgbToInt(255, 0, 0), ColorUtil.rgbToInt(255, 127, 0),
-			ColorUtil.rgbToInt(255, 255, 0), ColorUtil.rgbToInt(127, 255, 0),
-			ColorUtil.rgbToInt(0, 255, 0), ColorUtil.rgbToInt(0, 255, 127),
-			ColorUtil.rgbToInt(0, 255, 255), ColorUtil.rgbToInt(0, 127, 255),
-			ColorUtil.rgbToInt(0, 0, 255), ColorUtil.rgbToInt(127, 0, 255),
-			ColorUtil.rgbToInt(255, 0, 255), ColorUtil.rgbToInt(255, 127, 255),
-			ColorUtil.rgbToInt(255, 255, 255)};
-	
-	
+		ColorUtil.rgbToInt(255, 0, 0), ColorUtil.rgbToInt(255, 127, 0),
+		ColorUtil.rgbToInt(255, 255, 0), ColorUtil.rgbToInt(127, 255, 0),
+		ColorUtil.rgbToInt(0, 255, 0), ColorUtil.rgbToInt(0, 255, 127),
+		ColorUtil.rgbToInt(0, 255, 255), ColorUtil.rgbToInt(0, 127, 255),
+		ColorUtil.rgbToInt(0, 0, 255), ColorUtil.rgbToInt(127, 0, 255),
+		ColorUtil.rgbToInt(255, 0, 255), ColorUtil.rgbToInt(255, 127, 255),
+		ColorUtil.rgbToInt(255, 255, 255)};
+
+
 	/** 512 blocks wide */
 	public static final byte REGION_DETAIL_LEVEL = 9;
 	/** 16 blocks wide */
 	public static final byte CHUNK_DETAIL_LEVEL = 4;
 	/** 1 block wide */
 	public static final byte BLOCK_DETAIL_LEVEL = 0;
-	
+
 	/**
 	 * measured in Blocks <br>
 	 * detail level 9
@@ -66,12 +66,12 @@ public class LodUtil
 	public static final byte MAX_MC_LIGHT = 15;
 	/** lowest possible light level handled by Minecraft */
 	public static final byte MIN_MC_LIGHT = 0;
-	
+
 	/** the opacity value returned by {@link IBlockStateWrapper#getOpacity()} if a block is fully transparent */
 	public static final int BLOCK_FULLY_TRANSPARENT = 0;
 	/** the opacity value returned by {@link IBlockStateWrapper#getOpacity()} if a block is fully opaque */
 	public static final int BLOCK_FULLY_OPAQUE = 16;
-	
+
 	public static final double ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC = 30.0;
 	public static final double MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC = 100.0;
 
@@ -80,7 +80,7 @@ public class LodUtil
 	//=========//
 	// methods //
 	//=========//
-	
+
 	/** Returns the chunk int position for the given double position */
 	public static int getChunkPosFromDouble(double value) { return (int) Math.floor(value / CHUNK_WIDTH); }
 	/** Returns the float position inside the chunk for the given double position */
@@ -89,16 +89,16 @@ public class LodUtil
 		double chunkPos = Math.floor(value / CHUNK_WIDTH);
 		return (float) (value - chunkPos * CHUNK_WIDTH);
 	}
-	
+
 	public static class AssertFailureException extends RuntimeException
 	{
 		public AssertFailureException(String message)
 		{
 			super(message);
 		}
-		
+
 	}
-	
+
 	public static void assertTrue(boolean condition)
 	{
 		if (!condition)
@@ -117,7 +117,7 @@ public class LodUtil
 	{
 		throw new AssertFailureException("Assert Not Reach failed:\n " + message);
 	}
-	
-	
-	
+
+
+
 }

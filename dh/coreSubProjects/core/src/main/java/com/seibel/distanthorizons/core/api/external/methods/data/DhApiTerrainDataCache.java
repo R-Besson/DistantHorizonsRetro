@@ -15,16 +15,16 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 {
 	private final ReentrantLock modificationLock = new ReentrantLock();
 	private final Long2ReferenceOpenHashMap<SoftReference<FullDataSourceV2>> posToFullDataRef = new Long2ReferenceOpenHashMap<>();
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
-	
+
+
+
 	//==================//
 	// internal methods //
 	//==================//
 	//region
-	
+
 	public void add(long pos, FullDataSourceV2 dataSource)
 	{
 		try
@@ -37,14 +37,14 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 			modificationLock.unlock();
 		}
 	}
-	
+
 	@Nullable
 	public FullDataSourceV2 get(long pos)
 	{
 		try
 		{
 			modificationLock.lock();
-			
+
 			SoftReference<FullDataSourceV2> ref = this.posToFullDataRef.get(pos);
 			if (ref != null)
 			{
@@ -60,23 +60,23 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 			modificationLock.unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// API methods //
 	//=============//
 	//region
-	
-	@Override 
+
+	@Override
 	public void clear()
 	{
 		try
 		{
 			modificationLock.lock();
-			
+
 			LongSet keySet = this.posToFullDataRef.keySet();
 			for (long pos : keySet)
 			{
@@ -98,7 +98,7 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 					}
 				}
 			}
-			
+
 			// clearing can only be done after all the data sources have been closed
 			this.posToFullDataRef.clear();
 		}
@@ -107,24 +107,24 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 			modificationLock.unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
- 	// base overrides //
+	// base overrides //
 	//================//
 	//region
-	
-	@Override 
+
+	@Override
 	public void close() { this.clear(); }
-	
-	@Override 
+
+	@Override
 	public String toString() { return "Size: " + this.posToFullDataRef.size(); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

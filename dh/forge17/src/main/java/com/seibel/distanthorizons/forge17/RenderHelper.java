@@ -17,141 +17,141 @@ import java.nio.FloatBuffer;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-public class RenderHelper 
+public class RenderHelper
 {
 	/** Not cached in a static: the Tessellator mixin can load this class during the loading screen, before ForgeMain binds the accessor */
 	private static IAngelicaAccessor getAngelicaAccessor() { return ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class); }
-	
+
 	private static DhMat4f modelViewMatrix;
 	private static DhMat4f projectionMatrix;
-	
-	
-	
+
+
+
 	//=================//
 	// matrix handling //
 	//=================//
 	//region
-	
+
 	public static DhMat4f getModelViewMatrix() { return new DhMat4f(modelViewMatrix); }
 	public static DhMat4f getProjectionMatrix() { return new DhMat4f(projectionMatrix); }
-	
+
 	public static void setModelViewMatrixFromBuffer(FloatBuffer modelviewBuffer)
 	{ modelViewMatrix = McObjectConverter.convert(new Matrix4f(modelviewBuffer)); }
 	public static void setProjectionMatrixFromBuffer(FloatBuffer projectionBuffer)
 	{ projectionMatrix = McObjectConverter.convert(new Matrix4f(projectionBuffer)); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// rendering //
 	//===========//
 	//region
-	
-	public static void renderLods() 
-    {
-        ClientApi.RENDER_STATE.mcModelViewMatrix = getModelViewMatrix();
-        ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
-        ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
-	    ClientApi.RENDER_STATE.partialTickTime = MinecraftRenderWrapper.INSTANCE.getPartialTickTime();
-		
-	    // only crash during development
-	    if (ModInfo.IS_DEV_BUILD)
-	    {
-		    ClientApi.RENDER_STATE.canRenderOrThrow();
-	    }
-	    
-	    
-		
+
+	public static void renderLods()
+	{
+		ClientApi.RENDER_STATE.mcModelViewMatrix = getModelViewMatrix();
+		ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
+		ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
+		ClientApi.RENDER_STATE.partialTickTime = MinecraftRenderWrapper.INSTANCE.getPartialTickTime();
+
+		// only crash during development
+		if (ModInfo.IS_DEV_BUILD)
+		{
+			ClientApi.RENDER_STATE.canRenderOrThrow();
+		}
+
+
+
 		// set GL state for DH rendering
-	    // TODO could we use DH's GLState object? or would that be overkill?
-	    if (getAngelicaAccessor() == null) 
+		// TODO could we use DH's GLState object? or would that be overkill?
+		if (getAngelicaAccessor() == null)
 		{
 			LWJGL.glDisable(GL32.GL_ALPHA_TEST);
-        }
-       
-        int oldActiveTex = LWJGL.glGetInteger(GL32.GL_ACTIVE_TEXTURE);
-        int oldBoundTex = LWJGL.glGetInteger(GL32.GL_TEXTURE_BINDING_2D);
-       
-		
-		
-        ClientApi.INSTANCE.renderLods();
-        
-		
-		
+		}
+
+		int oldActiveTex = LWJGL.glGetInteger(GL32.GL_ACTIVE_TEXTURE);
+		int oldBoundTex = LWJGL.glGetInteger(GL32.GL_TEXTURE_BINDING_2D);
+
+
+
+		ClientApi.INSTANCE.renderLods();
+
+
+
 		// restore the GL State
-	    LWJGL.glDepthFunc(GL32.GL_LEQUAL);
-        if (getAngelicaAccessor() == null) 
+		LWJGL.glDepthFunc(GL32.GL_LEQUAL);
+		if (getAngelicaAccessor() == null)
 		{
 			LWJGL.glEnable(GL32.GL_ALPHA_TEST);
-        }
-	    LWJGL.glDisable(GL32.GL_BLEND);
-	    
-	    LWJGL.glActiveTexture(oldActiveTex);
-	    LWJGL.glBindTexture(GL32.GL_TEXTURE_2D, oldBoundTex);
-    }
-	
+		}
+		LWJGL.glDisable(GL32.GL_BLEND);
+
+		LWJGL.glActiveTexture(oldActiveTex);
+		LWJGL.glBindTexture(GL32.GL_TEXTURE_2D, oldBoundTex);
+	}
+
 	// TODO why do we need to disable depth here?
-    public static void beforeWater() { LWJGL.glDepthMask(true); }
-	
-    public static void renderFade(boolean translucent) 
-    {
-        if (getAngelicaAccessor() != null
-            && !getAngelicaAccessor().canDoFadeShader()) 
+	public static void beforeWater() { LWJGL.glDepthMask(true); }
+
+	public static void renderFade(boolean translucent)
+	{
+		if (getAngelicaAccessor() != null
+			&& !getAngelicaAccessor().canDoFadeShader())
 		{
 			return;
-        }
-        ClientApi.RENDER_STATE.mcModelViewMatrix = getModelViewMatrix();
-        ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
-        ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
-	    
-	    if (getAngelicaAccessor() == null)
-	    {
-		    LWJGL.glDisable(GL32.GL_ALPHA_TEST);
-	    }
-		
-	    if (translucent)
-	    {
-		    ClientApi.INSTANCE.renderFadeTransparent();
-	    }
-	    else
-	    {
-		    ClientApi.INSTANCE.renderFadeOpaque();
-	    }
-	    if (getAngelicaAccessor() == null)
-	    {
-		    LWJGL.glEnable(GL32.GL_ALPHA_TEST);
-	    }
-	    
-	    LWJGL.glDepthFunc(GL32.GL_LEQUAL);
-	    LWJGL.glDisable(GL32.GL_BLEND);
-    }
-	
-    public static void renderDeferredLods() 
-    {
-        if (getAngelicaAccessor() == null) 
-		{
-            return;
-        }
-        ClientApi.RENDER_STATE.mcModelViewMatrix = getModelViewMatrix();
-        ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
-        ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
+		}
+		ClientApi.RENDER_STATE.mcModelViewMatrix = getModelViewMatrix();
+		ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
+		ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
 
-        ClientApi.INSTANCE.renderDeferredLodsForShaders();
-    }
-	
+		if (getAngelicaAccessor() == null)
+		{
+			LWJGL.glDisable(GL32.GL_ALPHA_TEST);
+		}
+
+		if (translucent)
+		{
+			ClientApi.INSTANCE.renderFadeTransparent();
+		}
+		else
+		{
+			ClientApi.INSTANCE.renderFadeOpaque();
+		}
+		if (getAngelicaAccessor() == null)
+		{
+			LWJGL.glEnable(GL32.GL_ALPHA_TEST);
+		}
+
+		LWJGL.glDepthFunc(GL32.GL_LEQUAL);
+		LWJGL.glDisable(GL32.GL_BLEND);
+	}
+
+	public static void renderDeferredLods()
+	{
+		if (getAngelicaAccessor() == null)
+		{
+			return;
+		}
+		ClientApi.RENDER_STATE.mcModelViewMatrix = getModelViewMatrix();
+		ClientApi.RENDER_STATE.mcProjectionMatrix = getProjectionMatrix();
+		ClientApi.RENDER_STATE.clientLevelWrapper = ClientLevelWrapper.getWrapper(Minecraft.getMinecraft().theWorld);
+
+		ClientApi.INSTANCE.renderDeferredLodsForShaders();
+	}
+
 	//endregion
-	
-	
-	
-	
-	
-	/** 
-	 * Unbinding is necessary to prevent 
-	 * a crash if DH is enabled while MC starts loading into the world 
+
+
+
+
+
+	/**
+	 * Unbinding is necessary to prevent
+	 * a crash if DH is enabled while MC starts loading into the world
 	 */
-    public static void UnbindAfterTesselatorDraw()
+	public static void UnbindAfterTesselatorDraw()
 	{
 		// touching LWJGL before the GL context exists would permanently break DH's LWJGL service,
 		// the Tessellator can draw before that point
@@ -189,29 +189,29 @@ public class RenderHelper
 		}
 	}
 
-	
-	
+
+
 	//=====//
 	// fog //
 	//=====//
 	//region
-	
-    public static void enableFog() { LWJGL.glEnable(GL32.GL_FOG); }
 
-    public static void disableFogDuringSetup() 
-    {
-        if (!MixinVanillaFogCommon.cancelFog()) 
+	public static void enableFog() { LWJGL.glEnable(GL32.GL_FOG); }
+
+	public static void disableFogDuringSetup()
+	{
+		if (!MixinVanillaFogCommon.cancelFog())
 		{
-            return;
-        }
-	    LWJGL.glDisable(GL32.GL_FOG);
-		
-        // Extremely high values cause issues, but 15 mebi-meters out should be 
-	    // practically infinite For Angelica
-	    LWJGL.glFogf(GL32.GL_FOG_START, 1024 * 1024 * 15);
-	    LWJGL.glFogf(GL32.GL_FOG_END, 1024 * 1024 * 16);
-    }
-	
+			return;
+		}
+		LWJGL.glDisable(GL32.GL_FOG);
+
+		// Extremely high values cause issues, but 15 mebi-meters out should be
+		// practically infinite For Angelica
+		LWJGL.glFogf(GL32.GL_FOG_START, 1024 * 1024 * 15);
+		LWJGL.glFogf(GL32.GL_FOG_END, 1024 * 1024 * 16);
+	}
+
 	public static void disableFogDuringRender(int cap)
 	{
 		// Cancel enabling fog if needed
@@ -221,14 +221,14 @@ public class RenderHelper
 		{
 			return;
 		}
-		
+
 		LWJGL.glEnable(cap);
 	}
-	
+
 	//endregion
-	
-	
-	
-	
-	
+
+
+
+
+
 }

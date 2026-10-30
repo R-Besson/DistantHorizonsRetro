@@ -20,7 +20,7 @@ public final class LegacyDimensionInfo
 
 
 
-	private LegacyDimensionInfo() {}
+	private LegacyDimensionInfo() { }
 
 
 
@@ -29,11 +29,15 @@ public final class LegacyDimensionInfo
 	{
 		switch (dimensionId)
 		{
-			case OVERWORLD: return "overworld";
-			case NETHER:    return "nether";
-			case THE_END:   return "the_end";
+			case OVERWORLD:
+				return "overworld";
+			case NETHER:
+				return "nether";
+			case THE_END:
+				return "the_end";
 
-			default:        return "DIM" + dimensionId;
+			default:
+				return "DIM" + dimensionId;
 		}
 	}
 

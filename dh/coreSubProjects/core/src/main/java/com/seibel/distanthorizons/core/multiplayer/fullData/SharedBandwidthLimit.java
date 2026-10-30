@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SharedBandwidthLimit
 {
 	private final Set<FullDataPayloadSender> senders = Collections.newSetFromMap(new ConcurrentHashMap<>());
-	
+
 	public void setSenderActive(FullDataPayloadSender sender, boolean active)
 	{
 		if (active)
@@ -21,7 +21,7 @@ public class SharedBandwidthLimit
 			this.senders.remove(sender);
 		}
 	}
-	
+
 	public int getBandwidthShare()
 	{
 		int globalBandwidthLimit = Config.Server.globalBandwidthLimit.get();
@@ -29,8 +29,8 @@ public class SharedBandwidthLimit
 		{
 			globalBandwidthLimit = Integer.MAX_VALUE;
 		}
-		
+
 		return globalBandwidthLimit / Math.max(this.senders.size(), 1);
 	}
-	
+
 }

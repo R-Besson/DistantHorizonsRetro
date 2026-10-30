@@ -33,5 +33,5 @@ public interface IDhServerMessageReceived<T> extends IDhApiEvent<T>
 	 * @param message The message sent from the server.
 	 */
 	void serverMessageReceived(String channel, byte[] message);
-	
+
 }

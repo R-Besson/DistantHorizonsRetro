@@ -37,41 +37,42 @@ import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
  */
 public interface IDhApiFogConfig extends IDhApiConfigGroup
 {
-	
+
 	//===============//
 	// inner configs //
 	//===============//
-	
+
 	/** The advanced fog config. */
 	IDhApiFarFogConfig farFog();
-	
+
 	/** The height fog config. */
 	IDhApiHeightFogConfig heightFog();
-	
+
 	//====================//
 	// basic fog settings //
 	//====================//
-	
-	/** 
+
+	/**
 	 * Used to enable/disable DH fog rendering.
+	 *
 	 * @deprecated since API 4.0.0 use {@link IDhApiFogConfig#enableDhFog}
 	 */
 	@Deprecated
 	IDhApiConfigValue<EDhApiFogDrawMode> drawMode();
-	/** 
-	 * Used to enable/disable DH fog rendering. 
-	 * 
+	/**
+	 * Used to enable/disable DH fog rendering.
+	 *
 	 * @since API 4.0.0
 	 */
 	IDhApiConfigValue<Boolean> enableDhFog();
-	
+
 	/** Can be used to enable support with mods that change vanilla MC's fog color. */
 	IDhApiConfigValue<EDhApiFogColorMode> color();
-	
+
 	/**
 	 * If enabled attempts to disable vanilla MC's fog on real chunks. <br>
 	 * May not play nice with other fog editing mods.
-	 * 
+	 *
 	 * @deprecated since API 4.0.0 use {@link IDhApiFogConfig#enableVanillaFog()}
 	 */
 	@Deprecated
@@ -83,7 +84,7 @@ public interface IDhApiFogConfig extends IDhApiConfigGroup
 	 * @since API 4.0.0
 	 */
 	IDhApiConfigValue<Boolean> enableVanillaFog();
-	
-	
-	
+
+
+
 }

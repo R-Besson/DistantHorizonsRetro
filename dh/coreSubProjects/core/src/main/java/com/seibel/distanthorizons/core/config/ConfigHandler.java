@@ -20,7 +20,12 @@
 package com.seibel.distanthorizons.core.config;
 
 import com.seibel.distanthorizons.core.config.file.ConfigFileHandler;
-import com.seibel.distanthorizons.core.config.types.*;
+import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
+import com.seibel.distanthorizons.core.config.types.ConfigCategory;
+import com.seibel.distanthorizons.core.config.types.ConfigEntry;
+import com.seibel.distanthorizons.core.config.types.ConfigUIComment;
+import com.seibel.distanthorizons.core.config.types.ConfigUISpacer;
+import com.seibel.distanthorizons.core.config.types.ConfigUiLinkedEntry;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -30,7 +35,11 @@ import com.seibel.distanthorizons.coreapi.ModInfo;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Sets up everything in {@link Config} for the file/GUI and keeps track of all
@@ -39,18 +48,17 @@ import java.util.*;
  *
  * @author coolGi
  * @author Ran
- * 
  * @see Config
  */
 public class ConfigHandler
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
-	
+
 	/**
 	 * What the config works with
-	 * <br> 
+	 * <br>
 	 * <br> {@link Enum}
 	 * <br> {@link Boolean}
 	 * <br> {@link Byte}
@@ -60,7 +68,7 @@ public class ConfigHandler
 	 * <br> {@link Long}
 	 * <br> {@link Float}
 	 * <br> {@link String}
-	 * <br> 
+	 * <br>
 	 * <br> // Below, "T" should be a value from above
 	 * <br> // Note: This is not checked, so we trust that you are doing the right thing
 	 * <br> List<T>
@@ -78,34 +86,34 @@ public class ConfigHandler
 		this.add(Long.class);
 		this.add(Float.class);
 		this.add(String.class);
-		
+
 		// partially implemented but not entirely
 		this.add(List.class);
 		this.add(ArrayList.class);
 		this.add(Map.class);
 		this.add(HashMap.class);
 	}};
-	
-	
-	
+
+
+
 	public static final ConfigHandler INSTANCE = new ConfigHandler();
-	
+
 	public final ConfigFileHandler configFileHandler = new ConfigFileHandler(getConfigPath());
 	public final List<AbstractConfigBase<?>> configBaseList = new ArrayList<>();
-	
+
 	public boolean isLoaded = false;
-	/** 
+	/**
 	 * Disables the minimum and maximum validation. <Br>
 	 * Fun to use, but should be disabled by default.
 	 */
 	public boolean runMinMaxValidation = true;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public static void tryRunFirstTimeSetup()
 	{
 		if (INSTANCE.isLoaded)
@@ -113,18 +121,18 @@ public class ConfigHandler
 			LOGGER.debug("ConfigHandler setup already run, ignoring.");
 			return;
 		}
-		
+
 		INSTANCE.runFirstTimeSetup();
 	}
 	private void runFirstTimeSetup()
 	{
 		LOGGER.info("Initialising config for [" + ModInfo.NAME + "]");
-		
+
 		this.initNestedClass(Config.class, ""); // Init root category
-		
+
 		this.configFileHandler.loadFromFile();
 		this.runMinMaxValidation = !Config.Client.Advanced.Debugging.allowUnsafeValues.get();
-		
+
 		this.isLoaded = true;
 		LOGGER.info("[" + ModInfo.NAME + "] Config initialised");
 	}
@@ -132,9 +140,9 @@ public class ConfigHandler
 	private static Path getConfigPath()
 	{
 		return MC_SHARED
-				.getInstallationDirectory().toPath()
-				.resolve("config")
-				.resolve(ModInfo.NAME + ".toml");
+			.getInstallationDirectory().toPath()
+			.resolve("config")
+			.resolve(ModInfo.NAME + ".toml");
 	}
 	/** Put all the config entries into configEntryList */
 	private void initNestedClass(Class<?> configClass, String category)
@@ -147,8 +155,8 @@ public class ConfigHandler
 			{
 				continue;
 			}
-			
-			
+
+
 			// add this config to the master list
 			try
 			{
@@ -156,17 +164,17 @@ public class ConfigHandler
 			}
 			catch (IllegalAccessException e)
 			{
-				LOGGER.warn("Unable to add config ["+field.getType().getName()+"], error: ["+e.getMessage()+"].", e);
+				LOGGER.warn("Unable to add config [" + field.getType().getName() + "], error: [" + e.getMessage() + "].", e);
 				continue;
 			}
-			
-			
+
+
 			// set any necessary variables in this config
 			AbstractConfigBase<?> configBase = this.configBaseList.get(this.configBaseList.size() - 1);
 			configBase.category = category;
 			configBase.name = field.getName();
-			
-			
+
+
 			// validate the config's input type
 			if (ConfigEntry.class.isAssignableFrom(field.getType()))
 			{
@@ -177,17 +185,17 @@ public class ConfigHandler
 					this.configBaseList.remove(this.configBaseList.size() - 1); // Delete the entry if it is invalid so the game can still run
 				}
 			}
-			
+
 			// recursively add deeper categories if present
 			if (ConfigCategory.class.isAssignableFrom(field.getType()))
 			{
 				ConfigCategory configCategory = (ConfigCategory) configBase;
-				
+
 				if (configCategory.getDestination() == null)
 				{
 					configCategory.destination = configBase.getNameAndCategory();
 				}
-				
+
 				// shouldn't happen, but just in case
 				if (configBase.get() != null)
 				{
@@ -202,16 +210,16 @@ public class ConfigHandler
 		{
 			return true;
 		}
-		
+
 		return ACCEPTABLE_INPUTS.contains(inputClass);
 	}
-	
-	
-	
+
+
+
 	//===============//
 	// lang handling //
 	//===============//
-	
+
 	/**
 	 * Used for checking that all the lang files for the config exist.
 	 * This is just to re-format the lang or check if there is something in the lang that is missing
@@ -224,61 +232,61 @@ public class ConfigHandler
 	{
 		ILangWrapper langWrapper = SingletonInjector.INSTANCE.get(ILangWrapper.class);
 		List<Class<? extends Enum<?>>> enumList = new ArrayList<>();
-		
+
 		StringBuilder generatedLang = new StringBuilder();
-		
+
 		String starter = "  \"";
 		String separator = "\":\n    \"";
 		String ending = "\",\n";
-		
+
 		// config entries
 		for (AbstractConfigBase<?> entry : this.configBaseList)
 		{
 			String entryPrefix = "distanthorizons.config." + entry.getNameAndCategory();
-			
-			if (checkEnums 
-				&& entry.getType().isEnum() 
+
+			if (checkEnums
+				&& entry.getType().isEnum()
 				&& !enumList.contains(entry.getType()))
-			{ 
+			{
 				// Put it in an enum list to work with at the end
 				enumList.add((Class<? extends Enum<?>>) entry.getType());
 			}
-			
-			
+
+
 			// config file items don't need lang entries
 			if (!entry.getAppearance().showInGui)
 			{
 				continue;
 			}
-			
+
 			// some entries don't need localization
 			if (ConfigUiLinkedEntry.class.isAssignableFrom(entry.getClass())
 				|| ConfigUISpacer.class.isAssignableFrom(entry.getClass()))
 			{
 				continue;
 			}
-			
+
 			if (ConfigUIComment.class.isAssignableFrom(entry.getClass())
-				&& ((ConfigUIComment)entry).parentConfigPath != null)
+				&& ((ConfigUIComment) entry).parentConfigPath != null)
 			{
-				entryPrefix = "distanthorizons.config." + ((ConfigUIComment)entry).parentConfigPath;
+				entryPrefix = "distanthorizons.config." + ((ConfigUIComment) entry).parentConfigPath;
 			}
-			
-			
+
+
 			if (langWrapper.langExists(entryPrefix)
 				&& onlyShowMissing)
 			{
 				continue;
 			}
-			
-			
+
+
 			generatedLang.append(starter).append(entryPrefix).append(separator).append(langWrapper.getLang(entryPrefix)).append(ending)
 			;
-			
+
 			// only add tooltips for entries that are also missing
 			// their primary lang
 			// this is done since not all menu items need a tooltip
-			if (!langWrapper.langExists(entryPrefix + ".@tooltip") 
+			if (!langWrapper.langExists(entryPrefix + ".@tooltip")
 				|| !onlyShowMissing)
 			{
 				generatedLang.append(starter).append(entryPrefix).append(".@tooltip").append(separator).append(langWrapper.getLang(entryPrefix + ".@tooltip")
@@ -287,20 +295,20 @@ public class ConfigHandler
 				;
 			}
 		}
-		
-		
+
+
 		// enums
 		if (!enumList.isEmpty())
 		{
 			generatedLang.append("\n"); // Separate the main lang with the enum's
-			
+
 			for (Class<? extends Enum> anEnum : enumList)
 			{
 				for (Object enumStr : new ArrayList<Object>(EnumSet.allOf(anEnum)))
 				{
 					String enumPrefix = "distanthorizons.config.enum." + anEnum.getSimpleName() + "." + enumStr.toString();
-					
-					if (!langWrapper.langExists(enumPrefix) 
+
+					if (!langWrapper.langExists(enumPrefix)
 						|| !onlyShowMissing)
 					{
 						generatedLang.append(starter).append(enumPrefix).append(separator).append(langWrapper.getLang(enumPrefix)).append(ending)
@@ -309,10 +317,10 @@ public class ConfigHandler
 				}
 			}
 		}
-		
+
 		return generatedLang.toString();
 	}
-	
-	
-	
+
+
+
 }

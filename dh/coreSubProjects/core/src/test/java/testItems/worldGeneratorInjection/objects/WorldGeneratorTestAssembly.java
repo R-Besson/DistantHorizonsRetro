@@ -29,7 +29,7 @@ import com.seibel.distanthorizons.coreapi.util.StringUtil;
  */
 public class WorldGeneratorTestAssembly
 {
-	
+
 	/** Returns the first N packages in this class' path. */
 	public static String getPackagePath(int numberOfPackagesToReturn)
 	{
@@ -37,5 +37,5 @@ public class WorldGeneratorTestAssembly
 		int secondPackageEndingIndex = StringUtil.nthIndexOf(thisPackageName, ".", numberOfPackagesToReturn);
 		return thisPackageName.substring(0, secondPackageEndingIndex);
 	}
-	
+
 }

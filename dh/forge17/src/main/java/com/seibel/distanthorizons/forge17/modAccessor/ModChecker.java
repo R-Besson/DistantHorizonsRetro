@@ -19,12 +19,12 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModChecker
 
 import cpw.mods.fml.common.Loader;
 
-public class ModChecker implements IModChecker 
+public class ModChecker implements IModChecker
 {
 
-    public static final ModChecker INSTANCE = new ModChecker();
-	
-    @Override
-    public boolean isModLoaded(String modid) { return Loader.isModLoaded(modid); }
+	public static final ModChecker INSTANCE = new ModChecker();
+
+	@Override
+	public boolean isModLoaded(String modid) { return Loader.isModLoaded(modid); }
 
 }

@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	protected final PositionalLockProvider updateLockProvider = new PositionalLockProvider();
 	/**
 	 * generally just used for debugging,
@@ -39,34 +39,34 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 	 */
 	public final Set<Long> lockedPosSet = ConcurrentHashMap.newKeySet();
 	private final ConcurrentHashMap<Long, AtomicInteger> queuedUpdateCountsByPos = new ConcurrentHashMap<>();
-	
+
 	private final Set<IDataSourceUpdateListenerFunc<FullDataSourceV2>> dateSourceUpdateListenerSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
-	
+
 	private final AtomicBoolean isShutdownRef = new AtomicBoolean(false);
-	
+
 	private final FullDataSourceProviderV2 provider;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public FullDataUpdaterV2(FullDataSourceProviderV2 provider)
 	{
 		this.provider = provider;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// data updating //
 	//===============//
 	//region
-	
+
 	/**
 	 * Can be used if you don't want to lock the current thread
 	 * Otherwise the sync version {@link FullDataUpdaterV2#updateDataSource(FullDataSourceV2)} may be a better choice.
@@ -77,14 +77,14 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 		{
 			return CompletableFuture.completedFuture(null);
 		}
-		
+
 		AbstractExecutorService executor = ThreadPoolUtil.getChunkToLodBuilderExecutor();
 		if (executor == null || executor.isTerminated())
 		{
 			return CompletableFuture.completedFuture(null);
 		}
-		
-		
+
+
 		try
 		{
 			this.markUpdateStart(inputDataSource.getPos());
@@ -96,7 +96,7 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 				}
 				catch (Exception e)
 				{
-					LOGGER.error("Unexpected error in async data source update at pos: ["+ DhSectionPos.toString(inputDataSource.getPos())+"], error: ["+e.getMessage()+"].", e);
+					LOGGER.error("Unexpected error in async data source update at pos: [" + DhSectionPos.toString(inputDataSource.getPos()) + "], error: [" + e.getMessage() + "].", e);
 				}
 				finally
 				{
@@ -111,7 +111,7 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 			return CompletableFuture.completedFuture(null);
 		}
 	}
-	
+
 	/** After this method returns the inputData will be written to file. */
 	public void updateDataSource(@NotNull FullDataSourceV2 inputData)
 	{
@@ -119,20 +119,20 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 		{
 			return;
 		}
-		
-		
+
+
 		long updatePos = inputData.getPos();
-		
+
 		// a lock is necessary to prevent two threads from writing to the same position at once,
 		// if that happens only the second update will apply and the LOD will end up with hole(s)
 		ReentrantLock updateLock = this.updateLockProvider.getLock(updatePos);
-		
+
 		try
 		{
 			updateLock.lock();
 			this.lockedPosSet.add(updatePos);
-			
-			
+
+
 			// get or create the data source
 			try (FullDataSourceV2 recipientDataSource = this.provider.get(updatePos))
 			{
@@ -151,8 +151,8 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 							// where overhangs (specifically floating islands) have 0 sky light when they shouldn't.
 							DhLightingEngine.INSTANCE.bakeDataSourceSkyLight(recipientDataSource, this.provider.levelWrapper.hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT);
 						}
-						
-						
+
+
 						// save the updated data to the database
 						try (FullDataSourceV2DTO dto = this.createDtoFromDataSource(recipientDataSource))
 						{
@@ -161,8 +161,8 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 								this.provider.repo.save(dto);
 							}
 						}
-						
-						
+
+
 						for (IDataSourceUpdateListenerFunc<FullDataSourceV2> listener : this.dateSourceUpdateListenerSet)
 						{
 							if (listener != null)
@@ -176,7 +176,7 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Error updating pos ["+DhSectionPos.toString(updatePos)+"], error: "+e.getMessage(), e);
+			LOGGER.error("Error updating pos [" + DhSectionPos.toString(updatePos) + "], error: " + e.getMessage(), e);
 		}
 		finally
 		{
@@ -184,7 +184,7 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 			this.lockedPosSet.remove(updatePos);
 		}
 	}
-	
+
 	private FullDataSourceV2DTO createDtoFromDataSource(FullDataSourceV2 dataSource)
 	{
 		try
@@ -195,34 +195,34 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 		}
 		catch (IOException e)
 		{
-			LOGGER.warn("Unable to create DTO, error: ["+e.getMessage() + "].", e);
+			LOGGER.warn("Unable to create DTO, error: [" + e.getMessage() + "].", e);
 			return null;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// events //
 	//========//
 	//region
-	
+
 	public void addDataSourceUpdateListener(IDataSourceUpdateListenerFunc<FullDataSourceV2> listener)
 	{ this.dateSourceUpdateListenerSet.add(listener); }
 	public void removeDataSourceUpdateListener(IDataSourceUpdateListenerFunc<FullDataSourceV2> listener)
 	{ this.dateSourceUpdateListenerSet.remove(listener); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// debugger methods //
 	//==================//
 	//region
-	
+
 	/** used for debugging to track which positions are queued for updating */
 	private void markUpdateStart(long dataSourcePos)
 	{
@@ -248,31 +248,31 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 			return atomicCount;
 		});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
 	//region
-	
+
 	@Override
 	public void debugRender(AbstractDebugWireframeRenderer renderer)
 	{
 		this.lockedPosSet
-				.forEach((pos) -> renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 74f, 0.15f, Color.PINK)));
-		
+			.forEach((pos) -> renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 74f, 0.15f, Color.PINK)));
+
 		this.queuedUpdateCountsByPos
-				.forEach((pos, updateCountRef) -> renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f + (updateCountRef.get() * 16f), 0.20f, Color.WHITE)));
+			.forEach((pos, updateCountRef) -> renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f + (updateCountRef.get() * 16f), 0.20f, Color.WHITE)));
 	}
-	
+
 	@Override
 	public void close() { this.isShutdownRef.set(true); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

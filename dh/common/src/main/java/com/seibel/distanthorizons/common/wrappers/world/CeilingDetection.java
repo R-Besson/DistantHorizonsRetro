@@ -48,7 +48,10 @@ public class CeilingDetection
 	private static ParsedCsv getCeilingDimensions()
 	{
 		String csv = Config.Client.Advanced.Graphics.Culling.ceilingDimensionCsv.get();
-		if (csv == null) { csv = ""; }
+		if (csv == null)
+		{
+			csv = "";
+		}
 		ParsedCsv parsed = ceilingDimensions;
 		if (!parsed.csv.equals(csv))
 		{
@@ -60,7 +63,10 @@ public class CeilingDetection
 	private static ParsedCsv getNoCeilingDimensions()
 	{
 		String csv = Config.Client.Advanced.Graphics.Culling.noCeilingDimensionCsv.get();
-		if (csv == null) { csv = ""; }
+		if (csv == null)
+		{
+			csv = "";
+		}
 		ParsedCsv parsed = noCeilingDimensions;
 		if (!parsed.csv.equals(csv))
 		{
@@ -93,8 +99,9 @@ public class CeilingDetection
 		{
 			return !this.entries.isEmpty()
 				&& (this.entries.contains(Integer.toString(dimensionId))
-					|| this.entries.contains(LegacyDimensionInfo.fullName(dimensionId).toLowerCase(Locale.ROOT)));
+				|| this.entries.contains(LegacyDimensionInfo.fullName(dimensionId).toLowerCase(Locale.ROOT)));
 		}
+
 	}
 
 	//endregion

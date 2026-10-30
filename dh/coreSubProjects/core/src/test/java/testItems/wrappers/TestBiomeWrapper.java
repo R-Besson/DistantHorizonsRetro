@@ -5,24 +5,24 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 public class TestBiomeWrapper implements IBiomeWrapper
 {
 	private final String name;
-	
-	
+
+
 	public TestBiomeWrapper(String name)
 	{ this.name = name; }
-	
-	
-	@Override 
+
+
+	@Override
 	public String getName()
 	{ return this.name; }
-	@Override 
+	@Override
 	public String getSerialString()
 	{ return this.name; }
-	
-	@Override 
-	public Object getWrappedMcObject() 
+
+	@Override
+	public Object getWrappedMcObject()
 	{ return this; }
-	
-	
+
+
 	@Override
 	public int hashCode()
 	{ return this.name.hashCode(); }
@@ -33,8 +33,8 @@ public class TestBiomeWrapper implements IBiomeWrapper
 		{
 			return false;
 		}
-		
-		return this.name.equals(((TestBiomeWrapper)obj).name);
+
+		return this.name.equals(((TestBiomeWrapper) obj).name);
 	}
-	
+
 }

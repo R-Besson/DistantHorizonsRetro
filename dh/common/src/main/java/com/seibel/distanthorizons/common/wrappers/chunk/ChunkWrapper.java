@@ -16,6 +16,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.seibel.distanthorizons.common.wrappers.chunk;
 
 import com.seibel.distanthorizons.api.DhApi;
@@ -270,7 +271,7 @@ public class ChunkWrapper implements IChunkWrapper
 
 		// determine the highest empty section (top down)
 		ExtendedBlockStorage[] sections = this.getSections();
-		for (int index = sections.length-1; index >= 0; index--)
+		for (int index = sections.length - 1; index >= 0; index--)
 		{
 			// update at each position to fix using the max height if the chunk is empty
 			this.maxNonEmptyHeight = this.getChunkSectionMinHeight(index) + 16;
@@ -302,7 +303,7 @@ public class ChunkWrapper implements IChunkWrapper
 			&& !DhApi.isDhThread())
 		{
 			heightmapThreadWarningLogged = true;
-			LOGGER.warn("ChunkWrapper Height maps created on non-DH thread ["+Thread.currentThread().getName()+"]. This may cause stuttering.");
+			LOGGER.warn("ChunkWrapper Height maps created on non-DH thread [" + Thread.currentThread().getName() + "]. This may cause stuttering.");
 		}
 
 
@@ -323,14 +324,14 @@ public class ChunkWrapper implements IChunkWrapper
 				int y = this.getMaxNonEmptyHeight();
 				IBlockStateWrapper block = this.getBlockState(x, y, z);
 				while (// go down until we reach the minimum build height
-						y > minInclusiveBuildHeight
+					y > minInclusiveBuildHeight
 						// keep going until we find both height map values
 						&&
 						(
 							solidHeight == minInclusiveBuildHeight
-							|| lightBlockingHeight == minInclusiveBuildHeight
+								|| lightBlockingHeight == minInclusiveBuildHeight
 						)
-					)
+				)
 				{
 					// is this block solid?
 					if (solidHeight == minInclusiveBuildHeight
@@ -420,7 +421,7 @@ public class ChunkWrapper implements IChunkWrapper
 			// the message can be null (common for NPEs on Java 8), which ConcurrentHashMap doesn't accept
 			if (LOGGED_BLOCK_GET_ERRORS.add(e.getClass().getName() + ": " + e.getMessage()))
 			{
-				LOGGER.warn("Failed to get block from chunk ["+this.chunkPos+"] at relative block pos ["+relX+","+relY+","+relZ+"], air will be used instead. This error message will only be logged once. error: ["+e.getMessage()+"].", e);
+				LOGGER.warn("Failed to get block from chunk [" + this.chunkPos + "] at relative block pos [" + relX + "," + relY + "," + relZ + "], air will be used instead. This error message will only be logged once. error: [" + e.getMessage() + "].", e);
 			}
 
 			return BlockStateWrapper.AIR;
@@ -443,7 +444,7 @@ public class ChunkWrapper implements IChunkWrapper
 			// the message can be null (common for NPEs on Java 8), which ConcurrentHashMap doesn't accept
 			if (LOGGED_BLOCK_GET_ERRORS.add(e.getClass().getName() + ": " + e.getMessage()))
 			{
-				LOGGER.warn("Failed to get block from chunk ["+this.chunkPos+"] at relative block pos ["+relX+","+relY+","+relZ+"], air will be used instead. This error message will only be logged once. error: ["+e.getMessage()+"].", e);
+				LOGGER.warn("Failed to get block from chunk [" + this.chunkPos + "] at relative block pos [" + relX + "," + relY + "," + relZ + "], air will be used instead. This error message will only be logged once. error: [" + e.getMessage() + "].", e);
 			}
 
 			return BlockStateWrapper.AIR;

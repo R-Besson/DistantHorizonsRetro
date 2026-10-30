@@ -9,34 +9,34 @@ import java.util.concurrent.locks.StampedLock;
  * A thread-safe string pool backed by a trie.
  *
  * @link h<a href = " ttps: / / en.wikipedia.org / wiki / Trie
-	">...</a> * @link <a href="https://claude.ai/share/eb7fddbe-03a0-4562-88a0-a089b7a52006">...</a>
+	* ">...</a> * @link <a href="https://claude.ai/share/eb7fddbe-03a0-4562-88a0-a089b7a52006">...</a>
  */
 public class StringPool
 {
 	public static final StringPool INSTANCE = new StringPool();
-	
+
 	private final TrieNode root = new TrieNode();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	///region
-	
+	/// region
+
 	// for now we only need a single INSTANCE,
 	// if that changes in the future we can change this up
-	private StringPool() {}
-	
+	private StringPool() { }
+
 	///endregion
-	
-	
-	
+
+
+
 	//===================//
 	// get pooled string //
 	//===================//
 	///region
-	
+
 	/**
 	 * Returns a pooled String instance for the given character array.
 	 * If an equivalent string already exists in the pool, returns that instance.
@@ -46,7 +46,7 @@ public class StringPool
 	 * @return a pooled String instance
 	 */
 	public String getPooledString(CharArrayList chars) { return this.getPooledString(chars, 0, chars.size()); }
-	
+
 	/**
 	 * Returns a pooled String instance for a substring of the given character array.
 	 *
@@ -61,29 +61,29 @@ public class StringPool
 		{
 			return "";
 		}
-		
+
 		TrieNode currentNode = this.root;
-		
+
 		// Navigate/create the trie path
 		for (int i = 0; i < length; i++)
 		{
 			char c = chars.getChar(offset + i);
 			currentNode = currentNode.getOrCreateChild(c);
 		}
-		
+
 		// Get or set the string at the leaf node
 		return currentNode.getOrSetString(chars, offset, length);
 	}
-	
+
 	///endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	///region
-	
+
 	/**
 	 * Node in the trie structure. Uses a {@link StampedLock} for efficient concurrent access
 	 * with optimistic reads for the common use case where the node already exists.
@@ -93,23 +93,23 @@ public class StringPool
 		private volatile ConcurrentHashMap<Character, TrieNode> children;
 		private volatile String value;
 		private final StampedLock lock = new StampedLock();
-		
-		
-		
+
+
+
 		//================//
 		// node interface //
 		//================//
-		///region
-		
+		/// region
+
 		TrieNode getOrCreateChild(char inputChar)
 		{
 			// Optimistic read - try without locking first
 			long stamp = this.lock.tryOptimisticRead();
 			ConcurrentHashMap<Character, TrieNode> currentChildren = this.children;
-			
+
 			// check for an existing child node
 			if (stamp != 0 // zero means exclusively locked
-				&& this.lock.validate(stamp) 
+				&& this.lock.validate(stamp)
 				&& currentChildren != null)
 			{
 				TrieNode child = currentChildren.get(inputChar);
@@ -118,7 +118,7 @@ public class StringPool
 					return child;
 				}
 			}
-			
+
 			// we need to acquire a read lock to safely check again
 			stamp = this.lock.readLock();
 			try
@@ -131,7 +131,7 @@ public class StringPool
 						return child;
 					}
 				}
-				
+
 				// Upgrade to write lock to create the child
 				long writeStamp = this.lock.tryConvertToWriteLock(stamp);
 				if (writeStamp == 0)
@@ -140,7 +140,7 @@ public class StringPool
 					writeStamp = this.lock.writeLock();
 				}
 				stamp = writeStamp;
-				
+
 				// add the missing node if needed (check in case of concurrency)
 				if (this.children == null)
 				{
@@ -153,20 +153,20 @@ public class StringPool
 				this.lock.unlock(stamp);
 			}
 		}
-		
+
 		String getOrSetString(CharArrayList chars, int offset, int length)
 		{
 			// Optimistic read
 			long stamp = this.lock.tryOptimisticRead();
 			String currentValue = this.value;
-			
-			if (stamp != 0 
-				&& this.lock.validate(stamp) 
+
+			if (stamp != 0
+				&& this.lock.validate(stamp)
 				&& currentValue != null)
 			{
 				return currentValue;
 			}
-			
+
 			// Acquire read lock
 			stamp = this.lock.readLock();
 			try
@@ -175,7 +175,7 @@ public class StringPool
 				{
 					return this.value;
 				}
-				
+
 				// Upgrade to write lock
 				long writeStamp = this.lock.tryConvertToWriteLock(stamp);
 				if (writeStamp == 0)
@@ -185,13 +185,13 @@ public class StringPool
 					writeStamp = this.lock.writeLock();
 				}
 				stamp = writeStamp;
-				
+
 				// Double-check
 				if (this.value != null)
 				{
 					return this.value;
 				}
-				
+
 				// create our newly pooled string
 				this.value = new String(chars.elements(), offset, length);
 				return this.value;
@@ -201,14 +201,14 @@ public class StringPool
 				this.lock.unlock(stamp);
 			}
 		}
-		
+
 		///endregion
 
 	}
-	
+
 	///endregion
-	
-	
-	
+
+
+
 }
 

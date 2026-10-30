@@ -27,20 +27,20 @@ import com.seibel.distanthorizons.core.config.api.DhApiConfigValue;
 public class DhApiTextureConfig implements IDhApiTextureConfig
 {
 	public static DhApiTextureConfig INSTANCE = new DhApiTextureConfig();
-	
+
 	private DhApiTextureConfig() { }
-	
-	
-	
+
+
+
 	@Override
 	public IDhApiConfigValue<Boolean> texturesEnabled()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.enableTexturedLods); }
 	@Override
 	public IDhApiConfigValue<Integer> maxTexturedLodDetailLevel()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel); }
-	
-	
-	
+
+
+
 	@Override
 	public IDhApiConfigValue<String> blocksDontRenderTextureCsv()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blocksDontRenderTextureCsv); }
@@ -53,5 +53,5 @@ public class DhApiTextureConfig implements IDhApiTextureConfig
 	@Override
 	public IDhApiConfigValue<String> blocksAlwaysRasterizeTextureCsv()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blocksAlwaysRasterizeTextureCsv); }
-	
+
 }

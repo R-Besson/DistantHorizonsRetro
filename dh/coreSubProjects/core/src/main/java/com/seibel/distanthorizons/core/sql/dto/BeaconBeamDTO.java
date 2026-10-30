@@ -31,48 +31,48 @@ public class BeaconBeamDTO implements IBaseDTO<DhBlockPos>, INetworkObject
 {
 	public DhBlockPos blockPos;
 	public Color color;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public BeaconBeamDTO(DhBlockPos blockPos, Color color)
 	{
 		this.blockPos = blockPos;
 		this.color = color;
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// network //
 	//=========//
-	
+
 	@Override
 	public void encode(ByteBuf out)
 	{
 		this.blockPos.encode(out);
 		out.writeInt(this.color.getRGB());
 	}
-	
+
 	@Override
 	public void decode(ByteBuf in)
 	{
 		this.blockPos = INetworkObject.decodeToInstance(new DhBlockPos(), in);
 		this.color = new Color(in.readInt());
 	}
-	
-	
+
+
 	//===========//
 	// overrides //
 	//===========//
-	
+
 	@Override
 	public DhBlockPos getKey() { return this.blockPos; }
-	
-	@Override 
+
+	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj == null
@@ -80,19 +80,19 @@ public class BeaconBeamDTO implements IBaseDTO<DhBlockPos>, INetworkObject
 		{
 			return false;
 		}
-		
-		BeaconBeamDTO that = (BeaconBeamDTO)obj;
-		return this.blockPos.equals(that.blockPos) 
+
+		BeaconBeamDTO that = (BeaconBeamDTO) obj;
+		return this.blockPos.equals(that.blockPos)
 			&& this.color.equals(that.color);
 	}
-	
+
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-	
-	@Override 
+
+	@Override
 	public String toString() { return this.blockPos + " " + this.color; }
-	
-	
-	
+
+
+
 }

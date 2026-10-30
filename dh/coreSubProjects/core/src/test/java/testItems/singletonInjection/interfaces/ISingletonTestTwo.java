@@ -30,7 +30,7 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 public interface ISingletonTestTwo extends IBindable
 {
 	int getValue();
-	
+
 	int getDependentValue();
-	
+
 }

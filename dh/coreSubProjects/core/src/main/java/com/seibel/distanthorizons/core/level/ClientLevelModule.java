@@ -48,41 +48,41 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
-	
+
 	private final IDhClientLevel clientLevel;
-	
+
 	@WillNotClose
 	public final FullDataSourceProviderV2 fullDataSourceProvider;
 	public final AtomicReference<ClientRenderState> ClientRenderStateRef = new AtomicReference<>();
-	/** 
+	/**
 	 * This is handled outside of the {@link ClientRenderState} to prevent destroying
 	 * the {@link IDhGenericRenderer} when changing render distances or enabling/disabling rendering. <br><br>
-	 * 
-	 * Destroying the {@link IDhGenericRenderer} would cause any existing bindings to be 
+	 *
+	 * Destroying the {@link IDhGenericRenderer} would cause any existing bindings to be
 	 * erroneously removed.
 	 */
 	public final IDhGenericRenderer genericRenderer = WRAPPER_FACTORY.createGenericRenderer();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ClientLevelModule(IDhClientLevel clientLevel)
 	{
 		this.clientLevel = clientLevel;
-		
+
 		this.fullDataSourceProvider = this.clientLevel.getFullDataProvider();
 		this.fullDataSourceProvider.addDataSourceUpdateListener(this);
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// tick methods //
 	//==============//
-	
+
 	public void clientTick()
 	{
 		// can be false if the level is unloading
@@ -90,60 +90,60 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		{
 			return;
 		}
-		
+
 		ClientRenderState clientRenderState = this.ClientRenderStateRef.get();
 		if (clientRenderState == null)
 		{
 			return;
 		}
-		
+
 		// recreate the RenderState if the render distance changes
 		if (clientRenderState.viewDiameterInBlocks != ClientRenderState.getViewDiameterInBlocks())
 		{
 			// close the older renderer
 			clientRenderState.close();
 			this.ClientRenderStateRef.set(null);
-			
+
 			// create the new renderer
 			clientRenderState = new ClientRenderState(this.clientLevel, this.clientLevel.getFullDataProvider());
 			this.ClientRenderStateRef.set(clientRenderState);
 		}
-		
-		
+
+
 		DhBlockPos2D quadTreeTickBlockPos;
 		if (Config.Client.Advanced.Graphics.Quality.useCameraPositionForQualityDropOff.get())
 		{
 			// use camera position allow free cam mods work better
 			DhVec3d cameraDoublePos = MC_RENDER.getCameraExactPosition();
-			quadTreeTickBlockPos = new DhBlockPos2D((int)cameraDoublePos.x, (int)cameraDoublePos.z);
+			quadTreeTickBlockPos = new DhBlockPos2D((int) cameraDoublePos.x, (int) cameraDoublePos.z);
 		}
 		else
 		{
 			// player position allows multi-cam mods to work better
 			quadTreeTickBlockPos = new DhBlockPos2D(MC_CLIENT.getPlayerBlockPos());
 		}
-		
+
 		clientRenderState.quadtree.tryTick(quadTreeTickBlockPos);
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	public void startRenderer()
 	{
 		ClientRenderState clientRenderState = new ClientRenderState(this.clientLevel, this.clientLevel.getFullDataProvider());
 		if (!this.ClientRenderStateRef.compareAndSet(null, clientRenderState))
 		{
-			LOGGER.warn("Renderer already started for ["+this.clientLevel.getClientLevelWrapper()+"].");
+			LOGGER.warn("Renderer already started for [" + this.clientLevel.getClientLevelWrapper() + "].");
 			clientRenderState.close();
 		}
 	}
-	
+
 	public boolean isRendering() { return this.ClientRenderStateRef.get() != null; }
-	
+
 	public void stopRenderer()
 	{
 		ClientRenderState clientRenderState = this.ClientRenderStateRef.get();
@@ -152,18 +152,18 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 			LOGGER.warn("Tried to stop the renderer for [" + this + "] when it was not started.");
 			return;
 		}
-		
+
 		this.ClientRenderStateRef.compareAndSet(clientRenderState, null);
 		clientRenderState.close();
 	}
-	
-	
-	
+
+
+
 	//===============//
 	// data handling //
 	//===============//
-	
-	public CompletableFuture<Void> updateDataSourcesAsync(FullDataSourceV2 data) 
+
+	public CompletableFuture<Void> updateDataSourcesAsync(FullDataSourceV2 data)
 	{ return this.clientLevel.getFullDataProvider().updateDataSourceAsync(data); }
 	@Override
 	public void OnDataSourceUpdated(FullDataSourceV2 updatedFullDataSource)
@@ -175,7 +175,7 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 			ClientRenderState.quadtree.queuePosToReload(updatedFullDataSource.getPos());
 		}
 	}
-	
+
 	public void close()
 	{
 		// shutdown the renderer
@@ -185,17 +185,17 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 			this.ClientRenderStateRef.compareAndSet(ClientRenderState, null);
 			ClientRenderState.close();
 		}
-		
+
 		this.fullDataSourceProvider.removeDataSourceUpdateListener(this);
 		this.genericRenderer.close();
 	}
-	
-	
-	
+
+
+
 	//=======================//
 	// misc helper functions //
 	//=======================//
-	
+
 	public void clearRenderCache()
 	{
 		IClientLevelWrapper clientLevelWrapper = this.clientLevel.getClientLevelWrapper();
@@ -203,14 +203,14 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		{
 			clientLevelWrapper.clearBlockColorCache();
 		}
-		
+
 		ClientRenderState ClientRenderState = this.ClientRenderStateRef.get();
 		if (ClientRenderState != null && ClientRenderState.quadtree != null)
 		{
 			ClientRenderState.quadtree.clearRenderDataCache();
 		}
 	}
-	
+
 	public void reloadPos(long pos)
 	{
 		ClientRenderState clientRenderState = this.ClientRenderStateRef.get();
@@ -228,65 +228,65 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 			clientRenderState.quadtree.onConfigValueSet();
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	public static class ClientRenderState implements Closeable
 	{
 		public final LodQuadTree quadtree;
 		public final RenderBufferHandler renderBufferHandler;
-		
+
 		public final int viewDiameterInBlocks;
-		
-		
-		
+
+
+
 		//=============//
 		// constructor //
 		//=============//
-		
+
 		public ClientRenderState(
-				IDhClientLevel dhClientLevel, 
-				FullDataSourceProviderV2 fullDataSourceProvider)
+			IDhClientLevel dhClientLevel,
+			FullDataSourceProviderV2 fullDataSourceProvider)
 		{
 			this.viewDiameterInBlocks = getViewDiameterInBlocks();
-			
+
 			this.quadtree = new LodQuadTree(
 				dhClientLevel,
 				this.viewDiameterInBlocks,
 				// initial position is (0,0) just in case the player hasn't loaded in yet, the tree will be moved once the level starts ticking
 				0, 0,
 				fullDataSourceProvider);
-			
+
 			this.renderBufferHandler = new RenderBufferHandler(this.quadtree);
 		}
-		
+
 		/**
 		 * Used both during setup and
 		 * to determine if the render distance changed.
 		 */
-		public static int getViewDiameterInBlocks() 
-		{ 
-			return Config.Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius.get() 
-				* LodUtil.CHUNK_WIDTH 
-				* 2; 
+		public static int getViewDiameterInBlocks()
+		{
+			return Config.Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius.get()
+				* LodUtil.CHUNK_WIDTH
+				* 2;
 		}
-		
-		
-		
+
+
+
 		//================//
 		// base overrides //
 		//================//
-		
+
 		@Override
 		public void close()
 		{
 			this.quadtree.close();
 		}
-		
+
 	}
-	
+
 }

@@ -46,7 +46,7 @@ public class DhDataOutputStream extends DataOutputStream
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final ThreadLocal<ResettableArrayCache> LZMA_RESETTABLE_ARRAY_CACHE_GETTER = ThreadLocal.withInitial(() -> new ResettableArrayCache(new LzmaArrayCache()));
-	
+
 	private final ByteArrayList outputByteArray;
 	private final UnsynchronizedByteArrayOutputStream wrappedByteStream;
 	private final EDhApiDataCompressionMode compressionMode;
@@ -67,12 +67,12 @@ public class DhDataOutputStream extends DataOutputStream
 	{ return create(compressionMode, outputByteArray, DEFAULT_EXPECTED_SIZE_IN_BYTES); }
 	/**
 	 * @param expectedUncompressedSizeInBytes how big the buffer starts out,
-	 *                                        a good estimate saves growing and copying it while writing
+	 * a good estimate saves growing and copying it while writing
 	 */
 	public static DhDataOutputStream create(EDhApiDataCompressionMode compressionMode, ByteArrayList outputByteArray, int expectedUncompressedSizeInBytes) throws IOException
 	{ return new DhDataOutputStream(new UnsynchronizedByteArrayOutputStream(expectedUncompressedSizeInBytes), compressionMode, outputByteArray); }
 	private DhDataOutputStream(UnsynchronizedByteArrayOutputStream wrappedByteStream, EDhApiDataCompressionMode compressionMode, ByteArrayList outputByteArray) throws IOException
-	{ 
+	{
 		super(warpStream(wrappedByteStream, compressionMode));
 
 		this.wrappedByteStream = wrappedByteStream;
@@ -87,17 +87,17 @@ public class DhDataOutputStream extends DataOutputStream
 			switch (compressionMode)
 			{
 				case UNCOMPRESSED:
-					return stream;	
+					return stream;
 				case LZ4:
-					return new LZ4FrameOutputStream(stream, 
-							LZ4FrameOutputStream.BLOCKSIZE.SIZE_64KB, -1L,
-							// using native libraries has the least GC impact, however they also prevent
-							// shadowJar remapping, so we're going to use the normal fast instance for now
-							LZ4Factory.fastestInstance().fastCompressor(),
-							XXHashFactory.fastestInstance().hash32(),
-							//LZ4Factory.nativeInstance().fastCompressor(),
-							//XXHashFactory.nativeInstance().hash32(),
-							LZ4FrameOutputStream.FLG.Bits.BLOCK_INDEPENDENCE);
+					return new LZ4FrameOutputStream(stream,
+						LZ4FrameOutputStream.BLOCKSIZE.SIZE_64KB, -1L,
+						// using native libraries has the least GC impact, however they also prevent
+						// shadowJar remapping, so we're going to use the normal fast instance for now
+						LZ4Factory.fastestInstance().fastCompressor(),
+						XXHashFactory.fastestInstance().hash32(),
+						//LZ4Factory.nativeInstance().fastCompressor(),
+						//XXHashFactory.nativeInstance().hash32(),
+						LZ4FrameOutputStream.FLG.Bits.BLOCK_INDEPENDENCE);
 				case Z_STD_BLOCK:
 					// ZStd compression should be handled after the stream is closed
 					// just return the stream
@@ -109,35 +109,35 @@ public class DhDataOutputStream extends DataOutputStream
 					// Note: if the LZMA2Options are changed the array cache may need to be re-tested.
 					// the array cache was specifically tested and tuned for LZMA preset 3/4
 					return new XZOutputStream(stream, new LZMA2Options(3),
-							XZ.CHECK_CRC64, arrayCache);
-				
+						XZ.CHECK_CRC64, arrayCache);
+
 				case Z_STD_STREAM: // only kept so existing data can be read
 					throw new UnsupportedOperationException("Z_STD_STREAM is deprecated and shouldn't be used for encoding. The faster block encoding format should be used instead.");
-					
+
 				default:
-					throw new IllegalArgumentException("No compressor defined for ["+compressionMode+"]");
-				}
+					throw new IllegalArgumentException("No compressor defined for [" + compressionMode + "]");
 			}
-			catch (Error e)
-			{
-				// Should only happen if there's a library issue
-				LOGGER.error("Unexpected error when wrapping DhDataInputStream, error: ["+e.getMessage()+"].", e);
-				throw e;
-			}
+		}
+		catch (Error e)
+		{
+			// Should only happen if there's a library issue
+			LOGGER.error("Unexpected error when wrapping DhDataInputStream, error: [" + e.getMessage() + "].", e);
+			throw e;
+		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
-	public void close() throws IOException 
+	public void close() throws IOException
 	{
 		super.close();
-		
-		
+
+
 		this.outputByteArray.clear();
 		if (this.compressionMode == EDhApiDataCompressionMode.Z_STD_BLOCK)
 		{
@@ -147,9 +147,9 @@ public class DhDataOutputStream extends DataOutputStream
 		{
 			this.wrappedByteStream.appendTo(this.outputByteArray);
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 }

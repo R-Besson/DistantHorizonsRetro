@@ -11,7 +11,7 @@ import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 
 public class WorldGenUtil
 {
-	
+
 	/** will always return true if a generation max radius isn't set */
 	public static boolean isPosInWorldGenRange(
 		long requestedPos,
@@ -22,29 +22,29 @@ public class WorldGenUtil
 		{
 			return true;
 		}
-		
-		
+
+
 		DhBlockPos centerBlockPos = new DhChunkPos(centerChunkX, centerChunkZ).centerBlockPos();
 		int blockDistanceFromCenter = DhSectionPos.getChebyshevSignedBlockDistance(requestedPos, centerBlockPos);
 		int maxBlockRadius = maxChunkRadius * LodUtil.CHUNK_WIDTH;
-        return (blockDistanceFromCenter <= maxBlockRadius);
+		return (blockDistanceFromCenter <= maxBlockRadius);
 	}
-	
+
 	/** @return -1 for infinity */
 	public static int getMaxRegenDistanceInBlocks()
 	{
 		int lodChunkDist = Config.Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius.get();
 		int lodBlockDist = lodChunkDist * LodUtil.CHUNK_WIDTH;
-		
+
 		double percent = Config.Common.WorldGenerator.surfaceRegenMaxDistancePercent.get();
 		if (percent < 0.0f)
 		{
 			return -1;
 		}
-		
-		return (int)(lodBlockDist * percent);
+
+		return (int) (lodBlockDist * percent);
 	}
-	
+
 	/** @see FullDataUpdatePropagatorV2 */
 	public static boolean regenAllowed(FullDataSourceProviderV2 provider)
 	{
@@ -53,13 +53,13 @@ public class WorldGenUtil
 			// this provider doesn't allow generation
 			return false;
 		}
-		
+
 		if (!provider.getGeneratorPlan().chunkGenEnabled)
 		{
 			// chunk gen isn't allowed right now
 			return false;
 		}
-		
+
 		// Don't try re-generating pre-existing chunks
 		// since this will cause holes for missing/empty chunks.
 		// In the future we may want to change this so it ignores empty chunks instead,
@@ -68,7 +68,7 @@ public class WorldGenUtil
 		return !Config.Common.WorldGenerator.generatorPlan.get().surfaceGenEnabled
 			|| Config.Common.WorldGenerator.chunkGeneratorMode.get() != EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY;
 	}
-	
-	
-	
+
+
+
 }

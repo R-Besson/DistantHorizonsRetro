@@ -18,13 +18,31 @@ package com.seibel.distanthorizons.forge17;
 import com.seibel.distanthorizons.common.AbstractModInitializer;
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
 import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.*;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IChiselCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
 import com.seibel.distanthorizons.core.api.internal.ServerApi;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IPluginPacketSender;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.*;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IGregTechAccessor;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IHodgePodgeAccessor;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModChecker;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IRpleAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modLoader.IForgeMain;
-import com.seibel.distanthorizons.forge17.modAccessor.*;
+import com.seibel.distanthorizons.forge17.modAccessor.AngelicaAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.ChiselAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.CubicChunksAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.GregTechAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.GtnhLibAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.HodgePodgeAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.IrisAccessor;
+import com.seibel.distanthorizons.forge17.modAccessor.ModChecker;
+import com.seibel.distanthorizons.forge17.modAccessor.RpleAccessor;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -48,58 +66,58 @@ import java.util.function.Consumer;
 public class ForgeMain extends AbstractModInitializer implements IForgeMain
 {
 
-    @Mod.Instance
-    public static Object instance;
+	@Mod.Instance
+	public static Object instance;
 
 	private Consumer<MinecraftServer> eventHandlerStartServer;
-	
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public ForgeMain()
 	{
 		SingletonInjector.INSTANCE.bind(IForgeMain.class, this);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=======//
 	// setup //
 	//=======//
 	//region
-	
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) 
-    {
-        if (FMLCommonHandler.instance()
-            .getEffectiveSide()
-            .isClient()) 
+
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event)
+	{
+		if (FMLCommonHandler.instance()
+			.getEffectiveSide()
+			.isClient())
 		{
-            this.onInitializeClient();
-			
+			this.onInitializeClient();
+
 			// greg tech
-            if (Loader.isModLoaded("gregtech") 
-	            && this.enableGregTechAccessor())
-            {	
-	            this.addModCompatAccessor(IGregTechAccessor.class, GregTechAccessor::new);
-	            this.addModCompatAccessor(IGregTechCommonAccessor.class, GregTechAccessor::new);
-            }
-			
+			if (Loader.isModLoaded("gregtech")
+				&& this.enableGregTechAccessor())
+			{
+				this.addModCompatAccessor(IGregTechAccessor.class, GregTechAccessor::new);
+				this.addModCompatAccessor(IGregTechCommonAccessor.class, GregTechAccessor::new);
+			}
+
 			// angelica
-            if (Loader.isModLoaded(AngelicaAccessor.ANGELICA_MOD_ID))
+			if (Loader.isModLoaded(AngelicaAccessor.ANGELICA_MOD_ID))
 			{
 				AngelicaAccessor angelicaAccessor = new AngelicaAccessor();
-                angelicaAccessor.throwIfUnsupportedAngelicaVersion();
+				angelicaAccessor.throwIfUnsupportedAngelicaVersion();
 
 				// we don't use try-add here since there's some additional validation beyond
 				// just the mod being present
 				this.addModCompatAccessor(IAngelicaAccessor.class, () -> angelicaAccessor);
 			}
-			
+
 			// RPLE
 			if (Loader.isModLoaded("rple"))
 			{
@@ -119,11 +137,11 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 			{
 				this.addModCompatAccessor(IChiselCommonAccessor.class, ChiselAccessor::new);
 			}
-        }
+		}
 		else
 		{
-            this.onInitializeServer();
-        }
+			this.onInitializeServer();
+		}
 
 		// Hodge Podge
 		// used by the server-side world generator, so it's needed on both
@@ -142,10 +160,10 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 			this.addModCompatAccessor(ICubicChunksCommonAccessor.class, CubicChunksAccessor::new);
 		}
 
-        ForgeChunkManager.setForcedChunkLoadingCallback(
-            instance,
-            (List<ForgeChunkManager.Ticket> tickets, World world) -> releaseStaleTickets(tickets));
-    }
+		ForgeChunkManager.setForcedChunkLoadingCallback(
+			instance,
+			(List<ForgeChunkManager.Ticket> tickets, World world) -> releaseStaleTickets(tickets));
+	}
 	private boolean enableGregTechAccessor()
 	{
 		try
@@ -171,88 +189,88 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 			ForgeChunkManager.releaseTicket(ticket);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====================//
 	// server world events //
 	//=====================//
 	//region
-	
+
 	// ServerWorldLoadEvent
 	@Mod.EventHandler
 	public void onServerAboutToStart(FMLServerAboutToStartEvent event)
 	{
 		ServerThreadTaskHandler.INSTANCE.reset();
-		
+
 		// FML doesn't define an order between handlers of the same event,
 		// so config setup has to run in the same handler, before the DH world is created
 		if (this.eventHandlerStartServer != null)
 		{
 			this.eventHandlerStartServer.accept(event.getServer());
 		}
-		
+
 		ServerApi.INSTANCE.serverLoadEvent(
 			event.getServer()
 				.isDedicatedServer());
 	}
-	
-    // ServerWorldUnloadEvent
-    @Mod.EventHandler
-    public void serverWorldUnloadEvent(FMLServerStoppingEvent event) 
-    {
-        ServerApi.INSTANCE.serverUnloadEvent();
-    }
-	
-    @Mod.EventHandler
-    public void serverWorldUnloadEvent(FMLServerStoppedEvent event) 
-    {
-        ForgeServerProxy.serverStopping();
-    }
-	
+
+	// ServerWorldUnloadEvent
+	@Mod.EventHandler
+	public void serverWorldUnloadEvent(FMLServerStoppingEvent event)
+	{
+		ServerApi.INSTANCE.serverUnloadEvent();
+	}
+
+	@Mod.EventHandler
+	public void serverWorldUnloadEvent(FMLServerStoppedEvent event)
+	{
+		ForgeServerProxy.serverStopping();
+	}
+
 	//endregion
-	
-	
-	
+
+
+
 	//========================//
 	// AbstractModInitializer //
 	//========================//
 	//region
-	
-    @Override
-    protected void createInitialSharedBindings() 
-    {
-        SingletonInjector.INSTANCE.bind(IModChecker.class, ModChecker.INSTANCE);
-        SingletonInjector.INSTANCE.bind(IPluginPacketSender.class, new ForgePluginPacketSender());
-	    SingletonInjector.INSTANCE.bind(IBiomeHandler.class, BiomeHandler.INSTANCE);
-    }
-	
+
+	@Override
+	protected void createInitialSharedBindings()
+	{
+		SingletonInjector.INSTANCE.bind(IModChecker.class, ModChecker.INSTANCE);
+		SingletonInjector.INSTANCE.bind(IPluginPacketSender.class, new ForgePluginPacketSender());
+		SingletonInjector.INSTANCE.bind(IBiomeHandler.class, BiomeHandler.INSTANCE);
+	}
+
 	@Override
 	protected void createInitialClientBindings() { }
 	@Override
-    protected IEventProxy createClientProxy() { return new ForgeClientProxy(); }
-	
-    @Override
-    protected IEventProxy createServerProxy(boolean isDedicated) { return new ForgeServerProxy(isDedicated); }
-	
-    @Override
-    protected void initializeModCompat() 
-    { this.tryCreateModCompatAccessor("angelica", IIrisAccessor.class, IrisAccessor::new); }
-	
-    @Override
-    protected void subscribeClientStartedEvent(Runnable eventHandler) { eventHandler.run(); }
-	
+	protected IEventProxy createClientProxy() { return new ForgeClientProxy(); }
+
+	@Override
+	protected IEventProxy createServerProxy(boolean isDedicated) { return new ForgeServerProxy(isDedicated); }
+
+	@Override
+	protected void initializeModCompat()
+	{ this.tryCreateModCompatAccessor("angelica", IIrisAccessor.class, IrisAccessor::new); }
+
+	@Override
+	protected void subscribeClientStartedEvent(Runnable eventHandler) { eventHandler.run(); }
+
 	@Override
 	protected void subscribeServerStartingEvent(Consumer<MinecraftServer> eventHandler)
 	{ this.eventHandlerStartServer = eventHandler; }
-	
+
 	@Override
 	protected void runDelayedSetup() { SingletonInjector.INSTANCE.runDelayedSetup(); }
-	
+
 	//region
-	
-	
-	
+
+
+
 }

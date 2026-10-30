@@ -35,21 +35,21 @@ public class ConfigChangeListener<T> implements IConfigListener, Closeable
 {
 	private final ConfigEntry<T> configEntry;
 	private final Consumer<T> onValueChangeFunc;
-	
+
 	private T previousValue;
-	
-	
-	
+
+
+
 	public ConfigChangeListener(ConfigEntry<T> configEntry, Consumer<T> onValueChangeFunc)
 	{
 		this.configEntry = configEntry;
 		this.onValueChangeFunc = onValueChangeFunc;
-		
+
 		this.configEntry.addListener(this);
 		this.previousValue = this.configEntry.get();
 	}
-	
-	
+
+
 	@Override
 	public void onConfigValueSet()
 	{
@@ -60,17 +60,17 @@ public class ConfigChangeListener<T> implements IConfigListener, Closeable
 			this.onValueChangeFunc.accept(newValue);
 		}
 	}
-	
+
 	@Override
 	public void onUiModify() { /* do nothing, we only care about when the actual value is modified */ }
-	
-	
-	
+
+
+
 	/**
 	 * Removes the config event listener. <br>
 	 * Must be fired to prevent memory leaks.
 	 */
 	@Override
 	public void close() { this.configEntry.removeListener(this); }
-	
+
 }

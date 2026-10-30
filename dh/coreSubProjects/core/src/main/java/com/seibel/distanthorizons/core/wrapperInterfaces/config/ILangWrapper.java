@@ -23,9 +23,9 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 
 public interface ILangWrapper extends IBindable
 {
-	
+
 	boolean langExists(String str);
-	
+
 	String getLang(String str);
-	
+
 }

@@ -37,7 +37,7 @@ public interface IBlockStateFaceTextureProvider extends IBindable
 	 * since the texture needs to be baked.
 	 *
 	 * @param direction which face of the block to get,
-	 *                  only cardinal directions and up/down are valid
+	 * only cardinal directions and up/down are valid
 	 * @return null if no texture could be baked for this block state
 	 */
 	@Nullable
@@ -88,7 +88,7 @@ public interface IBlockStateFaceTextureProvider extends IBindable
 	 *
 	 * @param appearance from {@link #getPositionedAppearance}
 	 * @return how many rows, counted down from the top block, have their own side textures.
-	 *         0 if every row uses {@link #getPositionedFaceTexture}
+	 * 0 if every row uses {@link #getPositionedFaceTexture}
 	 */
 	int getPositionedSideRowCount(Object appearance);
 

@@ -30,7 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 18.0 (since 2.0 as {@code Objects})
  */
 @GwtCompatible
-public final class MoreObjects {
+public final class MoreObjects
+{
 
 	/**
 	 * Creates an instance of {@link ToStringHelper}.
@@ -65,16 +66,17 @@ public final class MoreObjects {
 	 * .add("x", 1)
 	 * .add("y", null)
 	 * .toString();
-	 * }
+	 *}
 	 *
 	 * <p>
 	 * Note that in GWT, class names are often obfuscated.
 	 *
 	 * @param self the object to generate the string for (typically {@code this}), used only for its
-	 *             class name
+	 * class name
 	 * @since 18.0 (since 2.0 as {@code Objects.toStringHelper()}).
 	 */
-	public static ToStringHelper toStringHelper(Object self) {
+	public static ToStringHelper toStringHelper(Object self)
+	{
 		return new ToStringHelper(
 			self.getClass()
 				.getSimpleName());
@@ -86,14 +88,16 @@ public final class MoreObjects {
 	 * @author Jason Lee
 	 * @since 18.0 (since 2.0 as {@code Objects.ToStringHelper}).
 	 */
-	public static final class ToStringHelper {
-		
+	public static final class ToStringHelper
+	{
+
 		private final String className;
 		private final ValueHolder holderHead = new ValueHolder();
 		private ValueHolder holderTail = holderHead;
-		
+
 		/** Use {@link MoreObjects#toStringHelper(Object)} to create an instance. */
-		private ToStringHelper(String className) {
+		private ToStringHelper(String className)
+		{
 			this.className = checkNotNull(className);
 		}
 
@@ -101,41 +105,45 @@ public final class MoreObjects {
 		 * Adds a name/value pair to the formatted output in {@code name=value} format. If {@code value}
 		 * is {@code null}, the string {@code "null"} is used.
 		 */
-		
-		public ToStringHelper add(String name, Object value) {
+
+		public ToStringHelper add(String name, Object value)
+		{
 			return addHolder(name, value);
 		}
-		
+
 		/**
 		 * Adds a name/value pair to the formatted output in {@code name=value} format.
 		 *
 		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
 		 */
-		
-		public ToStringHelper add(String name, boolean value) {
+
+		public ToStringHelper add(String name, boolean value)
+		{
 			return addHolder(name, String.valueOf(value));
 		}
-		
+
 		/**
 		 * Adds a name/value pair to the formatted output in {@code name=value} format.
 		 *
 		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
 		 */
-		
-		public ToStringHelper add(String name, int value) {
+
+		public ToStringHelper add(String name, int value)
+		{
 			return addHolder(name, String.valueOf(value));
 		}
-		
+
 		/**
 		 * Adds a name/value pair to the formatted output in {@code name=value} format.
 		 *
 		 * @since 18.0 (since 11.0 as {@code Objects.ToStringHelper.add()}).
 		 */
-		
-		public ToStringHelper add(String name, long value) {
+
+		public ToStringHelper add(String name, long value)
+		{
 			return addHolder(name, String.valueOf(value));
 		}
-		
+
 		/**
 		 * Returns a string in the format specified by {@link MoreObjects#toStringHelper(Object)}.
 		 *
@@ -146,55 +154,67 @@ public final class MoreObjects {
 		 * duplication of properties (multiple name/value pairs with the same name can be added).
 		 */
 		@Override
-		public String toString() {
+		public String toString()
+		{
 			// create a copy to keep it consistent in case value changes
 			String nextSeparator = "";
 			StringBuilder builder = new StringBuilder(32).append(className)
 				.append('{');
-			for (ValueHolder valueHolder = holderHead.next; valueHolder != null; valueHolder = valueHolder.next) {
+			for (ValueHolder valueHolder = holderHead.next; valueHolder != null; valueHolder = valueHolder.next)
+			{
 				Object value = valueHolder.value;
-				
+
 				builder.append(nextSeparator);
 				nextSeparator = ", ";
-				
-				if (valueHolder.name != null) {
+
+				if (valueHolder.name != null)
+				{
 					builder.append(valueHolder.name)
 						.append('=');
 				}
 				if (value != null && value.getClass()
-					.isArray()) {
-					Object[] objectArray = { value };
+					.isArray())
+				{
+					Object[] objectArray = {value};
 					String arrayString = Arrays.deepToString(objectArray);
 					builder.append(arrayString, 1, arrayString.length() - 1);
-				} else {
+				}
+				else
+				{
 					builder.append(value);
 				}
 			}
 			return builder.append('}')
 				.toString();
 		}
-		
-		private ValueHolder addHolder() {
+
+		private ValueHolder addHolder()
+		{
 			ValueHolder valueHolder = new ValueHolder();
 			holderTail = holderTail.next = valueHolder;
 			return valueHolder;
 		}
-		
-		private ToStringHelper addHolder(String name, Object value) {
+
+		private ToStringHelper addHolder(String name, Object value)
+		{
 			ValueHolder valueHolder = addHolder();
 			valueHolder.value = value;
 			valueHolder.name = checkNotNull(name);
 			return this;
 		}
-		
+
 		// Holder object for values that might be null and/or empty.
-		static class ValueHolder {
-			
+		static class ValueHolder
+		{
+
 			String name;
 			Object value;
 			ValueHolder next;
+
 		}
+
 	}
-	
-	private MoreObjects() {}
+
+	private MoreObjects() { }
+
 }

@@ -6,7 +6,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapp
 
 /**
  * Used to track the rendering state for the current frame.
- * 
+ *
  * @see ClientApi
  */
 public class DhRenderState
@@ -14,20 +14,20 @@ public class DhRenderState
 	public DhMat4f mcModelViewMatrix = new DhMat4f();
 	public DhMat4f mcProjectionMatrix = new DhMat4f();
 	/**
-     * percentage of time into the current client tick. <br><br>
-     *
-     * Can be converted to a millisecond frametime 
-     * (IE time between frames in milliseconds) using the formula: <br>
-     * <code>
-     * (partialTickTime/20*1000)
-     * </code> <br>
-     * IE 60 FPS = 16.6 MS <br>
-     *
-     * @link <a href="https://fpstoms.com/">...</a>
-     */
-	public float partialTickTime = -1; 
+	 * percentage of time into the current client tick. <br><br>
+	 *
+	 * Can be converted to a millisecond frametime
+	 * (IE time between frames in milliseconds) using the formula: <br>
+	 * <code>
+	 * (partialTickTime/20*1000)
+	 * </code> <br>
+	 * IE 60 FPS = 16.6 MS <br>
+	 *
+	 * @link <a href="https://fpstoms.com/">...</a>
+	 */
+	public float partialTickTime = -1;
 	public IClientLevelWrapper clientLevelWrapper = null;
-	
+
 	/**
 	 * This will generally be true if the player is: <br>
 	 * - blinded <br>
@@ -37,43 +37,43 @@ public class DhRenderState
 	 * to look correct.
 	 */
 	public boolean vanillaFogEnabled = false;
-	
-	
-	
+
+
+
 	//========//
 	// checks //
 	//========//
 	//region
-	
+
 	public String unableToRenderBecause()
 	{
 		String errorReasons = "";
-		
+
 		// the matrix may be the identity matrix or and old/incorrect matrix,
 		// but we did set it at least once before this
 		if (this.mcModelViewMatrix == null)
 		{
 			errorReasons += "no MVM Matrix, ";
 		}
-		
+
 		if (this.mcProjectionMatrix == null)
 		{
 			errorReasons += "no Projection Matrix, ";
 		}
-		
+
 		if (this.partialTickTime == -1)
 		{
 			errorReasons += "no Frame Time, ";
 		}
-		
+
 		if (this.clientLevelWrapper == null)
 		{
 			errorReasons += "no Level Wrapper, ";
 		}
-		
+
 		return errorReasons;
 	}
-	
+
 	public void canRenderOrThrow() throws IllegalStateException
 	{
 		String errorReasons = this.unableToRenderBecause();
@@ -82,9 +82,9 @@ public class DhRenderState
 			throw new IllegalStateException(errorReasons);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

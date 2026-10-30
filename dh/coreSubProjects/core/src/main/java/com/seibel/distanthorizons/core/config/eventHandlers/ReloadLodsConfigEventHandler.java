@@ -24,32 +24,32 @@ import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderProxy;
 
 public class ReloadLodsConfigEventHandler extends AbstractDelayedConfigEventHandler
 {
-	/** 
+	/**
 	 * should be used for user facing UI options
 	 * this allows the user a second to click through options before they're applied
 	 */
 	public static ReloadLodsConfigEventHandler DELAYED_INSTANCE = new ReloadLodsConfigEventHandler(AbstractDelayedConfigEventHandler.DEFAULT_TIMEOUT_IN_MS);
 	/** should be used for debug options so their change can be seen instantly */
 	public static ReloadLodsConfigEventHandler INSTANT_INSTANCE = new ReloadLodsConfigEventHandler(0);
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public ReloadLodsConfigEventHandler(long timeoutInMs) { super(timeoutInMs); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// events //
 	//========//
 	//region
-	
+
 	@Override
 	public void onConfigTimeout()
 	{
@@ -59,9 +59,9 @@ public class ReloadLodsConfigEventHandler extends AbstractDelayedConfigEventHand
 			renderProxy.clearRenderDataCache();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

@@ -6,21 +6,21 @@ import java.nio.ByteBuffer;
 
 public class IndexBufferBuilder
 {
-	
-	
+
+
 	//==========//
 	// building //
 	//==========//
 	//region
-	
+
 	public static ByteBuffer populateBuffer(PhantomArrayListCheckout checkout, int checkoutIndex, int quadCount)
 	{
 		int indexCount = quadCount * 6; // 2 triangles per quad
 		int byteSize = indexCount * Integer.BYTES;
-		
+
 		ByteBuffer buffer = checkout.getByteBuffer(checkoutIndex, byteSize);
 		buildBufferInt(quadCount, buffer);
-		
+
 		return buffer;
 	}
 	private static void buildBufferInt(int quadCount, ByteBuffer buffer)
@@ -43,9 +43,9 @@ public class IndexBufferBuilder
 		}
 		buffer.rewind();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

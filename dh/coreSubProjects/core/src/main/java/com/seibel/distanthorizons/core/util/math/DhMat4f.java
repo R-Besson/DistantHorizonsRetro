@@ -52,18 +52,18 @@ public class DhMat4f extends DhApiMat4f
 	{
 		IDENTITY.setIdentity();
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	/** all values are 0 */
 	public DhMat4f() { }
-	
+
 	public DhMat4f(DhApiMat4f sourceMatrix) { super(sourceMatrix); }
-	
+
 	/** Expects the values of the input buffer to be in row major order (AKA rows then columns) */
 	public DhMat4f(FloatBuffer buffer) { this(buffer.array()); }
 	/** Expects the values of the input array to be in row major order (AKA rows then columns) */
@@ -76,44 +76,44 @@ public class DhMat4f extends DhApiMat4f
 		this.m01 = sourceMatrix.m10();
 		this.m02 = sourceMatrix.m20();
 		this.m03 = sourceMatrix.m30();
-		
+
 		this.m10 = sourceMatrix.m01();
 		this.m11 = sourceMatrix.m11();
 		this.m12 = sourceMatrix.m21();
 		this.m13 = sourceMatrix.m31();
-		
+
 		this.m20 = sourceMatrix.m02();
 		this.m21 = sourceMatrix.m12();
 		this.m22 = sourceMatrix.m22();
 		this.m23 = sourceMatrix.m32();
-		
+
 		this.m30 = sourceMatrix.m03();
 		this.m31 = sourceMatrix.m13();
 		this.m32 = sourceMatrix.m23();
 		this.m33 = sourceMatrix.m33();
 	}
-	
+
 	public static Matrix4f createJomlMatrix(DhApiMat4f matrix)
 	{
 		return new Matrix4f(
-				matrix.m00, matrix.m10, matrix.m20, matrix.m30,
-				matrix.m01, matrix.m11, matrix.m21, matrix.m31,
-				matrix.m02, matrix.m12, matrix.m22, matrix.m32,
-				matrix.m03, matrix.m13, matrix.m23, matrix.m33
+			matrix.m00, matrix.m10, matrix.m20, matrix.m30,
+			matrix.m01, matrix.m11, matrix.m21, matrix.m31,
+			matrix.m02, matrix.m12, matrix.m22, matrix.m32,
+			matrix.m03, matrix.m13, matrix.m23, matrix.m33
 		);
 	}
 	public Matrix4f createJomlMatrix()
 	{
 		return new Matrix4f(
-				this.m00, this.m10, this.m20, this.m30,
-				this.m01, this.m11, this.m21, this.m31,
-				this.m02, this.m12, this.m22, this.m32,
-				this.m03, this.m13, this.m23, this.m33
+			this.m00, this.m10, this.m20, this.m30,
+			this.m01, this.m11, this.m21, this.m31,
+			this.m02, this.m12, this.m22, this.m32,
+			this.m03, this.m13, this.m23, this.m33
 		);
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
@@ -127,7 +127,7 @@ public class DhMat4f extends DhApiMat4f
 		matrix.m33 = 1.0F;
 		return matrix;
 	}
-	
+
 	public static DhMat4f createTranslateMatrix(float x, float y, float z)
 	{
 		DhMat4f matrix = new DhMat4f();
@@ -140,15 +140,15 @@ public class DhMat4f extends DhApiMat4f
 		matrix.m23 = z;
 		return matrix;
 	}
-	
-	
-	
+
+
+
 	//===============//
 	// Forge methods //
 	//===============//
 
 	public DhMat4f copy() { return new DhMat4f(this); }
-	
-	
-	
+
+
+
 }

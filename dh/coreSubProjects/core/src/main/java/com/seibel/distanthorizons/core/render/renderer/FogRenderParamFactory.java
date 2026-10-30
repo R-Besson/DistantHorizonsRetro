@@ -20,22 +20,22 @@ import java.awt.*;
 public class FogRenderParamFactory
 {
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
-	
+
 	/** cached object to reduce GC pressure */
 	private static final DhApiBeforeFogRenderEvent.EventParam EVENT_PARAM = new DhApiBeforeFogRenderEvent.EventParam();
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
 	//region
-	
+
 	/** returns a cached object to reduce GC pressure */
 	public static DhApiBeforeFogRenderEvent.EventParam getRenderParam(RenderParams renderParams)
 	{
 		Color fogColor = getFogColor();
-		
+
 		// far fog
 		EDhApiFogFalloff farFogFalloff = Config.Client.Advanced.Graphics.Fog.farFogFalloff.get();
 		float farFogStart = Config.Client.Advanced.Graphics.Fog.farFogStart.get();
@@ -43,20 +43,20 @@ public class FogRenderParamFactory
 		float farFogMin = Config.Client.Advanced.Graphics.Fog.farFogMin.get();
 		float farFogMax = Config.Client.Advanced.Graphics.Fog.farFogMax.get();
 		float farFogDensity = Config.Client.Advanced.Graphics.Fog.farFogDensity.get();
-		
-		
+
+
 		// height fog
 		EDhApiFogFalloff heightFogFalloff = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogFalloff.get();
 		EDhApiHeightFogMixMode heightFogMixingMode = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogMixMode.get();
 		EDhApiHeightFogDirection heightFogCameraDirection = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogDirection.get();
-		
+
 		float heightFogBaseHeight = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogBaseHeight.get();
 		float heightFogStart = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogStart.get();
 		float heightFogEnd = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogEnd.get();
 		float heightFogMin = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogMin.get();
 		float heightFogMax = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogMax.get();
 		float heightFogDensity = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogDensity.get();
-		
+
 		// override fog if underwater
 		if (MC_RENDER.isFogStateSpecial())
 		{
@@ -67,16 +67,16 @@ public class FogRenderParamFactory
 			farFogMax = 1.0f;
 			farFogDensity = 1.0f; // always render max density
 		}
-		
+
 		DhApiFogRenderParam fogRenderParam = new DhApiFogRenderParam(
 			fogColor,
-			
+
 			// far fog
 			farFogFalloff,
 			farFogStart, farFogEnd,
 			farFogMin, farFogMax,
 			farFogDensity,
-			
+
 			// height fog
 			heightFogFalloff,
 			heightFogMixingMode, heightFogCameraDirection,
@@ -85,15 +85,15 @@ public class FogRenderParamFactory
 			heightFogMin, heightFogMax,
 			heightFogDensity
 		);
-		
+
 		EVENT_PARAM.update(renderParams, fogRenderParam);
 		return EVENT_PARAM;
 	}
-	
+
 	private static Color getFogColor()
 	{
 		Color fogColor;
-		
+
 		if (Config.Client.Advanced.Graphics.Fog.colorMode.get() == EDhApiFogColorMode.USE_SKY_COLOR
 			// when underwater or special fogs are being used, don't use the sky color
 			&& !MC_RENDER.isFogStateSpecial())
@@ -104,12 +104,12 @@ public class FogRenderParamFactory
 		{
 			fogColor = MC_RENDER.getFogColor();
 		}
-		
+
 		return fogColor;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

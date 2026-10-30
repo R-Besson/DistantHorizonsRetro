@@ -59,9 +59,9 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRender
 public class DependencySetup
 {
 	protected static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
-	
+
+
+
 	public static void createSharedBindings()
 	{
 		SingletonInjector.INSTANCE.bind(ILangWrapper.class, LangWrapper.INSTANCE);
@@ -70,10 +70,10 @@ public class DependencySetup
 		SingletonInjector.INSTANCE.bind(IKeyedClientLevelManager.class, new KeyedClientLevelManager());
 		SingletonInjector.INSTANCE.bind(IDhApiCustomRenderObjectFactory.class, GenericRenderObjectFactory.INSTANCE);
 	}
-	
+
 	public static void createServerBindings()
 	{ SingletonInjector.INSTANCE.bind(IMinecraftSharedWrapper.class, MinecraftServerWrapper.INSTANCE); }
-	
+
 	public static void createClientBindings()
 	{
 		SingletonInjector.INSTANCE.bind(IMinecraftClientWrapper.class, MinecraftClientWrapper.INSTANCE);
@@ -82,7 +82,7 @@ public class DependencySetup
 		SingletonInjector.INSTANCE.bind(IConfigGui.class, ClassicConfigGUI.CONFIG_CORE_INTERFACE);
 		SingletonInjector.INSTANCE.bind(IBlockStateFaceTextureProvider.class, BlockStateTextureProvider.INSTANCE);
 	}
-	
+
 	private static boolean renderingApiBindingsSet = false;
 	/** will be called from a DH thread, not the render thread */
 	public synchronized static void setRenderingApiBindings()
@@ -94,20 +94,20 @@ public class DependencySetup
 			return;
 		}
 		renderingApiBindingsSet = true;
-		
-		
-		
+
+
+
 		EDhApiRenderingEngine renderingApiEnum = Config.Client.Advanced.Graphics.Experimental.renderingEngine.get();
 		if (renderingApiEnum == EDhApiRenderingEngine.AUTO)
 		{
 			IVersionConstants versionConstants = SingletonInjector.INSTANCE.get(IVersionConstants.class);
 			renderingApiEnum = versionConstants.getDefaultRenderingEngine();
 		}
-		
-		LOGGER.info("Setting DH Rendering API to: ["+renderingApiEnum+"]...");
-		
-		
-		
+
+		LOGGER.info("Setting DH Rendering API to: [" + renderingApiEnum + "]...");
+
+
+
 		boolean validApi;
 		AbstractDhRenderApiDefinition renderDefinition;
 		if (renderingApiEnum == EDhApiRenderingEngine.OPEN_GL)
@@ -122,35 +122,35 @@ public class DependencySetup
 		}
 		else
 		{
-			String message = "No ["+ AbstractDhRenderApiDefinition.class.getSimpleName()+"] concrete implementation found for the value: ["+renderingApiEnum+"].";
+			String message = "No [" + AbstractDhRenderApiDefinition.class.getSimpleName() + "] concrete implementation found for the value: [" + renderingApiEnum + "].";
 			LOGGER.fatal(message);
 			throw new IllegalStateException(message);
 		}
-		
-		
+
+
 		// crash if an invalid API is set
 		if (!validApi)
 		{
-			String message = "The Distant Horizons rendering engine ["+renderDefinition.getEngineName()+"]-["+renderingApiEnum+"] is not supported with this Minecraft config, reverting to ["+ EDhApiRenderingEngine.AUTO+"].";
+			String message = "The Distant Horizons rendering engine [" + renderDefinition.getEngineName() + "]-[" + renderingApiEnum + "] is not supported with this Minecraft config, reverting to [" + EDhApiRenderingEngine.AUTO + "].";
 			LOGGER.fatal(message);
 			Config.Client.Advanced.Graphics.Experimental.renderingEngine.set(EDhApiRenderingEngine.AUTO);
 			throw new IllegalStateException(message);
 		}
-		
+
 		// crash if the rendering API set doesn't match Minecraft's
 		EDhApiRenderingApi mcRenderApi = MinecraftRenderWrapper.INSTANCE.getMcRenderingApi();
 		if (mcRenderApi != renderDefinition.getRenderApi())
 		{
-			String message = "The Distant Horizons rendering engine ["+renderDefinition.getEngineName()+"]-["+renderDefinition.getRenderApi().name()+"] cannot be used since it's API doesn't match what Minecraft is currently set to use ["+mcRenderApi.name()+"]. Please either change Minecraft's rendering API or Distant Horizons'.";
+			String message = "The Distant Horizons rendering engine [" + renderDefinition.getEngineName() + "]-[" + renderDefinition.getRenderApi().name() + "] cannot be used since it's API doesn't match what Minecraft is currently set to use [" + mcRenderApi.name() + "]. Please either change Minecraft's rendering API or Distant Horizons'.";
 			LOGGER.fatal(message);
 			throw new IllegalStateException(message);
 		}
-		
-		
+
+
 		renderDefinition.bindRenderers();
-		LOGGER.info("DH Rendering successfully bound to: ["+renderDefinition.getEngineName()+"]...");
+		LOGGER.info("DH Rendering successfully bound to: [" + renderDefinition.getEngineName() + "]...");
 	}
-	
-	
-	
+
+
+
 }

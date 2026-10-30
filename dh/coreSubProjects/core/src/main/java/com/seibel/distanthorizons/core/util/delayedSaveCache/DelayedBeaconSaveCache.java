@@ -15,14 +15,14 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamDTO, DelayedBeaconSaveCache.BeaconSaveObjContainer>
 {
 	private final @NotNull ISaveBeaconsFunc saveBeaconsFunc;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public DelayedBeaconSaveCache(
 		@NotNull ISaveBeaconsFunc saveBeaconsFunc,
 		int saveDelayInMs)
@@ -30,25 +30,25 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 		super(saveDelayInMs);
 		this.saveBeaconsFunc = saveBeaconsFunc;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// save to memory //
 	//================//
 	//region
-	
+
 	/**
 	 * Replaces {@link DelayedBeaconSaveCache#writeToMemoryAndQueueSave(long, BeaconBeamDTO)}
 	 * due to some additional information being needed.
 	 */
 	public void queueBeaconBeamUpdatesForChunkPos(@NotNull DhChunkPos chunkPos, @NotNull List<BeaconBeamDTO> activeBeamList)
 	{
-		long pos = DhSectionPos.encodeContaining((byte)6, chunkPos);
+		long pos = DhSectionPos.encodeContaining((byte) 6, chunkPos);
 		BeaconSaveObjContainer container = super.writeToMemoryAndQueueSave(pos, null);
-		
+
 		ReentrantLock lockForPos = this.saveLockContainer.getLockForPos(pos);
 		try
 		{
@@ -60,28 +60,28 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 			lockForPos.unlock();
 		}
 	}
-	
-	/** 
+
+	/**
 	 * deprecated since we want to use {@link DelayedBeaconSaveCache#queueBeaconBeamUpdatesForChunkPos} instead
 	 * so we can track additional info.
 	 */
 	@Deprecated
 	@Override
 	public BeaconSaveObjContainer writeToMemoryAndQueueSave(long inputPos, BeaconBeamDTO inputObj) { throw new UnsupportedOperationException("Use queueBeaconBeamUpdatesForChunkPos instead"); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//====================//
 	// abstract overrides //
 	//====================//
 	//region
-	
-	@Override 
+
+	@Override
 	protected BeaconSaveObjContainer createEmptySaveObjContainer(long inputPos) { return new BeaconSaveObjContainer(inputPos); }
-	
-	@Override 
+
+	@Override
 	protected void handleDataSourceRemoval(@NotNull BeaconSaveObjContainer saveContainer)
 	{
 		for (DhChunkPos chunkPos : saveContainer.beaconsByBlockPosByChunkPos.keySet())
@@ -92,15 +92,15 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 			{
 				continue;
 			}
-			
+
 			HashMap<DhBlockPos, BeaconBeamDTO> beaconsByBlockPos = saveContainer.beaconsByBlockPosByChunkPos.get(chunkPos);
-			ArrayList<BeaconBeamDTO> beaconList = new ArrayList<>(beaconsByBlockPos.values()); 
-			
+			ArrayList<BeaconBeamDTO> beaconList = new ArrayList<>(beaconsByBlockPos.values());
+
 			int minBlockX = chunkPos.getMinBlockX();
 			int minBlockZ = chunkPos.getMinBlockZ();
 			int maxBlockX = chunkPos.getMaxBlockX();
 			int maxBlockZ = chunkPos.getMaxBlockZ();
-			
+
 			this.saveBeaconsFunc.updateBeaconBeamsBetweenBlockPos(
 				saveContainer.pos,
 				minBlockX, maxBlockX,
@@ -109,16 +109,16 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 			);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	@FunctionalInterface
 	public interface ISaveBeaconsFunc
 	{
@@ -129,32 +129,33 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 			int minBlockZ, int maxBlockZ,
 			List<BeaconBeamDTO> activeBeamList
 		);
+
 	}
-	
+
 	public static class BeaconSaveObjContainer extends AbstractSaveObjContainer<BeaconBeamDTO>
 	{
 		public final long pos;
 		public final HashMap<DhChunkPos, HashMap<DhBlockPos, BeaconBeamDTO>> beaconsByBlockPosByChunkPos = new HashMap<>();
-		
-		
-		
+
+
+
 		//=============//
 		// constructor //
 		//=============//
 		//region
-		
+
 		public BeaconSaveObjContainer(long pos) { this.pos = pos; }
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//===========//
 		// overrides //
 		//===========//
 		//region
-		
-		public void addBeaconsAtChunkPos(DhChunkPos chunkPos, List<BeaconBeamDTO> activeBeamList) 
+
+		public void addBeaconsAtChunkPos(DhChunkPos chunkPos, List<BeaconBeamDTO> activeBeamList)
 		{
 			HashMap<DhBlockPos, BeaconBeamDTO> beaconsByBlockPos = this.beaconsByBlockPosByChunkPos.get(chunkPos);
 			if (!this.beaconsByBlockPosByChunkPos.containsKey(chunkPos))
@@ -162,26 +163,26 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 				beaconsByBlockPos = new HashMap<>();
 				this.beaconsByBlockPosByChunkPos.put(chunkPos, beaconsByBlockPos);
 			}
-			
+
 			for (BeaconBeamDTO beacon : activeBeamList)
 			{
 				beaconsByBlockPos.put(beacon.blockPos, beacon);
 			}
 		}
-		
+
 		/**
 		 * This logic is handled via {@link BeaconSaveObjContainer#addBeaconsAtChunkPos} instead
 		 * due to requiring some additional information.
 		 */
-		@Override 
+		@Override
 		public void update(@Nullable BeaconBeamDTO newObj) { }
-		
+
 		//endregion
-		
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

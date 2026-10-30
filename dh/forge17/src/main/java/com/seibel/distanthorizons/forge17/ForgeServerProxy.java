@@ -30,21 +30,21 @@ import java.util.HashMap;
 
 public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 {
-    private final boolean isDedicated;
-	
-	
-	
+	private final boolean isDedicated;
+
+
+
 	//=============//
-    // constructor //
-    //=============//
+	// constructor //
+	//=============//
 	//region
 
-    public ForgeServerProxy(boolean isDedicated) 
-    { 
+	public ForgeServerProxy(boolean isDedicated)
+	{
 		this.isDedicated = isDedicated;
-	    
-    }
-	
+
+	}
+
 	@Override
 	public void registerEvents()
 	{
@@ -52,29 +52,29 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 		FMLCommonHandler.instance()
 			.bus()
 			.register(this);
-		
+
 		if (this.isDedicated)
 		{
 			ForgePluginPacketSender.setPacketHandler(ServerApi.INSTANCE::pluginMessageReceived);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
-    //========//
-    // events //
-    //========//
+
+
+
+	//========//
+	// events //
+	//========//
 	//region
-	
+
 	public static void serverStopping()
 	{
 		ServerThreadTaskHandler.INSTANCE.cancelPendingTasks();
 	}
 
-    // ServerTickEvent (at end)
-    @SubscribeEvent
+	// ServerTickEvent (at end)
+	@SubscribeEvent
 	public void serverTickEvent(TickEvent.ServerTickEvent event)
 	{
 		if (event.phase == TickEvent.Phase.START)
@@ -94,12 +94,12 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 	/** only used on the server thread */
 	private final HashMap<WorldServer, BlockChangeLodUpdater> blockChangeLodUpdaterByWorld = new HashMap<>();
 
-    // ServerLevelLoadEvent
-    @SubscribeEvent 
-    public void serverLevelLoadEvent(WorldEvent.Load event)
-    {
+	// ServerLevelLoadEvent
+	@SubscribeEvent
+	public void serverLevelLoadEvent(WorldEvent.Load event)
+	{
 		if (GetEventLevel(event) instanceof WorldServer)
-	    {
+		{
 			WorldServer world = (WorldServer) GetEventLevel(event);
 			ServerApi.INSTANCE.serverLevelLoadEvent(getServerLevelWrapper(world));
 
@@ -113,12 +113,12 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 		}
 	}
 
-    // ServerLevelUnloadEvent
-    @SubscribeEvent
+	// ServerLevelUnloadEvent
+	@SubscribeEvent
 	public void serverLevelUnloadEvent(WorldEvent.Unload event)
-    {
+	{
 		if (GetEventLevel(event) instanceof WorldServer)
-	    {
+		{
 			BlockChangeLodUpdater blockChangeLodUpdater = this.blockChangeLodUpdaterByWorld.remove((WorldServer) GetEventLevel(event));
 			if (blockChangeLodUpdater != null)
 			{
@@ -133,70 +133,70 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 		}
 	}
 
-    @SubscribeEvent
+	@SubscribeEvent
 	public void serverChunkLoadEvent(ChunkEvent.Load event)
-    {
+	{
 		if (!(event.world instanceof WorldServer))
-	    {
+		{
 			return;
 		}
-		
+
 		Chunk chunk = event.getChunk();
 		// Only handle event if chunk is ready, otherwise drop the update - we'll get it later during save
 		if (!ChunkWrapper.canSaveChunk(chunk))
-	    {
+		{
 			return;
 		}
-		
+
 		ILevelWrapper levelWrapper = ProxyUtil.getLevelWrapper(GetEventLevel(event));
 		ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, levelWrapper);
-	    ServerApi.INSTANCE.serverChunkLoadEvent(chunkWrapper, levelWrapper);
+		ServerApi.INSTANCE.serverChunkLoadEvent(chunkWrapper, levelWrapper);
 	}
 
-    @SubscribeEvent
-    public void serverChunkSaveEvent(ChunkDataEvent.Save event) 
-    {
-        if (!(event.world instanceof WorldServer)) 
+	@SubscribeEvent
+	public void serverChunkSaveEvent(ChunkDataEvent.Save event)
+	{
+		if (!(event.world instanceof WorldServer))
 		{
-            return;
-        }
-	    MixinChunkMapCommon.onChunkSave((WorldServer) event.world, event.getChunk());
-    }
+			return;
+		}
+		MixinChunkMapCommon.onChunkSave((WorldServer) event.world, event.getChunk());
+	}
 
-    @SubscribeEvent
-    public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event) 
-    {
-	    IServerPlayerWrapper serverPlayerWrapper = getServerPlayerWrapper(event);
-	    if (serverPlayerWrapper == null)
-	    {
-		    return;
-	    }
+	@SubscribeEvent
+	public void playerLoggedInEvent(PlayerEvent.PlayerLoggedInEvent event)
+	{
+		IServerPlayerWrapper serverPlayerWrapper = getServerPlayerWrapper(event);
+		if (serverPlayerWrapper == null)
+		{
+			return;
+		}
 		ServerApi.INSTANCE.serverPlayerJoinEvent(serverPlayerWrapper);
 	}
 
-    @SubscribeEvent
-    public void playerLoggedOutEvent(PlayerEvent.PlayerLoggedOutEvent event) 
-    {
-	    IServerPlayerWrapper serverPlayerWrapper = getServerPlayerWrapper(event);
-	    if (serverPlayerWrapper == null)
-	    {
-		    return;
-	    }
+	@SubscribeEvent
+	public void playerLoggedOutEvent(PlayerEvent.PlayerLoggedOutEvent event)
+	{
+		IServerPlayerWrapper serverPlayerWrapper = getServerPlayerWrapper(event);
+		if (serverPlayerWrapper == null)
+		{
+			return;
+		}
 		ServerApi.INSTANCE.serverPlayerDisconnectEvent(serverPlayerWrapper);
 	}
 
-    @SubscribeEvent
-    public void playerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event) 
-    {
-        ServerApi.INSTANCE.serverPlayerLevelChangeEvent(
-            getServerPlayerWrapper(event),
-            getServerLevelWrapper(event.fromDim, event),
-            getServerLevelWrapper(event.toDim, event));
-    }
+	@SubscribeEvent
+	public void playerChangedDimensionEvent(PlayerEvent.PlayerChangedDimensionEvent event)
+	{
+		ServerApi.INSTANCE.serverPlayerLevelChangeEvent(
+			getServerPlayerWrapper(event),
+			getServerLevelWrapper(event.fromDim, event),
+			getServerLevelWrapper(event.toDim, event));
+	}
 
-    @SubscribeEvent
+	@SubscribeEvent
 	public void clickBlockEvent(PlayerInteractEvent event)
-    {
+	{
 		// this event also fires for the client world in singleplayer,
 		// and RIGHT_CLICK_AIR has no block position (x/z are always 0)
 		if (event.world.isRemote
@@ -207,10 +207,10 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 
 		ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(event.world);
 		if (SharedApi.isChunkAtBlockPosAlreadyUpdating(wrappedLevel, event.x, event.z))
-	    {
+		{
 			return;
 		}
-		
+
 		ServerThreadTaskHandler.INSTANCE.queueTask(() ->
 		{
 			Chunk chunk = event.world.getChunkFromBlockCoords(event.x, event.z);
@@ -223,32 +223,32 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 			return null;
 		});
 	}
-	
+
 	//endregion
-	
-	
-	
-    //================//
-    // helper methods //
-    //================//
+
+
+
+	//================//
+	// helper methods //
+	//================//
 	//region
-	
+
 	private static World GetEventLevel(WorldEvent e) { return e.world; }
-	
-	private static IServerLevelWrapper getServerLevelWrapper(WorldServer level) 
-    { return ServerLevelWrapper.getWrapper(level); }
-	
-    private static IServerLevelWrapper getServerLevelWrapper(int dim, PlayerEvent event) 
-    {
-        WorldServer world = (WorldServer) event.player.worldObj;
-        WorldServer worldDim = world.func_73046_m()
-            .worldServerForDimension(dim);
-        return getServerLevelWrapper(worldDim);
-    }
-	
-    private static IServerPlayerWrapper getServerPlayerWrapper(PlayerEvent event) 
-    { return ServerPlayerWrapper.getWrapper((EntityPlayerMP) event.player); }
-	
+
+	private static IServerLevelWrapper getServerLevelWrapper(WorldServer level)
+	{ return ServerLevelWrapper.getWrapper(level); }
+
+	private static IServerLevelWrapper getServerLevelWrapper(int dim, PlayerEvent event)
+	{
+		WorldServer world = (WorldServer) event.player.worldObj;
+		WorldServer worldDim = world.func_73046_m()
+			.worldServerForDimension(dim);
+		return getServerLevelWrapper(worldDim);
+	}
+
+	private static IServerPlayerWrapper getServerPlayerWrapper(PlayerEvent event)
+	{ return ServerPlayerWrapper.getWrapper((EntityPlayerMP) event.player); }
+
 	//endregion
 
 }

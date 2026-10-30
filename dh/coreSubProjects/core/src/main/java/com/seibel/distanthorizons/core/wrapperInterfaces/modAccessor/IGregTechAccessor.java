@@ -21,5 +21,5 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor;
 
 public interface IGregTechAccessor extends IModAccessor
 {
-	
+
 }

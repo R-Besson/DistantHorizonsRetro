@@ -63,7 +63,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * than big globe does, so the difference in efficiency matters a lot less.
 	 */
 	private static final int SPECIAL_CASES = 2;
-	
+
 	/** the bit offset of {@link #links} where the lower link is stored. */
 	public static final int LOWER_SHIFT = 0;
 	/** the bit offset of {@link #links} where the higher link is stored. */
@@ -80,16 +80,16 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	public static final int LINK_MASK = 0xFFFF;
 	/** a constant to indicate that a link is non-existent. */
 	public static final int NULL = LINK_MASK;
-	
+
 	/** the default element of {@link #data} to indicate that there is no data. */
-	public static final long DEFAUlT_DATA  =  0L;
+	public static final long DEFAUlT_DATA = 0L;
 	/** the default element of {@link #links} to indicate that a node is not linked to any other nodes. */
 	public static final long DEFAULT_LINKS = -1L;
-	
-	
+
+
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Render Reducer");
-	
-	
+
+
 	/**
 	 * indexes of the nodes at the ends of this list.
 	 * access these fields through the getters,
@@ -113,19 +113,19 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * to the order of elements in this array.
 	 */
 	private ShortArrayList sortingArray;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public RenderDataPointReducingList()
 	{
 		super(ARRAY_LIST_POOL, 0, 1, 2, 0, 0);
 	}
-	
-	/** 
+
+	/**
 	 * Mutates this object so it can be used for the given {@link ColumnRenderView}. <Br>
 	 * Note: this must be called before this list can be used and this
 	 * object can only be used by one thread at a time.
@@ -133,7 +133,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	public void populate(ColumnRenderView view)
 	{
 		int size = view.size;
-		if (size == 0) 
+		if (size == 0)
 		{
 			this.setLowest(NULL);
 			this.setHighest(NULL);
@@ -146,10 +146,10 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			this.setSizeWithAir(0);
 			this.setSizeWithoutAir(0);
 			if (ASSERTS) this.checkLinks();
-			
+
 			return;
 		}
-		
+
 		// Allocate an array big enough to hold (2 * size - 1) nodes.
 		// This is the number of nodes we would have if none
 		// of the nodes in the provided view are touching,
@@ -161,14 +161,14 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		this.links = this.pooledArraysCheckout.getLongArray(0, arrayCapacity);
 		java.util.Arrays.fill(this.links.elements(), DEFAULT_LINKS);
 		this.data = this.pooledArraysCheckout.getLongArray(1, arrayCapacity);
-		
+
 		int sizeWithoutAir = 0;
-		for (int index = 0; index < size; index++) 
+		for (int index = 0; index < size; index++)
 		{
 			long packedData = view.get(index);
 			// first "pass" (if you can call it that) skips nodes with 0 height, and nodes that aren't visible.
 			// air nodes will be inserted *after* the nodes have been sorted by Y level.
-			if (isDataVisible(packedData) && RenderDataPointUtil.getYMin(packedData) < RenderDataPointUtil.getYMax(packedData)) 
+			if (isDataVisible(packedData) && RenderDataPointUtil.getYMin(packedData) < RenderDataPointUtil.getYMax(packedData))
 			{
 				this.setData(sizeWithoutAir, packedData);
 				this.setSortingIndex(sizeWithoutAir, sizeWithoutAir);
@@ -178,7 +178,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 
 		// Check if all segments to merge are air or otherwise invisible (barriers).
 		// If they are, then this list can stay empty.
-		if (sizeWithoutAir == 0) 
+		if (sizeWithoutAir == 0)
 		{
 			this.setLowest(NULL);
 			this.setHighest(NULL);
@@ -195,23 +195,23 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		this.sortByPosition(sizeWithoutAir);
 		//next pass: link the nodes together, and insert air nodes as necessary.
 		int sizeWithAir = sizeWithoutAir;
-		for (int sortingIndex = 1; sortingIndex < sizeWithoutAir; sortingIndex++) 
+		for (int sortingIndex = 1; sortingIndex < sizeWithoutAir; sortingIndex++)
 		{
-			int  lowerIndex = this.getSortingIndex(sortingIndex - 1);
+			int lowerIndex = this.getSortingIndex(sortingIndex - 1);
 			int higherIndex = this.getSortingIndex(sortingIndex);
-			long  lowerData = this.getData(lowerIndex);
+			long lowerData = this.getData(lowerIndex);
 			long higherData = this.getData(higherIndex);
-			int   lowerMaxY = RenderDataPointUtil.getYMax(lowerData);
-			int  higherMinY = RenderDataPointUtil.getYMin(higherData);
-			
-			if (lowerMaxY == higherMinY) 
-			{ 
+			int lowerMaxY = RenderDataPointUtil.getYMax(lowerData);
+			int higherMinY = RenderDataPointUtil.getYMin(higherData);
+
+			if (lowerMaxY == higherMinY)
+			{
 				//the two nodes touch.
 				this.setHigher(lowerIndex, higherIndex);
 				this.setLower(higherIndex, lowerIndex);
 			}
 			else if (lowerMaxY < higherMinY)
-			{ 
+			{
 				//the two nodes do not touch.
 				this.setData(
 					sizeWithAir,
@@ -227,7 +227,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 						RenderDataPointUtil.getBlockMaterialId(higherData)
 					)
 				);
-				
+
 				this.setSortingIndex(sizeWithAir, sizeWithAir);
 				this.setLower(higherIndex, sizeWithAir);
 				this.setHigher(lowerIndex, sizeWithAir);
@@ -235,25 +235,25 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				this.setHigher(sizeWithAir, higherIndex);
 				sizeWithAir++;
 			}
-			else 
-			{ 
+			else
+			{
 				// the two nodes overlap.
 				throw new IllegalArgumentException(RenderDataPointUtil.toString(lowerData) + " overlaps with " + RenderDataPointUtil.toString(higherData));
 			}
 		}
-		this.lowest  = this.sortingArray.getShort(0);
+		this.lowest = this.sortingArray.getShort(0);
 		this.highest = this.sortingArray.getShort(sizeWithoutAir - 1);
 
 		// now sort by size.
 		this.sortBySize(sizeWithAir);
-		for (int sortingIndex = 1; sortingIndex < sizeWithAir; sortingIndex++) 
+		for (int sortingIndex = 1; sortingIndex < sizeWithAir; sortingIndex++)
 		{
 			int smallerIndex = this.getSortingIndex(sortingIndex - 1);
-			int  biggerIndex = this.getSortingIndex(sortingIndex);
+			int biggerIndex = this.getSortingIndex(sortingIndex);
 			this.setBigger(smallerIndex, biggerIndex);
 			this.setSmaller(biggerIndex, smallerIndex);
 		}
-		
+
 		this.smallest = this.sortingArray.getShort(0);
 		this.biggest = this.sortingArray.getShort(sizeWithAir - 1);
 
@@ -262,13 +262,13 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 
 		if (ASSERTS) this.checkLinks();
 	}
-	
-	
-	
+
+
+
 	//========//
 	// reduce //
 	//========//
-	
+
 	/**
 	 * merges and/or eliminates nodes until our {@link #sizeWithoutAir}
 	 * is less than or equal to the provided target size.
@@ -278,87 +278,87 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * so if this is a new, unmodified list, then it is safe to call this method. <br><br>
 	 *
 	 * algorithm:
-	 * 	1: try to merge the smallest segment with the segment above or below it.
-	 * 		this will only succeed if the adjacent node has the same alpha as it.
-	 * 		1a: if there is only one adjacent node which matches these criteria,
-	 * 			we will merge with that node. <br><br>
+	 * 1: try to merge the smallest segment with the segment above or below it.
+	 * this will only succeed if the adjacent node has the same alpha as it.
+	 * 1a: if there is only one adjacent node which matches these criteria,
+	 * we will merge with that node. <br><br>
 	 *
-	 * 		1b: if both adjacent nodes match these criteria,
-	 * 			attempt to merge with the smaller one.
-	 * 			1b1: if both adjacent nodes are the same height,
-	 * 				merge with the higher one. <br><br>
+	 * 1b: if both adjacent nodes match these criteria,
+	 * attempt to merge with the smaller one.
+	 * 1b1: if both adjacent nodes are the same height,
+	 * merge with the higher one. <br><br>
 	 *
-	 * 		1c: if there are no adjacent nodes which match these criteria,
-	 * 			repeat step 1 with the next smallest segment instead.
-	 * 			continue trying bigger and bigger segments until we either:
-	 * 				* have a success, or
-	 * 				* reach the end of this list.
-	 * 	2: if we reach the end of the list before having a success, try again,
-	 * 		but this time, we are allowed to erase a segment entirely without merging it
-	 * 		if there are equal-alpha'd segments above and below it.
-	 * 	3: if we still fail, force the lowest segment to merge with the segment above it,
-	 * 		with no restrictions on alpha.
-	 * 		the highest alpha of the two segments takes priority though.
-	 * 	4: repeat until our size is less than or equal to the target size. <br><br>
-	 * 	
-	 *  <b>notes:</b> <br>
-	 * 	changing the size of a node requires re-sorting that node,
-	 * 	but it does not require re-sorting the whole list.
-	 * 	additionally, because of the fact that nodes are sorted smallest to biggest,
-	 * 	when a node is expanded, its new size will be
-	 * 	strictly less than or equal to twice its old size.
-	 * 	the significance of this is that in practice,
-	 * 	nodes should not need to be moved very far to be re-sorted. <br><br>
+	 * 1c: if there are no adjacent nodes which match these criteria,
+	 * repeat step 1 with the next smallest segment instead.
+	 * continue trying bigger and bigger segments until we either:
+	 * * have a success, or
+	 * * reach the end of this list.
+	 * 2: if we reach the end of the list before having a success, try again,
+	 * but this time, we are allowed to erase a segment entirely without merging it
+	 * if there are equal-alpha'd segments above and below it.
+	 * 3: if we still fail, force the lowest segment to merge with the segment above it,
+	 * with no restrictions on alpha.
+	 * the highest alpha of the two segments takes priority though.
+	 * 4: repeat until our size is less than or equal to the target size. <br><br>
 	 *
-	 * 	special case: there are a lot of segments of length 1 in big globe worlds.
-	 * 	these will genuinely have a long way to move on re-sort.
-	 * 	so, they are handled in a separate loop. <br><br>
+	 * <b>notes:</b> <br>
+	 * changing the size of a node requires re-sorting that node,
+	 * but it does not require re-sorting the whole list.
+	 * additionally, because of the fact that nodes are sorted smallest to biggest,
+	 * when a node is expanded, its new size will be
+	 * strictly less than or equal to twice its old size.
+	 * the significance of this is that in practice,
+	 * nodes should not need to be moved very far to be re-sorted. <br><br>
 	 *
-	 * 	after step 1 is completed, step 2 can't change the
-	 * 	list in a way which would give step 1 more work to do,
-	 * 	so step 2 is repeated as many times as necessary,
-	 * 	without jumping back to the start.
-	 * 	step 3 however can change the list in a way which gives previous
-	 * 	steps more work to do, so after step 3 merges something,
-	 * 	we jump back to step 1 and start over.
+	 * special case: there are a lot of segments of length 1 in big globe worlds.
+	 * these will genuinely have a long way to move on re-sort.
+	 * so, they are handled in a separate loop. <br><br>
+	 *
+	 * after step 1 is completed, step 2 can't change the
+	 * list in a way which would give step 1 more work to do,
+	 * so step 2 is repeated as many times as necessary,
+	 * without jumping back to the start.
+	 * step 3 however can change the list in a way which gives previous
+	 * steps more work to do, so after step 3 merges something,
+	 * we jump back to step 1 and start over.
 	 */
 	public void reduce(int target)
 	{
 		if (this.mergeVerySmallConnectedSegments(target)) return;
-		
+
 		if (this.mergeConnectedSegments(target)) return;
 		if (this.removeLeastImportantSegments(target)) return;
 		this.forceBottomToMerge(target);
 	}
-	
-	
-	
+
+
+
 	//======================//
 	// reduction operations //
 	//======================//
-	
+
 	/**
 	 * verifies that this list is in the "correct" state,
 	 * and throws an {@link AssertFailureException} if it isn't.
 	 */
 	@VisibleForTesting
-	public void checkLinks() 
+	public void checkLinks()
 	{
 		LodUtil.assertTrue(this.getSizeWithAir() >= 0, "size with air < 0");
 		LodUtil.assertTrue(this.getSizeWithoutAir() >= 0, "size without air < 0");
 		LodUtil.assertTrue(this.getSizeWithoutAir() <= this.getSizeWithAir(), "more segments without air than with air");
-		
-		if (this.getSizeWithAir() == 0) 
+
+		if (this.getSizeWithAir() == 0)
 		{
 			LodUtil.assertTrue(this.getSmallest() == NULL, "size is 0, but we have a smallest node");
-			LodUtil.assertTrue(this.getBiggest()  == NULL, "size is 0, but we have a biggest node");
-			LodUtil.assertTrue(this.getLowest()   == NULL, "size is 0, but we have a lowest node");
-			LodUtil.assertTrue(this.getHighest()  == NULL, "size is 0, but we have a highest node");
+			LodUtil.assertTrue(this.getBiggest() == NULL, "size is 0, but we have a biggest node");
+			LodUtil.assertTrue(this.getLowest() == NULL, "size is 0, but we have a lowest node");
+			LodUtil.assertTrue(this.getHighest() == NULL, "size is 0, but we have a highest node");
 		}
-		else 
+		else
 		{
 			int sizeWithAir = 0, sizeWithoutAir = 0;
-			for (int index = this.getSmallest(); index != NULL; index = this.getBigger(index)) 
+			for (int index = this.getSmallest(); index != NULL; index = this.getBigger(index))
 			{
 				int smaller = this.getSmaller(index);
 				int bigger = this.getBigger(index);
@@ -366,13 +366,13 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				LodUtil.assertTrue((bigger != NULL ? this.getSmaller(bigger) : this.getBiggest()) == index, "one-way link");
 				LodUtil.assertTrue(smaller == NULL || this.getSize(index) >= this.getSize(smaller), "node is not sorted by size");
 				sizeWithAir++;
-				
+
 				if (this.isIndexVisible(index)) sizeWithoutAir++;
 			}
 			LodUtil.assertTrue(sizeWithAir == this.getSizeWithAir() && sizeWithoutAir == this.getSizeWithoutAir(), "node count does not match size");
 
 			sizeWithAir = sizeWithoutAir = 0;
-			for (int index = this.getLowest(); index != NULL; index = this.getHigher(index)) 
+			for (int index = this.getLowest(); index != NULL; index = this.getHigher(index))
 			{
 				int lower = this.getLower(index);
 				int higher = this.getHigher(index);
@@ -381,7 +381,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				LodUtil.assertTrue(this.getMaxY(index) > this.getMinY(index), "node has inverted Y levels");
 				LodUtil.assertTrue(lower == NULL || this.getMinY(index) == this.getMaxY(lower), "node does not touch its lower neighbor");
 				sizeWithAir++;
-				
+
 				if (this.isIndexVisible(index)) sizeWithoutAir++;
 			}
 			LodUtil.assertTrue(sizeWithAir == this.getSizeWithAir() && sizeWithoutAir == this.getSizeWithoutAir(), "node count does not match size");
@@ -389,34 +389,34 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	}
 
 	/** removes the node at the given index from this list. */
-	public void remove(int index) 
+	public void remove(int index)
 	{
-		int lower  = this.getLower  (index);
-		int higher = this.getHigher (index);
-		int smaller= this.getSmaller(index);
-		int bigger = this.getBigger (index);
-		int alpha  = this.getAlpha  (index);
-		
-		
+		int lower = this.getLower(index);
+		int higher = this.getHigher(index);
+		int smaller = this.getSmaller(index);
+		int bigger = this.getBigger(index);
+		int alpha = this.getAlpha(index);
+
+
 		if (lower != NULL) this.setHigher(lower, higher);
 		else this.setLowest(higher);
-		
+
 		if (higher != NULL) this.setLower(higher, lower);
 		else this.setHighest(lower);
-		
+
 		if (smaller != NULL) this.setBigger(smaller, bigger);
 		else this.setSmallest(bigger);
-		
+
 		if (bigger != NULL) this.setSmaller(bigger, smaller);
 		else this.setBiggest(smaller);
-		
+
 		this.setData(index, DEFAUlT_DATA);
 		this.links.set(index, DEFAULT_LINKS);
 		this.sizeWithAir--;
-		
+
 		if (isAlphaVisible(alpha)) this.sizeWithoutAir--;
 	}
-	
+
 	/**
 	 * refreshes the smallest-to-biggest order of this list.
 	 * as a reminder, the list is internally sorted from smallest-to-biggest
@@ -429,60 +429,60 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * the constructor before the lowest-to-highest order is initialized.
 	 */
 	@VisibleForTesting
-	public void sortBySizeAndReLink() 
+	public void sortBySizeAndReLink()
 	{
 		if (this.getSizeWithAir() <= 1)
 		{
 			return;
 		}
-		
-		
+
+
 		LongArrayList datas = this.data;
 		int writeIndex = 0;
-		for (int readIndex = this.getLowest(); readIndex != NULL; readIndex = this.getHigher(readIndex)) 
+		for (int readIndex = this.getLowest(); readIndex != NULL; readIndex = this.getHigher(readIndex))
 		{
-			if (datas.getLong(readIndex) != DEFAUlT_DATA) 
+			if (datas.getLong(readIndex) != DEFAUlT_DATA)
 			{
 				this.setSortingIndex(writeIndex++, readIndex);
 			}
 		}
-		
+
 		this.sortBySize(writeIndex);
-		for (int index = 1; index < writeIndex; index++) 
+		for (int index = 1; index < writeIndex; index++)
 		{
 			int smaller = this.getSortingIndex(index - 1);
 			int bigger = this.getSortingIndex(index);
 			this.setSmaller(bigger, smaller);
 			this.setBigger(smaller, bigger);
 		}
-		
+
 		if (writeIndex == 0)
 		{
 			// if every data point in the list is NULL (0) the write index will be 0,
-			// and in order to prevent accessing index -1 below, 
+			// and in order to prevent accessing index -1 below,
 			// setting the write index to 1 is needed.
-			
+
 			// This shouldn't happen normally, however if the lod data is slightly malformed
 			// (which is specifically the case for the commonly shared wyncraft LODs)
 			// this check is needed.
 			// It would probably be best to fix the 6 or so NULL datapoints that are next
 			// to each other in the full data source, but for now this fix works.
-			
+
 			writeIndex = 1;
 		}
-		
+
 		this.smallest = this.sortingArray.getShort(0);
 		this.biggest = this.sortingArray.getShort(writeIndex - 1);
 		this.setSmaller(this.getSmallest(), NULL);
 		this.setBigger(this.getBiggest(), NULL);
 	}
-	
+
 	/**
 	 * sorts our {@link #sortingArray} in order of smallest-to-biggest,
 	 * but does NOT update our links accordingly.
 	 */
 	@VisibleForTesting
-	public void sortBySize(int size) 
+	public void sortBySize(int size)
 	{
 		it.unimi.dsi.fastutil.Arrays.quickSort(
 			0, size,
@@ -499,13 +499,13 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		);
 	}
 	private void sortBySizeSwapper(int index1, int index2) { ShortArrays.swap(this.sortingArray.elements(), index1, index2); }
-	
+
 	/**
 	 * sorts our {@link #sortingArray} in order of lowest-to-highest,
 	 * but does NOT update our links accordingly.
 	 */
 	@VisibleForTesting
-	public void sortByPosition(int size) 
+	public void sortByPosition(int size)
 	{
 		it.unimi.dsi.fastutil.Arrays.quickSort(
 			0, size,
@@ -522,7 +522,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		);
 	}
 	private void sortByPositionSwapper(int index1, int index2) { ShortArrays.swap(this.sortingArray.elements(), index1, index2); }
-	
+
 	/**
 	 * moves the smaller node to the correct position in the list,
 	 * under the assumption that all other nodes are already sorted.
@@ -534,39 +534,39 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * is made smaller. if the node is made smaller, it will be
 	 * left in its current position, even if that position is wrong.
 	 */
-	public void resortSize(int smaller) 
+	public void resortSize(int smaller)
 	{
 		int bigger = this.getBigger(smaller);
-		
+
 		// check if the node needs to be moved at all,
 		// and return if it doesn't.
 		if (bigger == NULL || this.getSize(smaller) <= this.getSize(bigger))
 		{
 			return;
 		}
-		
+
 		// first remove smaller from before bigger.
 		int smallest = this.getSmaller(smaller);
 		if (smallest != NULL) this.setBigger(smallest, bigger);
 		else this.setSmallest(bigger);
 		this.setSmaller(bigger, smallest);
-		
+
 		// next, find the position to re-insert the node.
 		do bigger = this.getBigger(bigger);
 		while (bigger != NULL && this.getSize(smaller) > this.getSize(bigger));
-		
+
 		// lastly, re-insert the node where it belongs.
 		this.setSmaller(smaller, bigger != NULL ? this.getSmaller(bigger) : this.getBiggest());
 		this.setBigger(smaller, bigger);
-		
+
 		if (bigger != NULL) this.setSmaller(bigger, smaller);
 		else this.setBiggest(smaller);
-		
+
 		smallest = this.getSmaller(smaller);
 		if (smallest != NULL) this.setBigger(smallest, smaller);
 		else this.setSmallest(smaller);
 	}
-	
+
 	/**
 	 * shared logic for merging segments in step 1 documented in {@link #reduce(int)}. <br<br>
 	 *
@@ -586,31 +586,31 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * current's smaller neighbor, when fastPath is set to false,
 	 * this method will return current's bigger neighbor instead.
 	 */
-	private int tryMergeStep1(int current, boolean fastPath) 
+	private int tryMergeStep1(int current, boolean fastPath)
 	{
 		int result = fastPath ? this.getSmaller(current) : this.getBigger(current);
 		int higher = this.getHigher(current);
-		int lower  = this.getLower(current);
+		int lower = this.getLower(current);
 		int toExtendDownwards;
 		int toRemove;
-		
-		
-		if (higher != NULL && this.getAlpha(higher) == this.getAlpha(current)) 
+
+
+		if (higher != NULL && this.getAlpha(higher) == this.getAlpha(current))
 		{
-			if (lower != NULL && this.getAlpha(lower) == this.getAlpha(current)) 
+			if (lower != NULL && this.getAlpha(lower) == this.getAlpha(current))
 			{
-				if (this.getSize(higher) <= this.getSize(lower)) 
+				if (this.getSize(higher) <= this.getSize(lower))
 				{
 					toExtendDownwards = higher;
 					toRemove = current;
 				}
-				else 
+				else
 				{
 					toExtendDownwards = current;
 					toRemove = lower;
 				}
 			}
-			else 
+			else
 			{
 				toExtendDownwards = higher;
 				toRemove = current;
@@ -628,24 +628,24 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				return result;
 			}
 		}
-		
+
 		// if we're about to remove the next node for iteration,
 		// then we need to continue iterating at the node after that.
 		// result will only be returned if fastPath is true,
 		// so the node after that is always the smaller one.
 		if (result == toRemove) result = this.getSmaller(result);
-		
+
 		this.setMinY(toExtendDownwards, this.getMinY(toRemove));
 		if (!fastPath) this.resortSize(toExtendDownwards);
-		
+
 		this.remove(toRemove);
-		
+
 		// off the fast path the list was just modified in a way that may invalidate
 		// the step 1 loop's assumptions, so return smallest to make it start over.
 		// That's cheap since small nodes are usually merged quickly.
 		return fastPath ? result : this.getSmallest();
 	}
-	
+
 	/**
 	 * returns the largest node whose height is strictly less than the provided size,
 	 * or null if all contained nodes are greater than or equal to the provided size.
@@ -662,9 +662,9 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * because the loop will immediately return the
 	 * smallest node's smaller neighbor, which is null.
 	 */
-	private int lowerNode(int size) 
+	private int lowerNode(int size)
 	{
-		for (int node = this.getSmallest(); node != NULL; node = this.getBigger(node)) 
+		for (int node = this.getSmallest(); node != NULL; node = this.getBigger(node))
 		{
 			if (this.getSize(node) >= size)
 			{
@@ -673,7 +673,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		}
 		return this.getBiggest();
 	}
-	
+
 	/**
 	 * handles special cases for step 1 of {@link #reduce(int)}.
 	 * in other words, handles all the nodes whose size
@@ -693,19 +693,19 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				{
 					this.sortBySizeAndReLink();
 					if (ASSERTS) this.checkLinks();
-					
+
 					return true;
 				}
 				current = this.tryMergeStep1(current, true);
 			}
 			this.sortBySizeAndReLink();
-			
+
 			if (ASSERTS) this.checkLinks();
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * handles the general case for step 1 of {@link #reduce(int)}.
 	 * in other words, handles all the nodes whose size
@@ -717,21 +717,21 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * the list's size down to less than or equal to target,
 	 * or false if more steps need to be performed.
 	 */
-	private boolean mergeConnectedSegments(int target) 
+	private boolean mergeConnectedSegments(int target)
 	{
-		for (int current = this.getSmallest(); current != NULL;) 
+		for (int current = this.getSmallest(); current != NULL; )
 		{
 			if (this.getSizeWithoutAir() <= target)
 			{
 				return true;
 			}
-			
+
 			current = this.tryMergeStep1(current, false);
 			if (ASSERTS) this.checkLinks();
 		}
 		return false;
 	}
-	
+
 	/**
 	 * handles step 2 of {@link #reduce(int)}, where nodes are allowed to be erased. <br><br>
 	 *
@@ -747,7 +747,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			{
 				return true;
 			}
-			
+
 			int lower = this.getLower(center);
 			int higher = this.getHigher(center);
 			if (lower != NULL && higher != NULL && this.getAlpha(lower) == this.getAlpha(higher))
@@ -757,7 +757,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				this.remove(lower);
 				this.remove(center);
 				if (ASSERTS) this.checkLinks();
-				
+
 				center = this.getSmallest();
 			}
 			else
@@ -767,7 +767,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		}
 		return false;
 	}
-	
+
 	/**
 	 * handles step 3 of {@link #reduce(int)}, where nodes
 	 * are forced to merge in order to fit the desired target,
@@ -784,7 +784,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			{
 				return;
 			}
-			
+
 			int lowY = this.getMinY(lowest);
 			int higher = this.getHigher(lowest);
 			while (true)
@@ -798,12 +798,12 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 					this.setBiggest(NULL);
 					this.setSizeWithAir(0);
 					this.setSizeWithoutAir(0);
-					
+
 					if (ASSERTS) this.checkLinks();
-					
+
 					return;
 				}
-				
+
 				// don't merge the lowest segment with an invisible segment.
 				// in other words, we don't want
 				//   visible
@@ -820,9 +820,9 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 					this.setMinY(higher, lowY);
 					this.resortSize(higher);
 					this.remove(lowest);
-					
+
 					if (ASSERTS) this.checkLinks();
-					
+
 					lowest = this.getLowest();
 					break;
 				}
@@ -836,7 +836,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			}
 		}
 	}
-	
+
 	/**
 	 * reduces the view to a single data point,
 	 * whose min Y is the lowest of all data points in the provided view,
@@ -846,14 +846,14 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 *
 	 * @implNote this method does not allocate any objects.
 	 */
-	public static long reduceToOne(ColumnRenderView view) 
+	public static long reduceToOne(ColumnRenderView view)
 	{
 		int size = view.size;
 		if (size <= 0)
 		{
 			return RenderDataPointUtil.EMPTY_DATA;
 		}
-		
+
 		long highestDataPoint;
 		long lowestDataPoint;
 		int index = 0;
@@ -873,7 +873,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			//no visible segments, return void.
 			return RenderDataPointUtil.EMPTY_DATA;
 		}
-		
+
 		//second loop: merge the rest of the segments.
 		for (; index < size; index++)
 		{
@@ -882,16 +882,16 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			{
 				int yMax = RenderDataPointUtil.getYMax(dataPoint);
 				int yMin = RenderDataPointUtil.getYMin(dataPoint);
-				
+
 				if (yMax > RenderDataPointUtil.getYMax(highestDataPoint)) highestDataPoint = dataPoint;
 				else if (yMin < RenderDataPointUtil.getYMin(lowestDataPoint)) lowestDataPoint = dataPoint;
 			}
 		}
-		
+
 		return (highestDataPoint & ~RenderDataPointUtil.MIN_Y_SHIFTED_MASK) | (RenderDataPointUtil.getYMin(lowestDataPoint) << RenderDataPointUtil.MIN_Y_SHIFT);
 	}
-	
-	
+
+
 	/** transfers the contents of this list to the provided view, in order of highest to lowest. */
 	public void copyTo(ColumnRenderView view)
 	{
@@ -905,7 +905,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 				view.set(writeIndex++, this.getData(node));
 			}
 		}
-		
+
 		// this list could be empty if all the segments for merging are invisible,
 		// but we must ensure that the view is non-empty.
 		// so, if we didn't set any data points, add a void data point.
@@ -913,87 +913,87 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		{
 			view.set(writeIndex++, RenderDataPointUtil.EMPTY_DATA);
 		}
-		
+
 		for (int size = view.size; writeIndex < size; writeIndex++)
 		{
 			view.set(writeIndex, RenderDataPointUtil.EMPTY_DATA);
 		}
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
-	
+
 	public int getSmallest() { return Short.toUnsignedInt(this.smallest); }
 	public int getBiggest() { return Short.toUnsignedInt(this.biggest); }
-	
+
 	public int getLowest() { return Short.toUnsignedInt(this.lowest); }
 	public int getHighest() { return Short.toUnsignedInt(this.highest); }
-	
+
 	public int getSizeWithAir() { return Short.toUnsignedInt(this.sizeWithAir); }
 	public int getSizeWithoutAir() { return Short.toUnsignedInt(this.sizeWithoutAir); }
-	
+
 	public int getSortingIndex(int index) { return Short.toUnsignedInt(this.sortingArray.getShort(index)); }
-	
+
 	public int getLower(int index) { return ((int) (this.links.getLong(index) >>> LOWER_SHIFT)) & LINK_MASK; }
 	public int getHigher(int index) { return ((int) (this.links.getLong(index) >>> HIGHER_SHIFT)) & LINK_MASK; }
-	
+
 	public int getSmaller(int index) { return ((int) (this.links.getLong(index) >>> SMALLER_SHIFT)) & LINK_MASK; }
 	public int getBigger(int index) { return ((int) (this.links.getLong(index) >>> BIGGER_SHIFT)) & LINK_MASK; }
-	
+
 	public long getData(int index) { return this.data.getLong(index); }
-	
+
 	public int getMinY(int index) { return RenderDataPointUtil.getYMin(this.getData(index)); }
 	public int getMaxY(int index) { return RenderDataPointUtil.getYMax(this.getData(index)); }
-	
+
 	public int getSize(int index)
 	{
 		long data = this.getData(index);
 		return RenderDataPointUtil.getYMax(data) - RenderDataPointUtil.getYMin(data);
 	}
-	
+
 	public int getAlpha(int index) { return RenderDataPointUtil.getAlpha(this.getData(index)); }
 
-	
-	
+
+
 	//=========//
 	// setters //
 	//=========//
-	
-	public void setSmallest(int smallest) { this.smallest = (short)(smallest); }
-	public void setBiggest(int biggest) { this.biggest = (short)(biggest); }
-	
-	public void setLowest(int lowest) { this.lowest = (short)(lowest); }
-	public void setHighest(int highest) { this.highest = (short)(highest); }
-	
-	public void setSizeWithAir(int sizeWithAir) { this.sizeWithAir = (short)(sizeWithAir); }
-	public void setSizeWithoutAir(int sizeWithoutAir) { this.sizeWithoutAir = (short)(sizeWithoutAir); }
 
-	public void setSortingIndex(int index, int to) { this.sortingArray.set(index, (short)to); }
+	public void setSmallest(int smallest) { this.smallest = (short) (smallest); }
+	public void setBiggest(int biggest) { this.biggest = (short) (biggest); }
 
-	public void setLower(int index, int lowerIndex) 
+	public void setLowest(int lowest) { this.lowest = (short) (lowest); }
+	public void setHighest(int highest) { this.highest = (short) (highest); }
+
+	public void setSizeWithAir(int sizeWithAir) { this.sizeWithAir = (short) (sizeWithAir); }
+	public void setSizeWithoutAir(int sizeWithoutAir) { this.sizeWithoutAir = (short) (sizeWithoutAir); }
+
+	public void setSortingIndex(int index, int to) { this.sortingArray.set(index, (short) to); }
+
+	public void setLower(int index, int lowerIndex)
 	{
-		this.links.set(index, (this.links.getLong(index) & ~(((long)(LINK_MASK)) << LOWER_SHIFT)) | (((long)(lowerIndex & LINK_MASK)) << LOWER_SHIFT));
+		this.links.set(index, (this.links.getLong(index) & ~(((long) (LINK_MASK)) << LOWER_SHIFT)) | (((long) (lowerIndex & LINK_MASK)) << LOWER_SHIFT));
 	}
-	public void setHigher(int index, int higherIndex) 
+	public void setHigher(int index, int higherIndex)
 	{
-		this.links.set(index, (this.links.getLong(index) & ~(((long)(LINK_MASK)) << HIGHER_SHIFT)) | (((long)(higherIndex & LINK_MASK)) << HIGHER_SHIFT));
+		this.links.set(index, (this.links.getLong(index) & ~(((long) (LINK_MASK)) << HIGHER_SHIFT)) | (((long) (higherIndex & LINK_MASK)) << HIGHER_SHIFT));
 	}
 
 	public void setSmaller(int index, int smallerIndex)
 	{
-		this.links.set(index, (this.links.getLong(index) & ~(((long)(LINK_MASK)) << SMALLER_SHIFT)) | (((long)(smallerIndex & LINK_MASK)) << SMALLER_SHIFT));
+		this.links.set(index, (this.links.getLong(index) & ~(((long) (LINK_MASK)) << SMALLER_SHIFT)) | (((long) (smallerIndex & LINK_MASK)) << SMALLER_SHIFT));
 	}
-	public void setBigger(int index, int biggerIndex) 
+	public void setBigger(int index, int biggerIndex)
 	{
-		this.links.set(index, (this.links.getLong(index) & ~(((long)(LINK_MASK)) << BIGGER_SHIFT)) | (((long)(biggerIndex & LINK_MASK)) << BIGGER_SHIFT));
+		this.links.set(index, (this.links.getLong(index) & ~(((long) (LINK_MASK)) << BIGGER_SHIFT)) | (((long) (biggerIndex & LINK_MASK)) << BIGGER_SHIFT));
 	}
 
 	public void setData(int index, long data) { this.data.set(index, data); }
 
-	public void setMinY(int index, int minY) 
+	public void setMinY(int index, int minY)
 	{
 		this.data.set(index, (this.data.getLong(index) & ~RenderDataPointUtil.MIN_Y_SHIFTED_MASK) | ((minY & RenderDataPointUtil.MIN_Y_MASK) << RenderDataPointUtil.MIN_Y_SHIFT));
 	}
@@ -1002,35 +1002,35 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	//================//
 	// helper methods //
 	//================//
-	
+
 	public boolean isIndexVisible(int index) { return isDataVisible(this.getData(index)); }
 
 	public static boolean isDataVisible(long data) { return isAlphaVisible(RenderDataPointUtil.getAlpha(data)); }
 
 	public static boolean isAlphaVisible(int alpha) { return alpha >= 16; }
-	
-	
-	
+
+
+
 	//==============//
 	// base methods //
 	//==============//
-	
+
 	@Override
-	public String toString() 
+	public String toString()
 	{
 		StringBuilder builder = new StringBuilder(this.sizeWithAir << 8).append("lowest to highest:");
 		for (int index = this.lowest; index != NULL; index = this.getHigher(index))
 		{
 			builder.append('\n').append(RenderDataPointUtil.toString(this.getData(index)));
 		}
-		
+
 		builder.append("\nsmallest to biggest:");
 		for (int index = this.smallest; index != NULL; index = this.getBigger(index))
 		{
 			builder.append('\n').append(RenderDataPointUtil.toString(this.getData(index)));
 		}
-		
+
 		return builder.toString();
 	}
-	
+
 }

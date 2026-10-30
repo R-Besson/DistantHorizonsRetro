@@ -35,21 +35,21 @@ public final class ModJarInfo
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final String FILE_NAME = "build_info.json";
-	
+
 	static
 	{
 		String gitBranch = "UNKNOWN";
 		String gitCommit = "UNKNOWN";
 		String buildSource = "UNKNOWN";
-		
+
 		try
 		{
 			// Warning: Atm, this file is in the common subproject as the processResources task in Gradle doesn't work for core
 			String jsonString = JarUtils.convertInputStreamToString(JarUtils.accessFile(FILE_NAME));
-			
+
 			Config jsonObject = Config.inMemory();
 			JsonFormat.minimalInstance().createParser().parse(jsonString, jsonObject, ParsingMode.REPLACE);
-			
+
 			gitBranch = jsonObject.get("info_git_branch");
 			gitCommit = jsonObject.get("info_git_commit");
 			buildSource = jsonObject.get("info_build_source");
@@ -58,14 +58,14 @@ public final class ModJarInfo
 		{
 			LOGGER.warn("Unable to get the Git information from " + FILE_NAME);
 		}
-		
+
 		Git_Commit = gitBranch;
 		Git_Branch = gitCommit;
 		Build_Source = buildSource;
 	}
-	
+
 	public static final String Git_Branch;
 	public static final String Git_Commit;
 	public static final String Build_Source;
-	
+
 }

@@ -44,17 +44,17 @@ import org.lwjgl.opengl.GL30;
 public class GlDhSSAOShader extends GlAbstractShaderRenderer
 {
 	public static GlDhSSAOShader INSTANCE = new GlDhSSAOShader();
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-	
-	
+
+
 	public int frameBuffer;
-	
+
 	private DhMat4f projection;
 	private DhMat4f invertedProjection;
-	
-	
+
+
 	// uniforms
 	public int uProj;
 	public int uInvProj;
@@ -69,13 +69,13 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 	public int uFadeDistanceInBlocks;
 	public int uIsReverseZDepth;
 	public int uDepthIsZeroToPositiveOne;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	@Override
 	public void onInit()
 	{
@@ -84,7 +84,7 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 			"assets/distanthorizons/shaders/ssao/gl/ao.frag",
 			"vPosition"
 		);
-		
+
 		// uniform setup
 		this.uProj = this.shader.getUniformLocation("uProj");
 		this.uInvProj = this.shader.getUniformLocation("uInvProj");
@@ -98,46 +98,46 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
 		this.uDepthIsZeroToPositiveOne = this.shader.getUniformLocation("uDepthIsZeroToPositiveOne");
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// render prep //
 	//=============//
-	
+
 	public void setProjectionMatrix(DhApiMat4f projectionMatrix)
 	{
 		this.projection = new DhMat4f(projectionMatrix);
-		
+
 		this.invertedProjection = new DhMat4f(projectionMatrix);
 		this.invertedProjection.invert();
 	}
-	
+
 	@Override
 	protected void onApplyUniforms(RenderParams renderParams)
 	{
 		this.shader.setUniform(this.uProj, this.projection);
-		
+
 		this.shader.setUniform(this.uInvProj, this.invertedProjection);
-		
+
 		this.shader.setUniform(this.uSampleCount, 6);
 		this.shader.setUniform(this.uRadius, 4.0f);
 		this.shader.setUniform(this.uStrength, 0.2f);
 		this.shader.setUniform(this.uMinLight, 0.25f);
 		this.shader.setUniform(this.uBias, 0.02f);
 		this.shader.setUniform(this.uFadeDistanceInBlocks, 1_600.0f);
-		
+
 		this.shader.setUniform(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 		this.shader.setUniform(this.uDepthIsZeroToPositiveOne, (RENDER_DEF.getDepthRange() == EDhApiDepthRange.ZERO_TO_POS_ONE) ? 1 : 0);
-		
+
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	@Override
 	protected void onRender()
 	{
@@ -145,13 +145,13 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 		GLMC.disableScissorTest();
 		GLMC.disableDepthTest();
 		GLMC.disableBlend();
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId());
-		
+
 		GlScreenQuad.INSTANCE.render();
 	}
-	
-	
-	
+
+
+
 }

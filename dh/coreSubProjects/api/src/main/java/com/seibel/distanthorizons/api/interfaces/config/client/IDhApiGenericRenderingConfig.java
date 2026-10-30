@@ -31,16 +31,16 @@ import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
  */
 public interface IDhApiGenericRenderingConfig extends IDhApiConfigGroup
 {
-	/** 
+	/**
 	 * If enabled DH will render generic objects into its terrain pass. <br>
 	 * This includes: clouds, beacons, and API added objects.
 	 */
 	IDhApiConfigValue<Boolean> renderingEnabled();
-	
+
 	/** If enabled DH will render beacon beams. */
 	IDhApiConfigValue<Boolean> beaconRenderingEnabled();
-	
+
 	/** If enabled DH will render clouds. */
 	IDhApiConfigValue<Boolean> cloudRenderingEnabled();
-	
+
 }

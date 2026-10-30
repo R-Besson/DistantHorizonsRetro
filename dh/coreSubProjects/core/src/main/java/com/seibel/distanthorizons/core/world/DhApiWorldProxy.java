@@ -45,36 +45,36 @@ import java.util.ArrayList;
 public class DhApiWorldProxy implements IDhApiWorldProxy
 {
 	public static DhApiWorldProxy INSTANCE = new DhApiWorldProxy();
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 	private static final String NO_WORLD_EXCEPTION_STRING = "No world loaded";
-	
+
 	private boolean isReadOnly = false;
-	
-	
-	
+
+
+
 	//=============//
-	// constructor // 
+	// constructor //
 	//=============//
-	
+
 	private DhApiWorldProxy() { }
-	
-	
-	
+
+
+
 	//===================//
 	// getters / setters //
 	//===================//
-	
+
 	@Override
 	public boolean worldLoaded() { return SharedApi.getAbstractDhWorld() != null; }
-	
+
 	@Override
 	public void setReadOnly(boolean readOnly) throws IllegalStateException { this.setReadOnly(readOnly, true); }
-	/** 
-	 * Not part of the public API. 
+	/**
+	 * Not part of the public API.
 	 * Normal API users shouldn't be able to change the upcoming world state
 	 * this is only here so DH can revert the readonly value after the world is unloaded
 	 */
@@ -84,10 +84,10 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		{
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
-		
+
 		boolean valueChanged = (this.isReadOnly != readOnly);
 		this.isReadOnly = readOnly;
-		
+
 		if (valueChanged)
 		{
 			if (this.isReadOnly)
@@ -100,7 +100,7 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean getReadOnly() throws IllegalStateException
 	{
@@ -108,12 +108,12 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		{
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
-		
-		
-		return this.isReadOnly; 
+
+
+		return this.isReadOnly;
 	}
-	
-	/** 
+
+	/**
 	 * Returns false if no world is loaded.
 	 * Can be used in places where the world state might be a bit more questionable
 	 * without having to worry about the {@link IllegalStateException} thrown by
@@ -126,16 +126,16 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 			// no world is loaded, use the default value for the next world
 			return false;
 		}
-		
+
 		return this.isReadOnly;
 	}
-	
-	
-	
+
+
+
 	//================//
 	// level handlers //
 	//================//
-	
+
 	@Override
 	public IDhApiLevelWrapper getSinglePlayerLevel() throws IllegalStateException
 	{
@@ -143,17 +143,17 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		{
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
-		
+
 		if (MC_SHARED.isDedicatedServer())
 		{
 			return null;
 		}
-		
-		
+
+
 		return MC_CLIENT.getWrappedClientLevel();
 	}
-	
-	
+
+
 	@Override
 	public Iterable<IDhApiLevelWrapper> getAllLoadedLevelWrappers() throws IllegalStateException
 	{
@@ -162,7 +162,7 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		{
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
-		
+
 		ArrayList<IDhApiLevelWrapper> returnList = new ArrayList<>();
 		for (IDhLevel dhLevel : world.getAllLoadedLevels())
 		{
@@ -170,7 +170,7 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		}
 		return returnList;
 	}
-	
+
 	@Override
 	public Iterable<IDhApiLevelWrapper> getAllLoadedLevelsForDimensionType(IDhApiDimensionTypeWrapper dimensionTypeWrapper) throws IllegalStateException
 	{
@@ -179,7 +179,7 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		{
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
-		
+
 		ArrayList<IDhApiLevelWrapper> returnList = new ArrayList<>();
 		for (IDhLevel dhLevel : world.getAllLoadedLevels())
 		{
@@ -191,7 +191,7 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		}
 		return returnList;
 	}
-	
+
 	@Override
 	public Iterable<IDhApiLevelWrapper> getAllLoadedLevelsWithDimensionNameLike(String dimensionName) throws IllegalStateException
 	{
@@ -200,9 +200,9 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		{
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
-		
+
 		String soughtDimName = dimensionName.toLowerCase();
-		
+
 		ArrayList<IDhApiLevelWrapper> returnList = new ArrayList<>();
 		for (IDhLevel dhLevel : world.getAllLoadedLevels())
 		{
@@ -213,9 +213,9 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 				returnList.add(levelWrapper);
 			}
 		}
-		
+
 		return returnList;
 	}
-	
-	
+
+
 }

@@ -10,41 +10,41 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlDhFramebuffer implements IDhApiFramebuffer
 {
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
+
 	private int id;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public GlDhFramebuffer() { this.id = LWJGL.glGenFramebuffers(); }
 
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
 	//region
-	
+
 	@Override
-	public void addDepthAttachment(int textureId, boolean isCombinedStencil) 
+	public void addDepthAttachment(int textureId, boolean isCombinedStencil)
 	{
 		this.bind();
-		
+
 		int depthAttachment = isCombinedStencil ? GL30.GL_DEPTH_STENCIL_ATTACHMENT : GL30.GL_DEPTH_ATTACHMENT;
 		LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, depthAttachment, GL11.GL_TEXTURE_2D, textureId, 0);
 	}
-	
+
 	@Override
 	public void addColorAttachment(int textureIndex, int textureId)
 	{
 		this.bind();
-		
+
 		LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0 + textureIndex, GL11.GL_TEXTURE_2D, textureId, 0);
 	}
 
@@ -54,40 +54,40 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 		if (this.id == -1)
 		{
 			throw new IllegalStateException("Framebuffer does not exist!");
-		} 
+		}
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.id);
 	}
-	
+
 	@Override
 	public void destroy()
 	{
-		LWJGL.glDeleteFramebuffers(this.id); 
+		LWJGL.glDeleteFramebuffers(this.id);
 		this.id = -1;
 	}
-	
+
 	@Override
 	public int getStatus()
 	{
 		this.bind();
 		return LWJGL.glCheckFramebufferStatus(GL30.GL_FRAMEBUFFER);
 	}
-	
+
 	@Override
 	public int getId() { return this.id; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// API methods //
 	//=============//
 	//region
-	
+
 	public boolean overrideThisFrame() { return true; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

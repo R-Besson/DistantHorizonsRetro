@@ -34,43 +34,43 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles adding SSAO via {@link GlDhFogShader} and {@link GlDhFogApplyShader}. <br><br>
- * 
+ *
  * {@link GlDhFogShader} - draws the Fog to a texture. <br>
  * {@link GlDhFogApplyShader} - draws the Fog texture to DH's FrameBuffer. <br>
  */
 public class GlDhFogRenderer implements IDhFogRenderer
 {
 	public static GlDhFogRenderer INSTANCE = new GlDhFogRenderer();
-	
+
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	private boolean init = false;
-	
+
 	private int width = -1;
 	private int height = -1;
 	private int fogFramebuffer = -1;
-	
+
 	private int fogTexture = -1;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	private GlDhFogRenderer() { }
-	
+
 	public void init()
 	{
 		if (this.init) return;
 		this.init = true;
-		
+
 		GlDhFogShader.INSTANCE.init();
 		GlDhFogApplyShader.INSTANCE.init();
 	}
-	
+
 	private void createFramebuffer(int width, int height)
 	{
 		if (this.fogFramebuffer != -1)
@@ -78,16 +78,16 @@ public class GlDhFogRenderer implements IDhFogRenderer
 			LWJGL.glDeleteFramebuffers(this.fogFramebuffer);
 			this.fogFramebuffer = -1;
 		}
-		
+
 		if (this.fogTexture != -1)
 		{
 			GLMC.glDeleteTextures(this.fogTexture);
 			this.fogTexture = -1;
 		}
-		
+
 		this.fogFramebuffer = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fogFramebuffer);
-		
+
 		this.fogTexture = GLMC.glGenTextures();
 		{
 			GLMC.glBindTexture(this.fogTexture);
@@ -95,20 +95,20 @@ public class GlDhFogRenderer implements IDhFogRenderer
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.fogTexture, 0);
-			
+
 			// disable mip-mapping since DH is just going to draw straight to the screen
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_BASE_LEVEL, 0);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
 		}
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
+
 	@Override
 	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams, DhApiFogRenderParam fogRenderParams)
@@ -117,7 +117,7 @@ public class GlDhFogRenderer implements IDhFogRenderer
 		try (GLState state = new GLState())
 		{
 			this.init();
-			
+
 			// resize the framebuffer if necessary
 			int width = MC_RENDER.getTargetFramebufferViewportWidth();
 			int height = MC_RENDER.getTargetFramebufferViewportHeight();
@@ -127,18 +127,18 @@ public class GlDhFogRenderer implements IDhFogRenderer
 				this.height = height;
 				this.createFramebuffer(width, height);
 			}
-			
+
 			GlDhFogShader.INSTANCE.frameBuffer = this.fogFramebuffer;
 			GlDhFogShader.INSTANCE.prepUniformObjects(renderParams.dhMvmProjMatrix, fogRenderParams);
 			GlDhFogShader.INSTANCE.render(renderParams);
-			
+
 			GlDhFogApplyShader.INSTANCE.fogTexture = this.fogTexture;
 			GlDhFogApplyShader.INSTANCE.render(renderParams);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

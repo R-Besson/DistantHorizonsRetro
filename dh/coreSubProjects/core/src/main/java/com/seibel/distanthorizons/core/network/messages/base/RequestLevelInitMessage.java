@@ -27,39 +27,39 @@ import io.netty.buffer.ByteBuf;
 public class RequestLevelInitMessage extends AbstractNetworkMessage
 {
 	public String dimensionResourceLocation;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public RequestLevelInitMessage() { }
 	public RequestLevelInitMessage(String dimensionResourceLocation) { this.dimensionResourceLocation = dimensionResourceLocation; }
-	
-	
-	
+
+
+
 	//===============//
 	// serialization //
 	//===============//
-	
+
 	@Override
 	public void encode(ByteBuf out) { this.writeString(this.dimensionResourceLocation, out); }
-	
+
 	@Override
 	public void decode(ByteBuf in) { this.dimensionResourceLocation = this.readString(in); }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public MoreObjects.ToStringHelper toStringHelper()
 	{
 		return super.toStringHelper()
-				.add("dimensionResourceLocation", this.dimensionResourceLocation);
+			.add("dimensionResourceLocation", this.dimensionResourceLocation);
 	}
-	
+
 }

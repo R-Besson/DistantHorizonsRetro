@@ -32,90 +32,90 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Holds each thread pool the system uses.
- * 
+ *
  * @see ThreadUtil
  */
 public class ThreadPoolUtil
 {
 	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
-	
-	
-	
+
+
+
 	//=========================//
 	// standalone thread pools //
 	//=========================//
-	
+
 	// standalone thread pools all handle independent systems
 	// and don't interfere with any other pool
-	
+
 	private static PriorityTaskPicker taskPicker;
-	
+
 	private static PriorityTaskPicker.Executor fileHandlerThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getFileHandlerExecutor() { return fileHandlerThreadPool; }
-	
+
 	private static PriorityTaskPicker.Executor renderSectionLoadThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getRenderLoadingExecutor() { return renderSectionLoadThreadPool; }
-	
+
 	private static PriorityTaskPicker.Executor updatePropagatorThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getUpdatePropagatorExecutor() { return updatePropagatorThreadPool; }
-	
+
 	private static PriorityTaskPicker.Executor worldGenThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getWorldGenExecutor() { return worldGenThreadPool; }
-	
+
 	public static final String CLEANUP_THREAD_NAME = "Cleanup";
 	private static final ThreadPoolExecutor cleanupThreadPool = ThreadUtil.makeSingleDaemonThreadPool(CLEANUP_THREAD_NAME);
 	/** not null since cleanup always needs to be run even when DH has been shut down */
 	@NotNull
 	public static ThreadPoolExecutor getCleanupExecutor() { return cleanupThreadPool; }
-	
+
 	public static final String BEACON_CULLING_THREAD_NAME = "Beacon Culling";
 	private static ThreadPoolExecutor beaconCullingThreadPool;
 	@Nullable
 	public static ThreadPoolExecutor getBeaconCullingExecutor() { return beaconCullingThreadPool; }
-	
+
 	// The main distinction between these thread pools is that one for compression has multiple threads and client handler is single-threaded
 	private static PriorityTaskPicker.Executor networkCompressionThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getNetworkCompressionExecutor() { return networkCompressionThreadPool; }
-	
+
 	private static ThreadPoolExecutor networkClientHandlerThreadPool;
 	@Nullable
 	public static ThreadPoolExecutor networkClientHandlerExecutor() { return networkClientHandlerThreadPool; }
-	
-	
+
+
 	public static final String FULL_DATA_MIGRATION_THREAD_NAME = "Full Data Migration";
 	private static ThreadPoolExecutor fullDataMigrationThreadPool;
 	@Nullable
 	public static ThreadPoolExecutor getFullDataMigrationExecutor() { return fullDataMigrationThreadPool; }
-	
-	
+
+
 	private static PriorityTaskPicker.Executor chunkToLodBuilderThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getChunkToLodBuilderExecutor() { return chunkToLodBuilderThreadPool; }
-	
-	
-	
+
+
+
 	//=================//
 	// setup / cleanup //
 	//=================//
-	///region
-	
+	/// region
+
 	public static void setupThreadPools()
 	{
 		//==================//
 		// main thread pool //
 		//==================//
-		
+
 		if (taskPicker != null)
 		{
 			taskPicker.shutdownNow();
 		}
 		taskPicker = new PriorityTaskPicker();
-		
+
 		networkCompressionThreadPool = taskPicker.createExecutor("Network Compression");
 		networkClientHandlerThreadPool = ThreadUtil.makeSingleThreadPool("Network Client Handler");
 		fileHandlerThreadPool = taskPicker.createExecutor("IO");
@@ -123,27 +123,27 @@ public class ThreadPoolUtil
 		chunkToLodBuilderThreadPool = taskPicker.createExecutor("LOD Builder");
 		updatePropagatorThreadPool = taskPicker.createExecutor("Update Propagator", Thread.NORM_PRIORITY, ThreadPoolUtil::updatePropagatorThreadsCanRun); // the update propagator isn't necessary when moving through the world, so we'll pause it along with the world generator when moving fast
 		worldGenThreadPool = taskPicker.createExecutor("World Gen", Thread.NORM_PRIORITY, ThreadPoolUtil::worldGenThreadsCanRun);
-		
-		
-		
+
+
+
 		//=========================//
 		// standalone thread pools //
 		//=========================//
-		
+
 		if (beaconCullingThreadPool != null)
 		{
 			beaconCullingThreadPool.shutdown();
 		}
 		beaconCullingThreadPool = ThreadUtil.makeSingleThreadPool(BEACON_CULLING_THREAD_NAME);
-		
+
 		if (fullDataMigrationThreadPool != null)
 		{
 			fullDataMigrationThreadPool.shutdown();
 		}
 		fullDataMigrationThreadPool = ThreadUtil.makeSingleThreadPool(FULL_DATA_MIGRATION_THREAD_NAME);
-		
+
 	}
-	
+
 	public static void shutdownThreadPools()
 	{
 		// standalone threads
@@ -152,23 +152,23 @@ public class ThreadPoolUtil
 		beaconCullingThreadPool.shutdown();
 		fullDataMigrationThreadPool.shutdown();
 	}
-	
+
 	///endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	///region
-	
+
 	/**
 	 * Some thread pools are very heavy (IE world gen)
 	 * making LOD load times slower. Pausing those
 	 * threads when the player is moving can provide a better experience. <br><br>
-	 * 
-	 * all speeds are measured in blocks per second 
-	 * 
+	 *
+	 * all speeds are measured in blocks per second
+	 *
 	 * @see LodUtil#ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC
 	 */
@@ -181,34 +181,34 @@ public class ThreadPoolUtil
 		{
 			return "camera moving fast";
 		}
-		
+
 		if (chunkBuilderOverloaded())
 		{
 			return "LOD builder overloaded";
 		}
-		
+
 		if (Config.Common.WorldGenerator.limitIfServerUnhealthy.get()
 			&& !MC_SHARED.isServerThreadHealthy())
 		{
 			String details = MC_SHARED.getServerHealthDetails();
 			return "server unhealthy" + (details != null ? " (" + details + ")" : "");
 		}
-		
+
 		return null;
 	}
-	
+
 	public static boolean updatePropagatorThreadsCanRun()
 	{
 		if (cameraMovingFast())
 		{
 			return false;
 		}
-		
+
 		if (chunkBuilderOverloaded())
 		{
 			return false;
 		}
-		
+
 		PriorityTaskPicker.Executor lodBuilderExecutor = getChunkToLodBuilderExecutor();
 		if (lodBuilderExecutor != null
 			&& !lodBuilderExecutor.isTerminated())
@@ -218,26 +218,26 @@ public class ThreadPoolUtil
 			int maxQueueSize = lodBuilderExecutor.getPoolSize() * 200;
 			return lodBuilderExecutor.getQueueSize() <= maxQueueSize;
 		}
-		
+
 		return true;
 	}
-	
-	
-	
+
+
+
 	private static boolean cameraMovingFast()
 	{
 		if (!Config.Common.WorldGenerator.pauseIfMovingQuickly.get())
 		{
 			return false;
 		}
-		
+
 		double cameraSpeed = ClientApi.INSTANCE.getAvgCameraSpeed();
 		// stop these threads if moving a little bit slower than max elytra speed
 		double maxAllowedSpeed = (LodUtil.ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC - 10.0);
 		// pause if the user is moving too fast
 		return cameraSpeed > maxAllowedSpeed;
 	}
-	
+
 	private static boolean chunkBuilderOverloaded()
 	{
 		// rarely the builder executor can queue up
@@ -248,9 +248,9 @@ public class ThreadPoolUtil
 		return ex != null
 			&& ex.getQueueSize() > 1000;
 	}
-	
+
 	///endregion
-	
-	
-	
+
+
+
 }

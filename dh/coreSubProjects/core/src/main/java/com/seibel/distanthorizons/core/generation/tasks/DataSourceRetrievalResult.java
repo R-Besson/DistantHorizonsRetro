@@ -32,13 +32,13 @@ public class DataSourceRetrievalResult
 	public final long pos;
 	@Nullable
 	public final FullDataSourceV2 dataSource;
-	
-	
-	
+
+
+
 	//==============//
- 	// constructors //
+	// constructors //
 	//==============//
-	
+
 	public static DataSourceRetrievalResult CreateSplit() { return new DataSourceRetrievalResult(ERetrievalResultState.REQUIRES_SPLITTING, 0, null); }
 	public static DataSourceRetrievalResult CreateSuccess(long pos, FullDataSourceV2 generatedDataSource) { return new DataSourceRetrievalResult(ERetrievalResultState.SUCCESS, pos, generatedDataSource); }
 	private DataSourceRetrievalResult(ERetrievalResultState state, long pos, @Nullable FullDataSourceV2 dataSource)
@@ -47,6 +47,6 @@ public class DataSourceRetrievalResult
 		this.pos = pos;
 		this.dataSource = dataSource;
 	}
-	
-	
+
+
 }

@@ -35,16 +35,16 @@ public enum EDhApiDebugRendering
 {
 	/** LODs are rendered normally */
 	OFF,
-	
+
 	/** LOD colors are based on their detail */
 	SHOW_DETAIL,
-	
+
 	/** Block Materials are often used by Iris shaders to determine how LODs should be rendered */
 	SHOW_BLOCK_MATERIAL,
-	
+
 	/** Only draw overlapping LOD quads. */
 	SHOW_OVERLAPPING_QUADS;
-	
+
 	public static EDhApiDebugRendering next(EDhApiDebugRendering type)
 	{
 		switch (type)
@@ -61,7 +61,7 @@ public enum EDhApiDebugRendering
 				return OFF;
 		}
 	}
-	
+
 	public static EDhApiDebugRendering previous(EDhApiDebugRendering type)
 	{
 		switch (type)
@@ -74,5 +74,5 @@ public enum EDhApiDebugRendering
 				return OFF;
 		}
 	}
-	
+
 }

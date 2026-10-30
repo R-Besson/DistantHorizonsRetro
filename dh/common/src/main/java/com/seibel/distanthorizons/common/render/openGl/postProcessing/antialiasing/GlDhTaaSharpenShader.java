@@ -33,10 +33,10 @@ import org.lwjgl.opengl.GL30;
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
- * 
+ *
  * Sharpens the image to offset the TAA blur
  * and draws onto DH's FrameBuffer. <br><br>
- * 
+ *
  * See Also: <br>
  * {@link GlDhTaaRenderer} - Parent to this shader. <br>
  * {@link GlDhTaaShader} - draws the AntiAliasing texture. <br>
@@ -44,23 +44,23 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 {
 	public static GlDhTaaSharpenShader INSTANCE = new GlDhTaaSharpenShader();
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	// uniforms
 	public int uViewWidth;
 	public int uViewHeight;
 	public int uCasAmount;
-	
+
 	public int uCurrentColorSampler;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	@Override
 	public void onInit()
 	{
@@ -69,22 +69,22 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 			"assets/distanthorizons/shaders/antialias/gl/sharpen.frag",
 			"vPosition"
 		);
-		
+
 		// uniform setup
 		this.uViewWidth = this.shader.getUniformLocation("uViewWidth");
 		this.uViewHeight = this.shader.getUniformLocation("uViewHeight");
 		this.uCasAmount = this.shader.getUniformLocation("uCasAmount");
-		
+
 		this.uCurrentColorSampler = this.shader.getUniformLocation("uCurrentColorSampler");
-		
+
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// render prep //
 	//=============//
-	
+
 	@Override
 	protected void onApplyUniforms(RenderParams renderParams)
 	{
@@ -93,39 +93,39 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 		this.shader.setUniform(this.uViewWidth, (float) width);
 		this.shader.setUniform(this.uViewHeight, (float) height);
 		this.shader.setUniform(this.uCasAmount, 0.3f);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(GlDhTaaShader.INSTANCE.outputColorTextureId);
 		LWJGL.glUniform1i(this.uCurrentColorSampler, 0);
-		
+
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	@Override
 	protected void onRender()
 	{
 		GLMC.enableBlend();
 		LWJGL.glBlendEquation(GL14.GL_FUNC_ADD);
 		GLMC.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		// Depth testing must be disabled otherwise this application shader won't apply anything.
-		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually, 
+		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually,
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
-		
-		
+
+
 		// apply the rendered AntiAliasing to DH's framebuffer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, GlDhTaaShader.INSTANCE.frameBuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, GlDhMetaRenderer.INSTANCE.getActiveFramebufferId());
-		
+
 		GlScreenQuad.INSTANCE.render();
-		
+
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, 0);
 	}
-	
+
 }

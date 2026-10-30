@@ -101,13 +101,13 @@ public class FullDataLookupCacheTest
 		Assert.assertEquals(Boolean.FALSE, cache.exists(pos));
 
 		// generation steps are copied, changing the source list doesn't change the cache
-		ByteArrayList generationSteps = new ByteArrayList(new byte[] { 1, 2, 3 });
+		ByteArrayList generationSteps = new ByteArrayList(new byte[]{1, 2, 3});
 		cache.invalidate(pos);
 		cache.putGenerationSteps(pos, generationSteps, cache.writeCount(pos));
 		generationSteps.set(0, (byte) 9);
 		ByteArrayList output = new ByteArrayList();
 		Assert.assertTrue(cache.getGenerationSteps(pos, output));
-		Assert.assertEquals(new ByteArrayList(new byte[] { 1, 2, 3 }), output);
+		Assert.assertEquals(new ByteArrayList(new byte[]{1, 2, 3}), output);
 	}
 
 

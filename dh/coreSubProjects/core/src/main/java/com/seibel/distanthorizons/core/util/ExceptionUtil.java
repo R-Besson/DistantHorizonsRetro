@@ -16,30 +16,30 @@ public class ExceptionUtil
 		{
 			unwrappedCompletion = unwrappedCompletion.getCause();
 		}
-		
+
 		return isThrowableShutdown(throwable)
-				|| isThrowableShutdown(unwrappedCompletion);
+			|| isThrowableShutdown(unwrappedCompletion);
 	}
 	private static boolean isThrowableShutdown(Throwable throwable)
 	{
 		return throwable instanceof InterruptedException
-				|| throwable instanceof UncheckedInterruptedException
-				|| throwable instanceof RejectedExecutionException
-				|| throwable instanceof CancellationException
-				|| throwable instanceof ClosedByInterruptException;
+			|| throwable instanceof UncheckedInterruptedException
+			|| throwable instanceof RejectedExecutionException
+			|| throwable instanceof CancellationException
+			|| throwable instanceof ClosedByInterruptException;
 	}
-	
-	
+
+
 	public static boolean isInterruptOrReject(Throwable t)
 	{
 		Throwable unwrapped = ensureUnwrap(t);
 		return UncheckedInterruptedException.isInterrupt(unwrapped) ||
-				unwrapped instanceof RejectedExecutionException ||
-				unwrapped instanceof CancellationException;
+			unwrapped instanceof RejectedExecutionException ||
+			unwrapped instanceof CancellationException;
 	}
 	public static Throwable ensureUnwrap(Throwable t)
 	{ return t instanceof CompletionException ? ensureUnwrap(t.getCause()) : t; }
-	
-	
-	
+
+
+
 }

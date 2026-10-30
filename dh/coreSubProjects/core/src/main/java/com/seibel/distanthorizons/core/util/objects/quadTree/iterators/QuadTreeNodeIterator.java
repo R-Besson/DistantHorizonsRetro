@@ -24,38 +24,42 @@ import com.seibel.distanthorizons.core.util.objects.quadTree.QuadNode;
 import com.seibel.distanthorizons.core.util.objects.quadTree.QuadTree;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.function.Consumer;
 
 public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 {
 	/** lowest numerical value, inclusive */
 	private final byte leafDetailLevel;
-	
-	
+
+
 	private final Queue<QuadNode<T>> validNodesForDetailLevel = new ArrayDeque<>();
 	private final Queue<QuadNode<T>> iteratorNodeQueue = new ArrayDeque<>();
 	private byte iteratorDetailLevel;
-	
+
 	private final boolean onlyReturnLeafValues;
 	@Nullable
 	private final QuadTree.INodeIteratorStoppingFunc<T> stopIteratingFunc;
-	
-	
+
+
 	public QuadTreeNodeIterator(
-			QuadNode<T> rootNode, 
-			boolean onlyReturnLeafValues, @Nullable QuadTree.INodeIteratorStoppingFunc<T> stopIteratingFunc)
+		QuadNode<T> rootNode,
+		boolean onlyReturnLeafValues, @Nullable QuadTree.INodeIteratorStoppingFunc<T> stopIteratingFunc)
 	{
 		this.onlyReturnLeafValues = onlyReturnLeafValues;
 		this.stopIteratingFunc = stopIteratingFunc;
 		this.leafDetailLevel = rootNode.parentTreeLeafDetailLevel;
 		this.iteratorDetailLevel = DhSectionPos.getDetailLevel(rootNode.sectionPos);
-		
-		
+
+
 		if (!this.onlyReturnLeafValues)
 		{
 			// return all nodes
-			
+
 			// set the start for the iterator
 			this.validNodesForDetailLevel.add(rootNode);
 			this.iteratorNodeQueue.add(rootNode);
@@ -63,24 +67,24 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 		else
 		{
 			// return leaf nodes
-			
+
 			// fully populate the iterator
-			// this isn't the best way to do this, especially for large trees, 
+			// this isn't the best way to do this, especially for large trees,
 			// but it is simple and functions well enough for now
 			Queue<QuadNode<T>> parentNodeQueue = new ArrayDeque<>();
 			parentNodeQueue.add(rootNode);
-			
+
 			// walk through the whole tree and add each leaf node to the iterator queue
 			while (parentNodeQueue.peek() != null)
 			{
 				QuadNode<T> parentNode = parentNodeQueue.poll();
-				
+
 				if (stopIteratingFunc != null
 					&& stopIteratingFunc.iteratorShouldStop(parentNode))
 				{
 					continue;
 				}
-				
+
 				for (int i = 0; i < 4; i++)
 				{
 					QuadNode<T> childNode = parentNode.getChildByIndex(i);
@@ -98,14 +102,14 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 				}
 			}
 		}
-		
+
 	}// constructor
-	
-	
-	
+
+
+
 	@Override
 	public boolean hasNext() { return !this.iteratorNodeQueue.isEmpty(); }
-	
+
 	@Override
 	public QuadNode<T> next()
 	{
@@ -117,26 +121,26 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 		{
 			throw new NoSuchElementException();
 		}
-		
-		
+
+
 		// get the current iterator node
 		QuadNode<T> currentNode = this.iteratorNodeQueue.poll();
-		
-		
+
+
 		// the iterator queue should be fully populated for leaf values,
 		// for all values, it needs to be populated for each detail level
-		if (this.iteratorNodeQueue.isEmpty() 
+		if (this.iteratorNodeQueue.isEmpty()
 			&& !this.onlyReturnLeafValues)
 		{
 			// populate the next detail level list
-			
+
 			this.iteratorDetailLevel--;
 			// only continue if we can go down farther
 			if (this.iteratorDetailLevel >= this.leafDetailLevel)
 			{
 				Queue<QuadNode<T>> parentNodes = new LinkedList<>(this.validNodesForDetailLevel);
 				this.validNodesForDetailLevel.clear();
-				
+
 				// populate the list of nodes for this detail level
 				for (QuadNode<T> parentNode : parentNodes)
 				{
@@ -145,8 +149,8 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 					{
 						continue;
 					}
-					
-					
+
+
 					for (int i = 0; i < 4; i++)
 					{
 						QuadNode<T> childNode = parentNode.getChildByIndex(i);
@@ -154,29 +158,29 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 						{
 							continue;
 						}
-						
+
 						if (this.stopIteratingFunc != null
 							&& this.stopIteratingFunc.iteratorShouldStop(childNode))
 						{
 							continue;
 						}
-						
+
 						this.iteratorNodeQueue.add(childNode);
 						this.validNodesForDetailLevel.add(childNode);
 					}
 				}
 			}
 		}
-		
+
 		return currentNode;
 	}
-	
-	
+
+
 	/** Unimplemented */
 	@Override
 	public void remove() { throw new UnsupportedOperationException("remove"); }
-	
+
 	@Override
 	public void forEachRemaining(Consumer<? super QuadNode<T>> action) { Iterator.super.forEachRemaining(action); }
-	
+
 }

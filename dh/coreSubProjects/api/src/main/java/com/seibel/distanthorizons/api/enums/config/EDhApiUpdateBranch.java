@@ -7,22 +7,22 @@ import com.seibel.distanthorizons.coreapi.ModInfo;
  * STABLE, <br>
  * NIGHTLY, <br><br>
  *
- * @since API 2.1.0
  * @version 2024-6-8
+ * @since API 2.1.0
  */
 public enum EDhApiUpdateBranch
 {
 	AUTO,
 	STABLE,
 	NIGHTLY;
-	
-	
-	
-	/** 
+
+
+
+	/**
 	 * If the updateBranch value is {@link EDhApiUpdateBranch#AUTO}
 	 * this method will convert it either to {@link EDhApiUpdateBranch#STABLE} or {@link EDhApiUpdateBranch#NIGHTLY}
 	 * based on this jar's state. <Br><br>
-	 * 
+	 *
 	 * If updateBranch is {@link EDhApiUpdateBranch#STABLE} or {@link EDhApiUpdateBranch#NIGHTLY}
 	 * it just returns.
 	 */
@@ -37,5 +37,5 @@ public enum EDhApiUpdateBranch
 			return ModInfo.IS_DEV_BUILD ? EDhApiUpdateBranch.NIGHTLY : EDhApiUpdateBranch.STABLE;
 		}
 	}
-	
+
 }

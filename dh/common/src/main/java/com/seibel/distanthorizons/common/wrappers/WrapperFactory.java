@@ -111,17 +111,17 @@ public class WrapperFactory implements IWrapperFactory
 	{
 		if (!(levelWrapper instanceof ILevelWrapper))
 		{
-			throw new ClassCastException("levelWrapper must be returned by DH and of type ["+ILevelWrapper.class.getName()+"].");
+			throw new ClassCastException("levelWrapper must be returned by DH and of type [" + ILevelWrapper.class.getName() + "].");
 		}
 
-		return BiomeWrapper.deserialize(resourceLocationString, (ILevelWrapper)levelWrapper);
+		return BiomeWrapper.deserialize(resourceLocationString, (ILevelWrapper) levelWrapper);
 	}
 	@Override
 	public IDhApiBlockStateWrapper getDefaultBlockStateWrapper(String resourceLocationString, IDhApiLevelWrapper levelWrapper) throws IOException, ClassCastException
 	{
 		if (!(levelWrapper instanceof ILevelWrapper))
 		{
-			throw new ClassCastException("Invalid ["+IDhApiLevelWrapper.class.getSimpleName()+"] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type ["+ILevelWrapper.class.getName()+"].");
+			throw new ClassCastException("Invalid [" + IDhApiLevelWrapper.class.getSimpleName() + "] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type [" + ILevelWrapper.class.getName() + "].");
 		}
 
 		return BlockStateWrapper.deserialize(resourceLocationString);
@@ -138,10 +138,10 @@ public class WrapperFactory implements IWrapperFactory
 		}
 		catch (IOException e)
 		{
-			throw new LodUtil.AssertFailureException("Unable to parse plains resource string ["+BiomeWrapper.PLAINS_RESOURCE_LOCATION_STRING+"], error:\n " + e.getMessage());
+			throw new LodUtil.AssertFailureException("Unable to parse plains resource string [" + BiomeWrapper.PLAINS_RESOURCE_LOCATION_STRING + "], error:\n " + e.getMessage());
 		}
 	}
-	
+
 	@Override
 	public IBlockStateWrapper deserializeBlockStateWrapper(String str) throws IOException { return BlockStateWrapper.deserialize(str); }
 	@Override
@@ -234,11 +234,11 @@ public class WrapperFactory implements IWrapperFactory
 		ILevelWrapper levelWrapper;
 		if (level.isRemote)
 		{
-			levelWrapper = ClientLevelWrapper.getWrapper((WorldClient)level);
+			levelWrapper = ClientLevelWrapper.getWrapper((WorldClient) level);
 		}
 		else
 		{
-			levelWrapper = ServerLevelWrapper.getWrapper((WorldServer)level);
+			levelWrapper = ServerLevelWrapper.getWrapper((WorldServer) level);
 		}
 
 		//endregion
@@ -284,7 +284,7 @@ public class WrapperFactory implements IWrapperFactory
 		// confirm the API level wrapper is also a Core wrapper
 		if (!(levelWrapper instanceof ILevelWrapper))
 		{
-			throw new ClassCastException("Invalid ["+IDhApiLevelWrapper.class.getSimpleName()+"] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type ["+ILevelWrapper.class.getName()+"].");
+			throw new ClassCastException("Invalid [" + IDhApiLevelWrapper.class.getSimpleName() + "] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type [" + ILevelWrapper.class.getName() + "].");
 		}
 		ILevelWrapper coreLevelWrapper = (ILevelWrapper) levelWrapper;
 
@@ -309,7 +309,7 @@ public class WrapperFactory implements IWrapperFactory
 	 */
 	private static String createBiomeWrapperErrorMessage(Object[] objectArray)
 	{
-		String[] expectedClassNames = new String[] { BiomeGenBase.class.getName() };
+		String[] expectedClassNames = new String[]{BiomeGenBase.class.getName()};
 
 		return createWrapperErrorMessage("Biome wrapper", expectedClassNames, objectArray);
 	}
@@ -319,11 +319,11 @@ public class WrapperFactory implements IWrapperFactory
 		// confirm the API level wrapper is also a Core wrapper
 		if (!(levelWrapper instanceof ILevelWrapper))
 		{
-			throw new ClassCastException("Invalid ["+IDhApiLevelWrapper.class.getSimpleName()+"] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type ["+ILevelWrapper.class.getName()+"].");
+			throw new ClassCastException("Invalid [" + IDhApiLevelWrapper.class.getSimpleName() + "] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type [" + ILevelWrapper.class.getName() + "].");
 		}
-		
-		
-		
+
+
+
 		if (objectArray.length != 3
 			&& objectArray.length != 1)
 		{
@@ -333,12 +333,11 @@ public class WrapperFactory implements IWrapperFactory
 		boolean blockClassCorrect =
 			(
 				(objectArray[0] instanceof Block)
-				&& (objectArray[1] instanceof Integer)
-				&& (objectArray[2] instanceof Integer)
+					&& (objectArray[1] instanceof Integer)
+					&& (objectArray[2] instanceof Integer)
 			)
-			||
-			(objectArray[0] instanceof IBlockState)
-		;
+				||
+				(objectArray[0] instanceof IBlockState);
 		if (!blockClassCorrect)
 		{
 			throw new ClassCastException(createBlockStateWrapperErrorMessage(objectArray));
@@ -347,7 +346,7 @@ public class WrapperFactory implements IWrapperFactory
 		IBlockState fakeBlockState;
 		if (objectArray[0] instanceof IBlockState)
 		{
-			fakeBlockState = (IBlockState)objectArray[0];
+			fakeBlockState = (IBlockState) objectArray[0];
 		}
 		else
 		{
@@ -366,7 +365,7 @@ public class WrapperFactory implements IWrapperFactory
 	 */
 	private static String createBlockStateWrapperErrorMessage(Object[] objectArray)
 	{
-		String[] expectedClassNames = new String[] { IBlockState.class.getName() };
+		String[] expectedClassNames = new String[]{IBlockState.class.getName()};
 
 		return createWrapperErrorMessage("BlockState wrapper", expectedClassNames, objectArray);
 	}

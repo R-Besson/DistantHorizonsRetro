@@ -16,4 +16,5 @@ public interface IBlockState
 	int getMeta();
 
 	int getLightValue();
+
 }

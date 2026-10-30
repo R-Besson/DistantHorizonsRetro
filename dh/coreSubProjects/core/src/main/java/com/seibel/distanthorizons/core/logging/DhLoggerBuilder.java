@@ -33,13 +33,13 @@ public class DhLoggerBuilder
 	private @Nullable ConfigEntry<EDhApiLoggerLevel> chatLevelConfig;
 	private @Nullable ConfigEntry<EDhApiLoggerLevel> fileLevelConfig;
 	private int maxLogPerSec = -1;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public DhLoggerBuilder() { this.name = ModInfo.NAME + "-" + getCallingClassName(); }
 	/** @return "??" if no name could be found */
 	private static String getCallingClassName()
@@ -50,60 +50,60 @@ public class DhLoggerBuilder
 		{
 			StackTraceElement ste = stElements[i];
 			if (!ste.getClassName().equals(DhLoggerBuilder.class.getName())
-					&& ste.getClassName().indexOf("java.lang.Thread") != 0)
+				&& ste.getClassName().indexOf("java.lang.Thread") != 0)
 			{
 				callerClassName = ste.getClassName();
 				break;
 			}
 		}
-		
+
 		return callerClassName;
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// variables //
 	//===========//
-	
+
 	public DhLoggerBuilder name(String name)
 	{
 		this.name = name;
 		return this;
 	}
-	
+
 	public DhLoggerBuilder chatLevelConfig(ConfigEntry<EDhApiLoggerLevel> chatLevelConfig)
 	{
 		this.chatLevelConfig = chatLevelConfig;
 		return this;
 	}
-	
+
 	public DhLoggerBuilder fileLevelConfig(ConfigEntry<EDhApiLoggerLevel> fileLevelConfig)
 	{
 		this.fileLevelConfig = fileLevelConfig;
 		return this;
 	}
-	
+
 	public DhLoggerBuilder maxCountPerSecond(int maxLogPerSec)
 	{
 		this.maxLogPerSec = maxLogPerSec;
 		return this;
 	}
-	
-	
-	
+
+
+
 	//=======//
 	// build //
 	//=======//
-	
+
 	public DhLogger build()
 	{
 		try
 		{
 			return new DhLogger(
-					this.name,
-					this.chatLevelConfig, this.fileLevelConfig,
-					this.maxLogPerSec
+				this.name,
+				this.chatLevelConfig, this.fileLevelConfig,
+				this.maxLogPerSec
 			);
 		}
 		catch (Exception e)
@@ -111,7 +111,7 @@ public class DhLoggerBuilder
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-	
+
+
+
 }

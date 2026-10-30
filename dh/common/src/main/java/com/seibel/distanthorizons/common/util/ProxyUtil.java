@@ -25,6 +25,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+
 public class ProxyUtil
 {
 
@@ -39,8 +40,8 @@ public class ProxyUtil
 		{
 			levelWrapper = ClientLevelWrapper.getWrapper((WorldClient) level);
 		}
-		
+
 		return levelWrapper;
 	}
-	
+
 }

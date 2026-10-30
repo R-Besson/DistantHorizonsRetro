@@ -47,38 +47,38 @@ import java.util.List;
 public class F3Screen
 {
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-	
+
 	public static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 	private static final String JAVA_VERSION = System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + ")";
-	
-	
-	
+
+
+
 	//=================//
 	// injection point //
 	//=================//
-	
+
 	/**
 	 * F3 menu example: <br>
-	 <code>
-	 Distant Horizons v: 2.1.1-a-dev <br> 
-	 Build: 7e163ce6 (main) <br><br>
-	 
-	 Queued chunk updates: 0 / 1000 <br>
-	 World Gen Tasks: 40/5304, (in progress: 7) <br><br>
-	 
-	 File thread pool tasks: 0 (complete: 759) <br>
-	 Update thread pool tasks: 10 (complete: 24) <br>
-	 Level Unsaved #: 0 <br>
-	 File Handler Unsaved #: 0 <br>
-	 Parent Update #: 12 <br><br>
-	 
-	 Client_Server World with 3 levels <br>
-	 [minecraft:overworld] rendering: Active <br>
-	 [minecraft:the_end] rendering: Inactive <br>
-	 [minecraft:the_nether] rendering: Inactive <br><br>
-	 
-	 VBO Render Count: 199/374 <br>
-	 </code>
+	 * <code>
+	 * Distant Horizons v: 2.1.1-a-dev <br>
+	 * Build: 7e163ce6 (main) <br><br>
+	 *
+	 * Queued chunk updates: 0 / 1000 <br>
+	 * World Gen Tasks: 40/5304, (in progress: 7) <br><br>
+	 *
+	 * File thread pool tasks: 0 (complete: 759) <br>
+	 * Update thread pool tasks: 10 (complete: 24) <br>
+	 * Level Unsaved #: 0 <br>
+	 * File Handler Unsaved #: 0 <br>
+	 * Parent Update #: 12 <br><br>
+	 *
+	 * Client_Server World with 3 levels <br>
+	 * [minecraft:overworld] rendering: Active <br>
+	 * [minecraft:the_end] rendering: Inactive <br>
+	 * [minecraft:the_nether] rendering: Inactive <br><br>
+	 *
+	 * VBO Render Count: 199/374 <br>
+	 * </code>
 	 */
 	public static void addStringToDisplay(List<String> messageList)
 	{
@@ -86,26 +86,26 @@ public class F3Screen
 		String y = MinecraftTextFormat.YELLOW;
 		String a = MinecraftTextFormat.AQUA;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-		
-		
-		
+
+
+
 		AbstractDhWorld world = SharedApi.getAbstractDhWorld();
 		if (world == null)
 		{
 			return;
 		}
-		
+
 		Iterable<? extends IDhLevel> levelIterator = world.getAllLoadedLevels();
-		
-		
+
+
 		// DH version
 		messageList.add("");
-		messageList.add(ModInfo.READABLE_NAME+": "+ModInfo.VERSION);
+		messageList.add(ModInfo.READABLE_NAME + ": " + ModInfo.VERSION);
 		if (ModInfo.IS_DEV_BUILD)
 		{
 			messageList.add("Build: " + StringUtil.shortenString(ModJarInfo.Git_Commit, 8) + " (" + ModJarInfo.Git_Branch + ")");
 		}
-		
+
 		messageList.add("Java: " + JAVA_VERSION);
 
 		// render validation error
@@ -113,8 +113,8 @@ public class F3Screen
 		{
 			messageList.add("Render Validation Err: " + r + ClientApi.INSTANCE.lastRenderParamValidationMessage + cf);
 		}
-		
-		
+
+
 		// player pos
 		if (Config.Client.Advanced.Debugging.F3Screen.showPlayerPos.get())
 		{
@@ -122,18 +122,18 @@ public class F3Screen
 			{
 				byte requestedDetailLevel = Config.Client.Advanced.Debugging.F3Screen.playerPosSectionDetailLevel.get().byteValue();
 				long sectionPos = DhSectionPos.encodeContaining(requestedDetailLevel, MC_CLIENT.getPlayerChunkPos());
-				
+
 				int detailLevel = DhSectionPos.getDetailLevel(sectionPos);
 				int posX = DhSectionPos.getX(sectionPos);
 				int posZ = DhSectionPos.getZ(sectionPos);
-				messageList.add("LOD Pos: "+y+detailLevel+"*"+posX+","+posZ+cf);
-				
+				messageList.add("LOD Pos: " + y + detailLevel + "*" + posX + "," + posZ + cf);
+
 				AbstractDhRenderApiDefinition renderApiDef = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-				messageList.add("Rendering API: "+a+renderApiDef.getEngineName()+cf);
+				messageList.add("Rendering API: " + a + renderApiDef.getEngineName() + cf);
 			}
 			messageList.add("");
 		}
-		
+
 		// thread pools
 		if (Config.Client.Advanced.Debugging.F3Screen.showThreadPools.get())
 		{
@@ -146,14 +146,14 @@ public class F3Screen
 			messageList.add(PriorityTaskPicker.Executor.getThreadPoolStatString("Networking", ThreadPoolUtil.getNetworkCompressionExecutor()));
 			messageList.add("");
 		}
-		
+
 		// render thread tasks
 		if (Config.Client.Advanced.Debugging.F3Screen.showRenderThreadTasks.get())
 		{
 			RenderThreadTaskHandler.INSTANCE.addDebugMenuStringsToList(messageList);
 			messageList.add("");
 		}
-		
+
 		// combined object pools
 		if (Config.Client.Advanced.Debugging.F3Screen.showCombinedObjectPools.get())
 		{
@@ -166,7 +166,7 @@ public class F3Screen
 			PhantomArrayListPool.addDebugMenuStringsToListForSeparatePools(messageList);
 			messageList.add("");
 		}
-		
+
 		// chunk updates
 		if (Config.Client.Advanced.Debugging.F3Screen.showQueuedChunkUpdateCount.get())
 		{
@@ -174,7 +174,7 @@ public class F3Screen
 			messageList.addAll(chunkQueueList);
 			messageList.add("");
 		}
-		
+
 		// world / levels
 		if (Config.Client.Advanced.Debugging.F3Screen.showLevelStatus.get())
 		{
@@ -194,11 +194,11 @@ public class F3Screen
 						}
 					}
 				}
-				
-				
-				
+
+
+
 				level.addDebugMenuStringsToList(messageList);
-				
+
 				// LOD rendering
 				RenderBufferHandler renderBufferHandler = level.getRenderBufferHandler();
 				if (renderBufferHandler != null)
@@ -210,7 +210,7 @@ public class F3Screen
 						messageList.add(showPassString);
 					}
 				}
-				
+
 				// Generic rendering
 				IDhGenericRenderer genericRenderer = level.getGenericRenderer();
 				if (genericRenderer != null)
@@ -221,7 +221,7 @@ public class F3Screen
 			}
 		}
 	}
-	
-	
-	
+
+
+
 }

@@ -20,7 +20,10 @@
 package com.seibel.distanthorizons.api.interfaces.config;
 
 import com.seibel.distanthorizons.api.interfaces.config.both.IDhApiWorldGenerationConfig;
-import com.seibel.distanthorizons.api.interfaces.config.client.*;
+import com.seibel.distanthorizons.api.interfaces.config.client.IDhApiDebuggingConfig;
+import com.seibel.distanthorizons.api.interfaces.config.client.IDhApiGraphicsConfig;
+import com.seibel.distanthorizons.api.interfaces.config.client.IDhApiMultiThreadingConfig;
+import com.seibel.distanthorizons.api.interfaces.config.client.IDhApiMultiplayerConfig;
 
 /**
  * This interfaces holds all config groups
@@ -39,5 +42,5 @@ public interface IDhApiConfig
 	// note: DON'T add the Auto Updater to this API. We only want the user's to have the ability to control when things are downloaded to their machines.
 	//IDhApiLoggingConfig logging(); // TODO implement
 	IDhApiDebuggingConfig debugging();
-	
+
 }

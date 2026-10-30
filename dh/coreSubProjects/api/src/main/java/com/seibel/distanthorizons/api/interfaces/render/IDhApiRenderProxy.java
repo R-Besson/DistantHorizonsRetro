@@ -19,8 +19,8 @@
 
 package com.seibel.distanthorizons.api.interfaces.render;
 
-import com.seibel.distanthorizons.api.enums.config.EDhApiDepthRange;
 import com.seibel.distanthorizons.api.enums.config.EDhApiDepthDirection;
+import com.seibel.distanthorizons.api.enums.config.EDhApiDepthRange;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiAfterDhInitEvent;
@@ -48,14 +48,13 @@ public interface IDhApiRenderProxy
 	 * This improves rendering speed and VRAM size, but prevents dynamically changing LOD colors. <Br>
 	 */
 	DhApiResult<Boolean> clearRenderDataCache();
-	
+
 	/**
 	 * Returns which specific {@link EDhApiRenderingApi}
 	 * Distant Horizons will use for rendering. <br><br>
-	 * 
-	 * @throws IllegalStateException if no renderer has been bound yet, 
-	 *      wait till after {@link DhApiAfterDhInitEvent} has been fired
-	 * 
+	 *
+	 * @throws IllegalStateException if no renderer has been bound yet,
+	 * wait till after {@link DhApiAfterDhInitEvent} has been fired
 	 * @see DhApiAfterDhInitEvent
 	 * @since API 7.0.0
 	 */
@@ -63,10 +62,9 @@ public interface IDhApiRenderProxy
 	/**
 	 * Returns which specific {@link EDhApiRenderingEngine}
 	 * Distant Horizons will use for rendering. <br><br>
-	 * 
-	 * @throws IllegalStateException if no renderer has been bound yet, 
-	 *      wait till after {@link DhApiAfterDhInitEvent} has been fired
-	 * 
+	 *
+	 * @throws IllegalStateException if no renderer has been bound yet,
+	 * wait till after {@link DhApiAfterDhInitEvent} has been fired
 	 * @see DhApiAfterDhInitEvent
 	 * @since API 7.1.0
 	 */
@@ -76,24 +74,22 @@ public interface IDhApiRenderProxy
 	 * is calling the base rendering API's method calls. <br>
 	 * ie GL.drawArrays() for OpenGL. <Br><br>
 	 *
-	 * If DH is using a rendering interpretation layer like Blaze3D (Mojang's rendering API) 
+	 * If DH is using a rendering interpretation layer like Blaze3D (Mojang's rendering API)
 	 * this will return false.
 	 *
-	 * @throws IllegalStateException if no renderer has been bound yet, 
-	 *      wait till after {@link DhApiAfterDhInitEvent} has been fired
-	 *
+	 * @throws IllegalStateException if no renderer has been bound yet,
+	 * wait till after {@link DhApiAfterDhInitEvent} has been fired
 	 * @see DhApiAfterDhInitEvent
 	 * @since API 7.0.0
 	 */
 	boolean isNativeRenderer() throws IllegalStateException;
-	
+
 	/**
 	 * Returns the currently active {@link EDhApiDepthRange} DH is rendering with this frame. <Br>
 	 * This value may change from frame to frame based on config and other active mods.
 	 *
-	 * @throws IllegalStateException if no renderer has been bound yet, 
-	 *      wait till after {@link DhApiAfterDhInitEvent} has been fired
-	 *
+	 * @throws IllegalStateException if no renderer has been bound yet,
+	 * wait till after {@link DhApiAfterDhInitEvent} has been fired
 	 * @since API 7.2.0
 	 */
 	EDhApiDepthRange getDepthRange() throws IllegalStateException;
@@ -101,19 +97,18 @@ public interface IDhApiRenderProxy
 	 * Returns the currently active {@link EDhApiDepthDirection} DH is rendering with this frame. <Br>
 	 * This value may change from frame to frame based on config and other active mods.
 	 *
-	 * @throws IllegalStateException if no renderer has been bound yet, 
-	 *      wait till after {@link DhApiAfterDhInitEvent} has been fired
-	 *
+	 * @throws IllegalStateException if no renderer has been bound yet,
+	 * wait till after {@link DhApiAfterDhInitEvent} has been fired
 	 * @since API 7.2.0
 	 */
 	EDhApiDepthDirection getDepthDirection() throws IllegalStateException;
-	
-	
-	
+
+
+
 	//=======================//
 	// OpenGL object getters //
 	//=======================//
-	
+
 	/** @deprecated in favor of {@link IDhApiRenderProxy#getDhDepthTextureGlId} */
 	@Deprecated // don't remove, this method is needed by Iris
 	default DhApiResult<Integer> getDhDepthTextureId() { return this.getDhDepthTextureGlId(); }
@@ -135,8 +130,8 @@ public interface IDhApiRenderProxy
 	 * @since API 7.1.0
 	 */
 	DhApiResult<IDhApiBlazeTextureWrapper> getDhDepthTextureBlazeWrapper();
-	
-	
+
+
 	/** @deprecated in favor of {@link IDhApiRenderProxy#getDhDepthTextureGlId} */
 	@Deprecated // don't remove, this method is needed by Iris
 	default DhApiResult<Integer> getDhColorTextureId() { return this.getDhColorTextureGlId(); }
@@ -154,25 +149,25 @@ public interface IDhApiRenderProxy
 	 * Will return {@link DhApiResult#success} = false and {@link DhApiResult#payload} = null if the texture hasn't been created yet
 	 * or a rendering API other than {@link EDhApiRenderingEngine#BLAZE_3D} is in use.
 	 *
-	 * @see IDhApiRenderProxy#getRenderingEngine() 
+	 * @see IDhApiRenderProxy#getRenderingEngine()
 	 * @since API 7.1.0
 	 */
 	DhApiResult<IDhApiBlazeTextureWrapper> getDhColorTextureBlazeWrapper();
-	
+
 	/**
 	 * Returns the OpenGL name of Distant Horizons' block ratio atlas texture. <br>
 	 * Will return {@link DhApiResult#success} = false and {@link DhApiResult#payload} = -1 if the texture hasn't been created yet
 	 * or a rendering API other than {@link EDhApiRenderingEngine#OPEN_GL} is in use. <br><br>
-	 *  
+	 *
 	 * The term "block ratio atlas" means the texture is a ratio between DH's underlying color
 	 * and the color the block should have for that face. <br>
 	 * A color value of 0.5f (or half a byte) means DH's base color will be used for that pixel. <br><br>
-	 *  
+	 *
 	 * <b>Note:</b> <br>
 	 * This texture is likely to be recreated/changed without warning.
 	 * If you want to use this texture at render-time it's recommended you
 	 * query this method every time before binding.
-	 * 
+	 *
 	 * @see IDhApiRenderProxy#getRenderingEngine()
 	 * @since API 7.1.0
 	 */
@@ -181,7 +176,7 @@ public interface IDhApiRenderProxy
 	 * Returns a wrapper around the Blaze3D objects that represent Distant Horizons' block ratio atlas texture. <br>
 	 * Will return {@link DhApiResult#success} = false and {@link DhApiResult#payload} = null if the texture hasn't been created yet
 	 * or a rendering API other than {@link EDhApiRenderingEngine#BLAZE_3D} is in use. <br><br>
-	 * 
+	 *
 	 * The term "block ratio atlas" means the texture is a ratio between DH's underlying color
 	 * and the color the block should have for that face. <br>
 	 * A color value of 0.5f (or half a byte) means DH's base color will be used for that pixel. <br><br>
@@ -195,25 +190,25 @@ public interface IDhApiRenderProxy
 	 * @since API 7.1.0
 	 */
 	DhApiResult<IDhApiBlazeTextureWrapper> getDhBlockRatioAtlasTextureBlazeWrapper();
-	
-	
-	
+
+
+
 	//======================//
 	// Shader compatibility //
 	//======================//
-	
+
 	/**
 	 * If set to true DH won't render opaque and transparent LODs in the same pass.
-	 * Instead, opaque objects will be rendered at the normal time, but 
+	 * Instead, opaque objects will be rendered at the normal time, but
 	 * transparent objects will only be rendered in a second pass during Minecraft's
 	 * own transparent rendering pass.
 	 */
 	void setDeferTransparentRendering(boolean deferTransparentRendering);
 	/** @return If DH should defer transparent rendering or not. */
 	boolean getDeferTransparentRendering();
-	
+
 	/** This may change based on FOV, player speed, and other factors. */
 	float getNearClipPlaneDistanceInBlocks(float partialTicks);
-	
-	
+
+
 }

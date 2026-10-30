@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-/** 
- * Handles creating and destroying {@link ReentrantLock}'s for 
+/**
+ * Handles creating and destroying {@link ReentrantLock}'s for
  * a given {@link DhSectionPos}.
  * This is necessary since we need an unlimited number of locks
  * when handling data updating, but we don't want to infinitely create locks.
@@ -26,30 +26,30 @@ public class PositionalLockProvider
 
 	private static final ThreadPoolExecutor LOCK_CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("Positional Lock Cleanup");
 	private static final int CLEANUP_THREAD_MAX_FREQUENCY_IN_MS = 1000;
-	
+
 	/** How long a lock can be unused before it is eligible for deletion */
 	private static final long UNUSED_LOCK_TIMEOUT_IN_MS = 10_000; // 10 seconds
 	private static final int MAX_NUMBER_OF_LOCKS = 100;
-	
-	
+
+
 	private final ConcurrentHashMap<Long, ExpiringLock> lockByPos = new ConcurrentHashMap<>();
-	
+
 	private final AtomicBoolean lockRemovalThreadRunning = new AtomicBoolean(false);
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
-	public PositionalLockProvider() {}
-	
-	
-	
+
+	public PositionalLockProvider() { }
+
+
+
 	//========//
 	// getter //
 	//========//
-	
+
 	public ReentrantLock getLock(long pos)
 	{
 		return this.lockByPos.compute(pos, (ignorePos, lock) ->
@@ -58,14 +58,14 @@ public class PositionalLockProvider
 			{
 				lock = new ExpiringLock();
 			}
-			
+
 			// clean up the expired locks on a separate thread, unless it's already running
 			if (this.lockByPos.size() > MAX_NUMBER_OF_LOCKS
 				&& !this.lockRemovalThreadRunning.getAndSet(true))
 			{
 				LOCK_CLEANUP_THREAD.execute(this::removeExpiredLocks);
 			}
-			
+
 			return lock;
 		});
 	}
@@ -75,7 +75,7 @@ public class PositionalLockProvider
 		{
 			// we don't need to trigger this every time the lock count is over the limit
 			Thread.sleep(CLEANUP_THREAD_MAX_FREQUENCY_IN_MS);
-			
+
 			// walk over every lock and check which ones need to be removed
 			Iterator<Long> keySet = this.lockByPos.keySet().iterator();
 			while (keySet.hasNext())
@@ -83,10 +83,10 @@ public class PositionalLockProvider
 				try
 				{
 					long currentTime = System.currentTimeMillis();
-					
+
 					long pos = keySet.next();
 					ExpiringLock lock = this.lockByPos.get(pos);
-					
+
 					// don't try removing a lock that's currently in use
 					if (lock.tryLockWithoutUpdatingExpirationTime())
 					{
@@ -96,57 +96,59 @@ public class PositionalLockProvider
 						}
 						lock.unlock();
 					}
-					
+
 				}
-				catch (NoSuchElementException ignore) { }
+				catch (NoSuchElementException ignore)
+				{
+				}
 			}
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("PositionLockProvider unexpected error when removing expired locks. Error: "+e.getMessage(), e);
+			LOGGER.error("PositionLockProvider unexpected error when removing expired locks. Error: " + e.getMessage(), e);
 		}
 		finally
 		{
 			this.lockRemovalThreadRunning.set(false);
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	/** a lock that tracks when it was last used */
 	private static class ExpiringLock extends ReentrantLock
 	{
-		/** 
+		/**
 		 * Indicates the system time in Milliseconds when this lock has expired. <br>
-		 * Should update whenever the lock is used. 
+		 * Should update whenever the lock is used.
 		 */
 		public long expirationTimeInMs;
-		
-		
-		
+
+
+
 		//=============//
 		// constructor //
 		//=============//
-		
+
 		public ExpiringLock() { this.resetExpirationTime(); }
-		
-		
-		
+
+
+
 		//===========//
 		// overrides //
 		//===========//
-		
-		@Override 
+
+		@Override
 		public void lock()
 		{
 			this.resetExpirationTime();
 			super.lock();
 		}
-		@Override 
+		@Override
 		public boolean tryLock()
 		{
 			this.resetExpirationTime();
@@ -158,29 +160,29 @@ public class PositionalLockProvider
 			this.resetExpirationTime();
 			return super.tryLock(timeout, unit);
 		}
-		
-		@Override 
+
+		@Override
 		public void unlock()
 		{
 			this.resetExpirationTime();
 			super.unlock();
 		}
-		
-		
-		
+
+
+
 		//================//
 		// helper methods //
 		//================//
-		
+
 		/** should be called whenever this lock is needed */
 		private void resetExpirationTime()
 		{
 			this.expirationTimeInMs = System.currentTimeMillis() + UNUSED_LOCK_TIMEOUT_IN_MS;
 		}
-		
+
 		public boolean tryLockWithoutUpdatingExpirationTime() { return super.tryLock(); }
-		
-		
+
+
 	}
-	
+
 }

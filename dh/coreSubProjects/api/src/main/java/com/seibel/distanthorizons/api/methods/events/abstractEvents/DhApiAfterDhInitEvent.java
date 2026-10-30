@@ -34,13 +34,13 @@ public abstract class DhApiAfterDhInitEvent implements IDhApiEvent<Void>, IDhApi
 {
 	/** Fired after Distant Horizons finishes its initial setup on Minecraft startup. */
 	public abstract void afterDistantHorizonsInit(DhApiEventParam<Void> input);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<Void> input) { this.afterDistantHorizonsInit(input); }
-	
+
 }

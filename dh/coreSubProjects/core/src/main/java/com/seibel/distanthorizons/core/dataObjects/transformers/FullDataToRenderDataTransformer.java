@@ -63,28 +63,28 @@ import java.util.HashSet;
 public class FullDataToRenderDataTransformer
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
-	
+
 	private static final LongOpenHashSet BROKEN_POS_SET = new LongOpenHashSet();
 	private static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Data Transformer");
-	
+
 	private static HashSet<IBlockStateWrapper> snowLayerBlockStates = null;
-	
-	
-	
+
+
+
 	//==============================//
 	// public transformer interface //
 	//==============================//
 	//region
-	
+
 	/**
 	 * @param onlyEdge if not null only the columns along this edge are transformed and held by the returned source
-	 *                 (IE a neighbor of the section being built, see {@link FullDataMinMaxPosUtil#getEncodedMinMaxPos})
+	 * (IE a neighbor of the section being built, see {@link FullDataMinMaxPosUtil#getEncodedMinMaxPos})
 	 */
 	public static ColumnRenderSource transformFullDataToRenderSource(
-			@Nullable FullDataSourceV2 fullDataSource, @Nullable IClientLevelWrapper levelWrapper, @Nullable EDhDirection onlyEdge)
+		@Nullable FullDataSourceV2 fullDataSource, @Nullable IClientLevelWrapper levelWrapper, @Nullable EDhDirection onlyEdge)
 	{
 		if (fullDataSource == null)
 		{
@@ -92,11 +92,11 @@ public class FullDataToRenderDataTransformer
 		}
 		else if (levelWrapper == null)
 		{
-			// if the client is no longer loaded in the world, render sources cannot be created 
+			// if the client is no longer loaded in the world, render sources cannot be created
 			return null;
 		}
-		
-		
+
+
 		try
 		{
 			return transformCompleteFullDataToColumnData(levelWrapper, fullDataSource, onlyEdge);
@@ -106,16 +106,16 @@ public class FullDataToRenderDataTransformer
 			return null;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// transformers //
 	//==============//
 	//region
-	
+
 	/**
 	 * Creates a LodNode for a chunk in the given world.
 	 *
@@ -138,7 +138,7 @@ public class FullDataToRenderDataTransformer
 
 		final long pos = fullDataSource.getPos();
 		final byte dataDetail = fullDataSource.getDataDetailLevel();
-		
+
 		int configVertSliceCount = Config.Client.Advanced.Graphics.Quality.verticalQuality.get().calculateMaxNumberOfVerticalSlicesAtDetailLevel(dataDetail);
 		// Textured LODs are close enough to see single blocks, too few slices merge them together
 		// (IE a tree trunk drawn as the leaves above it, or sandstone as the sand on top),
@@ -149,9 +149,9 @@ public class FullDataToRenderDataTransformer
 			configVertSliceCount = Math.max(configVertSliceCount, EDhApiVerticalQuality.HIGH.calculateMaxNumberOfVerticalSlicesAtDetailLevel(dataDetail));
 		}
 		final int maxVertSliceCount = configVertSliceCount;
-		
-		
-		
+
+
+
 		final ColumnRenderSource columnSource = ColumnRenderSource.createEmptyPartial(pos, maxVertSliceCount, minX, maxX, minZ, maxZ);
 		if (fullDataSource.isEmpty)
 		{
@@ -160,8 +160,8 @@ public class FullDataToRenderDataTransformer
 
 		int baseX = DhSectionPos.getMinCornerBlockX(pos);
 		int baseZ = DhSectionPos.getMinCornerBlockZ(pos);
-		
-		try(ColumnRenderView columnArrayView = ColumnRenderView.getPooled();
+
+		try (ColumnRenderView columnArrayView = ColumnRenderView.getPooled();
 			PhantomArrayListCheckout phantomCheckout = ARRAY_LIST_POOL.checkoutLongArrays(2);
 			ColumnRenderView tempExpandingColumnView = ColumnRenderView.getPooled();
 			RenderDataPointReducingList reducingList = new RenderDataPointReducingList())
@@ -173,7 +173,7 @@ public class FullDataToRenderDataTransformer
 				{
 					columnSource.populateColumnView(columnArrayView, x, z);
 					LongArrayList dataColumn = fullDataSource.getColumnAtRelPos(x, z);
-					
+
 					updateOrReplaceRenderDataViewColumnWithFullDataColumn(
 						levelWrapper, fullDataSource,
 						// bit shift is to account for LODs with a detail level greater than 0 so the block pos is correct
@@ -185,29 +185,29 @@ public class FullDataToRenderDataTransformer
 				}
 			}
 		}
-		
+
 		return columnSource;
 	}
-	
+
 	/** Updates the given {@link ColumnRenderView} to match the incoming Full data {@link LongArrayList} */
 	private static void updateOrReplaceRenderDataViewColumnWithFullDataColumn(
 		IClientLevelWrapper levelWrapper,
-		FullDataSourceV2 fullDataSource, int blockX, int blockZ, 
-		ColumnRenderView columnArrayView, 
+		FullDataSourceV2 fullDataSource, int blockX, int blockZ,
+		ColumnRenderView columnArrayView,
 		LongArrayList fullDataColumn,
 		// only needed if the render source stores texture ids, see applyTextureSetIds
 		@Nullable ColumnRenderSource columnSource, int sourceRelX, int sourceRelZ,
 		// pooled references
-		PhantomArrayListCheckout phantomCheckout, ColumnRenderView tempExpandingColumnView, 
+		PhantomArrayListCheckout phantomCheckout, ColumnRenderView tempExpandingColumnView,
 		RenderDataPointReducingList reducingList, DhBlockPosMutable mutableBlockPos)
 	{
 		// we can't do anything if the full data is missing or empty
-		if (fullDataColumn == null 
+		if (fullDataColumn == null
 			|| fullDataColumn.isEmpty())
 		{
 			return;
 		}
-		
+
 		int fullDataLength = fullDataColumn.size();
 		if (fullDataLength <= columnArrayView.maxVerticalSliceCount)
 		{
@@ -218,23 +218,23 @@ public class FullDataToRenderDataTransformer
 		{
 			LongArrayList dataArrayList = phantomCheckout.getLongArray(0, fullDataLength);
 			LongArrayList voidDataArrayList = phantomCheckout.getLongArray(1, fullDataLength);
-			
+
 			// expand the ColumnArrayView to fit the new larger max vertical size
 			tempExpandingColumnView.populate(
 				dataArrayList, voidDataArrayList,
 				fullDataLength, 0, 0, fullDataLength);
 			setRenderColumnView(levelWrapper, fullDataSource, blockX, blockZ, tempExpandingColumnView, fullDataColumn, mutableBlockPos);
-			
+
 			columnArrayView.changeVerticalSizeFrom(tempExpandingColumnView, reducingList);
 		}
-		
-		if (columnSource != null 
+
+		if (columnSource != null
 			&& columnSource.hasTextureSetIds())
 		{
 			applyTextureSetIds(levelWrapper, fullDataSource, blockX, blockZ, columnArrayView, fullDataColumn, columnSource, sourceRelX, sourceRelZ);
 		}
 	}
-	
+
 	/**
 	 * Determines the texture for each finished render data point
 	 * by finding the full data block at the data point's top. <br>
@@ -248,9 +248,9 @@ public class FullDataToRenderDataTransformer
 	 * get the texture MC draws at this position.
 	 */
 	private static void applyTextureSetIds(
-			IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource, int blockX, int blockZ,
-			ColumnRenderView renderColumnData, LongArrayList fullDataColumn,
-			ColumnRenderSource columnSource, int sourceRelX, int sourceRelZ)
+		IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource, int blockX, int blockZ,
+		ColumnRenderView renderColumnData, LongArrayList fullDataColumn,
+		ColumnRenderSource columnSource, int sourceRelX, int sourceRelZ)
 	{
 		for (int renderIndex = 0; renderIndex < renderColumnData.size; renderIndex++)
 		{
@@ -260,10 +260,10 @@ public class FullDataToRenderDataTransformer
 			{
 				break;
 			}
-			
+
 			int topBlockY = RenderDataPointUtil.getYMax(renderData) - 1;
 			byte materialId = RenderDataPointUtil.getBlockMaterialId(renderData);
-			
+
 			// find the full data point containing the render data point's top block,
 			// the full data column is sorted top down
 			short textureId = 0;
@@ -275,13 +275,13 @@ public class FullDataToRenderDataTransformer
 				{
 					continue;
 				}
-				
+
 				if (topBlockY < bottomY + FullDataPointUtil.getHeight(fullData))
 				{
 					try
 					{
 						IBlockStateWrapper block = fullDataSource.mapping.getBlockStateWrapper(FullDataPointUtil.getId(fullData));
-						
+
 						// If this render data is snow, but the block ID doesn't match,
 						// try getting the block above it.
 						// This is a hacky fix for snow on LOD borders rendering with the
@@ -293,7 +293,7 @@ public class FullDataToRenderDataTransformer
 							// Note: this is a hack.
 							// Since the Render data and textures aren't in the same data array it's difficult to map
 							// them together, but this guess works well enough for now.
-							
+
 							fullData = fullDataColumn.getLong(fullIndex - 1);
 							IBlockStateWrapper newBlock = fullDataSource.mapping.getBlockStateWrapper(FullDataPointUtil.getId(fullData));
 							// don't use air since that'll remove the texture
@@ -302,7 +302,7 @@ public class FullDataToRenderDataTransformer
 								block = newBlock;
 							}
 						}
-						
+
 						// the same plant top as the render data was built with (see setRenderColumnView)
 						if (RenderDataPointUtil.getShape(renderData) == RenderDataPointUtil.SHAPE_CROSS)
 						{
@@ -314,31 +314,31 @@ public class FullDataToRenderDataTransformer
 							: null;
 						// grass under a flattened snow layer, MC draws its sides snowy
 						textureId = (blockAbove != null
-								&& blockAbove.getMaterialId() == EDhApiBlockMaterial.SNOW.index
-								&& snowLayerBlockStates != null
-								&& snowLayerBlockStates.contains(blockAbove))
+							&& blockAbove.getMaterialId() == EDhApiBlockMaterial.SNOW.index
+							&& snowLayerBlockStates != null
+							&& snowLayerBlockStates.contains(blockAbove))
 							? BlockTextureRegistry.INSTANCE.getOrRegisterSnowCoveredSetId(block)
 							// MC tints the grass strip on the sides with the biome's grass color, IE brown in savannas
 							: (materialId == EDhApiBlockMaterial.GRASS.index)
 							? BlockTextureRegistry.INSTANCE.getOrRegisterTintedGrassSetId(block, RenderDataPointUtil.getColor(renderData))
 							: BlockTextureRegistry.INSTANCE.getOrRegisterBlockStateSetId(
-								block, levelWrapper, fullDataSource, blockX, topBlockY + levelWrapper.getMinHeight(), blockZ);
+							block, levelWrapper, fullDataSource, blockX, topBlockY + levelWrapper.getMinHeight(), blockZ);
 					}
 					catch (IndexOutOfBoundsException ignore)
 					{
 						// broken mappings are logged during color resolution, render flat here
 					}
 				}
-				
+
 				// when no data point contains the top block (IE merged across an air gap)
 				// the data point renders flat
 				break;
 			}
-			
+
 			columnSource.setTextureSetId(sourceRelX, sourceRelZ, renderIndex, textureId);
 		}
 	}
-	
+
 	/**
 	 * Grass keeps its own material under plants (IE tall grass) and snow,
 	 * its sides are drawn as dirt based on the grass material (see LodQuadBuilder),
@@ -356,14 +356,14 @@ public class FullDataToRenderDataTransformer
 	}
 
 	private static void setRenderColumnView(
-			IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
-			int blockX, int blockZ,
-			ColumnRenderView renderColumnData, LongArrayList fullColumnData, DhBlockPosMutable mutableBlockPos)
+		IClientLevelWrapper levelWrapper, FullDataSourceV2 fullDataSource,
+		int blockX, int blockZ,
+		ColumnRenderView renderColumnData, LongArrayList fullColumnData, DhBlockPosMutable mutableBlockPos)
 	{
 		//===============//
 		// config values //
 		//===============//
-		
+
 		boolean ignoreNonCollidingBlocks = (Config.Client.Advanced.Graphics.Culling.blocksToIgnore.get() == EDhApiBlocksToAvoid.NON_COLLIDING);
 		boolean colorBelowWithAvoidedBlocks = Config.Client.Advanced.Graphics.Culling.tintWithAvoidedBlocks.get();
 		boolean grassKeepsColorUnderPlants = Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
@@ -378,8 +378,8 @@ public class FullDataToRenderDataTransformer
 		final ObjectOpenHashSet<IBlockStateWrapper> waterSubsurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSubsurfaceReplacementBlocks();
 		final ObjectOpenHashSet<IBlockStateWrapper> waterSurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSurfaceReplacementBlocks();
 		final IBlockStateWrapper water = WRAPPER_FACTORY.getWaterBlockStateWrapper();
-		
-		
+
+
 		// build snow block cache if needed
 		if (snowLayerBlockStates == null)
 		{
@@ -399,60 +399,60 @@ public class FullDataToRenderDataTransformer
 				}
 			}
 		}
-		
+
 		int caveCullingMaxY = Config.Client.Advanced.Graphics.Culling.caveCullingHeight.get() - levelWrapper.getMinHeight();
-		boolean caveCullingEnabled = 
+		boolean caveCullingEnabled =
 			Config.Client.Advanced.Graphics.Culling.enableCaveCulling.get()
-			&& (
+				&& (
 				// dimensions with a ceiling will be all caves so we don't want cave culling
 				!levelWrapper.hasCeiling()
-				// the end has a lot of overhangs with 0 lighting above the void, which look broken with
-				// the current cave culling logic (this could probably be improved, but just skipping it works best for now)
-				&& !levelWrapper.getDimensionType().isTheEnd()
+					// the end has a lot of overhangs with 0 lighting above the void, which look broken with
+					// the current cave culling logic (this could probably be improved, but just skipping it works best for now)
+					&& !levelWrapper.getDimensionType().isTheEnd()
 			);
-		
+
 		boolean isColumnVoid = true;
-		
+
 		int lastColor = 0;
 		int lastBottom = -10_000;
 		IBlockStateWrapper lastBlock = null;
 		byte lastShape = RenderDataPointUtil.SHAPE_NONE;
-		
+
 		// there are several instances where we'll want
 		// to copy the top datapoint down and override the one below it
 		int colorToApplyToNextBlock = -1;
 		IBlockStateWrapper blockToApplyToNextBlock = null;
 		int skylightToApplyToNextBlock = -1;
 		int blocklightToApplyToNextBlock = -1;
-		
+
 		int renderDataIndex = 0;
-		
-		
-		
+
+
+
 		//==================================//
 		// convert full data to render data //
 		//==================================//
-		
+
 		FullDataPointIdMap fullDataMapping = fullDataSource.mapping;
-		
+
 		mutableBlockPos.setX(blockX);
 		mutableBlockPos.setZ(blockZ);
-		
+
 		// goes from the top down
 		for (int fullDataIndex = 0; fullDataIndex < fullColumnData.size(); fullDataIndex++)
 		{
 			long fullData = fullColumnData.getLong(fullDataIndex);
-			
+
 			int bottomY = FullDataPointUtil.getBottomY(fullData);
 			int blockHeight = FullDataPointUtil.getHeight(fullData);
 			int topY = bottomY + blockHeight;
 			int id = FullDataPointUtil.getId(fullData);
 			int blockLight = FullDataPointUtil.getBlockLight(fullData);
 			int skyLight = FullDataPointUtil.getSkyLight(fullData);
-			
+
 			// using the top Y samples the surface biome instead of a cave biome for tall datapoints
 			mutableBlockPos.setY(topY - 1 + levelWrapper.getMinHeight());
-			
+
 			IBiomeWrapper biome;
 			IBlockStateWrapper block;
 			try
@@ -466,17 +466,17 @@ public class FullDataToRenderDataTransformer
 				{
 					BROKEN_POS_SET.add(fullDataMapping.getPos());
 					String levelId = levelWrapper.getDhIdentifier();
-					LOGGER.warn("Unable to get data point with id ["+id+"] " +
-							"(Max possible ID: ["+fullDataMapping.getMaxValidId()+"]) " +
-							"for pos ["+fullDataMapping.getPos()+"] in level ["+levelId+"]. " +
-							"Error: ["+e.getMessage()+"]. " +
-							"Further errors for this position won't be logged.");
+					LOGGER.warn("Unable to get data point with id [" + id + "] " +
+						"(Max possible ID: [" + fullDataMapping.getMaxValidId() + "]) " +
+						"for pos [" + fullDataMapping.getPos() + "] in level [" + levelId + "]. " +
+						"Error: [" + e.getMessage() + "]. " +
+						"Further errors for this position won't be logged.");
 				}
-				
+
 				// don't render broken data
 				continue;
 			}
-			
+
 			// taken before any overrides, IE a slab with a snow layer on it is still a slab
 			byte shape = block.getLodShape();
 			if (shape == RenderDataPointUtil.SHAPE_BOTTOM_HALF
@@ -485,12 +485,12 @@ public class FullDataToRenderDataTransformer
 				// the half is only applied to the top, a stack of slabs would look 1.5 blocks tall
 				shape = RenderDataPointUtil.SHAPE_NONE;
 			}
-			
+
 			//==================//
-			// special case:    // 
+			// special case:    //
 			// air gap leak fix //
 			//==================//
-			
+
 			if (block.isAir())
 			{
 				// we don't want to apply the last block over an air gap,
@@ -501,14 +501,14 @@ public class FullDataToRenderDataTransformer
 				skylightToApplyToNextBlock = -1;
 				blocklightToApplyToNextBlock = -1;
 			}
-			
-			
-			
+
+
+
 			//=================//
 			// special case:   //
 			// water under ice //
 			//=================//
-			
+
 			// is this block water and the one above it ice?
 			if (block.getMaterialId() == EDhApiBlockMaterial.WATER.index
 				&& lastBlock != null
@@ -518,20 +518,20 @@ public class FullDataToRenderDataTransformer
 				// under the frozen lakes (which looks bad).
 				block = lastBlock;
 			}
-			
-			
-			
+
+
+
 			//====================//
 			// ignored block and  //
 			// cave culling check //
 			//====================//
-			
+
 			if (waterSubsurfaceReplacementBlocks.contains(block)
 				&& (lastBlock == null || lastBlock.isAir()))
 			{
 				block = water;
 			}
-			
+
 			boolean ignoreBlock = blockStatesToIgnore.contains(block);
 			boolean caveBlock = caveBlockStatesToIgnore.contains(block);
 			if (caveBlock
@@ -554,7 +554,7 @@ public class FullDataToRenderDataTransformer
 					// the air block here will always have a light of 0/0 due to only the top of the LOD's light being saved.
 					long nextFullData = fullColumnData.getLong(fullDataIndex + 1);
 					int nextSkyLight = FullDataPointUtil.getSkyLight(nextFullData);
-					
+
 					if (nextSkyLight == LodUtil.MIN_MC_LIGHT
 						&& ColorUtil.getAlpha(lastColor) == 255)
 					{
@@ -563,11 +563,11 @@ public class FullDataToRenderDataTransformer
 						columnData = RenderDataPointUtil.setYMin(columnData, bottomY);
 						renderColumnData.set(renderDataIndex - 1, columnData);
 					}
-					
+
 					continue;
 				}
-				
-				
+
+
 				if (ignoreBlock)
 				{
 					// if this is the bottom datapoint
@@ -581,7 +581,7 @@ public class FullDataToRenderDataTransformer
 							skyLight, blockLight
 						);
 					}
-					
+
 					// this is a merged block and a cave block, so it shouldn't be rendered
 					continue;
 				}
@@ -589,24 +589,24 @@ public class FullDataToRenderDataTransformer
 			else if (ignoreBlock)
 			{
 				// this is an ignored block, but shouldn't be merged like a cave block
-				
-				// applying this sky light to the next block should prevent black spots for opaque covering blocks 
+
+				// applying this sky light to the next block should prevent black spots for opaque covering blocks
 				skylightToApplyToNextBlock = skyLight;
 				continue;
 			}
-			
-			
-			
+
+
+
 			//=======================//
 			// non-solid block check //
 			//=======================//
-			
+
 			boolean ignoreNonSolidBlock =
 				ignoreNonCollidingBlocks
-				&& !block.isSolid()
-				&& !block.isLiquid()
-				&& block.getOpacity() != LodUtil.BLOCK_FULLY_OPAQUE;
-			
+					&& !block.isSolid()
+					&& !block.isLiquid()
+					&& block.getOpacity() != LodUtil.BLOCK_FULLY_OPAQUE;
+
 			// handle height reduction
 			// the material is checked first since it's a lot quicker than the set for every data point
 			boolean isSnowLayer = block.getMaterialId() == EDhApiBlockMaterial.SNOW.index
@@ -633,7 +633,7 @@ public class FullDataToRenderDataTransformer
 					// replace the block with water
 					block = WRAPPER_FACTORY.getWaterBlockStateWrapper();
 				}
-				
+
 				// sometimes a datapoint will be multiple blocks tall,
 				// in that case we just want to drop the top by 1
 				blockHeight -= 1;
@@ -641,15 +641,15 @@ public class FullDataToRenderDataTransformer
 				{
 					// this block was entirely removed, just color the block below it
 					ignoreNonSolidBlock = true;
-					
-					
+
+
 					if (isSnowLayer)
 					{
 						// snow is a special case where it should always tint the block
 						// below it, if not done grass will appear as gray
 						int snowColor = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
 						colorToApplyToNextBlock = ColorUtil.setAlpha(snowColor, 255);
-						
+
 						// the dirt/grass below the snow should be related with snow
 						blockToApplyToNextBlock = block;
 					}
@@ -662,7 +662,7 @@ public class FullDataToRenderDataTransformer
 					}
 				}
 			}
-			
+
 			if (ignoreNonSolidBlock
 				&& plantsAsCrosses
 				&& block.isCrossPlant())
@@ -690,7 +690,7 @@ public class FullDataToRenderDataTransformer
 			{
 				int ignoredColor = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
 				int ignoredAlpha = ColorUtil.getAlpha(ignoredColor);
-				
+
 				// light emitting blocks (fire, torches) only pass on their light,
 				// otherwise netherrack under fire is painted fire colored
 				if (colorBelowWithAvoidedBlocks
@@ -705,7 +705,7 @@ public class FullDataToRenderDataTransformer
 						blockToApplyToNextBlock = block;
 					}
 				}
-				
+
 				// Don't transfer the lighting when alpha is 0
 				// (the block below should have its own lighting).
 				if (ignoredAlpha != 0)
@@ -718,8 +718,8 @@ public class FullDataToRenderDataTransformer
 					skylightToApplyToNextBlock = skyLight;
 					blocklightToApplyToNextBlock = blockLight;
 				}
-				
-				
+
+
 				// if this is the bottom datapoint
 				// save it so lighting appears properly for floating
 				// islands over the void
@@ -731,12 +731,12 @@ public class FullDataToRenderDataTransformer
 						skyLight, blockLight
 					);
 				}
-				
+
 				// skip this non-colliding block
 				continue;
 			}
-			
-			
+
+
 			// lava pockets hidden inside the Nether's netherrack are enclosed by solid blocks, in game they can't be seen
 			// but LODs are coarser than the real walls so they poke through as orange dots, draw them as the rock above instead
 			if (block.isLiquid()
@@ -757,9 +757,9 @@ public class FullDataToRenderDataTransformer
 				// textured LODs are close enough to see the grass top, MC draws plants (IE tall grass) standing on it
 				// instead of recoloring it, so the grass keeps its own color like the grass around it
 				|| (grassKeepsColorUnderPlants
-					&& block.getMaterialId() == EDhApiBlockMaterial.GRASS.index
-					&& blockToApplyToNextBlock != null
-					&& blockToApplyToNextBlock.getMaterialId() != EDhApiBlockMaterial.SNOW.index))
+				&& block.getMaterialId() == EDhApiBlockMaterial.GRASS.index
+				&& blockToApplyToNextBlock != null
+				&& blockToApplyToNextBlock.getMaterialId() != EDhApiBlockMaterial.SNOW.index))
 			{
 				// use this block's color
 				color = levelWrapper.getBlockColor(mutableBlockPos, biome, fullDataSource, block);
@@ -773,13 +773,13 @@ public class FullDataToRenderDataTransformer
 					// remove the override so we don't accidentally override the next datapoint
 					skylightToApplyToNextBlock = -1;
 				}
-				
+
 				if (blocklightToApplyToNextBlock != -1)
 				{
 					blockLight = blocklightToApplyToNextBlock;
 					blocklightToApplyToNextBlock = -1;
 				}
-				
+
 				if (blockToApplyToNextBlock != null)
 				{
 					block = keepGrassMaterial(block, blockToApplyToNextBlock);
@@ -789,10 +789,10 @@ public class FullDataToRenderDataTransformer
 			else
 			{
 				// use the previous block's info as available
-				
+
 				color = colorToApplyToNextBlock;
 				colorToApplyToNextBlock = -1;
-				
+
 				// use the skylight override if present
 				if (skylightToApplyToNextBlock != -1)
 				{
@@ -831,7 +831,7 @@ public class FullDataToRenderDataTransformer
 				// lava pockets hidden inside the Nether's netherrack ceiling are enclosed by solid blocks,
 				// lower detail LODs can still expose them and they shouldn't glow there
 				&& !(isFullyOpaqueBlockAt(fullColumnData, fullDataIndex - 1, topY, true, fullDataMapping)
-					&& isFullyOpaqueBlockAt(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping)))
+				&& isFullyOpaqueBlockAt(fullColumnData, fullDataIndex + 1, bottomY, false, fullDataMapping)))
 			{
 				blockLight = lightEmission;
 			}
@@ -850,11 +850,11 @@ public class FullDataToRenderDataTransformer
 			//=============================//
 			// merge same-colored adjacent //
 			//=============================//
-			
+
 			// check if they share a top-bottom face and if they have same color
 			// (shapes are only merged when they stay the same shape, a half block on a half block isn't a half block)
-			if (color == lastColor 
-				&& bottomY + blockHeight == lastBottom  
+			if (color == lastColor
+				&& bottomY + blockHeight == lastBottom
 				&& renderDataIndex > 0
 				&& shape == lastShape
 				&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF)
@@ -877,8 +877,8 @@ public class FullDataToRenderDataTransformer
 			lastBlock = block;
 			lastShape = shape;
 		}
-		
-		
+
+
 		if (isColumnVoid)
 		{
 			renderColumnData.set(0, RenderDataPointUtil.EMPTY_DATA);
@@ -956,7 +956,7 @@ public class FullDataToRenderDataTransformer
 	{
 		return block != null
 			&& (block.getOpacity() == LodUtil.BLOCK_FULLY_OPAQUE
-				|| (block.isLiquid() && block.getLightEmission() > 0));
+			|| (block.isLiquid() && block.getLightEmission() > 0));
 	}
 
 	/**
@@ -1006,7 +1006,7 @@ public class FullDataToRenderDataTransformer
 		{
 			lastDatapoint = renderColumnData.get(renderDataIndex - 1);
 		}
-		
+
 		// Get the max y position from the previous render data point's bottom Y.
 		// This is necessary for lighting to appear correctly for adjacent air data points over the void.
 		int maxY = (bottomY + blockHeight);
@@ -1014,18 +1014,18 @@ public class FullDataToRenderDataTransformer
 		{
 			maxY = RenderDataPointUtil.getYMin(lastDatapoint);
 		}
-		
+
 		long columnData = RenderDataPointUtil.createDataPoint(
 			maxY, 0, // min Y since this datapoint should go all the way down to the void
 			ColorUtil.INVISIBLE, skyLight, blockLight,
-			// use air's material since this datapoint shouldn't be rendered, 
+			// use air's material since this datapoint shouldn't be rendered,
 			// it's only present to handle sky/block lighting
 			EDhApiBlockMaterial.AIR.index);
 		renderColumnData.setVoid(columnData);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

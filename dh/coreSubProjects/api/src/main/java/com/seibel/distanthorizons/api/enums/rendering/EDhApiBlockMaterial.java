@@ -1,9 +1,9 @@
 package com.seibel.distanthorizons.api.enums.rendering;
 
 /**
- * contains the indices used by shaders to determine 
+ * contains the indices used by shaders to determine
  * how different block types should be rendered. <br><br>
- * 
+ *
  * UNKNOWN, <br>
  * LEAVES, <br>
  * STONE, <br>
@@ -20,11 +20,11 @@ package com.seibel.distanthorizons.api.enums.rendering;
  * GRASS, <br>
  * AIR, <br>
  * ILLUMINATED, <br>
- * 
+ *
  * @author IMS
  * @author James Seibel
- * @since API 3.0.0
  * @version 2024-7-11
+ * @since API 3.0.0
  */
 public enum EDhApiBlockMaterial
 {
@@ -45,24 +45,24 @@ public enum EDhApiBlockMaterial
 	/** shouldn't normally be needed, but just in case */
 	AIR(14),
 	ILLUMINATED(15); // Max value
-	
-	
-	
+
+
+
 	public final byte index;
-	
-	EDhApiBlockMaterial(int index) { this.index = (byte)index;}
-	
+
+	EDhApiBlockMaterial(int index) { this.index = (byte) index; }
+
 	public static EDhApiBlockMaterial getFromIndex(int index)
 	{
-		for(EDhApiBlockMaterial material : EDhApiBlockMaterial.values())
+		for (EDhApiBlockMaterial material : EDhApiBlockMaterial.values())
 		{
 			if (material.index == index)
 			{
 				return material;
 			}
 		}
-		
+
 		return EDhApiBlockMaterial.UNKNOWN;
 	}
-	
+
 }

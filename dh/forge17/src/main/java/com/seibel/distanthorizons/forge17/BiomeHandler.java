@@ -13,40 +13,40 @@ import java.util.concurrent.ConcurrentHashMap;
  * Tracks all the biomes
  * created in MC 1.7.10 so we
  * can (de)serialize them. <br><br>
- * 
+ *
  * This assumes no biomes are created after the initial startup.
  */
 public class BiomeHandler implements IBiomeHandler
 {
-	public static final BiomeHandler INSTANCE = new BiomeHandler(); 
-	
+	public static final BiomeHandler INSTANCE = new BiomeHandler();
+
 	private final List<BiomeGenBase> biomeList = new ArrayList<>();
 	private ConcurrentHashMap<String, BiomeGenBase> biomeByName;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	private BiomeHandler() {}
-	
+
+	private BiomeHandler() { }
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
 	//region
-	
-	/** 
+
+	/**
 	 * Called by {@link MixinBiomeGenBase} to
 	 * populate all possible options.
 	 */
 	public void addBiome(BiomeGenBase biome) { this.biomeList.add(biome); }
-	
+
 	public BiomeGenBase getBiomeByName(String name)
 	{
 		// lazy initialization since we need to wait for BIOME_LIST
@@ -63,12 +63,12 @@ public class BiomeHandler implements IBiomeHandler
 			}
 			this.biomeByName = newBiomeByName;
 		}
-		
+
 		return this.biomeByName.get(name);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

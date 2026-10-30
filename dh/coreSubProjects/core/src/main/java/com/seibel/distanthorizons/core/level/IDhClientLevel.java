@@ -31,19 +31,19 @@ public interface IDhClientLevel extends IDhLevel
 {
 	@Nullable
 	IClientLevelWrapper getClientLevelWrapper();
-	
+
 	/**
 	 * Re-creates the color, render data.
 	 * This method should be called after resource packs are changed or LOD settings are modified.
 	 */
 	void clearRenderCache();
-	
-	/** 
+
+	/**
 	 * returns true if this level is currently rendering. <br>
 	 * Designed for use for debugging and the {@link F3Screen}.
 	 */
 	boolean isRendering();
-	
-	
-	
+
+
+
 }

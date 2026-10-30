@@ -56,9 +56,9 @@ public class TextureAtlasSpriteWrapper
 	/** meta bit MC sets on the top half of double plants */
 	private static final int DOUBLE_PLANT_TOP_BIT = 8;
 	/** the order of BlockDoublePlant's types (its meta), used in its icon names */
-	private static final String[] DOUBLE_PLANT_NAMES = { "sunflower", "syringa", "grass", "fern", "rose", "paeonia" };
+	private static final String[] DOUBLE_PLANT_NAMES = {"sunflower", "syringa", "grass", "fern", "rose", "paeonia"};
 	private static final int TALL_GRASS_TYPE = 2;
-	
+
 	/** @param topMeta 8 for an untyped top, otherwise 8 + the bottom's meta */
 	public static int getDoublePlantTopType(int topMeta)
 	{
@@ -169,7 +169,7 @@ public class TextureAtlasSpriteWrapper
 	 * (GregTech, {@link IconFlipped}, TwilightForest, IC2).
 	 *
 	 * @param sideOrdinal the {@link net.minecraftforge.common.util.ForgeDirection}/vanilla side
-	 *                    index passed to {@link Block#getIcon(int, int)}
+	 * index passed to {@link Block#getIcon(int, int)}
 	 * @return the resolved sprite, or null if none could be found
 	 */
 	@Nullable

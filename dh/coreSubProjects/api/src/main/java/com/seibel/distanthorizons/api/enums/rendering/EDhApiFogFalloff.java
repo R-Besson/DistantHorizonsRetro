@@ -33,14 +33,15 @@ public enum EDhApiFogFalloff
 	LINEAR(0),
 	EXPONENTIAL(1),
 	EXPONENTIAL_SQUARED(2);
-	
-	
-	/** 
-	 * Stable version of {@link EDhApiFogFalloff#ordinal()} 
+
+
+	/**
+	 * Stable version of {@link EDhApiFogFalloff#ordinal()}
+	 *
 	 * @since API 4.0.0
 	 */
 	public final int value;
-	
+
 	EDhApiFogFalloff(int value) { this.value = value; }
-	
+
 }

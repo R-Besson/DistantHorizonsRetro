@@ -33,43 +33,43 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles adding SSAO via {@link GlDhSSAOShader} and {@link GlDhSSAOApplyShader}. <br><br>
- * 
+ *
  * {@link GlDhSSAOShader} - draws the SSAO to a texture. <br>
  * {@link GlDhSSAOApplyShader} - draws the SSAO texture to DH's FrameBuffer. <br>
  */
 public class GlDhSSAORenderer implements IDhSsaoRenderer
 {
 	public static GlDhSSAORenderer INSTANCE = new GlDhSSAORenderer();
-	
+
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	private boolean init = false;
-	
+
 	private int width = -1;
 	private int height = -1;
 	private int ssaoFramebuffer = -1;
-	
+
 	private int ssaoTexture = -1;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	private GlDhSSAORenderer() { }
-	
+
 	public void init()
 	{
 		if (this.init) return;
 		this.init = true;
-		
+
 		GlDhSSAOShader.INSTANCE.init();
 		GlDhSSAOApplyShader.INSTANCE.init();
 	}
-	
+
 	private void createFramebuffer(int width, int height)
 	{
 		if (this.ssaoFramebuffer != -1)
@@ -77,46 +77,46 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 			LWJGL.glDeleteFramebuffers(this.ssaoFramebuffer);
 			this.ssaoFramebuffer = -1;
 		}
-		
+
 		if (this.ssaoTexture != -1)
 		{
 			GLMC.glDeleteTextures(this.ssaoTexture);
 			this.ssaoTexture = -1;
 		}
-		
+
 		this.ssaoFramebuffer = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.ssaoFramebuffer);
-		
+
 		this.ssaoTexture = GLMC.glGenTextures();
 		{
 			GLMC.glBindTexture(this.ssaoTexture);
 			LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_R16F, width, height, 0, GL11.GL_RED, GL30.GL_HALF_FLOAT, null);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-			
+
 			// disable mip-mapping since DH is just going to draw straight to the screen
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_BASE_LEVEL, 0);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
 		}
-		
+
 		LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.ssaoTexture, 0);
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
+
 	@Override
 	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams)
 	{
-		try(GLState state = new GLState())
+		try (GLState state = new GLState())
 		{
 			this.init();
-			
+
 			// resize the framebuffer if necessary
 			int width = MC_RENDER.getTargetFramebufferViewportWidth();
 			int height = MC_RENDER.getTargetFramebufferViewportHeight();
@@ -126,18 +126,18 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 				this.height = height;
 				this.createFramebuffer(width, height);
 			}
-			
+
 			GlDhSSAOShader.INSTANCE.frameBuffer = this.ssaoFramebuffer;
 			GlDhSSAOShader.INSTANCE.setProjectionMatrix(renderParams.dhProjectionMatrix);
 			GlDhSSAOShader.INSTANCE.render(renderParams);
-			
+
 			GlDhSSAOApplyShader.INSTANCE.ssaoTexture = this.ssaoTexture;
 			GlDhSSAOApplyShader.INSTANCE.render(renderParams);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

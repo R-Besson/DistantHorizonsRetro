@@ -37,15 +37,15 @@ public class ServerLevelModule implements AutoCloseable
 	private final IDhServerLevel parentServerLevel;
 	public final ISaveStructure saveStructure;
 	public final GeneratedFullDataSourceProvider fullDataFileHandler;
-	
+
 	public final LodRequestModule lodRequestModule;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ServerLevelModule(IDhServerLevel parentServerLevel, ISaveStructure saveStructure) throws SQLException, IOException
 	{
 		this.parentServerLevel = parentServerLevel;
@@ -53,13 +53,13 @@ public class ServerLevelModule implements AutoCloseable
 		this.fullDataFileHandler = new GeneratedFullDataSourceProvider(parentServerLevel, saveStructure);
 		this.lodRequestModule = new LodRequestModule(this.parentServerLevel, this.parentServerLevel, this.fullDataFileHandler, () -> new LodRequestState(this.parentServerLevel));
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public void close()
 	{
@@ -71,13 +71,13 @@ public class ServerLevelModule implements AutoCloseable
 		// level wrappers are reused so it'd otherwise be picked up again when the level reloads
 		WorldGeneratorInjector.INSTANCE.unbind(this.parentServerLevel.getLevelWrapper());
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	public static class LodRequestState extends AbstractLodRequestState
 	{
 		LodRequestState(IDhServerLevel level)
@@ -95,9 +95,9 @@ public class ServerLevelModule implements AutoCloseable
 			}
 			return new WorldGenerationQueue(worldGenerator, level);
 		}
-		
-		
-		
+
+
+
 	}
-	
+
 }

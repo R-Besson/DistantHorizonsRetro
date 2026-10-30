@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
@@ -29,39 +30,39 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
  * Now it provides support for buffer binding points natively.
  * This means that setting up the VAO is just use ONE native call when
  * binding to a buffer. <br><br>
- * 
+ *
  * Since I no longer need to implement binding points, I also no
  * longer needs to keep track of Pointers.
  */
 public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
-			.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
-			.build();
-	
-	
+		.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
+		.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
+		.build();
+
+
 	int numberOfBindingPoints = 0;
 	int strideSize = 0;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	/** This will bind the {@link GlAbstractVertexAttribute} */
 	public GlVertexAttributePostGL43()
 	{
 		super(); // also bind AbstractVertexAttribute
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// binding //
 	//=========//
-	
+
 	/** Requires both AbstractVertexAttribute and VertexBuffer to be bound */
 	@Override
 	public void bindBufferToAllBindingPoints(int buffer)
@@ -77,7 +78,7 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 	//==========================//
 	// manual attribute setting //
 	//==========================//
-	
+
 	/** Requires AbstractVertexAttribute to be bound */
 	@Override
 	public void setVertexAttribute(int bindingPoint, int attributeIndex, GlVertexPointer attribute)
@@ -89,9 +90,9 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 		else
 		{
 			LWJGL.glVertexAttribFormat(attributeIndex, attribute.elementCount, attribute.glType,
-					attribute.normalized, this.strideSize); // Here strideSize is new attrib offset
+				attribute.normalized, this.strideSize); // Here strideSize is new attrib offset
 		}
-		
+
 		this.strideSize += attribute.byteSize;
 		if (this.numberOfBindingPoints <= bindingPoint)
 		{
@@ -100,13 +101,13 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 		LWJGL.glVertexAttribBinding(attributeIndex, bindingPoint);
 		LWJGL.glEnableVertexAttribArray(attributeIndex);
 	}
-	
-	
-	
+
+
+
 	//============//
 	// validation //
 	//============//
-	
+
 	/** Requires AbstractVertexAttribute to be bound */
 	@Override
 	public void completeAndCheck(int expectedStrideSize)
@@ -114,12 +115,12 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 		if (this.strideSize != expectedStrideSize)
 		{
 			LOGGER.error("Vertex Attribute calculated stride size " + this.strideSize +
-					" does not match the provided expected stride size " + expectedStrideSize + "!");
+				" does not match the provided expected stride size " + expectedStrideSize + "!");
 			throw new IllegalArgumentException("Vertex Attribute Incorrect Format");
 		}
-		
+
 		LOGGER.info("Vertex Attribute (GL43+) completed. It contains " + this.numberOfBindingPoints
-				+ " binding points and a stride size of " + this.strideSize);
+			+ " binding points and a stride size of " + this.strideSize);
 	}
-	
+
 }

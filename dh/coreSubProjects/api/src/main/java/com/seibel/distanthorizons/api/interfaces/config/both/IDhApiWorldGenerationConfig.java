@@ -21,8 +21,8 @@ package com.seibel.distanthorizons.api.interfaces.config.both;
 
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiGeneratorPlan;
-import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigGroup;
+import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 
 /**
  * Distant Horizons' world generation configuration. <br><br>
@@ -35,10 +35,11 @@ import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigGroup;
  */
 public interface IDhApiWorldGenerationConfig extends IDhApiConfigGroup
 {
-	
+
 	/**
 	 * Defines whether LOD chunks will be generated
 	 * outside Minecraft's vanilla render distance.
+	 *
 	 * @deprecated use {@link IDhApiWorldGenerationConfig#GeneratorPlan()}
 	 */
 	@Deprecated
@@ -46,23 +47,26 @@ public interface IDhApiWorldGenerationConfig extends IDhApiConfigGroup
 	/**
 	 * Defines how LODs will be generated
 	 * outside Minecraft's vanilla render distance.
+	 *
 	 * @since API 7.1.0
 	 */
 	IDhApiConfigValue<EDhApiGeneratorPlan> GeneratorPlan();
-	
-	
-	/** 
-	 * Defines to what level LOD chunks will be generated. 
+
+
+	/**
+	 * Defines to what level LOD chunks will be generated.
+	 *
 	 * @deprecated use {@link IDhApiWorldGenerationConfig#chunkGeneratorMode()} instead
 	 */
 	@Deprecated
 	default IDhApiConfigValue<EDhApiDistantGeneratorMode> distantGeneratorMode() { return this.chunkGeneratorMode(); }
-	/** 
-	 * Defines to what level LOD chunks will be generated. 
+	/**
+	 * Defines to what level LOD chunks will be generated.
+	 *
 	 * @since API 7.1.0
 	 */
 	IDhApiConfigValue<EDhApiDistantGeneratorMode> chunkGeneratorMode();
-	
-	
-	
+
+
+
 }

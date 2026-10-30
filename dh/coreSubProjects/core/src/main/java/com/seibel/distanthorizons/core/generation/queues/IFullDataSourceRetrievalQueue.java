@@ -33,14 +33,14 @@ import java.util.concurrent.CompletableFuture;
  * Used to track what some of the full data sources the system currently
  * wants but doesn't have. <br>
  * IE, what sections should be generated via the world generator. <br><br>
- * 
+ *
  * Note: <br>
- * This won't contain every position that needs to be retrieved 
+ * This won't contain every position that needs to be retrieved
  * since that would cause issues when moving or with extreme
  * render distances. <br><br>
- * 
+ *
  * Used by both world gen and server networking.
- * 
+ *
  * @see LodQuadTree
  * @see AbstractLodRequestState
  * @see LodRequestModule
@@ -51,71 +51,72 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	// getters //
 	//=========//
 	//region
-	
-	/** 
+
+	/**
 	 * The largest numerical detail level. <br>
 	 * Detail level is absolute, not section;
 	 * IE 0 = Block, 1 = 2x2 blocks, etc.
 	 */
 	byte lowestDataDetail();
 
-	/** 
+	/**
 	 * Returns a value like "downloading" or "generating" depending on how the LODs are being retrieved.
 	 * Used to make the progress message easier to understand.
 	 */
 	String getRetrievalTypeName();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=======//
 	// setup //
 	//=======//
 	//region
-	
-	/** 
+
+	/**
 	 * Starts the retrieval process if not already running,
 	 * and if running updates the target position.
-	 * 
-	 * @param targetPos the position that retrieval should be centered around, 
-	 *                  generally this will be the player's position. 
-	 * */
+	 *
+	 * @param targetPos the position that retrieval should be centered around,
+	 * generally this will be the player's position.
+	 *
+	 */
 	void startAndSetTargetPos(DhBlockPos2D targetPos);
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// task handling //
 	//===============//
 	//region
-	
+
 	/**
 	 * Used to make sure the low-quality LODs
 	 * are generated first (if requested).
 	 */
 	boolean getCanRegenerate();
 	void setCanRegenerate(boolean retrievingLowDetailLods);
-	
-	/** 
+
+	/**
 	 * Generally the retrieval queue should be fairly small, so it's faster to iterate over the existing list
 	 * and check if each one is valid vs dumbly attempting to remove every position that just went out of range.
 	 */
 	void removeRetrievalRequestIf(DhSectionPos.IPrimitiveLongConsumer removeIf);
-	
+
 	/**
 	 * Can be used to check if any queued tasks
 	 * meet a certain positional state
 	 */
 	boolean requestPosExistsWhere(DhSectionPos.IPrimitiveLongConsumer returnTrueIf);
-	
+
 	/**
-	 * Cancels the waiting request farthest from the given center, 
+	 * Cancels the waiting request farthest from the given center,
 	 * but only if it's farther away than the given position. <br>
 	 * Used to let missing LODs near the player jump ahead when the queue is full.
-	 * 
+	 *
 	 * @return true if a request was removed
 	 */
 	default boolean removeFarthestRequestIfFartherThan(long pos, DhBlockPos2D centerPos) { return false; }
@@ -128,37 +129,37 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	default boolean canRetrievePos(long pos, DhBlockPos2D centerPos) { return true; }
 
 	CompletableFuture<DataSourceRetrievalResult> submitRetrievalTask(long pos, byte requiredDataDetail);
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==========//
 	// shutdown //
 	//==========//
 	//region
-	
+
 	/** Can be used to let any lingering generation requests finish before fully shutting down the system */
 	CompletableFuture<Void> startClosingAsync(boolean cancelCurrentGeneration, boolean alsoInterruptRunning);
-	
+
 	@Override
 	void close();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// debug display //
 	//===============//
 	//region
-	
+
 	int getWaitingTaskCount();
 	int getInProgressTaskCount();
-	
+
 	/** returns how many chunks are currently queued for retrieval */
 	int getQueuedChunkCount();
-	
+
 	/** used for displaying a progress update to the user */
 	long getRetrievalEstimatedRemainingChunkCount();
 	void setRetrievalEstimatedRemainingChunkCount(long newEstimate);
@@ -166,12 +167,12 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	/** messageList is used by AbstractFullDataNetworkRequestQueue's implementation for RemoteWorldRetrievalQueue, IntelliJ doesn't detect that */
 	@SuppressWarnings("unused")
 	void addDebugMenuStringsToList(List<String> messageList);
-	
+
 	/** Can be used to determine roughly how fast the world generator is running. */
 	RollingAverage getRollingAverageChunkGenTimeInMs();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

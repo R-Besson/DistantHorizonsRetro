@@ -12,4 +12,5 @@ public abstract class AbstractDhCommand
 	{
 		sender.addChatMessage(new ChatComponentText(message));
 	}
+
 }

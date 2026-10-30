@@ -17,19 +17,19 @@ import java.util.concurrent.TimeUnit;
 public class FullDataPayloadReceiver implements AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
-			.build();
-	
+		.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
+		.build();
+
 	private final ConcurrentMap<Integer, CompositeByteBuf> buffersById = CacheBuilder.newBuilder()
 		.expireAfterAccess(30, TimeUnit.SECONDS)
-			.<Integer, CompositeByteBuf>build().asMap();
-	
+		.<Integer, CompositeByteBuf>build().asMap();
+
 	@Override
 	public void close()
 	{
 		this.buffersById.clear();
 	}
-	
+
 	public void receiveChunk(FullDataSplitMessage message)
 	{
 		this.buffersById.compute(message.bufferId, (bufferId, composite) ->
@@ -44,7 +44,7 @@ public class FullDataPayloadReceiver implements AutoCloseable
 				LOGGER.debug("Received non-first full data chunk for empty buffer [" + message.bufferId + "]: [" + message.buffer + "].");
 				return null;
 			}
-			
+
 			message.buffer.readerIndex(0);
 			composite.addComponent(message.buffer);
 			composite.writerIndex(composite.writerIndex() + message.buffer.writerIndex());
@@ -52,12 +52,12 @@ public class FullDataPayloadReceiver implements AutoCloseable
 			return composite;
 		});
 	}
-	
+
 	public FullDataSourceV2DTO decodeDataSource(FullDataPayload payload)
 	{
 		CompositeByteBuf compositeByteBuffer = this.buffersById.get(payload.dtoBufferId);
 		Objects.requireNonNull(compositeByteBuffer, "Unable to get a complete buffer for a received payload. Ignore this if it doesn't spam similar errors");
-		
+
 		try
 		{
 			return INetworkObject.decodeToInstance(FullDataSourceV2DTO.CreateEmptyDataSourceForDecoding(), compositeByteBuffer);
@@ -68,5 +68,5 @@ public class FullDataPayloadReceiver implements AutoCloseable
 			this.buffersById.remove(payload.dtoBufferId);
 		}
 	}
-	
+
 }

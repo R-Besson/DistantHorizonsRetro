@@ -32,9 +32,9 @@ public class DhApiVec3i
 	public int x;
 	public int y;
 	public int z;
-	
-	
-	
+
+
+
 	/** creates a Vec3 at (0,0,0) */
 	public DhApiVec3i()
 	{
@@ -42,14 +42,14 @@ public class DhApiVec3i
 		this.y = 0;
 		this.z = 0;
 	}
-	
+
 	public DhApiVec3i(int x, int y, int z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -78,7 +78,7 @@ public class DhApiVec3i
 			return false;
 		}
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -86,8 +86,8 @@ public class DhApiVec3i
 		i = 31 * i + Float.floatToIntBits(this.y);
 		return 31 * i + Float.floatToIntBits(this.z);
 	}
-	
+
 	@Override
 	public String toString() { return "[" + this.x + ", " + this.y + ", " + this.z + "]"; }
-	
+
 }

@@ -28,9 +28,9 @@ import org.apache.logging.log4j.Level;
  * WARN
  * ERROR
  * DISABLED
- * 
- * @since API 5.0.0
+ *
  * @version 2024-4-6
+ * @since API 5.0.0
  */
 public enum EDhApiLoggerLevel
 {
@@ -42,12 +42,12 @@ public enum EDhApiLoggerLevel
 	ERROR(Level.ERROR),
 	DISABLED(Level.OFF),
 	;
-	
+
 	public final Level level;
-	
+
 	EDhApiLoggerLevel(Level level)
 	{ this.level = level; }
-	
-	
-	
+
+
+
 }

@@ -1,18 +1,18 @@
 /*
  *    This file is part of the Distant Horizons mod
  *    licensed under the GNU LGPL v3 License.
- *    
+ *
  *    Copyright (C) 2020 James Seibel
- *    
+ *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU Lesser General Public License as published by
  *    the Free Software Foundation, version 3.
- *    
+ *
  *    This program is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *    GNU Lesser General Public License for more details.
- *    
+ *
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -35,19 +35,19 @@ import java.util.concurrent.ThreadFactory;
 public class DhThreadFactory implements ThreadFactory
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public final String threadName;
 	public final int priority;
 	public final boolean isDaemon;
 	private int threadCount = 0;
 	private final LinkedList<WeakReference<Thread>> threads = new LinkedList<>();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	/** @param isDaemon should be set to true for static/cleanup threads that aren't manually shut down. */
 	public DhThreadFactory(String newThreadName, int priority, boolean isDaemon)
 	{
@@ -55,12 +55,12 @@ public class DhThreadFactory implements ThreadFactory
 		{
 			throw new IllegalArgumentException("Thread priority [" + priority + "] out of bounds. Priority should be between [" + Thread.MIN_PRIORITY + "-" + Thread.MAX_PRIORITY + "]!");
 		}
-		
+
 		this.threadName = ThreadUtil.THREAD_NAME_PREFIX + newThreadName + " Thread";
 		this.priority = priority;
 		this.isDaemon = isDaemon;
 	}
-	
+
 	@Override
 	public Thread newThread(@NotNull Runnable runnable)
 	{
@@ -70,13 +70,13 @@ public class DhThreadFactory implements ThreadFactory
 		this.threads.add(new WeakReference<>(thread));
 		return thread;
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// debugging //
 	//===========//
-	
+
 	private static String StackTraceToString(StackTraceElement[] stackTraceArray)
 	{
 		StringBuilder str = new StringBuilder();
@@ -104,13 +104,13 @@ public class DhThreadFactory implements ThreadFactory
 				if (stacks.length != 0)
 				{
 					LOGGER.info("===========================================\n" +
-							"Thread: " + thread.getName() + "\n" +
-							StackTraceToString(stacks));
+						"Thread: " + thread.getName() + "\n" +
+						StackTraceToString(stacks));
 				}
 			}
 		}
-		
+
 		this.threads.removeIf((weakRef) -> weakRef.get() == null);
 	}
-	
+
 }

@@ -26,37 +26,36 @@ import org.junit.Test;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @see KeyedLockContainer
- *
  * @author James Seibel
  * @version 2025-10-02
+ * @see KeyedLockContainer
  */
 public class KeyedLockTest
 {
-	
+
 	@Test
 	public void BasicKeyedLockTest()
 	{
 		KeyedLockContainer<Long> lockContainer = new KeyedLockContainer<>();
-		
+
 		for (long a = -10; a < 10; a++)
 		{
 			ReentrantLock aLock = lockContainer.getLockForPos(a);
-			
+
 			for (long b = -10; b < 10; b++)
 			{
 				ReentrantLock bLock = lockContainer.getLockForPos(a);
-				
+
 				// we only care that the same position always map to the same object
 				// if different positions map to the same object,
 				// that's expected hash-collision behavior and is fine
 				if (a == b)
 				{
-					Assert.assertEquals("long values ["+a+"] and ["+b+"] should have returned the same lock", aLock, bLock);
+					Assert.assertEquals("long values [" + a + "] and [" + b + "] should have returned the same lock", aLock, bLock);
 				}
 			}
 		}
-		
+
 	}
-	
+
 }

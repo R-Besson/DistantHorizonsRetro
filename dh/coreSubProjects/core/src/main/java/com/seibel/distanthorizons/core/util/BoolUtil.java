@@ -3,7 +3,7 @@ package com.seibel.distanthorizons.core.util;
 public class BoolUtil
 {
 	/** Used to prevent null {@link Boolean} objects in if statements */
-	public static boolean falseIfNull(Boolean value) 
+	public static boolean falseIfNull(Boolean value)
 	{
 		if (value == null)
 		{
@@ -16,5 +16,5 @@ public class BoolUtil
 			return value;
 		}
 	}
-	
+
 }

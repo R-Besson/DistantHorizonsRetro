@@ -30,19 +30,19 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
  */
 public abstract class AbstractDhApiTestEvent implements IDhApiEvent<Boolean>
 {
-	
+
 	public abstract void onTestEvent(DhApiEventParam<Boolean> input);
-	
+
 	/** just used for testing */
 	public abstract Boolean getTestValue();
-	
-	
-	
+
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<Boolean> input) { this.onTestEvent(input); }
-	
+
 }

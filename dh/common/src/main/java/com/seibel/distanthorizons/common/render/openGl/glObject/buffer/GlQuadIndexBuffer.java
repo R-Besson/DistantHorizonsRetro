@@ -29,16 +29,16 @@ import java.nio.ByteBuffer;
 /** aka GlQuadElementBuffer */
 public class GlQuadIndexBuffer extends GLIndexBuffer
 {
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public GlQuadIndexBuffer() { super(false); }
-	
+
 	public void upload(ByteBuffer buffer, int quadCount)
 	{
 		if (quadCount < 0)
@@ -50,32 +50,32 @@ public class GlQuadIndexBuffer extends GLIndexBuffer
 			// shouldn't happen, but just in case
 			return;
 		}
-		
+
 		this.indicesCount = quadCount * 6; // 2 triangles per quad
 		if (this.indicesCount >= this.getCapacity()
 			&& this.indicesCount < this.getCapacity() * BUFFER_SHRINK_TRIGGER)
 		{
 			return;
 		}
-		
+
 		this.glType = GL11.GL_UNSIGNED_INT;
 		super.uploadBuffer(buffer, EDhApiGpuUploadMethod.DATA,
 			this.indicesCount * GLEnums.getTypeSize(this.glType), GL15.GL_STATIC_DRAW);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	public int getCapacity() { return super.getSize() / GLEnums.getTypeSize(this.getGlType()); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

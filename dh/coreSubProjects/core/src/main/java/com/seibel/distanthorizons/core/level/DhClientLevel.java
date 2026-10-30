@@ -68,55 +68,55 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-	
+
 	public final ClientLevelModule clientside;
 	public final IClientLevelWrapper levelWrapper;
 	public final ISaveStructure saveStructure;
 	public final RemoteFullDataSourceProvider remoteDataSourceProvider;
-	
+
 	@CheckForNull
 	private final ClientNetworkState networkState;
 	@Nullable
 	private final ScopedNetworkEventSource networkEventSource;
 	@Nullable
 	private final Closeable sessionConfigListener;
-	
+
 	/** used when connected to a DH supported server so we don't process the same chunks multiple times */
 	private final Set<DhChunkPos> loadedOnceChunks = Collections.newSetFromMap(
-			CacheBuilder.newBuilder()
-					.expireAfterWrite(10, TimeUnit.MINUTES)
-					.<DhChunkPos, Boolean>build()
-					.asMap()
+		CacheBuilder.newBuilder()
+			.expireAfterWrite(10, TimeUnit.MINUTES)
+			.<DhChunkPos, Boolean>build()
+			.asMap()
 	);
-	
+
 	public final LodRequestModule lodRequestModule;
-	
+
 	@Nullable
 	private final SyncOnLoadRequestQueue syncOnLoadRequestQueue;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public DhClientLevel(
-		ISaveStructure saveStructure, 
-		IClientLevelWrapper clientLevelWrapper, 
+		ISaveStructure saveStructure,
+		IClientLevelWrapper clientLevelWrapper,
 		@Nullable ClientNetworkState networkState
-		) throws SQLException, IOException
+	) throws SQLException, IOException
 	{ this(saveStructure, clientLevelWrapper, null, networkState); }
 	public DhClientLevel(
-		ISaveStructure saveStructure, 
-		IClientLevelWrapper clientLevelWrapper, 
-		@Nullable File fullDataSaveDirOverride, 
+		ISaveStructure saveStructure,
+		IClientLevelWrapper clientLevelWrapper,
+		@Nullable File fullDataSaveDirOverride,
 		@Nullable ClientNetworkState networkState
-		) throws SQLException, IOException
+	) throws SQLException, IOException
 	{
 		File saveFolder = saveStructure.getSaveFolder(clientLevelWrapper);
 		File pre23Folder = saveStructure.getPre23SaveFolder(clientLevelWrapper);
-		
+
 		// the old folder can be the same as the new one (IE a save structure override or no server key),
 		// moving a folder onto itself fails
 		boolean pre23FolderIsSaveFolder = pre23Folder.getAbsoluteFile().toPath().normalize()
@@ -131,13 +131,13 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 
 		if (!saveFolder.exists())
 		{
-			throw new IOException("unable to create save folder at ["+saveFolder.getPath()+"]. If you're on Windows you may need to enable long file paths.");
+			throw new IOException("unable to create save folder at [" + saveFolder.getPath() + "]. If you're on Windows you may need to enable long file paths.");
 		}
-		
+
 		this.levelWrapper = clientLevelWrapper;
 		this.levelWrapper.setDhLevel(this);
 		this.saveStructure = saveStructure;
-		
+
 		this.networkState = networkState;
 		if (this.networkState != null)
 		{
@@ -150,18 +150,18 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			this.networkEventSource = null;
 			this.syncOnLoadRequestQueue = null;
 		}
-		
+
 		this.remoteDataSourceProvider = new RemoteFullDataSourceProvider(this, saveStructure, fullDataSaveDirOverride, this.syncOnLoadRequestQueue, this.networkState);
-		this.lodRequestModule = new LodRequestModule(this,this, this.remoteDataSourceProvider, () -> new LodRequestState(this, networkState));
-		
+		this.lodRequestModule = new LodRequestModule(this, this, this.remoteDataSourceProvider, () -> new LodRequestState(this, networkState));
+
 		this.clientside = new ClientLevelModule(this);
 		this.sessionConfigListener = this.networkState != null
 			? this.networkState.addSessionConfigListener(this.clientside::onGeneratorPlanChanged)
 			: null;
-		
+
 		this.createAndSetSupportingRepos(this.remoteDataSourceProvider.repo.databaseFile);
 		this.runRepoReliantSetup();
-		
+
 		this.clientside.startRenderer();
 		LOGGER.info("Started DHLevel for " + this.levelWrapper + " with saves at " + this.saveStructure);
 	}
@@ -197,15 +197,15 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	{
 		assert this.networkEventSource != null;
 		assert this.networkState != null;
-		
+
 		this.networkEventSource.registerHandler(FullDataPartialUpdateMessage.class, message ->
 		{
 			if (MC_CLIENT.connectedToReplay())
 			{
 				return;
 			}
-			
-			
+
+
 			// Check this before decoding data to prevent errors if multiple client levels
 			// are receiving data at once.
 			boolean isSameLevel = message.isSameLevelAs(this.levelWrapper);
@@ -213,10 +213,10 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			{
 				return;
 			}
-			
+
 			try (FullDataSourceV2DTO dataSourceDto = this.networkState.fullDataPayloadReceiver.decodeDataSource(message.payload))
 			{
-				
+
 				Executor executor = ThreadPoolUtil.getFileHandlerExecutor();
 				if (executor != null)
 				{
@@ -228,15 +228,15 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 						}
 						catch (Exception e)
 						{
-							LOGGER.error("Unexpected erorr while updating full data source, error: ["+e.getMessage()+"].", e);
+							LOGGER.error("Unexpected erorr while updating full data source, error: [" + e.getMessage() + "].", e);
 						}
 					});
 				}
-				
-				
+
+
 				FullDataSourceV2 fullDataSource = dataSourceDto.createDataSource(this.levelWrapper, null);
 				this.updateDataSourcesAsync(fullDataSource)
-						.whenComplete((result, e) -> fullDataSource.close());
+					.whenComplete((result, e) -> fullDataSource.close());
 			}
 			catch (Exception e)
 			{
@@ -244,11 +244,11 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			}
 		});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// tick methods //
 	//==============//
@@ -261,14 +261,14 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			// only tick the level the player is currently in
 			// (done to prevent ticking LodQuadTree's for levels that aren't rendering)
 			IClientLevelWrapper clientLevelWrapper = MC_CLIENT.getWrappedClientLevel();
-			if (clientLevelWrapper == null 
+			if (clientLevelWrapper == null
 				|| clientLevelWrapper.getDhLevel() != this)
 			{
 				return;
 			}
-			
+
 			this.clientside.clientTick();
-			
+
 			if (this.syncOnLoadRequestQueue != null)
 			{
 				this.syncOnLoadRequestQueue.tick(new DhBlockPos2D(MC_CLIENT.getPlayerBlockPos()));
@@ -276,74 +276,74 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Unexpected clientTick Exception: "+e.getMessage(), e);
+			LOGGER.error("Unexpected clientTick Exception: " + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public boolean shouldDoWorldGen()
 	{
 		ClientNetworkState networkState = this.networkState;
-		
+
 		boolean isClientUsable = false, isAllowedDimension = false;
 		if (networkState != null)
 		{
 			isClientUsable = networkState.isReady();
 			isAllowedDimension = MC_CLIENT.getWrappedClientLevel() == this.levelWrapper;
 		}
-		
+
 		return isClientUsable
-				&& networkState.sessionConfig.getGeneratorPlan().generationEnabled
-				&& isAllowedDimension
-				&& this.clientside.isRendering();
+			&& networkState.sessionConfig.getGeneratorPlan().generationEnabled
+			&& isAllowedDimension
+			&& this.clientside.isRendering();
 	}
-	
+
 	@Override
 	public DhBlockPos2D getTargetPosForGeneration() { return new DhBlockPos2D(MC_CLIENT.getPlayerBlockPos()); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// world gen //
 	//===========//
 	//region
-	
+
 	@Override
 	public void onWorldGenTaskComplete(long pos)
 	{
 		this.clientside.reloadPos(pos);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	@Override
 	public IClientLevelWrapper getClientLevelWrapper() { return this.levelWrapper; }
-	
+
 	@Override
 	public void clearRenderCache() { this.clientside.clearRenderCache(); }
-	
+
 	@Override
 	@NotNull
 	public ILevelWrapper getLevelWrapper() { return this.levelWrapper; }
-	
+
 	@Override
 	public CompletableFuture<Void> updateDataSourcesAsync(FullDataSourceV2 data) { return this.clientside.updateDataSourcesAsync(data); }
-	
+
 	@Override
 	public FullDataSourceProviderV2 getFullDataProvider() { return this.remoteDataSourceProvider; }
-	
+
 	@Override
 	public ISaveStructure getSaveStructure() { return this.saveStructure; }
-	
+
 	@Override
 	public IDhGenericRenderer getGenericRenderer() { return this.clientside.genericRenderer; }
 	@Override
@@ -352,29 +352,29 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		ClientLevelModule.ClientRenderState renderState = this.clientside.ClientRenderStateRef.get();
 		return (renderState != null) ? renderState.renderBufferHandler : null;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean isRendering() { return this.clientside.isRendering(); }
-	
+
 	public boolean shouldProcessChunkUpdate(DhChunkPos chunkPos)
 	{
 		if (this.networkState == null || !this.networkState.isReady())
 		{
 			return true;
 		}
-		
+
 		return !this.networkState.sessionConfig.isRealTimeUpdatesEnabled() || this.loadedOnceChunks.add(chunkPos);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// debugging //
 	//===========//
 	//region
-	
+
 	@Override
 	public void addDebugMenuStringsToList(List<String> messageList)
 	{
@@ -382,19 +382,19 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		String g = MinecraftTextFormat.GREEN;
 		String r = MinecraftTextFormat.RED;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-		
-		
+
+
 		String dimName = this.levelWrapper.getDhIdentifier();
-		boolean rendering = 
-			this.clientside.isRendering() 
-			&& !IgnoredDimensionCsvHandler.INSTANCE.dimensionNameShouldBeIgnored(dimName);
-		String renderingString = rendering ? (g+"yes"+cf) : (r+"no"+cf);
-		messageList.add("["+y+dimName+cf+"] rendering: "+renderingString);
-		
-		
+		boolean rendering =
+			this.clientside.isRendering()
+				&& !IgnoredDimensionCsvHandler.INSTANCE.dimensionNameShouldBeIgnored(dimName);
+		String renderingString = rendering ? (g + "yes" + cf) : (r + "no" + cf);
+		messageList.add("[" + y + dimName + cf + "] rendering: " + renderingString);
+
+
 		this.remoteDataSourceProvider.addDebugMenuStringsToList(messageList);
-		
-		
+
+
 		// world gen
 		this.lodRequestModule.addDebugMenuStringsToList(messageList);
 		if (this.syncOnLoadRequestQueue != null)
@@ -406,19 +406,19 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 			}
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public String toString() { return "DhClientLevel{" + this.getClientLevelWrapper().getDhIdentifier() + "}"; }
-	
+
 	@Override
 	public void close()
 	{
@@ -426,12 +426,12 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		{
 			this.lodRequestModule.close();
 		}
-		
+
 		if (this.networkEventSource != null)
 		{
 			this.networkEventSource.close();
 		}
-		
+
 		if (this.sessionConfigListener != null)
 		{
 			try
@@ -443,31 +443,32 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 				// the level is closing anyway
 			}
 		}
-		
+
 		this.levelWrapper.setDhLevel(null);
 		this.clientside.close();
 		super.close();
 		this.remoteDataSourceProvider.close();
 		LOGGER.info("Closed [" + DhClientLevel.class.getSimpleName() + "] for [" + this.levelWrapper + "]");
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	private static class LodRequestState extends AbstractLodRequestState
 	{
 		LodRequestState(DhClientLevel clientLevel, ClientNetworkState networkState)
 		{ super(clientLevel, new RemoteWorldRetrievalQueue(networkState, clientLevel)); }
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

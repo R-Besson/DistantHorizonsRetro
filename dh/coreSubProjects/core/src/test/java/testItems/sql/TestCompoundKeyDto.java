@@ -26,19 +26,19 @@ public class TestCompoundKeyDto implements IBaseDTO<DhChunkPos>
 {
 	public DhChunkPos id;
 	public String value;
-	
-	
-	
-	public TestCompoundKeyDto(DhChunkPos id, String value) 
-	{ 
+
+
+
+	public TestCompoundKeyDto(DhChunkPos id, String value)
+	{
 		this.id = id;
 		this.value = value;
 	}
-	
-	@Override 
+
+	@Override
 	public DhChunkPos getKey() { return this.id; }
-	
-	
+
+
 	@Override
 	public boolean equals(Object other)
 	{
@@ -49,22 +49,22 @@ public class TestCompoundKeyDto implements IBaseDTO<DhChunkPos>
 		else
 		{
 			TestCompoundKeyDto otherDto = (TestCompoundKeyDto) other;
-			
+
 			return otherDto.id.equals(this.id)
-					&& otherDto.value.equals(this.value);
+				&& otherDto.value.equals(this.value);
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.id + ", " + this.value;
 	}
-	
+
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-	
-	
-	
+
+
+
 }

@@ -189,7 +189,7 @@ public interface ILWJGLService
 	// ===================== Fog =========================
 	//region
 
-	void glFogf(int	pname, float params);
+	void glFogf(int pname, float params);
 
 	//endregion
 

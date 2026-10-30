@@ -19,8 +19,8 @@
 
 package com.seibel.distanthorizons.api.methods.events;
 
-import com.seibel.distanthorizons.api.objects.DhApiResult;
 import com.seibel.distanthorizons.api.methods.events.interfaces.IDhApiEvent;
+import com.seibel.distanthorizons.api.objects.DhApiResult;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 
 /**
@@ -50,7 +50,7 @@ public class DhApiEventRegister
 			return DhApiResult.createFail(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Unregisters the given event handler for this event if one has been registered. <br>
 	 * If no eventHandler of the given class has been registered the result will return
@@ -67,5 +67,5 @@ public class DhApiEventRegister
 			return DhApiResult.createFail("No event handler [" + eventHandlerClass.getSimpleName() + "] was bound for the event [" + eventInterface.getSimpleName() + "].");
 		}
 	}
-	
+
 }

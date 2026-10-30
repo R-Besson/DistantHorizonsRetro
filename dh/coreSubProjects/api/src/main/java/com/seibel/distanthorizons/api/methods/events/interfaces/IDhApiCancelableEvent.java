@@ -32,9 +32,9 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
  */
 public interface IDhApiCancelableEvent<T> extends IDhApiEvent<T>
 {
-	
+
 	void fireEvent(DhApiCancelableEventParam<T> input);
-	
+
 	/**
 	 * <strong> Shouldn't be called. </strong> <br><br>
 	 *
@@ -53,8 +53,8 @@ public interface IDhApiCancelableEvent<T> extends IDhApiEvent<T>
 		{
 			throw new IllegalArgumentException("Programmer error. [" + IDhApiCancelableEvent.class.getSimpleName() + "] was given a [" + DhApiEventParam.class.getSimpleName() + "] when it should only be given a [" + DhApiCancelableEventParam.class.getSimpleName() + "].");
 		}
-		
+
 		this.fireEvent((DhApiCancelableEventParam<T>) input);
 	}
-	
+
 }

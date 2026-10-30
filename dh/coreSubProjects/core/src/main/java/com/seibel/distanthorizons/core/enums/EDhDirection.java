@@ -44,28 +44,28 @@ public enum EDhDirection
 	WEST("west", EDhDirection.Axis.X, new DhVec3i(-1, 0, 0), 2, 4),
 	/** positive X */
 	EAST("east", EDhDirection.Axis.X, new DhVec3i(1, 0, 0), 3, 5);
-	
-	
+
+
 	/** Up, Down, West, East, North, South */
-	public static final EDhDirection[] ALL = new EDhDirection[] {
-			EDhDirection.UP,
-			EDhDirection.DOWN,
-			EDhDirection.WEST,
-			EDhDirection.EAST,
-			EDhDirection.NORTH,
-			EDhDirection.SOUTH
+	public static final EDhDirection[] ALL = new EDhDirection[]{
+		EDhDirection.UP,
+		EDhDirection.DOWN,
+		EDhDirection.WEST,
+		EDhDirection.EAST,
+		EDhDirection.NORTH,
+		EDhDirection.SOUTH
 	};
-	
+
 	/** North, South, East, West */
-	public static final EDhDirection[] CARDINAL_COMPASS = new EDhDirection[] {
-			EDhDirection.EAST,
-			EDhDirection.WEST,
-			EDhDirection.SOUTH,
-			EDhDirection.NORTH
+	public static final EDhDirection[] CARDINAL_COMPASS = new EDhDirection[]{
+		EDhDirection.EAST,
+		EDhDirection.WEST,
+		EDhDirection.SOUTH,
+		EDhDirection.NORTH
 	};
-	
-	
-	
+
+
+
 	public final String name;
 	public final EDhDirection.Axis axis;
 	public final DhVec3i normal;
@@ -73,13 +73,13 @@ public enum EDhDirection
 	public final int compassIndex;
 	/** used for textures and LOD geometry faces */
 	public final int faceIndex;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-		
+
 	EDhDirection(String name, EDhDirection.Axis axis, DhVec3i normal, int compassIndex, int faceIndex)
 	{
 		this.name = name;
@@ -88,37 +88,37 @@ public enum EDhDirection
 		this.compassIndex = compassIndex;
 		this.faceIndex = faceIndex;
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
-	
+
 	public EDhDirection opposite()
-	{ 
-		switch(this)
+	{
+		switch (this)
 		{
 			case UP:
 				return EDhDirection.DOWN;
 			case DOWN:
 				return EDhDirection.UP;
-				
+
 			case NORTH:
 				return EDhDirection.SOUTH;
 			case SOUTH:
 				return EDhDirection.NORTH;
-				
+
 			case EAST:
 				return EDhDirection.WEST;
 			case WEST:
 				return EDhDirection.EAST;
-				
+
 			default:
 				throw new IllegalArgumentException();
 		}
 	}
-	
+
 	public EDhApiDirection getApiVersion()
 	{
 		switch (this)
@@ -135,12 +135,12 @@ public enum EDhDirection
 				return EDhApiDirection.NORTH;
 			case SOUTH:
 				return EDhApiDirection.SOUTH;
-				
+
 			default:
-				throw new IllegalStateException("No API direction found for ["+this+"]");
+				throw new IllegalStateException("No API direction found for [" + this + "]");
 		}
 	}
-	
+
 	public static EDhDirection fromApiVersion(EDhApiDirection apiDirection)
 	{
 		switch (apiDirection)
@@ -157,21 +157,21 @@ public enum EDhDirection
 				return EDhDirection.NORTH;
 			case SOUTH:
 				return EDhDirection.SOUTH;
-				
+
 			default:
-				throw new IllegalStateException("No Core direction found for ["+apiDirection+"]");
+				throw new IllegalStateException("No Core direction found for [" + apiDirection + "]");
 		}
 	}
-	
+
 	@Override
 	public String toString() { return this.name; }
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	/**
 	 * X <br>
 	 * Y <br>
@@ -182,27 +182,27 @@ public enum EDhDirection
 		X("x"),
 		Y("y"),
 		Z("z");
-		
+
 		public final String name;
-		
-		
+
+
 		//=============//
 		// constructor //
 		//=============//
-		
+
 		Axis(String name) { this.name = name; }
-		
-		
-		
+
+
+
 		//=========//
 		// methods //
 		//=========//
-		
+
 		public boolean isHorizontal() { return this == X || this == Z; }
-		
+
 		@Override
 		public String toString() { return this.name; }
-		
+
 	}
 
 }

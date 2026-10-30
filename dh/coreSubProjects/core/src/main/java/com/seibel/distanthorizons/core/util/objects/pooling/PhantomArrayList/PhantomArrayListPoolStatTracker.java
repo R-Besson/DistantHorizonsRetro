@@ -20,43 +20,43 @@ public final class PhantomArrayListPoolStatTracker<T>
 	/** size of one element in bytes, used for memory-usage estimates */
 	public final long elementSizeInBytes;
 	private final Supplier<T> emptyListCreatorFunc;
-	
+
 	/** total number of backing lists ever created by this pool */
 	public final AtomicInteger totalArrayCountRef = new AtomicInteger(0);
-	
-	
+
+
 	/** used for debugging: estimated byte-size of all lists currently in the pool */
 	public long lastPoolSizeInBytes = -1;
 	/** used for debugging: number of lists currently in the pool */
 	public int lastPoolCount = 0;
-	
+
 	// temporary counts used when determining the size/array counts for
 	// the debug screen
 	private long pendingPoolByteSize = 0;
 	private int pendingPoolCount = 0;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public PhantomArrayListPoolStatTracker(long elementSizeInBytes, Supplier<T> emptyListCreatorFunc)
 	{
 		this.elementSizeInBytes = elementSizeInBytes;
 		this.emptyListCreatorFunc = emptyListCreatorFunc;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===================//
 	// checkout tracking //
 	//===================//
 	//region
-	
+
 	/**
 	 * Ensures {@link PhantomArrayListCheckout} contains at least {@code requestedArrayCount} lists,
 	 * creating new ones as needed.
@@ -73,16 +73,16 @@ public final class PhantomArrayListPoolStatTracker<T>
 			addArrayToCheckoutFunc.accept(newList);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====================//
 	// debug size tracking //
 	//=====================//
 	//region
-	
+
 	public void debugAddPoolByteSize(Iterable<T> lists)
 	{
 		for (T list : lists)
@@ -99,28 +99,28 @@ public final class PhantomArrayListPoolStatTracker<T>
 		else if (list instanceof LongArrayList) return ((LongArrayList) list).elements().length;
 		else if (list instanceof CharArrayList) return ((CharArrayList) list).elements().length;
 		else if (list instanceof ByteBufferCheckoutWrapper) return ((ByteBufferCheckoutWrapper) list).size;
-		
+
 		else throw new UnsupportedOperationException("getBackingElementCount not implemented for type [" + list.getClass().getSimpleName() + "].");
 	}
-	
+
 	public void updateDebugValues(boolean clearLastPoolSize)
 	{
 		if (clearLastPoolSize)
 		{
 			this.lastPoolSizeInBytes = 0;
 		}
-		
-		// math.max is used since the pool should only grow until a soft reference is freed, 
+
+		// math.max is used since the pool should only grow until a soft reference is freed,
 		// and it's easier to understand if this constantly grows instead of jumping around
 		this.lastPoolSizeInBytes = Math.max(this.pendingPoolByteSize, this.lastPoolSizeInBytes);
 		this.lastPoolCount = this.pendingPoolCount;
-		
+
 		this.pendingPoolByteSize = 0;
 		this.pendingPoolCount = 0;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

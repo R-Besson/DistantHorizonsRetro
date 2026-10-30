@@ -34,25 +34,25 @@ public enum EDhApiGpuUploadMethod
 {
 	/** Picks the best option based on the GPU the user has. */
 	AUTO(false, false),
-	
+
 	/** Fast rendering, no stuttering. */
 	BUFFER_STORAGE(false, true),
-	
+
 	/** Fast rendering but may stutter when uploading. */
 	SUB_DATA(false, false),
-	
+
 	/** Fast rendering but may stutter when uploading. */
 	DATA(false, false);
-	
-	
-	
+
+
+
 	public final boolean useEarlyMapping;
 	public final boolean useBufferStorage;
-	
+
 	EDhApiGpuUploadMethod(boolean useEarlyMapping, boolean useBufferStorage)
 	{
 		this.useEarlyMapping = useEarlyMapping;
 		this.useBufferStorage = useBufferStorage;
 	}
-	
+
 }

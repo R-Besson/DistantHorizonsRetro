@@ -34,7 +34,7 @@ public enum EPlatform
 	UNIX("Unix");
 
 	private static final EPlatform current;
-	
+
 	static
 	{
 		String osName = System.getProperty("os.name").toLowerCase();
@@ -66,7 +66,7 @@ public enum EPlatform
 			throw new LinkageError("Unknown platform: " + osName);
 		}
 	}
-	
+
 	private final String name;
 
 	EPlatform(String name)

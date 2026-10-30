@@ -31,55 +31,55 @@ package com.seibel.distanthorizons.api.enums.worldGeneration;
  */
 public enum EDhApiGeneratorPlan
 {
-	/** 
-	 * The rough surface will be generated first 
+	/**
+	 * The rough surface will be generated first
 	 * then chunks will be generated to fill in
 	 * missing features (ie trees and villages). <Br><br>
-	 * 
+	 *
 	 * Recommended for modded or vanilla worlds.
 	 */
 	SURFACE_THEN_CHUNKS(true, true, true),
-	
+
 	/**
 	 * Only the rough surface will be generated.
 	 * Chunk features like trees and villages
 	 * won't be generated. <Br><br>
-	 * 
+	 *
 	 * Recommended for computers that don't have
 	 * enough CPU power or RAM space to handle
 	 * the chunk generator.
 	 */
 	SURFACE_ONLY(true, false, true),
-	
+
 	/**
 	 * Slower than either surface options,
 	 * but provides more accurate terrain. <Br><br>
-	 * 
+	 *
 	 * Recommended for custom worlds
 	 * where the surface generator would
 	 * generate incorrect terrain.
 	 */
 	CHUNKS_ONLY(true, true, false),
-	
+
 	/**
 	 * No distant terrain will be generated.
 	 */
 	DISABLED(false, false, false);
-	
-	
+
+
 	/** if true then some sort of generation will happen */
 	public final boolean generationEnabled;
 	public final boolean chunkGenEnabled;
 	public final boolean surfaceGenEnabled;
-	
+
 	EDhApiGeneratorPlan(
 		boolean genEnabled,
-		boolean chunkGenEnabled, boolean surfaceGenEnabled) 
+		boolean chunkGenEnabled, boolean surfaceGenEnabled)
 	{
 		this.generationEnabled = genEnabled;
 		this.chunkGenEnabled = chunkGenEnabled;
 		this.surfaceGenEnabled = surfaceGenEnabled;
 	}
-	
-	
+
+
 }

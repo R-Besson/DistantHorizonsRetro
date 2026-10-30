@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class FullDataMinMaxPosTest
 {
-	
+
 	@Test
 	public void EncodeAdjacentMinMaxPosTest()
 	{
@@ -39,7 +39,7 @@ public class FullDataMinMaxPosTest
 					for (short maxZ = 0; maxZ < maxTest; maxZ++)
 					{
 						long encodedPos = FullDataMinMaxPosUtil.encodeAdjMinMaxPos(minX, maxX, minZ, maxZ);
-						
+
 						Assert.assertEquals(minX, FullDataMinMaxPosUtil.getAdjMinX(encodedPos));
 						Assert.assertEquals(maxX, FullDataMinMaxPosUtil.getAdjMaxX(encodedPos));
 						Assert.assertEquals(minZ, FullDataMinMaxPosUtil.getAdjMinZ(encodedPos));
@@ -48,7 +48,7 @@ public class FullDataMinMaxPosTest
 				}
 			}
 		}
-		
+
 	}
-	
+
 }

@@ -32,8 +32,8 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 public class SingletonInjector extends DependencyInjector<IBindable>
 {
 	public static final SingletonInjector INSTANCE = new SingletonInjector(IBindable.class);
-	
-	
+
+
 	public SingletonInjector(Class<IBindable> newBindableInterface) { super(newBindableInterface, false); }
-	
+
 }

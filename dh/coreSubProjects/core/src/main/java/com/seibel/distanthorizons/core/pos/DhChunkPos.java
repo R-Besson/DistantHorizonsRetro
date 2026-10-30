@@ -25,7 +25,7 @@ import com.seibel.distanthorizons.core.util.LodUtil;
 
 /**
  * immutable <br><br>
- * 
+ *
  * Dev note: if for some reason we want to store these as longs check the old commits. <br>
  * That logic was removed since it wasn't needed at the time
  */
@@ -33,24 +33,24 @@ public class DhChunkPos
 {
 	private final int x;
 	public int getX() { return this.x; }
-	
+
 	private final int z;
 	public int getZ() { return this.z; }
-	
+
 	/** cached to improve hashing speed */
 	public final int hashCode;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public DhChunkPos(int x, int z)
 	{
 		this.x = x;
 		this.z = z;
-		
+
 		// custom hash, 7309 is a random prime
 		this.hashCode = this.x * 7309 + this.z;
 	}
@@ -70,14 +70,14 @@ public class DhChunkPos
 
 	public int getMinBlockX() { return this.x << 4; }
 	public int getMinBlockZ() { return this.z << 4; }
-	
-	public int getMaxBlockX() 
+
+	public int getMaxBlockX()
 	{
 		int minBlockPos = this.getMinBlockX() + LodUtil.CHUNK_WIDTH;
 		minBlockPos += (minBlockPos < 0) ? -1 : 0;
 		return minBlockPos;
 	}
-	public int getMaxBlockZ() 
+	public int getMaxBlockZ()
 	{
 		int minBlockPos = this.getMinBlockZ() + LodUtil.CHUNK_WIDTH;
 		minBlockPos += (minBlockPos < 0) ? -1 : 0;
@@ -86,13 +86,13 @@ public class DhChunkPos
 
 	public double squaredDistance(DhChunkPos other)
 	{ return Math.pow(this.x - other.x, 2) + Math.pow(this.z - other.z, 2); }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -110,11 +110,11 @@ public class DhChunkPos
 			return this.x == that.x && this.z == that.z;
 		}
 	}
-	
+
 	@Override
 	public int hashCode() { return this.hashCode; }
-	
+
 	@Override
 	public String toString() { return "C[" + this.x + "," + this.z + "]"; }
-	
+
 }

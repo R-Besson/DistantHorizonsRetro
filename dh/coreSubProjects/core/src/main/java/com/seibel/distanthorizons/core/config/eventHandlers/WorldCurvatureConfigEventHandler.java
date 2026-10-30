@@ -31,15 +31,15 @@ import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
 public class WorldCurvatureConfigEventHandler implements IConfigListener
 {
 	public static WorldCurvatureConfigEventHandler INSTANCE = new WorldCurvatureConfigEventHandler();
-	
-	public static final int MIN_VALID_CURVE_VALUE = 50; 
-	
-	
+
+	public static final int MIN_VALID_CURVE_VALUE = 50;
+
+
 	/** private since we only ever need one handler at a time */
 	private WorldCurvatureConfigEventHandler() { }
-	
-	
-	
+
+
+
 	@Override
 	public void onConfigValueSet()
 	{
@@ -54,11 +54,11 @@ public class WorldCurvatureConfigEventHandler implements IConfigListener
 			// same as above, but in the negative direction
 			Config.Client.Advanced.Graphics.Experimental.earthCurveRatio.set(-MIN_VALID_CURVE_VALUE);
 		}
-		
+
 	}
-	
+
 	@Override
 	public void onUiModify() { /* do nothing, we only care about modified config values */ }
-	
-	
+
+
 }

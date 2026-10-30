@@ -19,8 +19,8 @@
 
 package com.seibel.distanthorizons.api.interfaces.config.client;
 
-import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigGroup;
+import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 
 /**
  * Distant Horizons' threading configuration.
@@ -31,15 +31,15 @@ import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigGroup;
  */
 public interface IDhApiMultiThreadingConfig extends IDhApiConfigGroup
 {
-	
+
 	/**
 	 * Defines how many threads Distant Horizons
 	 * uses.
-	 * 
+	 *
 	 * @since API 4.0.0
 	 */
 	IDhApiConfigValue<Integer> threadCount();
-	
+
 	/**
 	 * Defines how many long Distant Horizons
 	 * threads will spend running vs sleeping.
@@ -52,5 +52,5 @@ public interface IDhApiMultiThreadingConfig extends IDhApiConfigGroup
 	 * @since API 4.0.0
 	 */
 	IDhApiConfigValue<Double> threadRuntimeRatio();
-	
+
 }

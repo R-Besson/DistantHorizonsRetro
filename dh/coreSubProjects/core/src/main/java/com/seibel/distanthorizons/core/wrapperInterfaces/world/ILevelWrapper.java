@@ -37,10 +37,10 @@ import org.jetbrains.annotations.Nullable;
  * - A level wrapper holds a specific MC level object and will exist before a corresponding {@link IDhLevel} is created <br>
  * - A level wrapper handles all MC logic (IE getting min/max world height) <br>
  * - A level wrapper is accessible via the {@link DhApi} <br>
- * - A level wrapper can access some DH logic when the API needs it 
- *   (in general DH logic should be handled via a {@link IDhLevel} but due to how the API is currently configured
- *   it's easier to handle that logic here). <br>
- * 
+ * - A level wrapper can access some DH logic when the API needs it
+ * (in general DH logic should be handled via a {@link IDhLevel} but due to how the API is currently configured
+ * it's easier to handle that logic here). <br>
+ *
  * @see IDhLevel
  * @see IClientLevelWrapper
  * @see IServerLevelWrapper
@@ -49,14 +49,14 @@ public interface ILevelWrapper extends IDhApiLevelWrapper, IBindable
 {
 	@Override
 	IDimensionTypeWrapper getDimensionType();
-	
+
 	/**
-	 * Includes both the namespace and name. <br> 
-	 * example: "minecraft:overworld" 
+	 * Includes both the namespace and name. <br>
+	 * example: "minecraft:overworld"
 	 */
 	@Override
 	String getDimensionName();
-	
+
 	long getHashedSeed();
 	/**
 	 * Returns the result of {@link #getHashedSeed()}, encoded into a short string. <br>
@@ -67,17 +67,17 @@ public interface ILevelWrapper extends IDhApiLevelWrapper, IBindable
 		String encoded = BaseEncoding.base32Hex().encode(Longs.toByteArray(this.getHashedSeed()));
 		return encoded.substring(0, 13).toLowerCase(); // Remaining 3 chars are padding
 	}
-	
+
 	/** A string that uniquely identifies this level. */
 	@Override
 	String getDhIdentifier();
-	
+
 	@Override
 	boolean hasCeiling();
-	
+
 	@Override
 	boolean hasSkyLight();
-	
+
 	@Override
 	int getMaxHeight();
 	@Override
@@ -85,15 +85,15 @@ public interface ILevelWrapper extends IDhApiLevelWrapper, IBindable
 
 	/** Fired when the level is being unloaded. Doesn't unload the level. */
 	void onUnload();
-	
-	/** 
+
+	/**
 	 * Used so we can access DH related methods/objects
 	 * from the {@link DhApi}.
 	 */
 	void setDhLevel(IDhLevel parentLevel);
 	@Nullable
 	IDhLevel getDhLevel();
-	
-	
-	
+
+
+
 }

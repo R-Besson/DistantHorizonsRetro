@@ -40,13 +40,13 @@ public class ParsedIp
 	 */
 	public final String port;
 	public final boolean isNumeric;
-	
-	
+
+
 	/** parses a standard IP string */
 	public ParsedIp(String fullIp)
 	{
 		fullIp = fullIp.trim();
-		
+
 		isNumeric = fullIp.matches(NUMERIC_IP_REGEX);
 		if (isNumeric)
 		{
@@ -77,10 +77,10 @@ public class ParsedIp
 	public String toString()
 	{
 		return ip +
-				// only print the ":port" if a port is present
-				(port != null ? (":" + port) : "");
+			// only print the ":port" if a port is present
+			(port != null ? (":" + port) : "");
 	}
-	
+
 }
 
 

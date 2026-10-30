@@ -24,25 +24,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FullDataPayload implements INetworkObject
 {
 	private static final AtomicInteger lastBufferId = new AtomicInteger();
-	
+
 	public int dtoBufferId;
 	public ByteBuf dtoBuffer;
-	
+
 	public List<BeaconBeamDTO> beaconBeams;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public FullDataPayload() { }
 	public FullDataPayload(@NotNull FullDataSourceV2 fullDataSource, List<BeaconBeamDTO> beaconBeams)
 	{
 		Objects.requireNonNull(fullDataSource);
-		
+
 		this.dtoBufferId = lastBufferId.getAndIncrement();
-		
+
 		try
 		{
 			EDhApiDataCompressionMode compressionMode = Config.Common.LodBuilding.dataCompression.get();
@@ -56,44 +56,44 @@ public class FullDataPayload implements INetworkObject
 		{
 			throw new RuntimeException(e);
 		}
-		
+
 		this.beaconBeams = beaconBeams;
 	}
-	
-	
-	
+
+
+
 	//===============//
 	// serialization //
 	//===============//
-	
+
 	@Override
 	public void encode(ByteBuf out)
 	{
 		out.writeInt(this.dtoBufferId);
 		this.writeCollection(out, this.beaconBeams);
 	}
-	
+
 	@Override
 	public void decode(ByteBuf in)
 	{
 		this.dtoBufferId = in.readInt();
 		this.beaconBeams = this.readCollection(in, new ArrayList<>(), () -> new BeaconBeamDTO(null, null));
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public String toString()
 	{
 		return MoreObjects.toStringHelper(this)
-				.add("dtoBufferId", this.dtoBufferId)
-				.add("dtoBuffer", this.dtoBuffer)
-				.add("beaconBeams", this.beaconBeams)
-				.toString();
+			.add("dtoBufferId", this.dtoBufferId)
+			.add("dtoBuffer", this.dtoBuffer)
+			.add("beaconBeams", this.beaconBeams)
+			.toString();
 	}
-	
+
 }

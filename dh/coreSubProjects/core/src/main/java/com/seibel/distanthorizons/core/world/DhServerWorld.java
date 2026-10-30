@@ -36,24 +36,24 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 {
 	private final PregenManager pregenManager = new PregenManager();
 	public PregenManager getPregenManager() { return this.pregenManager; }
-	
-	
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public DhServerWorld()
 	{
 		super(EWorldEnvironment.SERVER_ONLY);
-		LOGGER.info("Started ["+DhServerWorld.class.getSimpleName()+"] of type ["+this.environment+"].");
+		LOGGER.info("Started [" + DhServerWorld.class.getSimpleName() + "] of type [" + this.environment + "].");
 	}
-	
-	
-	
+
+
+
 	//================//
 	// level handling //
 	//================//
-	
+
 	@Override
 	public DhServerLevel getOrLoadLevel(@NotNull ILevelWrapper wrapper)
 	{
@@ -61,8 +61,8 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 		{
 			return null;
 		}
-		
-		return this.dhLevelByLevelWrapper.computeIfAbsent(wrapper, 
+
+		return this.dhLevelByLevelWrapper.computeIfAbsent(wrapper,
 			(serverLevelWrapper) ->
 			{
 				try
@@ -73,21 +73,21 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 				}
 				catch (Exception e)
 				{
-					LOGGER.fatal("Failed to load server level, error: ["+e.getMessage()+"].", e);
-					
+					LOGGER.fatal("Failed to load server level, error: [" + e.getMessage() + "].", e);
+
 					String r = MinecraftTextFormat.RED;
 					String y = MinecraftTextFormat.YELLOW;
 					String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-					
+
 					ClientApi.INSTANCE.queueSlowChatMessage(
 						r + "Distant Horizons: Server level loading failed." + cf + "\n" +
-						"Unable to load level ["+y+serverLevelWrapper.getDhIdentifier()+cf+"], LODs may not appear. See log for more information.\n");
-					
+							"Unable to load level [" + y + serverLevelWrapper.getDhIdentifier() + cf + "], LODs may not appear. See log for more information.\n");
+
 					return null;
 				}
 			});
 	}
-	
+
 	@Override
 	public boolean unloadLevel(@NotNull ILevelWrapper wrapper)
 	{
@@ -95,7 +95,7 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 		{
 			return false;
 		}
-		
+
 		if (this.dhLevelByLevelWrapper.containsKey(wrapper))
 		{
 			wrapper.onUnload();
@@ -103,10 +103,10 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiLevelUnloadEvent.class, new DhApiLevelUnloadEvent.EventParam(wrapper));
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public void close()
 	{
@@ -116,8 +116,8 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 			LOGGER.info("Stopping the running pregen task.");
 			runningPregen.cancel(true);
 		}
-		
+
 		super.close();
 	}
-	
+
 }

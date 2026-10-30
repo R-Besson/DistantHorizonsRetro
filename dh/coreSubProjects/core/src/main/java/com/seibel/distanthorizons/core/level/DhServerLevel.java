@@ -35,23 +35,23 @@ public class DhServerLevel extends AbstractDhServerLevel
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public DhServerLevel(
-		ISaveStructure saveStructure, 
-		IServerLevelWrapper serverLevelWrapper, 
+		ISaveStructure saveStructure,
+		IServerLevelWrapper serverLevelWrapper,
 		ServerPlayerStateManager serverPlayerStateManager
-		) throws SQLException, IOException
-	{ 
+	) throws SQLException, IOException
+	{
 		super(saveStructure, serverLevelWrapper, serverPlayerStateManager);
 		this.serverLevelWrapper.setDhLevel(this);
 	}
-	
-	
-	
+
+
+
 	//=======//
 	// ticks //
 	//=======//
-	
+
 	@Override
 	public boolean shouldDoWorldGen() { return super.shouldDoWorldGen(); }
 	@Override
@@ -64,52 +64,52 @@ public class DhServerLevel extends AbstractDhServerLevel
 		}
 		return targetPos;
 	}
-	
-	
+
+
 	//=========//
 	// getters //
 	//=========//
-	
+
 	@Override
-	public IDhGenericRenderer getGenericRenderer() 
-	{ 
+	public IDhGenericRenderer getGenericRenderer()
+	{
 		// server-only levels don't support rendering
-		return null; 
+		return null;
 	}
 	@Override
 	public RenderBufferHandler getRenderBufferHandler()
-	{ 
+	{
 		// server-only levels don't support rendering
-		return null; 
+		return null;
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// debugging //
 	//===========//
-	
+
 	@Override
 	public void addDebugMenuStringsToList(List<String> messageList)
 	{
 		messageList.add("[" + this.serverLevelWrapper.getDhIdentifier() + "]");
 		super.addDebugMenuStringsToList(messageList);
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
-	public String toString() { return "DhServerLevel{"+this.serverLevelWrapper.getKeyedLevelDimensionName()+"}"; }
-	
+	public String toString() { return "DhServerLevel{" + this.serverLevelWrapper.getKeyedLevelDimensionName() + "}"; }
+
 	@Override
 	public void close()
 	{
 		super.close();
 		this.serverside.close();
 	}
-	
+
 }

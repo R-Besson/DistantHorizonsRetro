@@ -6,7 +6,11 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import org.jetbrains.annotations.Nullable;
-import team.chisel.ctmlib.*;
+import team.chisel.ctmlib.CTM;
+import team.chisel.ctmlib.ICTMBlock;
+import team.chisel.ctmlib.ISubmapManager;
+import team.chisel.ctmlib.RenderBlocksCTM;
+import team.chisel.ctmlib.TextureSubmap;
 
 /**
  * Picks the icons the same way Chisel's CTMRenderer and RenderBlocksCTM draw a block in the world.
@@ -40,7 +44,7 @@ public class ChiselAccessor implements IChiselCommonAccessor
 			|| ((RenderBlocksCTM) renderContext).submap == null)
 		{
 			// drawn like a normal block
-			return new IIcon[] { block.getIcon(world, x, y, z, side) };
+			return new IIcon[]{block.getIcon(world, x, y, z, side)};
 		}
 		RenderBlocksCTM ctmContext = (RenderBlocksCTM) renderContext;
 

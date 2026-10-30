@@ -26,7 +26,7 @@ package com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor;
 public interface IRpleAccessor extends IModAccessor
 {
 	void updateLightmap();
-	
+
 	int getLightmapTextureId();
-	
+
 }

@@ -38,69 +38,69 @@ import java.nio.ByteOrder;
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
- * Handles rendering the wireframe particles 
+ * Handles rendering the wireframe particles
  * that are used for seeing what the system's doing.
  */
 public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 {
 	public static GlDhDebugWireframeRenderer INSTANCE = new GlDhDebugWireframeRenderer();
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
-	
+
+
+
 	// rendering setup
 	private GlShaderProgram basicShader;
 	private GLVertexBuffer vertexBuffer;
 	private GLIndexBuffer indexBuffer;
 	private GlAbstractVertexAttribute va;
 	private boolean init = false;
-	
-	
-	
+
+
+
 	/** A box from 0,0,0 to 1,1,1 */
 	private static final float[] BOX_VERTICES = {
 		//region
-			// Pos x y z
-			0, 0, 0,
-			1, 0, 0,
-			1, 1, 0,
-			0, 1, 0,
-			0, 0, 1,
-			1, 0, 1,
-			1, 1, 1,
-			0, 1, 1,
+		// Pos x y z
+		0, 0, 0,
+		1, 0, 0,
+		1, 1, 0,
+		0, 1, 0,
+		0, 0, 1,
+		1, 0, 1,
+		1, 1, 1,
+		0, 1, 1,
 		//endregion
 	};
 
 	private static final int[] BOX_OUTLINE_INDICES = {
 		//region
-			0, 1,
-			1, 2,
-			2, 3,
-			3, 0,
+		0, 1,
+		1, 2,
+		2, 3,
+		3, 0,
 
-			4, 5,
-			5, 6,
-			6, 7,
-			7, 4,
+		4, 5,
+		5, 6,
+		6, 7,
+		7, 4,
 
-			0, 4,
-			1, 5,
-			2, 6,
-			3, 7,
+		0, 4,
+		1, 5,
+		2, 6,
+		3, 7,
 		//endregion
 	};
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private GlDhDebugWireframeRenderer() { }
-	
+
 	public void init()
 	{
 		if (this.init)
@@ -121,10 +121,10 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 		);
 		this.createBuffer();
 	}
-	
+
 	private void createBuffer()
 	{
-		// box vertices 
+		// box vertices
 		ByteBuffer boxVerticesBuffer = ByteBuffer.allocateDirect(BOX_VERTICES.length * Float.BYTES);
 		boxVerticesBuffer.order(ByteOrder.nativeOrder());
 		boxVerticesBuffer.asFloatBuffer().put(BOX_VERTICES);
@@ -132,8 +132,8 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 		this.vertexBuffer = new GLVertexBuffer(false);
 		this.vertexBuffer.bind();
 		this.vertexBuffer.uploadBuffer(boxVerticesBuffer, 8, EDhApiGpuUploadMethod.DATA, BOX_VERTICES.length * Float.BYTES);
-		
-		
+
+
 		// outline vertex indexes
 		ByteBuffer boxOutlineBuffer = ByteBuffer.allocateDirect(BOX_OUTLINE_INDICES.length * Integer.BYTES);
 		boxOutlineBuffer.order(ByteOrder.nativeOrder());
@@ -141,39 +141,39 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 		boxOutlineBuffer.rewind();
 		this.indexBuffer = new GLIndexBuffer(false);
 		this.indexBuffer.uploadBuffer(boxOutlineBuffer, EDhApiGpuUploadMethod.DATA, BOX_OUTLINE_INDICES.length * Integer.BYTES, GL15.GL_STATIC_DRAW);
-		
+
 	}
-	
-	
+
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// rendering //
 	//===========//
 	//region
-	
+
 	@Override
 	public void render(RenderParams renderParams)
 	{
 		this.init();
-		
+
 		LWJGL.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_LINE);
 		GLMC.enableDepthTest();
-		
+
 		this.basicShader.bind();
 		this.va.bind();
 		this.va.bindBufferToAllBindingPoints(this.vertexBuffer.getId());
-		
+
 		this.indexBuffer.bind();
-		
+
 		super.render(renderParams);
-		
+
 		// revert to prevent issues with the following passes
 		LWJGL.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 	}
-	
+
 	@Override
 	public void renderBox(Box box)
 	{
@@ -188,9 +188,9 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 
 		LWJGL.glDrawElements(GL11.GL_LINES, BOX_OUTLINE_INDICES.length, GL11.GL_UNSIGNED_INT, 0);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

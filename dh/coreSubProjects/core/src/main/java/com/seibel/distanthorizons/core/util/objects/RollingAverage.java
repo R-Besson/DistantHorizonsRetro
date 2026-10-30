@@ -5,47 +5,47 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This can be used for easily profiling methods to get the average execution time. <br>
- * This is a thread safe implementation. 
+ * This is a thread safe implementation.
  */
 public class RollingAverage
 {
 	private final double[] values;
 	private final int maxSize;
-	
+
 	private int currentSize = 0;
 	private int index = 0;
 	private double sum = 0.0;
 	private final Lock arrayLock = new ReentrantLock();
 	/** how many items have been added to this average over its lifetime */
 	private long lifetimeCount = 0;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public RollingAverage(int size)
 	{
 		if (size <= 0)
 		{
 			throw new IllegalArgumentException("Size must be greater than 0");
 		}
-		
+
 		this.maxSize = size;
 		this.values = new double[size];
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=======//
 	// input //
 	//=======//
 	//region
-	
+
 	public void add(double value)
 	{
 		this.arrayLock.lock();
@@ -59,9 +59,9 @@ public class RollingAverage
 			this.sum += value;
 			// Move to the next index
 			this.index = (this.index + 1) % this.maxSize;
-			
-			this.currentSize = Math.max(this.index+1, this.currentSize);
-			
+
+			this.currentSize = Math.max(this.index + 1, this.currentSize);
+
 			this.lifetimeCount++;
 		}
 		finally
@@ -69,16 +69,16 @@ public class RollingAverage
 			this.arrayLock.unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// output //
 	//========//
 	//region
-	
+
 	/** Gets the current rolling average. */
 	public double getAverage()
 	{
@@ -92,26 +92,26 @@ public class RollingAverage
 			this.arrayLock.unlock();
 		}
 	}
-	/** rounded to two decimals*/
+	/** rounded to two decimals */
 	public String getAverageRoundedString() { return String.format("%.2f", this.getAverage()); }
-	
-	/** how many items have been added to the rolling average since it's last  */
+
+	/** how many items have been added to the rolling average since it's last */
 	public long getLifetimeCount() { return this.lifetimeCount; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
-	@Override 
-	public String toString() { return "avg: ["+this.getAverageRoundedString()+"], count: ["+this.currentSize+"], max count: ["+this.maxSize+"]."; }
-	
+
+	@Override
+	public String toString() { return "avg: [" + this.getAverageRoundedString() + "], count: [" + this.currentSize + "], max count: [" + this.maxSize + "]."; }
+
 	//endregion
-	
-	
+
+
 }
 

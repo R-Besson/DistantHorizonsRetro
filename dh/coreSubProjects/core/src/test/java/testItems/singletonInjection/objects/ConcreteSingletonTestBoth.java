@@ -32,14 +32,14 @@ import testItems.singletonInjection.interfaces.ISingletonTestTwo;
 public class ConcreteSingletonTestBoth implements ISingletonTestOne, ISingletonTestTwo, IBindable
 {
 	public static final int VALUE = 3;
-	
+
 	@Override
 	public int getValue()
 	{
 		return VALUE;
 	}
-	
+
 	@Override
 	public int getDependentValue() { return -1; }
-	
+
 }

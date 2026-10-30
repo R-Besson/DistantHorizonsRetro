@@ -25,7 +25,11 @@ import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -38,21 +42,21 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlShader
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
-			.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
-			.build();
-	
-	
+		.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
+		.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
+		.build();
+
+
 	/** OpenGL shader ID */
 	public final int id;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	/**
 	 * Creates a shader with specified type.
 	 *
@@ -62,27 +66,27 @@ public class GlShader
 	 */
 	public GlShader(int type, String sourceString)
 	{
-		LOGGER.info("Loading shader with type: ["+type+"]");
-		LOGGER.debug("Source: \n["+sourceString+"]");
+		LOGGER.info("Loading shader with type: [" + type + "]");
+		LOGGER.debug("Source: \n[" + sourceString + "]");
 		if (sourceString == null || sourceString.isEmpty())
 		{
 			throw new IllegalArgumentException("No shader source given.");
 		}
-		
+
 		// Create an empty shader object
 		this.id = LWJGL.glCreateShader(type);
 		if (this.id == 0)
 		{
-			throw new IllegalArgumentException("Failed to create shader with type ["+type+"] and Source: \n["+sourceString+"].");
+			throw new IllegalArgumentException("Failed to create shader with type [" + type + "] and Source: \n[" + sourceString + "].");
 		}
-		
+
 		LWJGL.glShaderSourceSafe(this.id, sourceString);
 		LWJGL.glCompileShader(this.id);
 		// check if the shader compiled
 		int status = LWJGL.glGetShaderi(this.id, GL20.GL_COMPILE_STATUS);
 		if (status != GL11.GL_TRUE)
 		{
-			
+
 			String message = "Shader compiler error. Details: [" + LWJGL.glGetShaderInfoLog(this.id, 1024) + "]\n";
 			message += "Source: \n[" + sourceString + "]";
 			this.free(); // important!
@@ -90,22 +94,22 @@ public class GlShader
 		}
 		LOGGER.info("Shader loaded sucessfully.");
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// helpers //
 	//=========//
 	//region
-	
+
 	public void free() { LWJGL.glDeleteShader(this.id); }
-	
+
 	public static String loadFile(String path, boolean absoluteFilePath)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		
+
 		try
 		{
 			// open the file
@@ -138,12 +142,12 @@ public class GlShader
 		{
 			throw new RuntimeException("Unable to load shader from file [" + path + "]. Error: " + e.getMessage());
 		}
-		
+
 		return stringBuilder.toString();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

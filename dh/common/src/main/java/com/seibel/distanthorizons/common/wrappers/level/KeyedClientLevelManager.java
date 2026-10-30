@@ -17,21 +17,21 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 {
 	/** Stores the server-provided keys indexed by dimension name for persistence. */
 	private final Map<String, KeyInfo> keysByDimensionName = new ConcurrentHashMap<>();
-	
+
 	/** Cache for already keyed level wrappers to maintain object identity. */
 	private final Map<WorldClient, IServerKeyedClientLevel>
 		keyedLevelsCache = Collections.synchronizedMap(new WeakHashMap<>());
-	
+
 	/** Allows to keep level manager enabled between loading different keyed levels */
 	private volatile boolean enabled = false;
-	
-	
-	
+
+
+
 	//======================//
 	// level override logic //
 	//======================//
 	//region
-	
+
 	@Override
 	@Nullable
 	public IServerKeyedClientLevel getServerKeyedLevel(IClientLevelWrapper levelWrapper)
@@ -40,20 +40,20 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 		{
 			return null;
 		}
-		
+
 		// We synchronize on the cache map to ensure atomicity of the lookup-and-populate sequence.
 		// This prevents multiple threads from creating duplicate wrappers for the same level.
 		synchronized (this.keyedLevelsCache)
 		{
 			WorldClient level = (WorldClient) levelWrapper.getWrappedMcObject();
-			
+
 			// Check the cache first
 			IServerKeyedClientLevel cached = this.keyedLevelsCache.get(level);
 			if (cached != null)
 			{
 				return cached;
 			}
-			
+
 			// Determine the dimension name for this level
 			// We use bypassLevelKeyManager=true to avoid recursion back into this manager
 			IClientLevelWrapper wrappedLevel = ClientLevelWrapper.getWrapper(level, true);
@@ -61,83 +61,85 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 			{
 				return null;
 			}
-			
+
 			String dimensionName = wrappedLevel.getDimensionName();
 			KeyInfo info = this.keysByDimensionName.get(dimensionName);
 			if (info == null)
 			{
 				return null;
 			}
-			
+
 			// Create and cache a new keyed wrapper
 			IServerKeyedClientLevel keyedLevel = new ServerKeyedClientLevelWrapper(level, info.serverKey, info.levelKey);
 			this.keyedLevelsCache.put(level, keyedLevel);
 			return keyedLevel;
 		}
 	}
-	
+
 	@Override
 	public IServerKeyedClientLevel setServerKeyedLevel(IClientLevelWrapper clientLevel, String dimensionResource, String serverKey, String levelKey)
 	{
 		this.keysByDimensionName.put(dimensionResource, new KeyInfo(serverKey, levelKey));
 		this.enabled = true;
-		
+
 		synchronized (this.keyedLevelsCache)
 		{
-			this.keyedLevelsCache.keySet().removeIf(level -> 
+			this.keyedLevelsCache.keySet().removeIf(level ->
 			{
 				String levelDim = LegacyDimensionInfo.fullName(level.provider.dimensionId);
 
 				return levelDim.equals(dimensionResource);
 			});
 		}
-		
-		if (clientLevel == null || !clientLevel.getDimensionName().equals(dimensionResource)) {
+
+		if (clientLevel == null || !clientLevel.getDimensionName().equals(dimensionResource))
+		{
 			return null;
 		}
-		
+
 		return this.getServerKeyedLevel(clientLevel);
 	}
 
 	public void clearKeyedLevel()
-	{ 
+	{
 		synchronized (this.keyedLevelsCache)
 		{
-			this.keyedLevelsCache.clear(); 
+			this.keyedLevelsCache.clear();
 			this.keysByDimensionName.clear();
 		}
 	}
-	
+
 	@Override
 	public boolean isEnabled() { return this.enabled; }
-	
+
 	@Override
-	public void disable() 
-	{ 
-		this.enabled = false; 
+	public void disable()
+	{
+		this.enabled = false;
 		this.clearKeyedLevel();
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	private static class KeyInfo
 	{
 		public final String serverKey;
 		public final String levelKey;
-		
+
 		public KeyInfo(String serverKey, String levelKey)
 		{
 			this.serverKey = serverKey;
 			this.levelKey = levelKey;
 		}
+
 	}
-	
+
 	//endregion
-	
-	
+
+
 }

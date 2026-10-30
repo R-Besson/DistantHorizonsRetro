@@ -35,12 +35,12 @@ public class BlockFaceTexture
 	/**
 	 * Pixel colors in ARGB order. <br>
 	 * Indexed via <code>(v * width) + u</code> where (0,0) is the face's top left pixel. <br><br>
-	 * 
+	 *
 	 * If changed {@link DhApiBlockTextureOverrideEvent}
 	 * will need to be updated.
 	 */
 	public final int[] argbPixels;
-	
+
 	public final boolean uploadAsColorRatio;
 	/**
 	 * The ARGB color the LOD face is drawn with before tinting and shading,
@@ -49,34 +49,34 @@ public class BlockFaceTexture
 	 * 0 uses the texture's own average.
 	 */
 	public int ratioReferenceColor = 0;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public static BlockFaceTexture createSolidColor(int argbColor)
-	{ return new BlockFaceTexture(1, 1, new int[] { argbColor }, false); }
-	
+	{ return new BlockFaceTexture(1, 1, new int[]{argbColor}, false); }
+
 	public static BlockFaceTexture createErrorGridTexture()
 	{
 		// similar pink/black grid used by source engine games for missing textures
-		int[] argbPixels = new int[] 
-		{
-			ColorUtil.HOT_PINK, // top left
-			ColorUtil.BLACK, // top right
-			
-			ColorUtil.BLACK, // bottom left
-			ColorUtil.HOT_PINK, // bottom right
-		};
-		return new BlockFaceTexture(2, 2, argbPixels, false); 
+		int[] argbPixels = new int[]
+			{
+				ColorUtil.HOT_PINK, // top left
+				ColorUtil.BLACK, // top right
+
+				ColorUtil.BLACK, // bottom left
+				ColorUtil.HOT_PINK, // bottom right
+			};
+		return new BlockFaceTexture(2, 2, argbPixels, false);
 	}
-	
+
 	public static BlockFaceTexture createTexture(int width, int height, int[] argbPixels)
 	{ return new BlockFaceTexture(width, height, argbPixels, true); }
-	
+
 	private BlockFaceTexture(int width, int height, int[] argbPixels, boolean uploadAsColorRatio)
 	{
 		this.width = width;
@@ -84,16 +84,16 @@ public class BlockFaceTexture
 		this.argbPixels = argbPixels;
 		this.uploadAsColorRatio = uploadAsColorRatio;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====//
 	// API //
 	//=====//
 	//region
-	
+
 	public void updateFromApiEvent(DhApiBlockTextureOverrideEvent.EventParam eventParam)
 	{
 		for (int u = 0; u < TextureUtil.TEXTURE_WIDTH_AND_HEIGHT; u++)
@@ -105,9 +105,9 @@ public class BlockFaceTexture
 			}
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

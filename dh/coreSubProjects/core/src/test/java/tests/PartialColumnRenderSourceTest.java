@@ -42,4 +42,5 @@ public class PartialColumnRenderSourceTest
 			Assert.assertThrows(IllegalArgumentException.class, () -> partial.populateColumnView(view, 1, 0));
 		}
 	}
+
 }

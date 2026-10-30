@@ -26,37 +26,38 @@ import com.seibel.distanthorizons.core.util.LodUtil;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
 /**
  * immutable  <br><br>
- *  
+ *
  * Dev note: if for some reason we want to store these as longs check the old commits. <br>
  * That logic was removed since it wasn't needed at the time.
- * 
- * @see DhBlockPosMutable 
+ *
+ * @see DhBlockPosMutable
  */
 public class DhBlockPos implements INetworkObject
 {
 	/** Useful for methods that need a position passed in but won't actually be used */
 	public static final DhBlockPos ZERO = new DhBlockPos(0, 0, 0);
-	
-	
+
+
 	protected int x;
 	public int getX() { return this.x; }
-	
+
 	protected int y;
 	public int getY() { return this.y; }
-	
+
 	protected int z;
 	public int getZ() { return this.z; }
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public DhBlockPos(int x, int y, int z)
 	{
 		this.x = x;
@@ -79,21 +80,21 @@ public class DhBlockPos implements INetworkObject
 		mutablePos.y = this.y + direction.normal.y;
 		mutablePos.z = this.z + direction.normal.z;
 	}
-	
-	
-	
+
+
+
 	//================//
 	// chunk relative //
 	//================//
-	
+
 	/** Returns a new {@link DhBlockPos} limited to a value between 0 and 15 (inclusive) */
 	public DhBlockPos createChunkRelativePos() { return this.mutateOrCreateChunkRelativePos(null); }
 	/** Limits the input {@link DhBlockPos} to a value between 0 and 15 (inclusive) */
 	public void mutateToChunkRelativePos(DhBlockPosMutable mutableBlockPos) { this.mutateOrCreateChunkRelativePos(mutableBlockPos); }
-	/** 
-	 * Limits the block position to a value between 0 and 15 (inclusive) 
-	 * If not null, mutates "mutableBlockPos" 
-	 * 
+	/**
+	 * Limits the block position to a value between 0 and 15 (inclusive)
+	 * If not null, mutates "mutableBlockPos"
+	 *
 	 * @return the mutated or created {@link DhBlockPos}
 	 */
 	protected DhBlockPos mutateOrCreateChunkRelativePos(@Nullable DhBlockPosMutable mutableBlockPos)
@@ -101,14 +102,14 @@ public class DhBlockPos implements INetworkObject
 		int relX = convertWorldPosToChunkRelative(this.x);
 		// the y value shouldn't need to be changed
 		int relZ = convertWorldPosToChunkRelative(this.z);
-		
-		
+
+
 		if (mutableBlockPos != null)
 		{
 			mutableBlockPos.x = relX;
 			mutableBlockPos.y = this.y;
 			mutableBlockPos.z = relZ;
-			
+
 			return mutableBlockPos;
 		}
 		else
@@ -116,7 +117,7 @@ public class DhBlockPos implements INetworkObject
 			return new DhBlockPos(relX, this.y, relZ);
 		}
 	}
-	
+
 	protected static int convertWorldPosToChunkRelative(int xOrZ)
 	{
 		// move the position into the range -15 and +15
@@ -131,7 +132,7 @@ public class DhBlockPos implements INetworkObject
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -149,18 +150,18 @@ public class DhBlockPos implements INetworkObject
 			return this.x == that.x && this.y == that.y && this.z == that.z;
 		}
 	}
-	
+
 	@Override
 	public int hashCode() { return Objects.hash(this.x, this.y, this.z); }
 	@Override
-	public String toString() { return "DHBlockPos["+ this.x +", "+ this.y +", "+ this.z +"]"; }
-	
-	
-	
+	public String toString() { return "DHBlockPos[" + this.x + ", " + this.y + ", " + this.z + "]"; }
+
+
+
 	//=========//
 	// network //
 	//=========//
-	
+
 	@Override
 	public void encode(ByteBuf out)
 	{
@@ -168,7 +169,7 @@ public class DhBlockPos implements INetworkObject
 		out.writeInt(this.y);
 		out.writeInt(this.z);
 	}
-	
+
 	@Override
 	public void decode(ByteBuf in)
 	{
@@ -176,5 +177,5 @@ public class DhBlockPos implements INetworkObject
 		this.y = in.readInt();
 		this.z = in.readInt();
 	}
-	
+
 }

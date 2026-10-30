@@ -31,98 +31,98 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
  *
  * Note: this is only fired once per {@link IDhApiBlockStateWrapper} that is created
  * and those {@link IDhApiBlockStateWrapper} will only be created once per JVM session.
- * 
+ *
  * @author James Seibel
  * @version 2026-04-14
- * @since API 6.0.0
  * @see IDhApiBlockStateWrapper
+ * @since API 6.0.0
  */
-public abstract class   DhApiBlockStateWrapperCreatedEvent implements IDhApiEvent<DhApiBlockStateWrapperCreatedEvent.EventParam>
+public abstract class DhApiBlockStateWrapperCreatedEvent implements IDhApiEvent<DhApiBlockStateWrapperCreatedEvent.EventParam>
 {
 	public abstract void blockStateWrapperCreated(DhApiEventParam<EventParam> event);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> event) { this.blockStateWrapperCreated(event); }
-	
-	
+
+
 	//==================//
 	// parameter object //
 	//==================//
-	
+
 	public static class EventParam implements IDhApiEventParam
 	{
-		/** 
+		/**
 		 * A copy of the wrapper that will be created. <Br>
 		 * Note: modifying this object won't change anything
 		 * a new wrapper will be created after this event finishes.
 		 */
 		private final IDhApiBlockStateWrapper blockStateWrapper;
-		
+
 		private boolean overridesSet = false;
 		private EDhApiBlockMaterial blockMaterial = null;
 		private Integer opacity = null;
 		private Boolean allowApiColorOverride = null;
 		private Boolean allowApiTextureOverride = null;
-		
-		
-		
+
+
+
 		//=============//
 		// constructor //
 		//=============//
-		
+
 		public EventParam(IDhApiBlockStateWrapper blockStateWrapper) { this.blockStateWrapper = blockStateWrapper; }
-		
-		
-		
+
+
+
 		//=================//
 		// getters/setters //
 		//=================//
-		
+
 		public IDhApiBlockStateWrapper getBlockStateWrapper() { return this.blockStateWrapper; }
-		
+
 		/** if set this will override the value currently set in the given {@link IDhApiBlockStateWrapper} */
-		public void setBlockMaterial(EDhApiBlockMaterial blockMaterial) 
+		public void setBlockMaterial(EDhApiBlockMaterial blockMaterial)
 		{
-			this.blockMaterial = blockMaterial; 
+			this.blockMaterial = blockMaterial;
 			this.overridesSet = true;
 		}
 		public EDhApiBlockMaterial getBlockMaterial() { return this.blockMaterial; }
-		
+
 		/** if set this will override the value currently set in the given {@link IDhApiBlockStateWrapper} */
-		public void setOpacity(int opacity) 
+		public void setOpacity(int opacity)
 		{
 			this.opacity = opacity;
 			this.overridesSet = true;
 		}
 		public Integer getOpacity() { return this.opacity; }
-		
+
 		/** if set to true this {@link IDhApiBlockStateWrapper} will trigger {@link DhApiBlockColorOverrideEvent} */
-		public void setAllowApiColorOverride(boolean allowApiColorOverride) 
+		public void setAllowApiColorOverride(boolean allowApiColorOverride)
 		{
 			this.allowApiColorOverride = allowApiColorOverride;
 			this.overridesSet = true;
 		}
 		public Boolean getAllowApiColorOverride() { return this.allowApiColorOverride; }
-		
+
 		/** if set to true, {@link DhApiBlockTextureOverrideEvent} events will be triggered whenever a block is first seen. */
-		public void setAllowApiTextureOverride(boolean allowApiColorOverride) 
+		public void setAllowApiTextureOverride(boolean allowApiColorOverride)
 		{
 			this.allowApiTextureOverride = allowApiColorOverride;
 			this.overridesSet = true;
 		}
 		public Boolean getAllowApiTextureOverride() { return this.allowApiTextureOverride; }
-		
+
 		/** If true then one or more options for this block were set to be changed */
 		public boolean getOverridesSet() { return this.overridesSet; }
-		
-		
-		
-		/** 
+
+
+
+		/**
 		 * Returns the same instance of this event.
 		 * Copying this event isn't supported
 		 * since the internal parameters must be mutated
@@ -131,10 +131,10 @@ public abstract class   DhApiBlockStateWrapperCreatedEvent implements IDhApiEven
 		 */
 		@Override
 		public EventParam copy() { return this; }
-		
-		@Override 
+
+		@Override
 		public boolean getCopyBeforeFire() { return false; }
-		
+
 	}
-	
+
 }

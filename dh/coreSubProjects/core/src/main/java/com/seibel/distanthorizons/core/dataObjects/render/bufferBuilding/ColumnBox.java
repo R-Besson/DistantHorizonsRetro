@@ -44,14 +44,14 @@ public class ColumnBox
 	private static final byte SKYLIGHT_COVERED = -1;
 	/** block light falloff on vertical faces is done in steps this tall to keep the quad count down */
 	private static final int BLOCK_LIGHT_FALLOFF_STEP_HEIGHT = 3;
-	
-	
-	
+
+
+
 	//=========//
 	// builder //
 	//=========//
 	//region
-	
+
 	/**
 	 * @param shape only used when the blockWidth is 1, see {@link RenderDataPointUtil#SHAPE_NONE}
 	 * @param sideRowTileIds see {@link BlockTextureRegistry#getSideRowTileIds}
@@ -108,19 +108,19 @@ public class ColumnBox
 		//================//
 		// variable setup //
 		//================//
-		
+
 		short maxX = (short) (minX + blockWidth);
 		short maxY = (short) (minY + yHeight);
 		short maxZ = (short) (minZ + blockWidth);
 		byte skyLightBottom = RenderDataPointUtil.doesDataPointExist(bottomData) ? RenderDataPointUtil.getLightSky(bottomData) : LodUtil.MIN_MC_LIGHT;
-		
+
 		boolean transparencyEnabled = Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE;
-		
+
 		boolean isTransparent = ColorUtil.getAlpha(color) < 255 && transparencyEnabled;
 		boolean overVoid = !RenderDataPointUtil.doesDataPointExist(bottomData);
 		boolean isTopTransparent = RenderDataPointUtil.getAlpha(topData) < 255 && transparencyEnabled;
 		boolean isBottomTransparent = RenderDataPointUtil.getAlpha(bottomData) < 255 && transparencyEnabled;
-		
+
 		// defaulting to a value far below what we can normally render means we
 		// don't need to have an additional "is cave culling enabled" check
 		int caveCullingMaxY = Integer.MIN_VALUE;
@@ -128,16 +128,16 @@ public class ColumnBox
 		{
 			caveCullingMaxY = Config.Client.Advanced.Graphics.Culling.caveCullingHeight.get() - clientLevelWrapper.getMinHeight();
 		}
-		
-		
-		
+
+
+
 		// if there isn't any data below this LOD, make this LOD's color opaque to prevent seeing void through transparent blocks
 		// Note: this LOD should still be considered transparent for this method's checks, otherwise rendering bugs may occur
 		if (!RenderDataPointUtil.doesDataPointExist(bottomData))
 		{
 			color = ColorUtil.setAlpha(color, 255);
 		}
-		
+
 		// never let air render,
 		// air is only used for holding sky/block light data
 		if (irisBlockMaterialId == EDhApiBlockMaterial.AIR.index)
@@ -157,25 +157,25 @@ public class ColumnBox
 				skyLight, blockLight);
 			return;
 		}
-		
-		
-		
+
+
+
 		//==========================//
 		// add top and bottom faces //
 		//==========================//
-		
+
 		// top face
 		{
 			// a bottom half's top is below the block above it,
 			// and a post above only covers part of this top
 			boolean skipTop = RenderDataPointUtil.doesDataPointExist(topData)
-					&& (RenderDataPointUtil.getYMin(topData) == maxY)
-					&& !isTopTransparent
-					&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF
-					&& !isPost(getShape(topData, blockWidth))
-					&& getShape(topData, blockWidth) != RenderDataPointUtil.SHAPE_CROSS
-					&& !isSeeThroughLeaves(topData, seeThroughLeavesEnabled);
-			
+				&& (RenderDataPointUtil.getYMin(topData) == maxY)
+				&& !isTopTransparent
+				&& shape != RenderDataPointUtil.SHAPE_BOTTOM_HALF
+				&& !isPost(getShape(topData, blockWidth))
+				&& getShape(topData, blockWidth) != RenderDataPointUtil.SHAPE_CROSS
+				&& !isSeeThroughLeaves(topData, seeThroughLeavesEnabled);
+
 			if (!skipTop)
 			{
 				// MC doesn't smooth light emitting blocks, they're drawn evenly lit
@@ -194,22 +194,22 @@ public class ColumnBox
 					cornerLights);
 			}
 		}
-		
-		// bottom face 
+
+		// bottom face
 		{
 			// shaped blocks below don't reach or don't cover this bottom
 			boolean skipBottom = RenderDataPointUtil.doesDataPointExist(bottomData)
-					&& (RenderDataPointUtil.getYMax(bottomData) == minY)
-					&& !isBottomTransparent
-					&& getShape(bottomData, blockWidth) == RenderDataPointUtil.SHAPE_NONE
-					&& !isSeeThroughLeaves(bottomData, seeThroughLeavesEnabled);
+				&& (RenderDataPointUtil.getYMax(bottomData) == minY)
+				&& !isBottomTransparent
+				&& getShape(bottomData, blockWidth) == RenderDataPointUtil.SHAPE_NONE
+				&& !isSeeThroughLeaves(bottomData, seeThroughLeavesEnabled);
 			if (!skipBottom)
 			{
 				builder.addQuadDown(
-					minX, minY, minZ, 
-					blockWidth, 
-					ColorUtil.applyShade(color, clientLevelWrapper.getShade(EDhDirection.DOWN)), tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.DOWN), 
-					irisBlockMaterialId, 
+					minX, minY, minZ,
+					blockWidth,
+					ColorUtil.applyShade(color, clientLevelWrapper.getShade(EDhDirection.DOWN)), tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.DOWN),
+					irisBlockMaterialId,
 					skyLightBottom, blockLight);
 			}
 		}
@@ -234,12 +234,12 @@ public class ColumnBox
 			}
 		}
 
-		
-		
+
+
 		//========================================//
 		// add North, south, east, and west faces //
 		//========================================//
-		
+
 		if (isPost(shape))
 		{
 			// posts are thinner than the neighbors that would cover them, so their sides are always drawn,
@@ -257,7 +257,7 @@ public class ColumnBox
 			}
 			return;
 		}
-		
+
 		// NORTH face
 		{
 			ColumnRenderView adjCol = adjData[EDhDirection.NORTH.compassIndex];
@@ -269,9 +269,9 @@ public class ColumnBox
 				if (!isTransparent || overVoid)
 				{
 					builder.addQuadAdj(
-						EDhDirection.NORTH, 
-						minX, minY, minZ, 
-						blockWidth, yHeight, 
+						EDhDirection.NORTH,
+						minX, minY, minZ,
+						blockWidth, yHeight,
 						color, tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.NORTH),
 						irisBlockMaterialId, LodUtil.MAX_MC_LIGHT, blockLight);
 				}
@@ -281,13 +281,13 @@ public class ColumnBox
 				makeAdjVerticalQuad(
 					builder, phantomArrayCheckout, clientLevelWrapper,
 					adjCol, faceTileIdsByDirectionOrdinal,
-					adjSameDetailLevel, caveCullingMaxY, EDhDirection.NORTH, 
+					adjSameDetailLevel, caveCullingMaxY, EDhDirection.NORTH,
 					minX, minY, minZ, blockWidth, yHeight,
 					color, irisBlockMaterialId, blockLight,
 					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
-		
+
 		// SOUTH face
 		{
 			ColumnRenderView adjCol = adjData[EDhDirection.SOUTH.compassIndex];
@@ -297,9 +297,9 @@ public class ColumnBox
 				if (!isTransparent || overVoid)
 				{
 					builder.addQuadAdj(
-						EDhDirection.SOUTH, 
-						minX, minY, maxZ, 
-						blockWidth, yHeight, 
+						EDhDirection.SOUTH,
+						minX, minY, maxZ,
+						blockWidth, yHeight,
 						color, tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.SOUTH),
 						irisBlockMaterialId, LodUtil.MAX_MC_LIGHT, blockLight);
 				}
@@ -315,7 +315,7 @@ public class ColumnBox
 					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
-		
+
 		// WEST face
 		{
 			ColumnRenderView adjCol = adjData[EDhDirection.WEST.compassIndex];
@@ -325,9 +325,9 @@ public class ColumnBox
 				if (!isTransparent || overVoid)
 				{
 					builder.addQuadAdj(
-						EDhDirection.WEST, 
-						minX, minY, minZ, 
-						blockWidth, yHeight, 
+						EDhDirection.WEST,
+						minX, minY, minZ,
+						blockWidth, yHeight,
 						color, tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.WEST),
 						irisBlockMaterialId, LodUtil.MAX_MC_LIGHT, blockLight);
 				}
@@ -337,13 +337,13 @@ public class ColumnBox
 				makeAdjVerticalQuad(
 					builder, phantomArrayCheckout, clientLevelWrapper,
 					adjCol, faceTileIdsByDirectionOrdinal,
-					adjSameDetailLevel, caveCullingMaxY, EDhDirection.WEST, 
+					adjSameDetailLevel, caveCullingMaxY, EDhDirection.WEST,
 					minX, minY, minZ, blockWidth, yHeight,
 					color, irisBlockMaterialId, blockLight,
 					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
-		
+
 		// EAST face
 		{
 			ColumnRenderView adjCol = adjData[EDhDirection.EAST.compassIndex];
@@ -353,9 +353,9 @@ public class ColumnBox
 				if (!isTransparent || overVoid)
 				{
 					builder.addQuadAdj(
-						EDhDirection.EAST, 
-						maxX, minY, minZ, 
-						blockWidth, yHeight, 
+						EDhDirection.EAST,
+						maxX, minY, minZ,
+						blockWidth, yHeight,
 						color, tryGetTextureId(faceTileIdsByDirectionOrdinal, EDhDirection.EAST),
 						irisBlockMaterialId, LodUtil.MAX_MC_LIGHT, blockLight);
 				}
@@ -365,14 +365,14 @@ public class ColumnBox
 				makeAdjVerticalQuad(
 					builder, phantomArrayCheckout, clientLevelWrapper,
 					adjCol, faceTileIdsByDirectionOrdinal,
-					adjSameDetailLevel, caveCullingMaxY, EDhDirection.EAST, 
+					adjSameDetailLevel, caveCullingMaxY, EDhDirection.EAST,
 					maxX, minY, minZ, blockWidth, yHeight,
 					color, irisBlockMaterialId, blockLight,
 					transparencyEnabled, seeThroughLeavesEnabled);
 			}
 		}
 	}
-	
+
 	private static void makeAdjVerticalQuad(
 		LodQuadBuilder builder, PhantomArrayListCheckout phantomArrayCheckout, IClientLevelWrapper clientLevelWrapper,
 		@NotNull ColumnRenderView adjColumnView, short @Nullable [] faceTileIdsByDirectionOrdinal,
@@ -384,56 +384,56 @@ public class ColumnBox
 		// pooled arrays
 		LongArrayList segments = phantomArrayCheckout.getLongArray(0, 0);
 		LongArrayList newSegments = phantomArrayCheckout.getLongArray(1, 0);
-		
-		
-		
+
+
+
 		//==================//
 		// create face with //
 		// no adjacent data //
 		//==================//
-		
+
 		color = ColorUtil.applyShade(color, clientLevelWrapper.getShade(direction));
-		
+
 		if (adjColumnView.size == 0
 			|| RenderDataPointUtil.hasZeroHeight(adjColumnView.get(0)))
 		{
 			builder.addQuadAdj(
-				direction, 
-				x, yMin, z, 
-				horizontalBlockWidth, ySize, 
+				direction,
+				x, yMin, z,
+				horizontalBlockWidth, ySize,
 				color, tryGetTextureId(faceTileIdsByDirectionOrdinal, direction),
-				irisBlockMaterialId, 
+				irisBlockMaterialId,
 				LodUtil.MAX_MC_LIGHT, blockLight);
 			return;
 		}
-		
-		
-		
+
+
+
 		//=================================//
 		// determine face visibility/light //
 		//=================================//
-		
+
 		boolean inputTransparent = ColorUtil.getAlpha(color) < 255 && transparencyEnabled;
 		short yMax = (short) (yMin + ySize);
-		
-		
+
+
 		int adjCount = adjColumnView.size;
-		
+
 		// Start with the entire range at max light.
 		// Block light is replaced with the light of the air next to the face where the adjacent column has some,
 		// otherwise a light on top of this column (IE fire on a hill) would light its whole side
 		segments.add(YSegmentUtil.encode(yMin, yMax, LodUtil.MAX_MC_LIGHT, blockLight, false));
-		
+
 		// Process each adjacent Datapoint and split segments as needed
 		// (index -1 is a special case for the void Datapoint)
 		for (int adjIndex = -1; adjIndex < adjCount; adjIndex++)
 		{
-			long adjPoint = (adjIndex != -1) 
-				? adjColumnView.get(adjIndex) 
+			long adjPoint = (adjIndex != -1)
+				? adjColumnView.get(adjIndex)
 				: adjColumnView.getVoid();
 			short adjMinY = RenderDataPointUtil.getYMin(adjPoint);
 			short adjMaxY = RenderDataPointUtil.getYMax(adjPoint);
-			
+
 			// skip empty adjacent points
 			// or points below this one
 			if (!RenderDataPointUtil.doesDataPointExist(adjPoint)
@@ -442,8 +442,8 @@ public class ColumnBox
 			{
 				continue;
 			}
-			
-			
+
+
 			long adjAbovePoint = (adjIndex > 0) ? adjColumnView.get(adjIndex - 1) : RenderDataPointUtil.EMPTY_DATA;
 			// where the overhang above this point ends, or everything above the adjacent column's top
 			short adjAboveMinY = (adjIndex == 0) ? yMax : RenderDataPointUtil.getYMin(adjAbovePoint);
@@ -465,49 +465,49 @@ public class ColumnBox
 			long adjBelowPoint;
 			if (adjIndex != -1)
 			{
-				adjBelowPoint = (adjIndex + 1 < adjCount) 
-					? adjColumnView.get(adjIndex + 1) 
+				adjBelowPoint = (adjIndex + 1 < adjCount)
+					? adjColumnView.get(adjIndex + 1)
 					: adjColumnView.getVoid();
 			}
 			else
 			{
 				adjBelowPoint = adjColumnView.getVoid();
 			}
-			
+
 			// the Datapoint below this may be empty due to how Datapoint reducing
 			// is done. In that case use the void Datapoint.
 			if (adjBelowPoint == RenderDataPointUtil.EMPTY_DATA)
 			{
 				adjBelowPoint = adjColumnView.getVoid();
 			}
-			
+
 			boolean adjOverVoid = !RenderDataPointUtil.doesDataPointExist(adjBelowPoint);
-			boolean adjTransparent = 
+			boolean adjTransparent =
 				!adjOverVoid
-				&& RenderDataPointUtil.getAlpha(adjPoint) < 255
-				&& transparencyEnabled;
-			
+					&& RenderDataPointUtil.getAlpha(adjPoint) < 255
+					&& transparencyEnabled;
+
 			byte adjSkyLight = RenderDataPointUtil.getLightSky(adjPoint);
 			// a data point's light is the light of the air right above it
 			byte adjBlockLight = RenderDataPointUtil.getLightBlock(adjPoint);
 			byte lightToApply;
 			byte blockLightToApply;
-			
+
 			// shaped neighbors don't fill their block, so they don't hide this face
 			boolean adjShaped = (adjacentIsSameDetailLevel
-					&& getShape(adjPoint, horizontalBlockWidth) != RenderDataPointUtil.SHAPE_NONE)
+				&& getShape(adjPoint, horizontalBlockWidth) != RenderDataPointUtil.SHAPE_NONE)
 				// plants never cover anything, even next to a lower detail LOD
 				|| (RenderDataPointUtil.doesDataPointExist(adjPoint)
-					&& RenderDataPointUtil.getShape(adjPoint) == RenderDataPointUtil.SHAPE_CROSS)
+				&& RenderDataPointUtil.getShape(adjPoint) == RenderDataPointUtil.SHAPE_CROSS)
 				// faces behind see-through leaves can be seen through their gaps
 				|| (adjacentIsSameDetailLevel
-					&& isSeeThroughLeaves(adjPoint, seeThroughLeavesEnabled));
+				&& isSeeThroughLeaves(adjPoint, seeThroughLeavesEnabled));
 			// a transparent neighbor only hides the same material (IE the walls between water blocks),
 			// otherwise water behind glass (or glass in water) would be invisible
 			boolean adjOtherTransparentMaterial = adjTransparent
 				&& RenderDataPointUtil.getBlockMaterialId(adjPoint) != irisBlockMaterialId;
 			boolean adjCoversFace = !adjShaped && !adjOtherTransparentMaterial;
-			
+
 			if (adjShaped)
 			{
 				// lit by the air next to the neighbor
@@ -517,33 +517,33 @@ public class ColumnBox
 			else if (!adjTransparent)
 			{
 				// Adjacent is opaque
-				
+
 				// The following logic is done to provide a little bit of overdraw to
 				// prevent holes when low detail LODs are replaced by higher-detail ones
 				// when moving.
-				// If not done higher quality LODs can cause holes due to not 
+				// If not done higher quality LODs can cause holes due to not
 				// covering the whole face like the lower detail LODs they replaced,
 				// while still culling most LODs that are covered by other blocks.
-				
-				boolean onBorder = 
+
+				boolean onBorder =
 					(direction == EDhDirection.WEST && x == 0)
-					|| (direction == EDhDirection.NORTH && z == 0)
-					|| (direction == EDhDirection.EAST && x == ((horizontalBlockWidth) * (ColumnRenderSource.WIDTH)))
-					|| (direction == EDhDirection.SOUTH && z == ((horizontalBlockWidth) * (ColumnRenderSource.WIDTH)));
-				
+						|| (direction == EDhDirection.NORTH && z == 0)
+						|| (direction == EDhDirection.EAST && x == ((horizontalBlockWidth) * (ColumnRenderSource.WIDTH)))
+						|| (direction == EDhDirection.SOUTH && z == ((horizontalBlockWidth) * (ColumnRenderSource.WIDTH)));
+
 				boolean isLit =
 					RenderDataPointUtil.getLightSky(adjPoint) != LodUtil.MIN_MC_LIGHT
-					|| RenderDataPointUtil.getLightBlock(adjPoint) != LodUtil.MIN_MC_LIGHT;
-				
+						|| RenderDataPointUtil.getLightBlock(adjPoint) != LodUtil.MIN_MC_LIGHT;
+
 				// render the face if...
 				boolean useAdjLighting =
 					// we're on the border... (holes can only happen on LOD borders since faces inside an LOD will always be the same detail level)
 					onBorder
-					// ...this face has some sort of lighting... (0 light generally means the face is covered by other blocks)
-					&& isLit
-					// ...and is above the culling height
-					&& RenderDataPointUtil.getYMax(adjPoint) >= caveCullingMaxY;
-				
+						// ...this face has some sort of lighting... (0 light generally means the face is covered by other blocks)
+						&& isLit
+						// ...and is above the culling height
+						&& RenderDataPointUtil.getYMax(adjPoint) >= caveCullingMaxY;
+
 				lightToApply = useAdjLighting ? adjSkyLight : SKYLIGHT_COVERED;
 				blockLightToApply = useAdjLighting ? adjBlockLight : LodUtil.MIN_MC_LIGHT;
 			}
@@ -600,14 +600,14 @@ public class ColumnBox
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		//=======================//
 		// Create vertical faces //
 		// from segments         //
 		//=======================//
-		
+
 		boolean selfLit = irisBlockMaterialId == EDhApiBlockMaterial.LAVA.index
 			|| irisBlockMaterialId == EDhApiBlockMaterial.ILLUMINATED.index;
 		for (int i = 0; i < segments.size(); i++)
@@ -621,12 +621,12 @@ public class ColumnBox
 				// light emitting blocks (lava falls) light their own faces, the falloff is only for light from the neighbors
 				selfLit ? (byte) Math.max(blockLight, YSegmentUtil.getBlockLight(segment)) : YSegmentUtil.getBlockLight(segment),
 				YSegmentUtil.getSkyLight(segment), YSegmentUtil.isCovered(segment),
-				inputTransparent, 
+				inputTransparent,
 				YSegmentUtil.getEndY(segment), YSegmentUtil.getStartY(segment)
 			);
 		}
 	}
-	
+
 	/**
 	 * Apply the new light value over the given y range,
 	 * splitting segments as needed
@@ -635,9 +635,9 @@ public class ColumnBox
 	 * source: claude.ai
 	 */
 	private static void applyLightToRangeAndPopulateNewSgements(
-			LongArrayList segments, LongArrayList newSegments, 
-			short rangeStart, short rangeEnd,
-			byte newLight, byte newBlockLight, boolean coversRange)
+		LongArrayList segments, LongArrayList newSegments,
+		short rangeStart, short rangeEnd,
+		byte newLight, byte newBlockLight, boolean coversRange)
 	{
 		// clear the pooled array that the new segments will go into
 		newSegments.clear();
@@ -652,15 +652,15 @@ public class ColumnBox
 			boolean covered = YSegmentUtil.isCovered(seg);
 
 			// No overlap
-			if (endY <= rangeStart 
+			if (endY <= rangeStart
 				|| startY >= rangeEnd)
 			{
 				newSegments.add(seg);
 				continue;
 			}
-			
+
 			// Partial or complete overlap - need to split
-			
+
 			// Part before the range
 			if (startY < rangeStart)
 			{
@@ -668,8 +668,8 @@ public class ColumnBox
 			}
 
 			// Overlapping part - take minimum skylight, the block light is replaced
-			short overlapStart = (short)Math.max(startY, rangeStart);
-			short overlapEnd = (short)Math.min(endY, rangeEnd);
+			short overlapStart = (short) Math.max(startY, rangeStart);
+			short overlapEnd = (short) Math.min(endY, rangeEnd);
 			byte minLight = (byte) Math.min(newLight, skyLight);
 			newSegments.add(YSegmentUtil.encode(overlapStart, overlapEnd, minLight, newBlockLight, covered || coversRange));
 
@@ -680,23 +680,23 @@ public class ColumnBox
 			}
 		}
 	}
-	
+
 	private static void tryAddVerticalFaceWithSkyLightToBuilder(
 		LodQuadBuilder builder, EDhDirection direction,
 		short x, short z, short horizontalWidth,
-		int color, short faceTextureId, 
-		byte irisBlockMaterialId, 
+		int color, short faceTextureId,
+		byte irisBlockMaterialId,
 		byte blockLight, byte lastSkyLight, boolean covered,
-		boolean inputTransparent, 
+		boolean inputTransparent,
 		int quadTopY, int quadBottomY
-		)
+	)
 	{
 		// invalid positions will have a negative skylight
 		if (lastSkyLight < 0)
 		{
 			return;
 		}
-		
+
 		// Don't add transparent vertical faces
 		// unless the adjacent position is empty.
 		// Skylight can't be used for this, it's below max under overhangs and in dimensions without a sky.
@@ -706,31 +706,31 @@ public class ColumnBox
 		{
 			return;
 		}
-		
+
 		// don't add negative/empty height faces
 		short height = (short) (quadTopY - quadBottomY);
 		if (height <= 0)
 		{
 			return;
 		}
-		
+
 		builder.addQuadAdj(
-			direction, 
-			x, (short) quadBottomY, z, 
-			horizontalWidth, height, 
+			direction,
+			x, (short) quadBottomY, z,
+			horizontalWidth, height,
 			color, faceTextureId,
 			irisBlockMaterialId, lastSkyLight, blockLight);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	//region
-	
+
 	/**
 	 * Smooth lighting like MC's: each corner of a top face gets the average light of the air above
 	 * this column and the 2 columns next to that corner.
@@ -761,7 +761,7 @@ public class ColumnBox
 	}
 	/**
 	 * @return the light of the air at the given height in the column as (skyLight << 4 | blockLight),
-	 *          or the fallback if there isn't air there
+	 * or the fallback if there isn't air there
 	 */
 	private static int getAirLight(@Nullable ColumnRenderView column, short airY, int fallback)
 	{
@@ -810,7 +810,7 @@ public class ColumnBox
 			? RenderDataPointUtil.getShape(dataPoint)
 			: RenderDataPointUtil.SHAPE_NONE;
 	}
-	
+
 	/**
 	 * See-through leaves (like MC's fancy leaves) are only drawn by 1 block wide textured LODs,
 	 * the faces they touch can be seen through their gaps so they aren't culled.
@@ -829,27 +829,27 @@ public class ColumnBox
 		return shape == RenderDataPointUtil.SHAPE_THIN_POST
 			|| shape == RenderDataPointUtil.SHAPE_THICK_POST;
 	}
-	
+
 	private static short tryGetTextureId(short @Nullable [] faceTileIdsByDirectionOrdinal, EDhDirection direction)
 	{
 		if (faceTileIdsByDirectionOrdinal == null)
 		{
 			return BlockTextureRegistry.UNTEXTURED_ID;
 		}
-		
+
 		return faceTileIdsByDirectionOrdinal[direction.faceIndex];
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
-	/** 
+
+	/**
 	 * encodes height/light data into a long
 	 * to reduce object allocations.
 	 */
@@ -857,11 +857,11 @@ public class ColumnBox
 	{
 		private static final int HEIGHT_WIDTH = Short.SIZE;
 		private static final int SKY_LIGHT_WIDTH = Byte.SIZE;
-		
+
 		private static final int START_Y_MASK = (int) Math.pow(2, HEIGHT_WIDTH) - 1;
 		private static final int END_Y_MASK = (int) Math.pow(2, HEIGHT_WIDTH) - 1;
 		private static final int SKY_LIGHT_MASK = (int) Math.pow(2, SKY_LIGHT_WIDTH) - 1;
-		
+
 		private static final int START_Y_OFFSET = 0;
 		private static final int END_Y_OFFSET = START_Y_OFFSET + HEIGHT_WIDTH;
 		private static final int SKY_LIGHT_OFFSET = END_Y_OFFSET + HEIGHT_WIDTH;
@@ -887,11 +887,11 @@ public class ColumnBox
 		public static byte getSkyLight(long data) { return (byte) ((data >> SKY_LIGHT_OFFSET) & SKY_LIGHT_MASK); }
 		public static byte getBlockLight(long data) { return (byte) ((data >> BLOCK_LIGHT_OFFSET) & SKY_LIGHT_MASK); }
 		public static boolean isCovered(long data) { return ((data >> COVERED_OFFSET) & 1L) != 0; }
-		
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

@@ -4,4 +4,5 @@ package com.seibel.distanthorizons.core.file.fullDatafile;
 public interface IDataSourceUpdateListenerFunc<TDataSource>
 {
 	void OnDataSourceUpdated(TDataSource updatedFullDataSource);
+
 }

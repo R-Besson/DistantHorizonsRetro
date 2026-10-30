@@ -24,24 +24,24 @@ public class DhBlockPosMutable extends DhBlockPos
 	public void setX(int x) { this.x = x; }
 	public void setY(int y) { this.y = y; }
 	public void setZ(int z) { this.z = z; }
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
-	public DhBlockPosMutable(int x, int y, int z) { super(x,y,z); }
+
+	public DhBlockPosMutable(int x, int y, int z) { super(x, y, z); }
 	public DhBlockPosMutable() { super(0, 0, 0); }
 	public DhBlockPosMutable(DhBlockPos pos) { super(pos); }
 
-	
-	
+
+
 	//================//
 	// chunk relative //
 	//================//
-	
+
 	public DhBlockPosMutable createChunkRelativePos() { return new DhBlockPosMutable(this.mutateOrCreateChunkRelativePos(null)); }
-	
-	
+
+
 }

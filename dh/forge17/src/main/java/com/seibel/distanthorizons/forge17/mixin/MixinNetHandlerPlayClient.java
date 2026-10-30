@@ -21,13 +21,13 @@ public class MixinNetHandlerPlayClient
 
 
 
-    @Inject(method = "handleJoinGame", at = @At("RETURN"))
-    private void connect(S01PacketJoinGame packetIn, CallbackInfo ci)
-    { ClientApi.INSTANCE.onClientOnlyConnected(); }
+	@Inject(method = "handleJoinGame", at = @At("RETURN"))
+	private void connect(S01PacketJoinGame packetIn, CallbackInfo ci)
+	{ ClientApi.INSTANCE.onClientOnlyConnected(); }
 
-    @Inject(method = "cleanup", at = @At("RETURN"))
-    private void disconnect(CallbackInfo ci)
-    { ClientApi.INSTANCE.onClientOnlyDisconnected(); }
+	@Inject(method = "cleanup", at = @At("RETURN"))
+	private void disconnect(CallbackInfo ci)
+	{ ClientApi.INSTANCE.onClientOnlyDisconnected(); }
 
 	// blocks changed by the server (players breaking/placing, machines, etc.) update the LODs of client only DH
 	@Inject(method = "handleBlockChange", at = @At("RETURN"))

@@ -93,14 +93,21 @@ import java.nio.FloatBuffer;
 
 		switch (dhDirection)
 		{
-			case DOWN: return ForgeDirection.DOWN;
-			case UP: return ForgeDirection.UP;
-			case NORTH: return ForgeDirection.NORTH;
-			case SOUTH: return ForgeDirection.SOUTH;
-			case WEST: return ForgeDirection.WEST;
-			case EAST: return ForgeDirection.EAST;
+			case DOWN:
+				return ForgeDirection.DOWN;
+			case UP:
+				return ForgeDirection.UP;
+			case NORTH:
+				return ForgeDirection.NORTH;
+			case SOUTH:
+				return ForgeDirection.SOUTH;
+			case WEST:
+				return ForgeDirection.WEST;
+			case EAST:
+				return ForgeDirection.EAST;
 
-			default: throw new IllegalArgumentException("No Minecraft direction defined for [" + dhDirection + "].");
+			default:
+				throw new IllegalArgumentException("No Minecraft direction defined for [" + dhDirection + "].");
 		}
 	}
 

@@ -29,8 +29,8 @@ public interface IVertexBufferWrapper extends IBindable, AutoCloseable
 	void uploadVertexBuffer(ByteBuffer buffer, int vertexCount);
 	/** Does nothing if {@link AbstractDhRenderApiDefinition#useSingleIbo()} returns true */
 	void uploadIndexBuffer(ByteBuffer buffer, int vertexCount);
-	
+
 	@Override
 	void close();
-	
+
 }

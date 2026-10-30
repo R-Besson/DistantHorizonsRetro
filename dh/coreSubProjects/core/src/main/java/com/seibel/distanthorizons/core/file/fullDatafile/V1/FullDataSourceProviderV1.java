@@ -24,25 +24,25 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
-		implements AutoCloseable
+	implements AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("V1DTO");
-	
+
 	protected final ReentrantLock closeLock = new ReentrantLock();
-	
+
 	protected final TDhLevel level;
 	protected final File saveDir;
-	
+
 	public final FullDataSourceV1Repo repo;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public FullDataSourceProviderV1(TDhLevel level, File saveDir) throws SQLException, IOException
 	{
 		this.level = level;
@@ -51,16 +51,16 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 		{
 			LOGGER.warn("Unable to create full data folder, file saving may fail.");
 		}
-		
+
 		this.repo = new FullDataSourceV1Repo(AbstractDhRepo.DEFAULT_DATABASE_TYPE, new File(this.saveDir.getPath() + File.separator + ISaveStructure.DATABASE_NAME));
 	}
-	
-	
-	
+
+
+
 	//==================//
 	// abstract methods //
 	//==================//
-	
+
 	protected FullDataSourceV1 createDataSourceFromDto(FullDataSourceV1DTO dto) throws InterruptedException, IOException, DataCorruptedException
 	{
 		FullDataSourceV1 dataSource = FullDataSourceV1.createEmpty(dto.pos);
@@ -72,13 +72,13 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 		}
 		return dataSource;
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// data reading //
 	//==============//
-	
+
 	/**
 	 * Should only be used in internal file handler methods where we are already running on a file handler thread.
 	 * Can return null.
@@ -95,34 +95,36 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 				dataSource = this.createDataSourceFromDto(dto);
 			}
 		}
-		catch (InterruptedException ignore) { }
+		catch (InterruptedException ignore)
+		{
+		}
 		catch (DataCorruptedException e)
 		{
-			// stack trace not included since a lot of corrupt data would cause the log to get quite messy, 
+			// stack trace not included since a lot of corrupt data would cause the log to get quite messy,
 			// and it should be fairly easy to see what the problem was from the message
-			LOGGER.warn("Corrupted data found at pos ["+ DhSectionPos.toString(pos)+"]. Data at position will be deleted so it can be re-generated and to prevent future issues. Error: "+e.getMessage());
+			LOGGER.warn("Corrupted data found at pos [" + DhSectionPos.toString(pos) + "]. Data at position will be deleted so it can be re-generated and to prevent future issues. Error: " + e.getMessage());
 			this.repo.deleteWithKey(pos);
 		}
 		catch (IOException e)
 		{
-			LOGGER.warn("File read Error for pos ["+ DhSectionPos.toString(pos)+"], error: "+e.getMessage(), e);
+			LOGGER.warn("File read Error for pos [" + DhSectionPos.toString(pos) + "], error: " + e.getMessage(), e);
 		}
-		
+
 		return dataSource;
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// migration //
 	//===========//
-	
+
 	public long getDataSourceMigrationCount() { return this.repo.getMigrationCount(); }
-	
+
 	public ArrayList<FullDataSourceV1> getDataSourcesToMigrate(int limit)
 	{
 		ArrayList<FullDataSourceV1> dataSourceList = new ArrayList<>();
-		
+
 		LongArrayList migrationPosList = this.repo.getPositionsToMigrate(limit);
 		for (int i = 0; i < migrationPosList.size(); i++)
 		{
@@ -133,25 +135,25 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 				dataSourceList.add(dataSource);
 			}
 		}
-		
+
 		return dataSourceList;
 	}
-	
+
 	public void markMigrationFailed(long pos) { this.repo.markMigrationFailed(pos); }
-	
-	
-	
+
+
+
 	//=========//
 	// cleanup //
 	//=========//
-	
+
 	@Override
 	public void close()
 	{
 		try
 		{
 			this.closeLock.lock();
-			
+
 			LOGGER.info("Closing [" + this.getClass().getSimpleName() + "] for level: [" + this.level + "].");
 			this.repo.close();
 		}
@@ -160,5 +162,5 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 			this.closeLock.unlock();
 		}
 	}
-	
+
 }

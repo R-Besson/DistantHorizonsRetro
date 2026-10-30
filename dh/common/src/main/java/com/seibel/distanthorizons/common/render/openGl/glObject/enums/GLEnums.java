@@ -19,8 +19,79 @@
 
 package com.seibel.distanthorizons.common.render.openGl.glObject.enums;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL11.GL_ALWAYS;
+import static org.lwjgl.opengl.GL11.GL_BACK;
+import static org.lwjgl.opengl.GL11.GL_BYTE;
+import static org.lwjgl.opengl.GL11.GL_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL11.GL_DECR;
+import static org.lwjgl.opengl.GL11.GL_DOUBLE;
+import static org.lwjgl.opengl.GL11.GL_DST_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_EQUAL;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_FRONT;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_GEQUAL;
+import static org.lwjgl.opengl.GL11.GL_GREATER;
+import static org.lwjgl.opengl.GL11.GL_INCR;
+import static org.lwjgl.opengl.GL11.GL_INT;
+import static org.lwjgl.opengl.GL11.GL_INVERT;
+import static org.lwjgl.opengl.GL11.GL_KEEP;
+import static org.lwjgl.opengl.GL11.GL_LEQUAL;
+import static org.lwjgl.opengl.GL11.GL_LESS;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.GL_NEVER;
+import static org.lwjgl.opengl.GL11.GL_NOTEQUAL;
+import static org.lwjgl.opengl.GL11.GL_ONE;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_CONSTANT_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_DST_COLOR;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_POINT;
+import static org.lwjgl.opengl.GL11.GL_REPLACE;
+import static org.lwjgl.opengl.GL11.GL_SHORT;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_COLOR;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_SHORT;
+import static org.lwjgl.opengl.GL11.GL_ZERO;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE10;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE11;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE12;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE13;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE14;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE15;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE16;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE17;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE18;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE19;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE20;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE21;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE22;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE23;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE24;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE25;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE26;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE27;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE28;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE29;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE3;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE30;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE31;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE4;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE5;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE6;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE7;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE8;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE9;
 import static org.lwjgl.opengl.GL14.GL_DECR_WRAP;
 import static org.lwjgl.opengl.GL14.GL_INCR_WRAP;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
@@ -30,7 +101,7 @@ import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 // Turns GL int enums back to readable strings
 public class GLEnums
 {
-	
+
 	public static String getString(int glEnum)
 	{
 		// blend stuff
@@ -66,7 +137,7 @@ public class GLEnums
 				return "GL_ONE_MINUS_CONSTANT_ALPHA";
 			default:
 		}
-		
+
 		// shader stuff
 		switch (glEnum)
 		{
@@ -78,7 +149,7 @@ public class GLEnums
 				return "GL_FRAGMENT_SHADER";
 			default:
 		}
-		
+
 		// stencil stuff
 		switch (glEnum)
 		{
@@ -100,7 +171,7 @@ public class GLEnums
 				return "GL_DECR_WRAP";
 			default:
 		}
-		
+
 		// depth stuff
 		switch (glEnum)
 		{
@@ -122,7 +193,7 @@ public class GLEnums
 				return "GL_ALWAYS";
 			default:
 		}
-		
+
 		// Texture binding points
 		switch (glEnum)
 		{
@@ -192,7 +263,7 @@ public class GLEnums
 				return "GL_TEXTURE31";
 			default:
 		}
-		
+
 		// Polygon modes
 		switch (glEnum)
 		{
@@ -204,7 +275,7 @@ public class GLEnums
 				return "GL_FILL";
 			default:
 		}
-		
+
 		// Culling modes
 		switch (glEnum)
 		{
@@ -216,7 +287,7 @@ public class GLEnums
 				return "GL_FRONT_AND_BACK";
 			default:
 		}
-		
+
 		// Types
 		switch (glEnum)
 		{
@@ -238,10 +309,10 @@ public class GLEnums
 				return "GL_DOUBLE";
 			default:
 		}
-		
+
 		return "GL_UNKNOWN(" + glEnum + ")";
 	}
-	
+
 	public static int getTypeSize(int glTypeEnum)
 	{
 		switch (glTypeEnum)
@@ -262,5 +333,5 @@ public class GLEnums
 				throw new IllegalArgumentException("Unknown type enum: " + getString(glTypeEnum));
 		}
 	}
-	
+
 }

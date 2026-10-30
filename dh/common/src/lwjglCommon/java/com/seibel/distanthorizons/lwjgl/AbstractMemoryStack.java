@@ -14,18 +14,18 @@ import java.nio.FloatBuffer;
 public abstract class AbstractMemoryStack implements AutoCloseable
 {
 
-    public static AbstractMemoryStack stackPush() { return LWJGLServiceProvider.LWJGL.stackPush();  }
+	public static AbstractMemoryStack stackPush() { return LWJGLServiceProvider.LWJGL.stackPush(); }
 
 
 
-    @Override
-    public abstract void close();
+	@Override
+	public abstract void close();
 
 
 
-    // ===================== MALLOC OPERATIONS =====================
+	// ===================== MALLOC OPERATIONS =====================
 	//region
-	
+
 	public abstract FloatBuffer mallocFloat(int count);
 
 	//endregion

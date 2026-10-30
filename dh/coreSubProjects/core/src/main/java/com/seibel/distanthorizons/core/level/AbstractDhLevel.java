@@ -55,32 +55,32 @@ import java.util.concurrent.locks.ReentrantLock;
 public abstract class AbstractDhLevel implements IDhLevel
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	/** if this is null then the other handler is probably null too, but just in case */
 	@Nullable
 	public ChunkHashRepo chunkHashRepo;
 	/** if this is null then the other handler is probably null too, but just in case */
 	@Nullable
 	public BeaconBeamRepo beaconBeamRepo;
-	
+
 	protected final KeyedLockContainer<Long> beaconUpdateLockContainer = new KeyedLockContainer<>();
 	protected final DelayedDataSourceSaveCache delayedFullDataSourceSaveCache = new DelayedDataSourceSaveCache(this::onDataSourceSaveAsync, 1_000);
 	protected final DelayedBeaconSaveCache delayedBeaconSaveCache = new DelayedBeaconSaveCache(this::updateBeaconBeamsBetweenBlockPos, 1_000);
 	/** contains the {@link DhChunkPos} for each {@link DhSectionPos} that are queued to save */
 	protected final ConcurrentHashMap<Long, HashSet<DhChunkPos>> updatedChunkPosSetBySectionPos = new ConcurrentHashMap<>();
 	protected final ConcurrentHashMap<DhChunkPos, Integer> updatedChunkHashesByChunkPos = new ConcurrentHashMap<>();
-	
-	
-	
-	
+
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	protected AbstractDhLevel() { }
-	
-	/** 
+
+	/**
 	 * Creating the repos requires access to the level file, which isn't
 	 * available at constructor time.
 	 */
@@ -94,11 +94,11 @@ public abstract class AbstractDhLevel implements IDhLevel
 		}
 		catch (SQLException | IOException e)
 		{
-			LOGGER.fatal("Unable to create ["+ChunkHashRepo.class.getSimpleName()+"], error: ["+e.getMessage()+"].", e);
+			LOGGER.fatal("Unable to create [" + ChunkHashRepo.class.getSimpleName() + "], error: [" + e.getMessage() + "].", e);
 		}
 		this.chunkHashRepo = newChunkHashRepo;
-		
-		
+
+
 		// beacon beam
 		BeaconBeamRepo newBeaconBeamRepo = null;
 		try
@@ -107,11 +107,11 @@ public abstract class AbstractDhLevel implements IDhLevel
 		}
 		catch (SQLException | IOException e)
 		{
-			LOGGER.error("Unable to create ["+BeaconBeamRepo.class.getSimpleName()+"], error: ["+e.getMessage()+"].", e);
+			LOGGER.error("Unable to create [" + BeaconBeamRepo.class.getSimpleName() + "], error: [" + e.getMessage() + "].", e);
 		}
 		this.beaconBeamRepo = newBeaconBeamRepo;
 	}
-	
+
 	/** handles any setup that needs the repos to be created */
 	protected void runRepoReliantSetup()
 	{
@@ -127,21 +127,21 @@ public abstract class AbstractDhLevel implements IDhLevel
 				if (enabledCloudDimensions.contains(dimName))
 				{
 					// adds the clouds to the generic renderer, which keeps the handler alive through their render callbacks
-					new CloudRenderHandler((IDhClientLevel)this, genericRenderer);
+					new CloudRenderHandler((IDhClientLevel) this, genericRenderer);
 				}
 			}
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// default methods //
 	//=================//
 	//region
-	
+
 	@Override
 	public void updateChunkAsync(IChunkWrapper chunkWrapper, int chunkHash)
 	{
@@ -152,8 +152,8 @@ public abstract class AbstractDhLevel implements IDhLevel
 				// This can happen if, among other reasons, a chunk save is superseded by a later event
 				return;
 			}
-			
-			
+
+
 			this.updatedChunkPosSetBySectionPos.compute(dataSource.getPos(), (dataSourcePos, chunkPosSet) ->
 			{
 				if (chunkPosSet == null)
@@ -164,17 +164,17 @@ public abstract class AbstractDhLevel implements IDhLevel
 				return chunkPosSet;
 			});
 			this.updatedChunkHashesByChunkPos.put(chunkWrapper.getChunkPos(), chunkHash);
-			
+
 			// merging writes together in memory significantly improves throughput, since most
 			// chunk modifications will be right next to each other, IE effecting the same LODs
 			this.delayedFullDataSourceSaveCache.writeToMemoryAndQueueSave(dataSource);
 		}
 	}
-	
+
 	private CompletableFuture<Void> onDataSourceSaveAsync(FullDataSourceV2 fullDataSource)
 	{
 		return this.updateDataSourcesAsync(fullDataSource)
-			.thenRun(() -> 
+			.thenRun(() ->
 			{
 				// If we are processing a lot of chunks at once
 				// (like with C2ME OpenCL)
@@ -186,7 +186,7 @@ public abstract class AbstractDhLevel implements IDhLevel
 				{
 					return;
 				}
-				
+
 				try
 				{
 					HashSet<DhChunkPos> updatedChunkPosSet = this.updatedChunkPosSetBySectionPos.remove(fullDataSource.getPos());
@@ -196,17 +196,17 @@ public abstract class AbstractDhLevel implements IDhLevel
 						{
 							return;
 						}
-						
+
 						Connection dbConnection = this.chunkHashRepo.getConnection();
 						if (dbConnection == null)
 						{
 							return;
 						}
-						
+
 						// insert all chunk hashes in a single transaction to speed things up
 						boolean previousAutoCommit = dbConnection.getAutoCommit();
 						dbConnection.setAutoCommit(false);
-						
+
 						try
 						{
 							for (DhChunkPos chunkPos : updatedChunkPosSet)
@@ -218,12 +218,12 @@ public abstract class AbstractDhLevel implements IDhLevel
 								{
 									this.chunkHashRepo.save(new ChunkHashDTO(chunkPos, chunkHash));
 								}
-								
+
 								ApiEventInjector.INSTANCE.fireAllEvents(
 									DhApiChunkModifiedEvent.class,
 									new DhApiChunkModifiedEvent.EventParam(this.getLevelWrapper(), chunkPos.getX(), chunkPos.getZ()));
 							}
-							
+
 							dbConnection.commit();
 						}
 						finally
@@ -235,20 +235,20 @@ public abstract class AbstractDhLevel implements IDhLevel
 				}
 				catch (Exception e)
 				{
-					LOGGER.error("Unexpected issue after onDataSourceSaveAsync, error: ["+e.getMessage()+"].", e);
+					LOGGER.error("Unexpected issue after onDataSourceSaveAsync, error: [" + e.getMessage() + "].", e);
 				}
 			});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=======//
 	// repos //
 	//=======//
 	//region
-	
+
 	@Override
 	public int getChunkHash(DhChunkPos pos)
 	{
@@ -256,15 +256,15 @@ public abstract class AbstractDhLevel implements IDhLevel
 		{
 			return 0;
 		}
-		
+
 		ChunkHashDTO dto = this.chunkHashRepo.getByKey(pos);
 		return (dto != null) ? dto.chunkHash : 0;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// beacon handling //
 	//=================//
@@ -276,48 +276,48 @@ public abstract class AbstractDhLevel implements IDhLevel
 		int minBlockZ = DhSectionPos.getMinCornerBlockZ(sectionPos);
 		int maxBlockX = minBlockX + DhSectionPos.getBlockWidth(sectionPos);
 		int maxBlockZ = minBlockZ + DhSectionPos.getBlockWidth(sectionPos);
-		
+
 		// no delayed cache needed since each hit will be at a different position
 		// and this is generally called when LODs are received from the
 		// server, so repeat hits to the same position are unlikely
 		this.updateBeaconBeamsBetweenBlockPos(
-				sectionPos,
-				minBlockX, maxBlockX,
-				minBlockZ, maxBlockZ,
-				activeBeamList
+			sectionPos,
+			minBlockX, maxBlockX,
+			minBlockZ, maxBlockZ,
+			activeBeamList
 		);
 	}
-	
+
 	@Override
 	public void updateBeaconBeamsForChunkPos(DhChunkPos chunkPos, List<BeaconBeamDTO> activeBeamList)
-	{ 
+	{
 		// a delayed cache is used to prevent lock contention
 		// when flying through new chunks (or updating modified chunks)
 		// that are right next to each other (requiring up to 16 hits to the same LOD position
-		this.delayedBeaconSaveCache.queueBeaconBeamUpdatesForChunkPos(chunkPos, activeBeamList); 
+		this.delayedBeaconSaveCache.queueBeaconBeamUpdatesForChunkPos(chunkPos, activeBeamList);
 	}
-	
+
 	private void updateBeaconBeamsBetweenBlockPos(
-			long sectionPosForLock,
-			int minBlockX, int maxBlockX,
-			int minBlockZ, int maxBlockZ,
-			List<BeaconBeamDTO> activeBeamList
-		)
+		long sectionPosForLock,
+		int minBlockX, int maxBlockX,
+		int minBlockZ, int maxBlockZ,
+		List<BeaconBeamDTO> activeBeamList
+	)
 	{
 		if (this.beaconBeamRepo == null)
 		{
 			return;
 		}
-		
+
 
 		// locked to prevent two threads from updating the same position at the same time
 		ReentrantLock lock = this.beaconUpdateLockContainer.getLockForPos(sectionPosForLock);
 		try
 		{
 			lock.lock();
-			
+
 			HashSet<DhBlockPos> allPosSet = new HashSet<>();
-			
+
 			// sort new beams
 			HashMap<DhBlockPos, BeaconBeamDTO> activeBeamByPos = new HashMap<>(activeBeamList.size());
 			for (BeaconBeamDTO beam : activeBeamList)
@@ -325,21 +325,21 @@ public abstract class AbstractDhLevel implements IDhLevel
 				activeBeamByPos.put(beam.blockPos, beam);
 				allPosSet.add(beam.blockPos);
 			}
-			
+
 			// get existing beams
 			List<BeaconBeamDTO> existingBeamList = this.beaconBeamRepo.getAllBeamsInBlockPosRange(
-					minBlockX, maxBlockX,
-					minBlockZ, maxBlockZ);
+				minBlockX, maxBlockX,
+				minBlockZ, maxBlockZ);
 			HashMap<DhBlockPos, BeaconBeamDTO> existingBeamByPos = new HashMap<>(existingBeamList.size());
 			for (BeaconBeamDTO beam : existingBeamList)
 			{
 				existingBeamByPos.put(beam.blockPos, beam);
 				allPosSet.add(beam.blockPos);
 			}
-			
-			
-			
-			
+
+
+
+
 			for (DhBlockPos beaconPos : allPosSet)
 			{
 				if (minBlockX > beaconPos.getX() || beaconPos.getX() > maxBlockX
@@ -348,8 +348,8 @@ public abstract class AbstractDhLevel implements IDhLevel
 					// don't modify beacons outside the updated range
 					continue;
 				}
-				
-				
+
+
 				BeaconBeamDTO existingBeam = existingBeamByPos.get(beaconPos);
 				BeaconBeamDTO activeBeam = activeBeamByPos.get(beaconPos);
 				if (activeBeam != null)
@@ -377,22 +377,22 @@ public abstract class AbstractDhLevel implements IDhLevel
 			lock.unlock();
 		}
 	}
-	
+
 	@Override
 	@Nullable
 	public BeaconBeamRepo getBeaconBeamRepo() { return this.beaconBeamRepo; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
-	public void close() 
-	{ 
+	public void close()
+	{
 		if (this.chunkHashRepo != null)
 		{
 			this.chunkHashRepo.close();
@@ -401,12 +401,12 @@ public abstract class AbstractDhLevel implements IDhLevel
 		{
 			this.beaconBeamRepo.close();
 		}
-		
-		
-		
+
+
+
 		this.delayedFullDataSourceSaveCache.close();
 	}
-	
-	
-	
+
+
+
 }

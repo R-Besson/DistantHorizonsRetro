@@ -29,19 +29,19 @@ import com.seibel.distanthorizons.api.enums.config.DisallowSelectingViaConfigGui
  * MEDIUM, <br>
  * HIGH, <br>
  * EXTREME, <br>
- * 
- * @since API 2.0.0
+ *
  * @version 2024-4-6
+ * @since API 2.0.0
  */
 public enum EDhApiQualityPreset
 {
 	@DisallowSelectingViaConfigGui
 	CUSTOM,
-	
+
 	MINIMUM,
 	LOW,
 	MEDIUM,
 	HIGH,
 	EXTREME;
-	
+
 }

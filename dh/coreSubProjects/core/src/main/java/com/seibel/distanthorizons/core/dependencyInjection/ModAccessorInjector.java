@@ -39,27 +39,27 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 public class ModAccessorInjector extends DependencyInjector<IModAccessor>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public static final ModAccessorInjector INSTANCE = new ModAccessorInjector(IModAccessor.class);
-	
-	
+
+
 	public ModAccessorInjector(Class<IModAccessor> newBindableInterface)
 	{
 		super(newBindableInterface, false);
 	}
-	
-	
+
+
 	/**
 	 * Go to {@link DependencyInjector#bind(Class, IBindable)} DependencyHandler.bind()}
 	 * for this method's Javadocs.
 	 */
 	@Override
 	public void bind(Class<? extends IModAccessor> interfaceClass, IModAccessor modAccessor)
-			throws IllegalStateException, IllegalArgumentException
+		throws IllegalStateException, IllegalArgumentException
 	{
 		super.bind(interfaceClass, modAccessor);
 		LOGGER.info("Registered mod compatibility accessor for: [" + modAccessor.getModName() + "].");
 	}
-	
-	
+
+
 }

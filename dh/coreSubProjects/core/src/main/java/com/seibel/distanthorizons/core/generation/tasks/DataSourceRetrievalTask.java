@@ -31,30 +31,30 @@ import java.util.concurrent.CompletableFuture;
 public final class DataSourceRetrievalTask
 {
 	public final long pos;
-	/** 
+	/**
 	 * Usually the same as {@link DataSourceRetrievalTask#pos}, but
 	 * can differ if the task needs something different.
 	 */
 	public final byte requestDetailLevel;
 	public final int widthInChunks;
-	
+
 	public final CompletableFuture<DataSourceRetrievalResult> future = new CompletableFuture<>();
-	
-	
-	
+
+
+
 	//=============//
- 	// constructor //
+	// constructor //
 	//=============//
-	
+
 	public DataSourceRetrievalTask(long pos, byte dataDetail)
 	{
 		this.pos = pos;
 		this.requestDetailLevel = dataDetail;
-		
+
 		int widthInBlocks = BitShiftUtil.powerOfTwo(DhSectionPos.getDetailLevel(this.pos));
-		this.widthInChunks = widthInBlocks / LodUtil.CHUNK_WIDTH; 
+		this.widthInChunks = widthInBlocks / LodUtil.CHUNK_WIDTH;
 	}
-	
-	
-	
+
+
+
 }

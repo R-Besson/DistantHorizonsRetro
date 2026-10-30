@@ -27,8 +27,8 @@ import com.seibel.distanthorizons.coreapi.interfaces.config.IConverter;
  */
 public class ApiGeneratorModeToBoolConverter implements IConverter<EDhApiGeneratorPlan, Boolean>
 {
-	
-	@Override 
+
+	@Override
 	public EDhApiGeneratorPlan convertToCoreType(Boolean genEnabled)
 	{
 		if (genEnabled)
@@ -37,14 +37,14 @@ public class ApiGeneratorModeToBoolConverter implements IConverter<EDhApiGenerat
 		}
 		else
 		{
-			return EDhApiGeneratorPlan.DISABLED;	
+			return EDhApiGeneratorPlan.DISABLED;
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public Boolean convertToApiType(EDhApiGeneratorPlan genMode)
 	{ return genMode.generationEnabled; }
-	
-	
-	
+
+
+
 }

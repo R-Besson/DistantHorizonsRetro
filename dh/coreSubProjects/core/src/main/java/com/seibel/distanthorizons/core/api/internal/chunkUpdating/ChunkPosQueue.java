@@ -12,32 +12,32 @@ public class ChunkPosQueue
 	private final PriorityBlockingQueue<DhChunkPos> closestQueue;
 	private final PriorityBlockingQueue<DhChunkPos> furthestQueue;
 	private final ConcurrentHashMap<DhChunkPos, ChunkUpdateData> updateDataByChunkPos;
-	
+
 	private DhChunkPos center;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ChunkPosQueue()
 	{
 		this.closestQueue = new PriorityBlockingQueue<>(500, Comparator.comparingDouble(pos -> pos.squaredDistance(this.center)));
-		this.furthestQueue = new PriorityBlockingQueue<>(500, Comparator.comparingDouble(pos -> ((DhChunkPos)pos).squaredDistance(this.center)).reversed());
+		this.furthestQueue = new PriorityBlockingQueue<>(500, Comparator.comparingDouble(pos -> ((DhChunkPos) pos).squaredDistance(this.center)).reversed());
 		this.updateDataByChunkPos = new ConcurrentHashMap<>();
-		// defaulting to 0,0 is fine since it'll be updated once we start adding items 
+		// defaulting to 0,0 is fine since it'll be updated once we start adding items
 		this.center = new DhChunkPos(0, 0);
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// list methods //
 	//==============//
-	
+
 	public boolean contains(DhChunkPos pos) { return this.updateDataByChunkPos.containsKey(pos); }
-	
+
 	public void addItem(DhChunkPos pos, ChunkUpdateData updateData)
 	{
 		if (this.updateDataByChunkPos.containsKey(pos))
@@ -49,33 +49,33 @@ public class ChunkPosQueue
 		this.closestQueue.add(pos);
 		this.furthestQueue.add(pos);
 	}
-	
+
 	public int getQueuedCount() { return this.updateDataByChunkPos.size(); }
-	
+
 	public boolean isEmpty() { return this.updateDataByChunkPos.isEmpty(); }
-	
-	
-	
+
+
+
 	//==================//
 	// position methods //
 	//==================//
-	
+
 	public void setCenter(DhChunkPos newCenter)
 	{
-		// if the rebuild time takes too long 
+		// if the rebuild time takes too long
 		// (in James' testing a queue of 500 items only took around 0.1 milliseconds)
 		// this equation could be changed to only update after moving 2 or 4 chunks from the center
 		if (newCenter.equals(this.center))
 		{
 			return;
 		}
-		
+
 		this.center = newCenter;
-		
+
 		// rebuild the priority queues to match the new center
 		this.rebuildQueues();
 	}
-	
+
 	/** also drops any stale entries left behind by {@link #popClosest()} and {@link #popFurthest()} */
 	private void rebuildQueues()
 	{
@@ -87,9 +87,9 @@ public class ChunkPosQueue
 			this.furthestQueue.add(pos);
 		}
 	}
-	
-	/** 
-	 * Rebuilds the queues once they're mostly stale entries 
+
+	/**
+	 * Rebuilds the queues once they're mostly stale entries
 	 * so they don't grow forever when only one end is popped.
 	 */
 	private void compactIfTooStale()
@@ -100,14 +100,14 @@ public class ChunkPosQueue
 			this.rebuildQueues();
 		}
 	}
-	
+
 	public ChunkUpdateData popClosest()
 	{
 		if (this.closestQueue.isEmpty())
 		{
 			return null;
 		}
-		
+
 		// the furthest queue isn't updated here since removing from the middle of a
 		// PriorityBlockingQueue is O(n); stale entries are skipped when polled instead
 		DhChunkPos closest;
@@ -122,7 +122,7 @@ public class ChunkPosQueue
 			updateData = this.updateDataByChunkPos.remove(closest);
 		}
 		while (updateData == null);
-		
+
 		this.compactIfTooStale();
 		return updateData;
 	}
@@ -133,7 +133,7 @@ public class ChunkPosQueue
 		{
 			return null;
 		}
-		
+
 		// see popClosest() for why stale entries are skipped instead of removed
 		DhChunkPos furthest;
 		ChunkUpdateData updateData;
@@ -147,9 +147,10 @@ public class ChunkPosQueue
 			updateData = this.updateDataByChunkPos.remove(furthest);
 		}
 		while (updateData == null);
-		
+
 		this.compactIfTooStale();
 		return updateData;
 	}
+
 }
-		
+

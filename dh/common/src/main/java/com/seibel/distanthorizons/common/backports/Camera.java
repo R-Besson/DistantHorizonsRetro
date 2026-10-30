@@ -15,8 +15,8 @@ import org.joml.Vector4f;
 public class Camera
 {
 	public static final Camera INSTANCE = new Camera();
-	
-    private final Vector3d pos = new Vector3d();
+
+	private final Vector3d pos = new Vector3d();
 
 	/**
 	 * The camera position is requested many times per frame (IE once per cloud),
@@ -39,7 +39,7 @@ public class Camera
 		}
 		output.set(this.pos.x, this.pos.y, this.pos.z);
 	}
-	
+
 	private void update(EntityLivingBase entity, float partialTicks)
 	{
 		DhMat4f modelViewMatrix = ClientApi.RENDER_STATE.mcModelViewMatrix;
@@ -59,4 +59,5 @@ public class Camera
 		final double camZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks + offset.z;
 		this.pos.set(camX, camY, camZ);
 	}
+
 }

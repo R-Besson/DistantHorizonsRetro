@@ -30,7 +30,13 @@ import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockFlower;
+import net.minecraft.block.BlockGrass;
+import net.minecraft.block.BlockLeavesBase;
+import net.minecraft.block.BlockPane;
+import net.minecraft.block.BlockRotatedPillar;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
@@ -74,11 +80,11 @@ public class ClientBlockStateColorCache
 	private static final ForgeDirection[] FACE_SAMPLE_ORDER = {
 		ForgeDirection.UP,
 		ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST,
-		ForgeDirection.DOWN };
+		ForgeDirection.DOWN};
 	/** logs and other pillars are mostly seen from the side, their top is the end grain */
 	private static final ForgeDirection[] PILLAR_FACE_SAMPLE_ORDER = {
 		ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST,
-		ForgeDirection.UP, ForgeDirection.DOWN };
+		ForgeDirection.UP, ForgeDirection.DOWN};
 
 
 
@@ -200,7 +206,7 @@ public class ClientBlockStateColorCache
 		try
 		{
 			RESOLVE_LOCK.lock();
-			FakeBlockState blockState = (FakeBlockState)this.blockState;
+			FakeBlockState blockState = (FakeBlockState) this.blockState;
 
 			// user overrides are final colors, so they skip tinting
 			Integer overrideColor = BlockColorOverrides.get(blockState.block, blockState.meta);
@@ -346,12 +352,12 @@ public class ClientBlockStateColorCache
 				for (int u = 0; u < textureWidth; u++)
 				{
 					tempColor = TextureAtlasSpriteWrapper.getPixelARGB(texture, frame, u, v);
-	
+
 					int r = ColorUtil.getRed(tempColor);
 					int g = ColorUtil.getGreen(tempColor);
 					int b = ColorUtil.getBlue(tempColor);
 					int a = ColorUtil.getAlpha(tempColor);
-	
+
 					int scale = 1;
 					if (colorMode == EColorMode.Leaves)
 					{
@@ -402,10 +408,10 @@ public class ClientBlockStateColorCache
 
 			// determine the average color
 			tempColor = ColorUtil.argbToInt(
-					averageAlpha,
-					linearToSrgb((float) (red / (double) alpha)),
-					linearToSrgb((float) (green / (double) alpha)),
-					linearToSrgb((float) (blue / (double) alpha)));
+				averageAlpha,
+				linearToSrgb((float) (red / (double) alpha)),
+				linearToSrgb((float) (green / (double) alpha)),
+				linearToSrgb((float) (blue / (double) alpha)));
 		}
 
 		//check if not missing texture
@@ -484,7 +490,7 @@ public class ClientBlockStateColorCache
 				// route through FakeWorld + Block.colorMultiplier so block-tint logic
 				// (grass/foliage/water/etc.) gets a usable IBlockAccess + biome lookup
 				IBlockAccess realLevel = (IBlockAccess) this.clientLevelWrapper.getWrappedMcObject();
-				FakeBlockState fakeBlockState = (FakeBlockState)this.blockState;
+				FakeBlockState fakeBlockState = (FakeBlockState) this.blockState;
 
 				FakeWorld fakeWorld = FAKE_WORLD_REF.get();
 				fakeWorld.update(realLevel, biomeWrapper.biome, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ(), fakeBlockState);

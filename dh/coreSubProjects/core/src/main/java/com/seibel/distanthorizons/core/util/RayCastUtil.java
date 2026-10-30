@@ -25,7 +25,7 @@ package com.seibel.distanthorizons.core.util;
  */
 public class RayCastUtil
 {
-	
+
 	/**
 	 * This function should work for any 2 perpendicular axis, X and Y could be replaced with X, Y, or Z
 	 *
@@ -35,29 +35,29 @@ public class RayCastUtil
 	 * @param squareMinY the square's Y corner closest to negative infinity
 	 */
 	public static boolean rayIntersectsSquare(
-			double rayX, double rayY, double rayXDirection, double rayYDirection,
-			double squareMinX, double squareMinY, double squareWidth)
+		double rayX, double rayY, double rayXDirection, double rayYDirection,
+		double squareMinX, double squareMinY, double squareWidth)
 	{
 		double roundingValue = 0.05;
-		
+
 		// determine the other corner of the square
 		double squareMaxX = squareMinX + squareWidth;
 		double squareMaxY = squareMinY + squareWidth;
-		
-		
+
+
 		// check if the ray originates in the square
 		if (rayX >= squareMinX && rayX <= squareMaxX &&
-				rayY >= squareMinY && rayY <= squareMaxY)
+			rayY >= squareMinY && rayY <= squareMaxY)
 		{
 			return true;
 		}
-		
-		
-		
+
+
+
 		if (isRoughly(rayXDirection, 0, roundingValue) && isRoughly(rayYDirection, 0, roundingValue))
 		{
 			// slope is in a direction perpendicular to this ray
-			
+
 			// this ray can be treated like a point,
 			// checking if the point originated inside the square
 			// should catch if this was true
@@ -66,10 +66,10 @@ public class RayCastUtil
 		else if (isRoughly(Math.abs(rayYDirection), 1, roundingValue) || isRoughly(Math.abs(rayXDirection), 0, roundingValue))
 		{
 			// slope is straight up or down
-			
+
 			// is the ray pointing towards the square?
 			if ((rayYDirection > 0 && rayY > squareMaxY) || // up
-					(rayYDirection < 0 && rayY < squareMinY)) // down
+				(rayYDirection < 0 && rayY < squareMinY)) // down
 			{
 				// the ray is pointing away from the square
 				return false;
@@ -83,10 +83,10 @@ public class RayCastUtil
 		else if (isRoughly(Math.abs(rayXDirection), 1, roundingValue) || isRoughly(rayYDirection, 0, roundingValue))
 		{
 			// slope is 0 (horizontal line)
-			
+
 			// is the ray pointing towards the square?
 			if ((rayXDirection > 0 && rayX > squareMaxX) || // right
-					(rayXDirection < 0 && rayX < squareMinX)) // left
+				(rayXDirection < 0 && rayX < squareMinX)) // left
 			{
 				// the ray is pointing away from the square
 				return false;
@@ -101,28 +101,28 @@ public class RayCastUtil
 		{
 			// slope is a valid range (between -infinity and infinity)
 			double slope = rayYDirection / rayXDirection;
-			
+
 			// move the square into ray space (where the ray is at the origin)
 			squareMinX -= rayX;
 			squareMaxX -= rayX;
-			
+
 			squareMinY -= rayY;
 			squareMaxY -= rayY;
-			
-			
+
+
 			boolean intersectsX = false;
 			boolean intersectsY = false;
-			
-			
-			
+
+
+
 			// ray Y intersect
 			// y = mx
 			double yIntersectMin = slope * squareMinX;
 			double yIntersectMax = slope * squareMaxX;
-			
+
 			// does the intersection happen before the ray's origin?
 			if ((rayYDirection > 0 && (yIntersectMin <= rayY && yIntersectMax <= rayY)) || // moving in pos Y direction
-					(rayYDirection < 0 && (yIntersectMin >= rayY && yIntersectMax >= rayY)))   // moving in neg Y direction
+				(rayYDirection < 0 && (yIntersectMin >= rayY && yIntersectMax >= rayY)))   // moving in neg Y direction
 			{
 				return false;
 			}
@@ -135,16 +135,16 @@ public class RayCastUtil
 			{
 				intersectsY = true;
 			}
-			
-			
+
+
 			// ray X intersect
 			// x = y/m
 			double xIntersectMin = squareMinY / slope;
 			double xIntersectMax = squareMaxY / slope;
-			
+
 			// does the intersection happen before the ray's origin?
 			if ((rayXDirection > 0 && (xIntersectMin <= rayX && xIntersectMax <= rayX)) || // moving in pos X direction
-					(rayXDirection < 0 && (xIntersectMin >= rayX && xIntersectMax >= rayX)))   // moving in neg X direction
+				(rayXDirection < 0 && (xIntersectMin >= rayX && xIntersectMax >= rayX)))   // moving in neg X direction
 			{
 				return false;
 			}
@@ -157,8 +157,8 @@ public class RayCastUtil
 			{
 				intersectsX = true;
 			}
-			
-			
+
+
 			// if the ray intersects both the top and side of the square, that means
 			// the ray intersects the square as a whole
 			return intersectsX && intersectsY;
@@ -166,6 +166,6 @@ public class RayCastUtil
 	}
 	/** used to get around floating point number rounding errors */
 	private static boolean isRoughly(double input, double equalsVal, double errorValue) { return input >= equalsVal - errorValue && input <= equalsVal + errorValue; }
-	
-	
+
+
 }

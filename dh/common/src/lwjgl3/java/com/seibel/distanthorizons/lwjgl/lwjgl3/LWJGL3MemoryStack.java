@@ -10,21 +10,25 @@ import java.nio.FloatBuffer;
  */
 public class LWJGL3MemoryStack extends AbstractMemoryStack
 {
-    private final org.lwjgl.system.MemoryStack delegate;
+	private final org.lwjgl.system.MemoryStack delegate;
 
-    public LWJGL3MemoryStack(org.lwjgl.system.MemoryStack delegate) {
-        this.delegate = delegate;
-    }
+	public LWJGL3MemoryStack(org.lwjgl.system.MemoryStack delegate)
+	{
+		this.delegate = delegate;
+	}
 
-    @Override
-    public void close() {
-        delegate.close();
-    }
-
-    // ===================== MALLOC OPERATIONS =====================
-	
 	@Override
-    public FloatBuffer mallocFloat(int count) {
-        return delegate.mallocFloat(count);
-    }
+	public void close()
+	{
+		delegate.close();
+	}
+
+	// ===================== MALLOC OPERATIONS =====================
+
+	@Override
+	public FloatBuffer mallocFloat(int count)
+	{
+		return delegate.mallocFloat(count);
+	}
+
 }

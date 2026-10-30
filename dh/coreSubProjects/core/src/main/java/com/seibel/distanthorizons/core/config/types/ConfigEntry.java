@@ -46,7 +46,7 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	private final String chatCommandName;
 	@Nullable
 	private final IShowEnumOptionFunc showEnumOptionFunc;
-	
+
 	/**
 	 * If true this config can be controlled by the API <br>
 	 * and any get() method calls will return the apiValue if it is set.
@@ -57,40 +57,40 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	private T apiValue;
 	@Nullable
 	private String apiUser;
-	/** 
+	/**
 	 * When this option was last modified by the API.
 	 * This is present to prevent aliasing if the option is
 	 * rapidly set/cleared.
 	 */
 	private long apiValueLastSetMs = 0L;
-	
-	/** 
+
+	/**
 	 * Will be null if un-set. <br> <br>
-	 * 
+	 *
 	 * Some options aren't supported on all Minecraft versions,
-	 * in those cases this value will be set to override the 
+	 * in those cases this value will be set to override the
 	 * config file option.
 	 */
 	@Nullable
 	private T mcVersionOverrideValue;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private ConfigEntry(
-		EConfigEntryAppearance appearance, 
-		String comment, String chatCommandName, 
+		EConfigEntryAppearance appearance,
+		String comment, String chatCommandName,
 		@Nullable IShowEnumOptionFunc showEnumOptionFunc,
 		T value, T min, T max,
-		boolean allowApiOverride, 
+		boolean allowApiOverride,
 		ArrayList<IConfigListener> listenerList)
 	{
 		super(appearance, value);
-		
+
 		this.comment = comment;
 		this.min = min;
 		this.max = max;
@@ -99,42 +99,42 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		this.allowApiOverride = allowApiOverride;
 		this.listenerList = listenerList;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==========================//
 	// property getters/setters //
 	//==========================//
 	//region
-	
+
 	/** the string used when entering the config into the command line or chat */
 	public String getChatCommandName() { return this.chatCommandName; }
-	
+
 	public String getComment() { return this.comment; }
-	
+
 	@Nullable
 	public IShowEnumOptionFunc getShowEnumOptionFunc() { return this.showEnumOptionFunc; }
-	
+
 	/**
 	 * If true this config can be controlled by the API <br>
 	 * and any get() method calls will return the apiValue if it is set.
 	 */
 	public boolean getAllowApiOverride() { return this.allowApiOverride; }
-	
+
 	public T getMin() { return this.min; }
 	public T getMax() { return this.max; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// value setters //
 	//===============//
 	//region
-	
+
 	public void setApiValue(T newApiValue, String apiUser)
 	{
 		this.apiValue = newApiValue;
@@ -143,36 +143,36 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			// don't ever pass in a null value so we can see who the last set API user was
 			this.apiUser = apiUser;
 		}
-		
+
 		if (newApiValue != null)
 		{
 			// only update the last set time if we're changing to a new value,
-			// otherwise constant null sets 
+			// otherwise constant null sets
 			// (which may occur if the API isn't being used)
-			// incorrectly causes the UI to think the API was used recently 
+			// incorrectly causes the UI to think the API was used recently
 			this.apiValueLastSetMs = System.currentTimeMillis();
 		}
-		
+
 		synchronized (this.listenerList)
 		{
 			this.listenerList.forEach(IConfigListener::onConfigValueSet);
 		}
 	}
-	
-	public boolean apiIsOverriding() 
-	{ 
+
+	public boolean apiIsOverriding()
+	{
 		if (!this.allowApiOverride)
 		{
 			// this config can't be controlled via the API
 			return false;
 		}
-		
+
 		if (this.apiValue != null)
 		{
 			// an API value is currently present
 			return true;
 		}
-		
+
 		long timeSinceLastApiSet = (System.currentTimeMillis() - this.apiValueLastSetMs);
 		// an API value was present very recently
 		// This check is necessary to fix an issue where rendering mods may change
@@ -181,29 +181,30 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		// Causing the UI to appear like the option can be changed,
 		// when it can't.
 		return timeSinceLastApiSet < 500L;
-		
+
 		// this option can be controlled like normal
 	}
-	
+
 	/** setting to null will allow the config to be used normally */
 	public void setMcVersionOverrideValue(@Nullable T value)
 	{ this.mcVersionOverrideValue = value; }
-	
+
 	public boolean mcVersionOverridePresent()
 	{ return this.mcVersionOverrideValue != null; }
-	
-	/** 
+
+	/**
 	 * Should only be used when loading the config from file. <Br>
 	 * Sets the value without informing the rest of the code (ie, it doesn't call listeners, or saving the value to file).
+	 *
 	 * @see ConfigFileHandler
 	 */
 	public void setWithoutFiringEvents(T newValue) { super.set(newValue); }
-	
+
 	/** Sets the value without saving */
 	public void setWithoutSaving(T newValue)
 	{
 		super.set(newValue);
-		
+
 		synchronized (this.listenerList)
 		{
 			this.listenerList.forEach(IConfigListener::onConfigValueSet);
@@ -215,25 +216,25 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		this.setWithoutSaving(newValue);
 		this.save();
 	}
-	
+
 	public void uiSetWithoutSaving(T newValue)
 	{
 		this.setWithoutSaving(newValue);
-		
+
 		synchronized (this.listenerList)
 		{
 			this.listenerList.forEach(IConfigListener::onUiModify);
 		}
 	}
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// value getters //
 	//===============//
 	//region
-	
+
 	@Override
 	public T get()
 	{
@@ -242,34 +243,34 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		{
 			return this.mcVersionOverrideValue;
 		}
-		
-		if (this.allowApiOverride 
+
+		if (this.allowApiOverride
 			&& this.apiValue != null)
 		{
 			return this.apiValue;
 		}
-		
+
 		return super.get();
 	}
 	/** Ignores the API value if set. */
 	public T getTrueValue() { return super.get(); }
-	
+
 	public T getDefaultValue() { return super.defaultValue; }
-	
+
 	@Nullable
 	public T getApiValue() { return this.apiValue; }
 	@Nullable
 	public String getApiUser() { return this.apiUser; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// listeners //
 	//===========//
 	//region
-	
+
 	/** Fired whenever the config value changes to a new value. */
 	public void addValueChangeListener(Consumer<T> onValueChangeFunc)
 	{
@@ -277,15 +278,15 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		this.addListener(changeListener);
 	}
 	/** Fired whenever the config value is updated, including when the value doesn't change (IE when the UI changes state or the config is reloaded). */
-	public void addListener(IConfigListener newListener) 
+	public void addListener(IConfigListener newListener)
 	{
 		synchronized (this.listenerList)
 		{
 			this.listenerList.add(newListener);
 		}
 	}
-	
-	public void removeListener(IConfigListener oldListener) 
+
+	public void removeListener(IConfigListener oldListener)
 	{
 		synchronized (this.listenerList)
 		{
@@ -293,14 +294,14 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		}
 	}
 	//endregion
-	
-	
-	
+
+
+
 	//====================//
 	// min/max validation //
 	//====================//
 	//region
-	
+
 	/** Checks if the given value is valid */
 	public EConfigValidity getValidity(@Nullable T value) { return this.getValidity(value, this.min, this.max); }
 	/** Checks if the given value is valid */
@@ -310,15 +311,15 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		{
 			return EConfigValidity.VALID;
 		}
-		else if (min == null 
-				&& max == null)
+		else if (min == null
+			&& max == null)
 		{
 			// no validation is needed for this field
 			return EConfigValidity.VALID;
 		}
-		else if (value == null 
-				|| this.value == null
-				|| value.getClass() != this.value.getClass())
+		else if (value == null
+			|| this.value == null
+			|| value.getClass() != this.value.getClass())
 		{
 			// If the 2 variables aren't the same type
 			// or the input is missing
@@ -326,20 +327,20 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return EConfigValidity.INVALID;
 		}
 		else if (value instanceof Number)
-		{ 
+		{
 			// Only check min/max if this config's type is a number
-			if (max != null 
+			if (max != null
 				&& NumberUtil.greaterThan((Number) value, (Number) max))
 			{
 				return EConfigValidity.NUMBER_TOO_HIGH;
 			}
-			
-			if (min != null 
+
+			if (min != null
 				&& NumberUtil.lessThan((Number) value, (Number) min))
 			{
 				return EConfigValidity.NUMBER_TOO_LOW;
 			}
-			
+
 			return EConfigValidity.VALID;
 		}
 		else
@@ -347,40 +348,40 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return EConfigValidity.VALID;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// file handling //
 	//===============//
 	//region
-	
+
 	/** This should normally not be called since set() automatically calls this */
 	public void save() { ConfigHandler.INSTANCE.configFileHandler.saveEntry(this); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
-	@Override 
+
+	@Override
 	public String toString() { return this.name + ": [" + this.get() + "]"; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// builder //
 	//=========//
 	//region
-	
+
 	public static class Builder<T> extends AbstractConfigBase.Builder<T, Builder<T>>
 	{
 		private String tmpComment = null;
@@ -389,15 +390,15 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		protected String tmpChatCommandName = null;
 		protected IShowEnumOptionFunc tmpShowEnumOptionFunc = null;
 		protected ArrayList<IConfigListener> tmpIConfigListener = new ArrayList<>();
-		
-		
-		
+
+
+
 		public Builder<T> comment(String newComment)
 		{
 			this.tmpComment = newComment;
 			return this;
 		}
-		
+
 		/** Allows most values to be set by 1 setter */
 		public Builder<T> setMinDefaultMax(T newMin, T newDefault, T newMax)
 		{
@@ -405,64 +406,65 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			this.setMinMax(newMin, newMax);
 			return this;
 		}
-		
+
 		public void setMinMax(T newMin, T newMax)
 		{
 			this.tmpMin = newMin;
 			this.tmpMax = newMax;
 		}
-		
+
 		public Builder<T> setChatCommandName(String name)
 		{
 			this.tmpChatCommandName = name;
 			return this;
 		}
-		
+
 		public Builder<T> setShowEnumOptionFunc(IShowEnumOptionFunc func)
 		{
 			this.tmpShowEnumOptionFunc = func;
 			return this;
 		}
-		
+
 		public Builder<T> addListener(IConfigListener newConfigListener)
 		{
 			this.tmpIConfigListener.add(newConfigListener);
 			return this;
 		}
-		
+
 
 
 		// build //
-		
+
 		public ConfigEntry<T> build()
 		{
 			boolean tmpUseApiOverwrite = true;
 			return new ConfigEntry<>(
 				this.tmpAppearance,
-				this.tmpComment, this.tmpChatCommandName, 
+				this.tmpComment, this.tmpChatCommandName,
 				this.tmpShowEnumOptionFunc,
 				this.tmpValue, this.tmpMin, this.tmpMax,
-				tmpUseApiOverwrite, 
+				tmpUseApiOverwrite,
 				this.tmpIConfigListener);
 		}
-		
+
 	}
-	
+
 	//endregion
-	
-	
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	@FunctionalInterface
 	public interface IShowEnumOptionFunc
 	{
 		boolean shouldShowEnum(Enum<?> enumValue);
+
 	}
-	
+
 	//endregion
-	
-	
+
+
 }

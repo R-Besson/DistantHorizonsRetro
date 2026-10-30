@@ -45,49 +45,49 @@ public class ClientOnlySaveStructure implements ISaveStructure
 	public static final String SERVER_DATA_FOLDER_NAME = "Distant_Horizons_server_data";
 	public static final String REPLAY_SERVER_FOLDER_NAME = "REPLAY";
 	public static final String INVALID_FILE_CHARACTERS_REGEX = "[\\\\/:*?\"<>|]";
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
-	
-	
+
+
 	private final ConcurrentHashMap<ILevelWrapper, File> levelWrapperToFileMap = new ConcurrentHashMap<>();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ClientOnlySaveStructure() { }
-	
-	
-	
+
+
+
 	//================//
 	// folder methods //
 	//================//
-	
+
 	@Override
 	public File getSaveFolder(ILevelWrapper levelWrapper)
 	{
 		return this.levelWrapperToFileMap.computeIfAbsent(levelWrapper, (newLevelWrapper) ->
 		{
 			File saveFolder;
-			
+
 			// Use the server provided key if one was provided
 			if (newLevelWrapper instanceof IServerKeyedClientLevel)
 			{
 				IServerKeyedClientLevel keyedClientLevel = (IServerKeyedClientLevel) newLevelWrapper;
 				LOGGER.info("Loading level [" + newLevelWrapper.getDhIdentifier() + "] with key: [" + keyedClientLevel.getServerLevelKey() + "].");
-				
+
 				String serverKey = keyedClientLevel.getServerKey();
 				if (serverKey.isEmpty())
 				{
 					serverKey = getServerFolderName();
 				}
-				
-				// This world was identified by the server directly, so we can know for sure which folder to use.				
+
+				// This world was identified by the server directly, so we can know for sure which folder to use.
 				saveFolder = getSaveFolderByLevelId(serverKey, keyedClientLevel.getServerLevelKey());
 			}
 			else
@@ -95,7 +95,7 @@ public class ClientOnlySaveStructure implements ISaveStructure
 				// get the default folder
 				saveFolder = getSaveFolderByLevelId(getServerFolderName(), levelWrapper.getDhIdentifier());
 			}
-			
+
 			// Allow API users to override the save folder
 			IDhApiSaveStructure saveStructureOverride = OverrideInjector.INSTANCE.get(IDhApiSaveStructure.class);
 			if (saveStructureOverride != null)
@@ -103,15 +103,15 @@ public class ClientOnlySaveStructure implements ISaveStructure
 				File overrideFile = saveStructureOverride.overrideFilePath(saveFolder, newLevelWrapper);
 				if (overrideFile != null)
 				{
-					LOGGER.info("Save folder overridden from ["+saveFolder.getPath()+"] -> ["+overrideFile.getPath()+"].");
+					LOGGER.info("Save folder overridden from [" + saveFolder.getPath() + "] -> [" + overrideFile.getPath() + "].");
 					saveFolder = overrideFile;
 				}
 			}
-			
+
 			return saveFolder;
 		});
 	}
-	
+
 	@Override
 	public File getPre23SaveFolder(ILevelWrapper levelWrapper)
 	{
@@ -121,12 +121,12 @@ public class ClientOnlySaveStructure implements ISaveStructure
 		{
 			return this.getSaveFolder(levelWrapper);
 		}
-		
+
 		return getSaveFolderByLevelId(getServerFolderName(), levelWrapper.getDimensionType().getName());
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
@@ -134,13 +134,13 @@ public class ClientOnlySaveStructure implements ISaveStructure
 	private static File getSaveFolderByLevelId(String folderName, String dimensionName)
 	{
 		String path = MC_SHARED.getInstallationDirectory().getPath() + File.separatorChar
-				+ SERVER_DATA_FOLDER_NAME + File.separatorChar
-				+ folderName + File.separatorChar
-				+ dimensionName.replace(":", "@@");
-		
+			+ SERVER_DATA_FOLDER_NAME + File.separatorChar
+			+ folderName + File.separatorChar
+			+ dimensionName.replace(":", "@@");
+
 		return new File(path);
 	}
-	
+
 	/** Generated from the server the client is currently connected to. */
 	private static String getServerFolderName()
 	{
@@ -150,25 +150,25 @@ public class ClientOnlySaveStructure implements ISaveStructure
 		{
 			return REPLAY_SERVER_FOLDER_NAME;
 		}
-		
-		
+
+
 		// parse the current server's IP
 		ParsedIp parsedIp = new ParsedIp(MC_CLIENT.getCurrentServerIp());
 		String serverIpCleaned = parsedIp.ip.replaceAll(INVALID_FILE_CHARACTERS_REGEX, "");
 		String serverPortCleaned = parsedIp.port != null ? parsedIp.port.replaceAll(INVALID_FILE_CHARACTERS_REGEX, "") : "";
-		
-		
+
+
 		// determine the auto folder name format
 		EDhApiServerFolderNameMode folderNameMode = Config.Client.Advanced.Multiplayer.serverFolderNameMode.get();
 		String serverName = MC_CLIENT.getCurrentServerName().replaceAll(INVALID_FILE_CHARACTERS_REGEX, "");
 		String serverMcVersion = MC_CLIENT.getCurrentServerVersion().replaceAll(INVALID_FILE_CHARACTERS_REGEX, "");
-		
-		
+
+
 		// generate the folder name
 		String folderName;
-		
+
 		String s = (!serverPortCleaned.isEmpty() ? ("-" + serverPortCleaned) : "");
-		
+
 		switch (folderNameMode)
 		{
 			case NAME_IP:
@@ -188,22 +188,22 @@ public class ClientOnlySaveStructure implements ISaveStructure
 				folderName = serverName;
 				break;
 		}
-		
+
 		// PercentEscaper makes the characters all part of the standard alphameric character set
 		// This fixes some issues when the server is named something in other languages
 		return new PercentEscaper("", true).escape(folderName);
 	}
-	
-	
-	
+
+
+
 	//==================//
 	// override methods //
 	//==================//
-	
+
 	@Override
-	public void close() {  }
-	
+	public void close() { }
+
 	@Override
 	public String toString() { return "[" + this.getClass().getSimpleName() + "@(" + StringUtil.join(";", this.levelWrapperToFileMap.values()) + ")]"; }
-	
+
 }

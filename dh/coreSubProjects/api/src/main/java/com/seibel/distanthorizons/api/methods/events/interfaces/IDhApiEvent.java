@@ -35,7 +35,7 @@ public interface IDhApiEvent<T> extends IBindable
 	//==========//
 	// external //
 	//==========//
-	
+
 	/**
 	 * Returns true if the event should be automatically unbound
 	 * after firing. <br>
@@ -45,12 +45,12 @@ public interface IDhApiEvent<T> extends IBindable
 	 * IE: The event will not be removed after firing and will continue firing until removed.
 	 */
 	default boolean removeAfterFiring() { return false; }
-	
-	
+
+
 	//==========//
 	// internal //
 	//==========//
-	
+
 	/**
 	 * Called internally by Distant Horizons when the event happens.
 	 * This method shouldn't directly be overridden and
@@ -59,5 +59,5 @@ public interface IDhApiEvent<T> extends IBindable
 	 * @param input the parameter object passed in from the event source. Can be null.
 	 */
 	void fireEvent(DhApiEventParam<T> input);
-	
+
 }

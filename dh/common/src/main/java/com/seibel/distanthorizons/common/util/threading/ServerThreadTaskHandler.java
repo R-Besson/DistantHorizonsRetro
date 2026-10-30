@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 // TODO move to core
 //  Although only currently called in MC 1.7.10.
 //  Maybe move into Forge17 instead?
+
 /**
  * Queues work that must run on the Minecraft server thread. The platform's
  * server-tick callback is responsible for calling {@link #onTickStart()} at the
@@ -53,8 +54,8 @@ public class ServerThreadTaskHandler
 	 * only run on the server thread; volatile so {@link #reset()} can clear it from elsewhere.
 	 */
 	private volatile long tickStartNano = TICK_START_NOT_SET;
-	
-	/** 
+
+	/**
 	 * How long {@link #runTasks()} took for each of the last n ticks. <br>
 	 * This work runs after Minecraft records its tick time, so it has to be tracked separately
 	 * to know how much of each tick is actually used.
@@ -130,7 +131,7 @@ public class ServerThreadTaskHandler
 			this.dhNanosPerTickIndex = (this.dhNanosPerTickIndex + 1) % DH_TICK_HISTORY_LENGTH;
 		}
 	}
-	
+
 	/** @return the average time DH's queued server thread work has taken per tick recently */
 	public double getAverageDhMsPerTick()
 	{
@@ -141,7 +142,7 @@ public class ServerThreadTaskHandler
 		}
 		return (totalNano / (double) DH_TICK_HISTORY_LENGTH) * 1e-6;
 	}
-	
+
 	private void runTasksUntilDeadline()
 	{
 		long deadlineNano = this.deadlineForTickNano(this.tickStartNano);
@@ -190,7 +191,7 @@ public class ServerThreadTaskHandler
 		long maxBudgetDeadlineNano = nowNano + MAX_BUDGET_NANO;
 		return Math.min(tickDeadlineNano, maxBudgetDeadlineNano);
 	}
-	
+
 	private boolean deferrableTasksCanRun()
 	{
 		if (!Config.Common.WorldGenerator.limitIfServerUnhealthy.get())
@@ -232,7 +233,8 @@ public class ServerThreadTaskHandler
 	{
 		this.isShutdown = false;
 		this.tickStartNano = TICK_START_NOT_SET;
-		if (mcSharedWrapper == null) {
+		if (mcSharedWrapper == null)
+		{
 			mcSharedWrapper = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 		}
 	}
@@ -273,5 +275,7 @@ public class ServerThreadTaskHandler
 				this.future.completeExceptionally(throwable);
 			}
 		}
+
 	}
+
 }

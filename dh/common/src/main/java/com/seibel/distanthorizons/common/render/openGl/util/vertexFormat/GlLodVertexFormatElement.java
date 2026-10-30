@@ -37,7 +37,7 @@ public class GlLodVertexFormatElement
 	private final int index;
 	private final int count;
 	private final int byteSize;
-	
+
 	public GlLodVertexFormatElement(int newIndex, GlLodVertexFormatElement.DataType newType, int newCount)
 	{
 		this.dataType = newType;
@@ -45,7 +45,7 @@ public class GlLodVertexFormatElement
 		this.count = newCount;
 		this.byteSize = newType.getSize() * this.count;
 	}
-	
+
 	public final int getByteSize()
 	{
 		return this.byteSize;
@@ -78,10 +78,10 @@ public class GlLodVertexFormatElement
 			return this.name;
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	@Override
 	public int hashCode()
 	{
@@ -89,13 +89,13 @@ public class GlLodVertexFormatElement
 		i = 31 * i + this.index;
 		return 31 * i + this.count;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.count + "," + this.dataType.getName();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -128,5 +128,5 @@ public class GlLodVertexFormatElement
 			return false;
 		}
 	}
-	
+
 }

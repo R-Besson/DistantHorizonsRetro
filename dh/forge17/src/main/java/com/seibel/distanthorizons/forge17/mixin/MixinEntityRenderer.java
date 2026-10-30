@@ -19,20 +19,20 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
-public abstract class MixinEntityRenderer 
+public abstract class MixinEntityRenderer
 {
 	//=====//
 	// fog //
 	//=====//
 	//region
-	
-    @Inject(method = "setupFog", at = @At(value = "HEAD"))
-    private void enableFog(int p_78468_1_, float p_78468_2_, CallbackInfo ci)
-    {
-	    RenderHelper.enableFog();
-	    // the blindness and cloud fog branches don't post the density event
-	    MinecraftRenderWrapper.modDensityFogActive = false;
-    }
+
+	@Inject(method = "setupFog", at = @At(value = "HEAD"))
+	private void enableFog(int p_78468_1_, float p_78468_2_, CallbackInfo ci)
+	{
+		RenderHelper.enableFog();
+		// the blindness and cloud fog branches don't post the density event
+		MinecraftRenderWrapper.modDensityFogActive = false;
+	}
 
 	/**
 	 * Mods (IE GregTech's pollution) make thick fog by cancelling the fog density event.
@@ -52,36 +52,36 @@ public abstract class MixinEntityRenderer
 		return cancelled;
 	}
 
-    @Redirect(
-        method = "setupFog",
-        at = @At(
-            value = "INVOKE",
-            target = "Lcpw/mods/fml/common/eventhandler/EventBus;post(Lcpw/mods/fml/common/eventhandler/Event;)Z",
-            remap = false,
-            ordinal = 1))
-    private boolean disableFogDuringSetup(EventBus instance, Event event, @Local(argsOnly = true) int p_78468_1_)
-    {
-	    // let other mods adjust the fog first, DH's override has to win
-	    boolean result = instance.post(event);
-		
-	    // p_78468_1_ fogMode: -1 = sky fog pass, >=0 = terrain fog pass
-	    if (p_78468_1_ != -1)
-	    {
-		    RenderHelper.disableFogDuringSetup();
-	    }
-	    return result;
-    }
-	
+	@Redirect(
+		method = "setupFog",
+		at = @At(
+			value = "INVOKE",
+			target = "Lcpw/mods/fml/common/eventhandler/EventBus;post(Lcpw/mods/fml/common/eventhandler/Event;)Z",
+			remap = false,
+			ordinal = 1))
+	private boolean disableFogDuringSetup(EventBus instance, Event event, @Local(argsOnly = true) int p_78468_1_)
+	{
+		// let other mods adjust the fog first, DH's override has to win
+		boolean result = instance.post(event);
+
+		// p_78468_1_ fogMode: -1 = sky fog pass, >=0 = terrain fog pass
+		if (p_78468_1_ != -1)
+		{
+			RenderHelper.disableFogDuringSetup();
+		}
+		return result;
+	}
+
 	@Redirect(
 		method = "renderWorld",
 		at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glEnable(I)V", remap = false))
 	private void disableFogDuringRender(int cap)
 	{ RenderHelper.disableFogDuringRender(cap); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// far plane //
 	//===========//
@@ -89,7 +89,7 @@ public abstract class MixinEntityRenderer
 
 	@Shadow
 	private float farPlaneDistance;
-	
+
 	/** MC's far clip plane is twice this, so mobs are drawn as far as {@link MixinEntity} allows */
 	@Unique
 	private static final float DISTANT_HORIZONS_MIN_FAR_PLANE_DISTANCE = 128.0f;
@@ -120,7 +120,7 @@ public abstract class MixinEntityRenderer
 	// lightmap //
 	//==========//
 	//region
-	
+
 	@Inject(method = "updateCameraAndRender", at = @At("HEAD"))
 	private void updateLightmap(float partialTicks, CallbackInfo ci)
 	{
@@ -133,9 +133,9 @@ public abstract class MixinEntityRenderer
 			rpleAccessor.updateLightmap();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

@@ -66,6 +66,7 @@ public class ProfilerWrapper implements IProfilerWrapper
 		{
 			this.profiler.endSection();
 		}
+
 	}
 
 	//endregion

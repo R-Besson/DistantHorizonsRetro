@@ -28,22 +28,22 @@ import java.io.File;
 public interface IMinecraftSharedWrapper extends IBindable
 {
 	boolean isDedicatedServer();
-	
+
 	File getInstallationDirectory();
-	
+
 	int getPlayerCount();
-	
+
 	/** If used on the client will only return a non-null object if the client is hosting a LAN server */
 	@Nullable
 	IServerLevelWrapper getLevelWrapper(String dimensionResourceLocation);
-	
+
 	/** returns true if MC's server thread is running in an acceptable amount of time */
 	boolean isServerThreadHealthy();
 	/** @return the numbers {@link #isServerThreadHealthy()} is based on, for troubleshooting, or null if unavailable */
 	default String getServerHealthDetails() { return null; }
-	
+
 	/** returns true if this MC version supports surface world generation */
 	boolean supportsSurfaceGeneration();
-	
-	
+
+
 }

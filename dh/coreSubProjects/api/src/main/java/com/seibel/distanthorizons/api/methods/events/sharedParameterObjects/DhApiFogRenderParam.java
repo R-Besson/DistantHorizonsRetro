@@ -31,108 +31,107 @@ import java.awt.*;
 
 /**
  * Contains all the information needed to render Distant Horizons' fog.
- * 
+ *
+ * @author James Seibel
+ * @version 2026-05-20
  * @see IDhApiFogConfig
  * @see IDhApiFarFogConfig
  * @see IDhApiHeightFogConfig
- * 
- * @author James Seibel
- * @version 2026-05-20
  * @since API 7.0.0
  */
 public class DhApiFogRenderParam implements IDhApiEventParam
 {
 	protected Color fogColor;
 	public Color getFogColor() { return this.fogColor; }
-	
+
 	// far fog //
 	//region
-	
+
 	protected EDhApiFogFalloff farFogFalloff;
 	/** @see IDhApiFarFogConfig#farFogFalloff() */
 	public EDhApiFogFalloff getFarFogFalloff() { return this.farFogFalloff; }
-	
+
 	protected float farFogStartPercent;
 	/** @see IDhApiFarFogConfig#farFogStartDistance() */
 	public float getFarFogStartPercent() { return this.farFogStartPercent; }
-	
+
 	protected float farFogEndPercent;
 	/** @see IDhApiFarFogConfig#farFogEndDistance() */
 	public float getFarFogEndPercent() { return this.farFogEndPercent; }
-	
+
 	protected float farFogMinThickness;
 	/** @see IDhApiFarFogConfig#farFogMinThickness() */
 	public float getFarFogMinThickness() { return this.farFogMinThickness; }
-	
+
 	protected float farFogMaxThickness;
 	/** @see IDhApiFarFogConfig#farFogMaxThickness() */
 	public float getFarFogMaxThickness() { return this.farFogMaxThickness; }
-	
+
 	protected float farFogDensity;
 	/** @see IDhApiFarFogConfig#farFogDensity() */
 	public float getFarFogDensity() { return this.farFogDensity; }
-	
+
 	//endregion
-	
+
 	// height fog //
 	//region
-	
+
 	protected EDhApiFogFalloff heightFogFalloff;
 	/** @see IDhApiHeightFogConfig#heightFogFalloff() */
 	public EDhApiFogFalloff getHeightFogFalloff() { return this.heightFogFalloff; }
-	
+
 	protected EDhApiHeightFogMixMode heightFogMixingMode;
 	/** @see IDhApiHeightFogConfig#heightFogMixMode() */
 	public EDhApiHeightFogMixMode getHeightFogMixingMode() { return this.heightFogMixingMode; }
-	
+
 	protected EDhApiHeightFogDirection heightFogDirection;
 	/** @see IDhApiHeightFogConfig#heightFogDirection() */
 	public EDhApiHeightFogDirection getHeightFogDirection() { return this.heightFogDirection; }
-	
+
 	protected float heightFogBaseHeight;
 	/** @see IDhApiHeightFogConfig#heightFogBaseHeight() */
 	public float getHeightFogBaseHeight() { return this.heightFogBaseHeight; }
-	
+
 	protected float heightFogStartPercent;
 	/** @see IDhApiHeightFogConfig#heightFogStartingHeightPercent() */
 	public float getHeightFogStartPercent() { return this.heightFogStartPercent; }
-	
+
 	protected float heightFogEndPercent;
 	/** @see IDhApiHeightFogConfig#heightFogEndingHeightPercent() */
 	public float getHeightFogEndPercent() { return this.heightFogEndPercent; }
-	
+
 	protected float heightFogMinThickness;
 	/** @see IDhApiHeightFogConfig#heightFogMinThickness() */
 	public float getHeightFogMinThickness() { return this.heightFogMinThickness; }
-	
+
 	protected float heightFogMaxThickness;
 	/** @see IDhApiHeightFogConfig#heightFogMaxThickness() */
 	public float getHeightFogMaxThickness() { return this.heightFogMaxThickness; }
-	
+
 	protected float heightFogDensity;
 	/** @see IDhApiHeightFogConfig#heightFogDensity() */
 	public float getHeightFogDensity() { return this.heightFogDensity; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public DhApiFogRenderParam(DhApiFogRenderParam parent)
 	{
 		this(
 			parent.fogColor,
-			
+
 			// far fog
 			parent.farFogFalloff,
 			parent.farFogStartPercent, parent.farFogEndPercent,
 			parent.farFogMinThickness, parent.farFogMaxThickness,
 			parent.farFogDensity,
-			
+
 			// height fog
 			parent.heightFogFalloff,
 			parent.heightFogMixingMode, parent.heightFogDirection,
@@ -144,13 +143,13 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 	}
 	public DhApiFogRenderParam(
 		Color fogColor,
-		
+
 		// far fog
 		EDhApiFogFalloff farFogFalloff,
 		float farFogStartPercent, float farFogEndPercent,
 		float farFogMinThickness, float farFogMaxThickness,
 		float farFogDensity,
-		
+
 		// height fog
 		EDhApiFogFalloff heightFogFalloff,
 		EDhApiHeightFogMixMode heightFogMixingMode, EDhApiHeightFogDirection heightFogDirection,
@@ -161,7 +160,7 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 	)
 	{
 		this.fogColor = fogColor;
-		
+
 		// far fog
 		this.farFogFalloff = farFogFalloff;
 		this.farFogStartPercent = farFogStartPercent;
@@ -169,7 +168,7 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 		this.farFogMinThickness = farFogMinThickness;
 		this.farFogMaxThickness = farFogMaxThickness;
 		this.farFogDensity = farFogDensity;
-		
+
 		// height fog
 		this.heightFogFalloff = heightFogFalloff;
 		this.heightFogMixingMode = heightFogMixingMode;
@@ -181,22 +180,22 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 		this.heightFogMaxThickness = heightFogMaxThickness;
 		this.heightFogDensity = heightFogDensity;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public DhApiFogRenderParam copy() { return new DhApiFogRenderParam(this); }
-	
+
 	//endregion
-	
-	
-	
-	
+
+
+
+
 }

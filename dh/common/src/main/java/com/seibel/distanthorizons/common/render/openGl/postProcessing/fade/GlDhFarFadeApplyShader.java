@@ -31,7 +31,7 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Draws the Fade texture onto Minecraft's FrameBuffer. <br><br>
- * 
+ *
  * See Also: <br>
  * {@link GlVanillaFadeRenderer} - Parent to this shader. <br>
  * {@link GlDhVanillaFadeShader} - draws the Fade texture. <br>
@@ -39,25 +39,25 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 {
 	public static GlDhFarFadeApplyShader INSTANCE = new GlDhFarFadeApplyShader();
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
-	
+
+
+
 	public int fadeTexture;
-	
+
 	public int readFramebuffer;
 	public int drawFramebuffer;
-	
+
 	// uniforms
 	public int uFadeColorTextureUniform = -1;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	@Override
 	public void onInit()
 	{
@@ -66,54 +66,54 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 			"assets/distanthorizons/shaders/fade/gl/apply.frag",
 			"vPosition"
 		);
-		
+
 		// uniform setup
 		this.uFadeColorTextureUniform = this.shader.getUniformLocation("uFadeColorTextureUniform");
-		
+
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// render prep //
 	//=============//
-	
+
 	@Override
 	protected void onApplyUniforms(RenderParams renderParams)
 	{
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(this.fadeTexture);
 		LWJGL.glUniform1i(this.uFadeColorTextureUniform, 0);
-		
+
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	@Override
 	protected void onRender()
 	{
 		GLMC.disableBlend();
-		
+
 		// Depth testing must be disabled otherwise this application shader won't apply anything.
-		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually, 
+		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually,
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
-		
-		
+
+
 		// apply the rendered Fade to Minecraft's framebuffer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, this.readFramebuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, this.drawFramebuffer);
-		
+
 		GlScreenQuad.INSTANCE.render();
-		
+
 		GLMC.enableDepthTest();
-		
+
 	}
-	
-	
-	
+
+
+
 }

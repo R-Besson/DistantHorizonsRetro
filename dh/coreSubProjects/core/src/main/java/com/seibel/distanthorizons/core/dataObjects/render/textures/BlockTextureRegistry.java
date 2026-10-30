@@ -50,35 +50,35 @@ import java.util.function.Function;
 public class BlockTextureRegistry
 {
 	private static final IBlockStateFaceTextureProvider TEXTURE_PROVIDER = SingletonInjector.INSTANCE.get(IBlockStateFaceTextureProvider.class);
-	
+
 	/** RGBA */
 	public static final int TILE_BYTE_COUNT = TextureUtil.TEXTURE_WIDTH_AND_HEIGHT * TextureUtil.TEXTURE_WIDTH_AND_HEIGHT * 4;
-	
+
 	/**
 	 * tile ids are stored in 16 vertex bits,
 	 * if we somehow run out of ids additional faces just render flat
 	 */
 	public static final int MAX_TILE_COUNT = 65_536;
-	
+
 	/** renders every face flat, also used when set registration overflows */
 	public static final short UNTEXTURED_ID = 0;
-	
-	
+
+
 	// needs to be defined after the other static variables so it can reference them
 	public static final BlockTextureRegistry INSTANCE = new BlockTextureRegistry();
-	
-	
-	
-	
+
+
+
+
 	/** indexed by tile id, holds the ratio-encoded RGBA pixels ready for GPU upload */
 	private final ArrayList<byte[]> tilePixelsById = new ArrayList<>();
 	/** used to dedupe tiles so block faces sharing a texture share a tile */
 	private final HashMap<TileKey, Short> tileIdByContent = new HashMap<>();
 	/** tiles that haven't been uploaded to the GPU yet, drained by the render thread */
 	private int firstTileIdPendingUpload = 0;
-	
-	/** 
-	 * indexed by set id (stored by {@link BlockTextureRegistry#setIdByBlockStateWrapper}), 
+
+	/**
+	 * indexed by set id (stored by {@link BlockTextureRegistry#setIdByBlockStateWrapper}),
 	 * holds the 6 face tile ids for one block state.
 	 */
 	private final ArrayList<short[]> faceTileIdsBySetId = new ArrayList<>();
@@ -95,19 +95,19 @@ public class BlockTextureRegistry
 	 * elements are written before the array is (re)published through this volatile field.
 	 */
 	private volatile short[][][] sideRowTileIdsBySetId = new short[0][][];
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private BlockTextureRegistry()
 	{
 		// reserve the flat tile so id 0 always renders as a 1.0 multiplier
 		byte[] flatPixels = new byte[TILE_BYTE_COUNT];
-		
+
 		// fill everything with a gray pixel
 		for (int i = 0; i < TILE_BYTE_COUNT; i += 4)
 		{
@@ -117,20 +117,20 @@ public class BlockTextureRegistry
 			flatPixels[i + 3] = (byte) 0xFF; // max opacity (256)
 		}
 		this.tilePixelsById.add(flatPixels);
-		
+
 		// reserve the all-flat face set so set id 0 always renders flat
 		this.faceTileIdsBySetId.add(new short[6]);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// tile getters //
 	//==============//
 	//region
-	
+
 	/**
 	 * Returns the id of the given block state's face tile set,
 	 * baking and registering the face textures if necessary. <br>
@@ -210,6 +210,7 @@ public class BlockTextureRegistry
 		return setId;
 	}
 	private static final ThreadLocal<TintedGrassKey> TINTED_GRASS_LOOKUP_KEY = ThreadLocal.withInitial(() -> new TintedGrassKey(null, 0));
+
 	/** only the thread local lookup keys are changed, keys in the map never are */
 	private static final class TintedGrassKey
 	{
@@ -235,6 +236,7 @@ public class BlockTextureRegistry
 
 		@Override
 		public int hashCode() { return this.blockState.hashCode() * 31 + this.color; }
+
 	}
 
 	/**
@@ -293,7 +295,7 @@ public class BlockTextureRegistry
 	 * IE the top and bottom of Chisel's connected textures.
 	 *
 	 * @return the face tile ids (like {@link #getFaceTileIds}) for each row counted down from the LOD's top block,
-	 *         rows past the end use the set's tiles. Null if every row uses the set's tiles.
+	 * rows past the end use the set's tiles. Null if every row uses the set's tiles.
 	 * @see IBlockStateFaceTextureProvider#getPositionedSideRowCount
 	 */
 	public short @Nullable [][] getSideRowTileIds(int setId)
@@ -327,7 +329,7 @@ public class BlockTextureRegistry
 		}
 		return this.faceTileIdsBySetId.get(setId);
 	}
-	
+
 	/** @param createSideRowTileIds null if the set's sides are the same on every row */
 	private <K> short registerFaceSet(
 		K key, ConcurrentHashMap<K, Short> setIdByKey, Function<EDhDirection, BlockFaceTexture> getFaceTexture,
@@ -340,9 +342,9 @@ public class BlockTextureRegistry
 		{
 			BlockFaceTexture faceTexture = getFaceTexture.apply(direction);
 			short tileId = (faceTexture != null)
-					? this.getOrCreateTileId(faceTexture)
-					: UNTEXTURED_ID;
-			
+				? this.getOrCreateTileId(faceTexture)
+				: UNTEXTURED_ID;
+
 			// If no texture exists in the current north/sout/west/east direction,
 			// try using the top instead.
 			// This fixes fences, walls, anvils, etc.
@@ -356,11 +358,11 @@ public class BlockTextureRegistry
 					? this.getOrCreateTileId(faceTexture)
 					: UNTEXTURED_ID;
 			}
-			
+
 			faceTileIds[direction.faceIndex] = tileId;
 			anyFaceTextured |= (tileId != UNTEXTURED_ID);
 		}
-		
+
 		short textureId;
 		if (!anyFaceTextured)
 		{
@@ -395,16 +397,16 @@ public class BlockTextureRegistry
 		Short existingSetId = setIdByKey.putIfAbsent(key, textureId);
 		return (existingSetId != null) ? existingSetId : textureId;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===================//
 	// tile registration //
 	//===================//
 	//region
-	
+
 	private synchronized short getOrCreateTileId(BlockFaceTexture faceTexture)
 	{
 		byte[] ratioPixels = convertColorsToDifferenceRatios(faceTexture);
@@ -412,25 +414,25 @@ public class BlockTextureRegistry
 		{
 			return UNTEXTURED_ID;
 		}
-		
+
 		TileKey key = new TileKey(ratioPixels);
 		Short existingId = this.tileIdByContent.get(key);
 		if (existingId != null)
 		{
 			return existingId;
 		}
-		
+
 		if (this.tilePixelsById.size() >= MAX_TILE_COUNT)
 		{
 			return UNTEXTURED_ID;
 		}
-		
+
 		short newId = (short) this.tilePixelsById.size();
 		this.tilePixelsById.add(ratioPixels);
 		this.tileIdByContent.put(key, newId);
 		return newId;
 	}
-	
+
 	/**
 	 * Converts the texture's absolute colors into ratios
 	 * relative to the texture's average color.
@@ -441,7 +443,7 @@ public class BlockTextureRegistry
 	private static byte[] convertColorsToDifferenceRatios(BlockFaceTexture faceTexture)
 	{
 		int[] argbPixels = faceTexture.argbPixels;
-		
+
 		// average only the visible pixels, otherwise
 		// cutout textures (IE fences) would have overly dark averages.
 		// The LOD's base color is averaged in linear light (see ClientBlockStateColorCache.calculateColorFromTexture),
@@ -478,8 +480,8 @@ public class BlockTextureRegistry
 			averageGreen = Math.max(ColorUtil.getGreen(faceTexture.ratioReferenceColor), 1.0f);
 			averageBlue = Math.max(ColorUtil.getBlue(faceTexture.ratioReferenceColor), 1.0f);
 		}
-		
-		
+
+
 		byte[] uploadPixels = new byte[TILE_BYTE_COUNT];
 		boolean anyPixelDiffersFromAverage = false;
 		for (int v = 0; v < TextureUtil.TEXTURE_WIDTH_AND_HEIGHT; v++)
@@ -488,9 +490,9 @@ public class BlockTextureRegistry
 			{
 				// 1x1 fallback tiles repeat their single pixel
 				int sourceIndex = ((v * faceTexture.height / TextureUtil.TEXTURE_WIDTH_AND_HEIGHT) * faceTexture.width)
-						+ (u * faceTexture.width / TextureUtil.TEXTURE_WIDTH_AND_HEIGHT);
+					+ (u * faceTexture.width / TextureUtil.TEXTURE_WIDTH_AND_HEIGHT);
 				int argb = argbPixels[sourceIndex];
-				
+
 				byte red, green, blue, alpha;
 				if (faceTexture.uploadAsColorRatio)
 				{
@@ -501,44 +503,44 @@ public class BlockTextureRegistry
 					// ratios above the max are scaled down together,
 					// clamping them separately would shift the pixel's hue (IE tint leaves yellow)
 					float ratioScale = MAX_RATIO / Math.max(MAX_RATIO, Math.max(redRatio, Math.max(greenRatio, blueRatio)));
-					red   = encodeRatio(redRatio * ratioScale);
+					red = encodeRatio(redRatio * ratioScale);
 					green = encodeRatio(greenRatio * ratioScale);
-					blue  = encodeRatio(blueRatio * ratioScale);
+					blue = encodeRatio(blueRatio * ratioScale);
 				}
 				else
 				{
 					// upload as an absolute color
 					// (due to how rendering is done this will only partially work,
 					// but is helpful for the error texture to appear correctly)
-					red   = (byte) ColorUtil.getRed(argb);
+					red = (byte) ColorUtil.getRed(argb);
 					green = (byte) ColorUtil.getGreen(argb);
-					blue  = (byte) ColorUtil.getBlue(argb);
+					blue = (byte) ColorUtil.getBlue(argb);
 				}
-				alpha = (byte)ColorUtil.getAlpha(argb);
-				
-				int outIndex = TextureUtil.getPixelIndex(u,v) * 4;
+				alpha = (byte) ColorUtil.getAlpha(argb);
+
+				int outIndex = TextureUtil.getPixelIndex(u, v) * 4;
 				uploadPixels[outIndex] = red;
 				uploadPixels[outIndex + 1] = green;
 				uploadPixels[outIndex + 2] = blue;
 				uploadPixels[outIndex + 3] = alpha;
-				
-				
+
+
 				// only check if the pixel differs when the alpha is visible (non-zero)
 				if (alpha != 0)
 				{
 					// 128 is gray (half-way between 0 and 256)
 					byte averageGray = (byte) 128;
-					
-					// we only care about the texture if it differs from the average block color 
+
+					// we only care about the texture if it differs from the average block color
 					// (represented by gray in the uploaded texture)
 					anyPixelDiffersFromAverage |=
 						red != averageGray
-						|| green != averageGray
-						|| blue != averageGray;
+							|| green != averageGray
+							|| blue != averageGray;
 				}
 			}
 		}
-		
+
 		return anyPixelDiffersFromAverage ? uploadPixels : null;
 	}
 	/** @param channel 0-255 */
@@ -561,16 +563,16 @@ public class BlockTextureRegistry
 		int encoded = Math.round(ratio * 127.5f);
 		return (byte) Math.min(encoded, 255);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//============//
 	// GPU upload //
 	//============//
 	//region
-	
+
 	/**
 	 * Returns the tiles registered since the last call so they can
 	 * be uploaded to the GPU, must be called from the render thread.
@@ -583,7 +585,7 @@ public class BlockTextureRegistry
 		{
 			return null;
 		}
-		
+
 		byte[][] pixelArrays = new byte[tileCount][];
 		for (int i = 0; i < tileCount; i++)
 		{
@@ -592,12 +594,12 @@ public class BlockTextureRegistry
 		this.firstTileIdPendingUpload = this.tilePixelsById.size();
 		return new PendingTiles(firstId, pixelArrays);
 	}
-	
+
 	public synchronized int getTileCount() { return this.tilePixelsById.size(); }
-	
+
 	/** Makes every tile pending again, used when the GPU atlas is re-allocated. */
 	public synchronized void resetPendingUploads() { this.firstTileIdPendingUpload = 0; }
-	
+
 	/** Should be called whenever MC's textures change, IE when resource packs are swapped. */
 	public synchronized void clear()
 	{
@@ -609,76 +611,77 @@ public class BlockTextureRegistry
 		short[] flatSet = this.faceTileIdsBySetId.get(UNTEXTURED_ID);
 		this.faceTileIdsBySetId.clear();
 		this.faceTileIdsBySetId.add(flatSet);
-		
+
 		this.tileIdByContent.clear();
 		byte[] flatTile = this.tilePixelsById.get(UNTEXTURED_ID);
 		this.tilePixelsById.clear();
 		this.tilePixelsById.add(flatTile);
 		this.firstTileIdPendingUpload = 0;
-		
+
 		IBlockStateFaceTextureProvider textureProvider = SingletonInjector.INSTANCE.get(IBlockStateFaceTextureProvider.class);
 		if (textureProvider != null)
 		{
 			textureProvider.clear();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	/** wraps tile pixels so they can be used as a hash map key for deduplication */
 	private static class TileKey
 	{
 		private final byte[] pixels;
 		private final int hash;
-		
+
 		public TileKey(byte[] pixels)
 		{
 			this.pixels = pixels;
 			this.hash = Arrays.hashCode(pixels);
 		}
-		
+
 		@Override
 		public int hashCode() { return this.hash; }
-		
+
 		@Override
 		public boolean equals(Object obj)
 		{
-			if (this == obj) 
+			if (this == obj)
 			{
-				return true; 
+				return true;
 			}
-			
-			if (!(obj instanceof TileKey)) 
+
+			if (!(obj instanceof TileKey))
 			{
-				return false; 
+				return false;
 			}
-			
+
 			return Arrays.equals(this.pixels, ((TileKey) obj).pixels);
 		}
-		
+
 	}
-	
+
 	public static class PendingTiles
 	{
 		public final int firstTileId;
 		public final byte[][] tilePixels;
-		
+
 		public PendingTiles(int firstTileId, byte[][] tilePixels)
 		{
 			this.firstTileId = firstTileId;
 			this.tilePixels = tilePixels;
 		}
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

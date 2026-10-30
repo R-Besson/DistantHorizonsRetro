@@ -12,9 +12,9 @@ public class PooledZstdDecompressor
 {
 	/** reuse the ZStd native context for a minor speed improvement */
 	private static final ConcurrentLinkedQueue<ZstdDecompressCtx> ZSTD_CONTEXT_CACHE = new ConcurrentLinkedQueue<>();
-	
-	
-	
+
+
+
 	/**
 	 * Replaces {@link Zstd#decompress} so we can use a pooled byte array
 	 * which significantly reduces GC pressure.
@@ -33,7 +33,7 @@ public class PooledZstdDecompressor
 			// otherwise let ZstdException get error message itself
 			throw new ZstdException(contentSize);
 		}
-		
+
 		ByteArrayList destination = checkout.getByteArray(0, contentSize);
 		return decompress(src, compressedSize, contentSize, destination);
 	}
@@ -43,23 +43,23 @@ public class PooledZstdDecompressor
 		{
 			throw new ZstdException(Zstd.errGeneric(), "Original size should not be negative");
 		}
-		
+
 		// reuse the ZStd native context for a minor speed improvement
 		ZstdDecompressCtx ctx = ZSTD_CONTEXT_CACHE.poll();
 		if (ctx == null)
 		{
 			ctx = new ZstdDecompressCtx();
 		}
-		
+
 		int size = ctx.decompressByteArray(destination.elements(), 0, destination.size(), src, 0, srcSize);
 		if (size != originalSize)
 		{
 			destination.size(size); // this assumes the size will only be smaller than the expected
 		}
-		
+
 		ZSTD_CONTEXT_CACHE.add(ctx);
-		
+
 		return destination;
 	}
-	
+
 }

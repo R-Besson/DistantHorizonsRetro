@@ -7,17 +7,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ChunkCache.class)
-public interface IMixinChunkCache_SideFacingUnloaded 
+public interface IMixinChunkCache_SideFacingUnloaded
 {
-    @Accessor
-    Chunk[][] getChunkArray();
+	@Accessor
+	Chunk[][] getChunkArray();
 
-    @Accessor
-    int getChunkX();
+	@Accessor
+	int getChunkX();
 
-    @Accessor
-    int getChunkZ();
-	
-	
-	
+	@Accessor
+	int getChunkZ();
+
+
+
 }

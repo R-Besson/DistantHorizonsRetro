@@ -18,114 +18,114 @@ public class QuadTreeTickNodeHolder
 {
 	/** Nodes that should be pulled in from the disk */
 	private final HashSet<LodRenderSection> sectionsToLoad = new HashSet<>();
-	
+
 	private final HashSet<QuadNode<LodRenderSection>> presentNodes = new HashSet<>();
-	
+
 	private final HashSet<QuadNode<LodRenderSection>> nodesToEnable = new HashSet<>();
 	private final HashSet<QuadNode<LodRenderSection>> nodesToDisable = new HashSet<>();
 	private final ArrayList<QuadNode<LodRenderSection>> nodesToEnableDeleteChildrenList = new ArrayList<>();
-	
-	/** 
+
+	/**
 	 * not included in {@link #clear()} to allow for use on the {@link LodQuadTree}'s
 	 * queuing thread.
-	 * Always generated based on other 
+	 * Always generated based on other
 	 */
 	private final ArrayList<QuadNode<LodRenderSection>> nodesForWorldGen = new ArrayList<>();
-	
+
 	private final QuadNodeNearComparator quadNodeNearComparator = new QuadNodeNearComparator();
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
-	///region
-	
+	/// region
+
 	public void clear()
 	{
 		this.sectionsToLoad.clear();
-		
+
 		this.presentNodes.clear();
-		
+
 		this.nodesToEnable.clear();
 		this.nodesToDisable.clear();
 		this.nodesToEnableDeleteChildrenList.clear();
 	}
-	
-	
+
+
 	// loading
 	public void addLoadSection(LodRenderSection section) { this.sectionsToLoad.add(section); }
 	public HashSet<LodRenderSection> getLoadSections() { return this.sectionsToLoad; }
-	
-	
+
+
 	// enable
 	public void addEnableNode(QuadNode<LodRenderSection> node)
 	{
-		if(this.presentNodes.add(node))
+		if (this.presentNodes.add(node))
 		{
 			this.nodesToEnable.add(node);
 		}
 	}
-	
+
 	/**  */
 	public void removeEnableAndDisableNode(QuadNode<LodRenderSection> node)
 	{
 		this.nodesToEnable.remove(node);
 		this.nodesToEnableDeleteChildrenList.remove(node);
-		
+
 		this.presentNodes.add(node); // should already be present, but re-added just in case
 		this.nodesToDisable.add(node); // node shouldn't be rendered since it's being disabled by a parent
 	}
-	
+
 	public HashSet<QuadNode<LodRenderSection>> getEnabledNodes() { return this.nodesToEnable; }
-	
-	
+
+
 	// disable
 	public void addDisableNode(QuadNode<LodRenderSection> node)
 	{
-		if(this.presentNodes.add(node))
+		if (this.presentNodes.add(node))
 		{
 			this.nodesToDisable.add(node);
 		}
 	}
 	public HashSet<QuadNode<LodRenderSection>> getDisableNodes() { return this.nodesToDisable; }
-	
-	
+
+
 	// enable - delete children
 	public void addEnableDeleteChildrenNode(QuadNode<LodRenderSection> node)
 	{
-		if(this.presentNodes.add(node))
+		if (this.presentNodes.add(node))
 		{
 			this.nodesToEnableDeleteChildrenList.add(node);
 		}
 	}
 	public ArrayList<QuadNode<LodRenderSection>> getEnableDeleteChildrenNodes() { return this.nodesToEnableDeleteChildrenList; }
-	public ArrayList<QuadNode<LodRenderSection>> getWorldGenNodesNearToFar(DhBlockPos2D centerPos) 
+	public ArrayList<QuadNode<LodRenderSection>> getWorldGenNodesNearToFar(DhBlockPos2D centerPos)
 	{
 		this.quadNodeNearComparator.centerPos = centerPos;
 		this.nodesToEnableDeleteChildrenList.sort(this.quadNodeNearComparator);
-		
-		// this 
+
+		// this
 		this.nodesForWorldGen.clear();
 		this.nodesForWorldGen.addAll(this.nodesToEnableDeleteChildrenList);
-		
+
 		return this.nodesForWorldGen;
 	}
-	
+
 	///endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	///region
-	
+
 	/** orders closest LODs first */
 	private static class QuadNodeNearComparator implements Comparator<QuadNode<LodRenderSection>>
 	{
 		public DhBlockPos2D centerPos = DhBlockPos2D.ZERO;
-		
+
 		@Override
 		public int compare(QuadNode<LodRenderSection> nodeA, QuadNode<LodRenderSection> nodeB)
 		{
@@ -135,10 +135,11 @@ public class QuadTreeTickNodeHolder
 			int bDist = DhSectionPos.getChebyshevSignedBlockDistance(nodeB.sectionPos, this.centerPos);
 			return Integer.compare(aDist, bDist); // smaller numbers first
 		}
+
 	}
-	
+
 	///endregion
-	
-	
-	
+
+
+
 }

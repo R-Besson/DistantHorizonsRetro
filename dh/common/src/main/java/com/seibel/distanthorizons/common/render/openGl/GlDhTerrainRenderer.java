@@ -9,27 +9,27 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTe
 public class GlDhTerrainRenderer implements IDhTerrainRenderer
 {
 	public static final GlDhTerrainRenderer INSTANCE = new GlDhTerrainRenderer();
-	
+
 	private GlDhTerrainShaderProgram terrainShaderProgram = null;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	private GlDhTerrainRenderer() {}
-	
+
+	private GlDhTerrainRenderer() { }
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	/** must be called on the render thread the first time so GL can run it's setup */
 	public GlDhTerrainShaderProgram getTerrainShaderProgram()
 	{
@@ -37,30 +37,30 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 		{
 			this.terrainShaderProgram = new GlDhTerrainShaderProgram();
 		}
-		
+
 		return this.terrainShaderProgram;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
-	@Override 
+
+	@Override
 	public void render(RenderParams renderEventParam, boolean opaquePass, SortedArraySet<LodBufferContainer> bufferContainers)
 	{
 		this.getTerrainShaderProgram();
-		
+
 		this.terrainShaderProgram.tryInit();
 		this.terrainShaderProgram.render(renderEventParam, opaquePass, bufferContainers);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

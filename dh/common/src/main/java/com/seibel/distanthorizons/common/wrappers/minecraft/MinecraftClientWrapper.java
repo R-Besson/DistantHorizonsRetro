@@ -86,7 +86,7 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	public boolean connectedToReplay()
 	{
 		return !this.hasServerConnection()
-			&& !this.hasSinglePlayerServer() ;
+			&& !this.hasSinglePlayerServer();
 	}
 
 	private boolean hasServerConnection()
@@ -134,13 +134,19 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	}
 	private String getServerIp(ServerData server)
 	{
-		if (server == null) { return "NA"; }
+		if (server == null)
+		{
+			return "NA";
+		}
 
 		return server.serverIP;
 	}
 	private String getServerVersion(ServerData server)
 	{
-		if (server == null) { return "UNKOWN"; }
+		if (server == null)
+		{
+			return "UNKOWN";
+		}
 
 		return server.gameVersion;
 	}
@@ -243,7 +249,8 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 		}
 
 		String[] lines = string.split("\n");
-		for (String line : lines) {
+		for (String line : lines)
+		{
 			player.addChatMessage(new ChatComponentText(line));
 		}
 	}

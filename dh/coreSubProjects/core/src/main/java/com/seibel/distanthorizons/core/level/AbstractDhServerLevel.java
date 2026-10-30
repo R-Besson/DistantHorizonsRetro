@@ -38,45 +38,45 @@ import java.util.concurrent.CompletableFuture;
 public abstract class AbstractDhServerLevel extends AbstractDhLevel implements IDhServerLevel
 {
 	protected static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public final ServerLevelModule serverside;
 	protected final IServerLevelWrapper serverLevelWrapper;
-	
+
 	protected final ServerPlayerStateManager serverPlayerStateManager;
-	
+
 	/**
 	 * Used for ensuring fair generation speed for each player. <br>
 	 * Every tick the next player in this level gets used for centering generation.
 	 */
 	private int worldGenCenteringPlayerIndex = 0;
-	
+
 	private final FullDataSourceRequestHandler requestHandler;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public AbstractDhServerLevel(
-		ISaveStructure saveStructure, 
-		IServerLevelWrapper serverLevelWrapper, 
+		ISaveStructure saveStructure,
+		IServerLevelWrapper serverLevelWrapper,
 		ServerPlayerStateManager serverPlayerStateManager
-		) throws SQLException, IOException
+	) throws SQLException, IOException
 	{ this(saveStructure, serverLevelWrapper, serverPlayerStateManager, true); }
-	
+
 	public AbstractDhServerLevel(
-			ISaveStructure saveStructure,
-			IServerLevelWrapper serverLevelWrapper,
-			ServerPlayerStateManager serverPlayerStateManager,
-			boolean runRepoReliantSetup
-		) throws SQLException, IOException
+		ISaveStructure saveStructure,
+		IServerLevelWrapper serverLevelWrapper,
+		ServerPlayerStateManager serverPlayerStateManager,
+		boolean runRepoReliantSetup
+	) throws SQLException, IOException
 	{
 		File saveFolder = saveStructure.getSaveFolder(serverLevelWrapper);
 		saveFolder.mkdirs();
 		if (!saveFolder.exists())
 		{
-			throw new IOException("unable to create save folder at ["+saveFolder.getPath()+"]. If you're on Windows you may need to enable long file paths.");
+			throw new IOException("unable to create save folder at [" + saveFolder.getPath() + "]. If you're on Windows you may need to enable long file paths.");
 		}
 		this.serverLevelWrapper = serverLevelWrapper;
 		this.serverside = new ServerLevelModule(this, saveStructure);
@@ -85,19 +85,19 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		{
 			this.runRepoReliantSetup();
 		}
-		
-		LOGGER.info("Started "+this.getClass().getSimpleName()+" for ["+serverLevelWrapper+"] at ["+saveStructure+"].");
-		
+
+		LOGGER.info("Started " + this.getClass().getSimpleName() + " for [" + serverLevelWrapper + "] at [" + saveStructure + "].");
+
 		this.serverPlayerStateManager = serverPlayerStateManager;
 		this.requestHandler = new FullDataSourceRequestHandler(this);
 	}
-	
-	
-	
+
+
+
 	//=======//
 	// ticks //
 	//=======//
-	
+
 	@Override
 	public boolean shouldDoWorldGen()
 	{
@@ -139,13 +139,13 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		}
 		return playersInLevel;
 	}
-	
-	
-	
+
+
+
 	//==================//
 	// network handling //
 	//==================//
-	
+
 	public void registerNetworkHandlers(ServerPlayerState serverPlayerState)
 	{
 		serverPlayerState.networkSession.registerHandler(FullDataSourceRequestMessage.class, (message) ->
@@ -154,12 +154,12 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 			{
 				return;
 			}
-			
+
 			DhVec3d playerPosition = serverPlayerState.getServerPlayer().getPosition();
 			int distanceFromPlayer = DhSectionPos.getChebyshevSignedBlockDistance(message.sectionPos, new DhBlockPos2D((int) playerPosition.x, (int) playerPosition.z)) / 16;
-			
+
 			ServerPlayerState.RateLimiterSet rateLimiterSet = serverPlayerState.getRateLimiterSet(this);
-			
+
 			if (message.clientTimestamp == null)
 			{
 				if (distanceFromPlayer > Config.Server.maxGenerationRequestDistance.get())
@@ -167,7 +167,7 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 					message.sendResponse(new RequestOutOfRangeException("Distance too large: " + distanceFromPlayer + " > " + Config.Server.maxGenerationRequestDistance.get()));
 					return;
 				}
-				
+
 				boolean posInRange = WorldGenUtil.isPosInWorldGenRange(
 					message.sectionPos,
 					Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
@@ -197,38 +197,38 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 				this.requestHandler.queueLodSyncForRequestMessage(serverPlayerState, message, rateLimiterSet);
 			}
 		});
-		
-		
+
+
 		serverPlayerState.networkSession.registerHandler(CancelMessage.class, msg ->
 			this.requestHandler.cancelRequest(msg.futureId));
 	}
-	
-	
+
+
 	/** May send an error message in response if the message is a {@link AbstractTrackableMessage} */
 	private <T extends AbstractNetworkMessage> boolean validatePlayerInCurrentLevel(T message)
 	{
 		if (!(message instanceof ILevelRelatedMessage))
 		{
-			LodUtil.assertNotReach("Received message ["+message+"] does not implement ["+ILevelRelatedMessage.class.getSimpleName()+"]");
+			LodUtil.assertNotReach("Received message [" + message + "] does not implement [" + ILevelRelatedMessage.class.getSimpleName() + "]");
 		}
-		
+
 		// Only handle requests for this level
 		if (!((ILevelRelatedMessage) message).isSameLevelAs(this.getServerLevelWrapper()))
 		{
 			return false;
 		}
-		
+
 		LodUtil.assertTrue(message.getSession().serverPlayer != null);
-		
+
 		return true;
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// world gen //
 	//===========//
-	
+
 	@Override
 	public void onWorldGenTaskComplete(long pos)
 	{
@@ -240,25 +240,25 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	{
 		this.requestHandler.onWorldGenTaskFailed(pos);
 	}
-	
-	
-	
+
+
+
 	//=================//
 	// player handling //
 	//=================//
-	
+
 	@Override
 	public CompletableFuture<Void> updateDataSourcesAsync(FullDataSourceV2 data)
 	{
 		return this.getFullDataProvider()
 			.updateDataSourceAsync(data)
-			.thenRun(() -> 
+			.thenRun(() ->
 			{
 				if (!Config.Server.enableRealTimeUpdates.get())
 				{
 					return;
 				}
-				
+
 				LodUtil.assertTrue(this.beaconBeamRepo != null, "beaconBeamRepo should not be null");
 				FullDataPayload payload = new FullDataPayload(data, this.beaconBeamRepo.getAllBeamsForPos(data.getPos()));
 				for (ServerPlayerState serverPlayerState : this.serverPlayerStateManager.getReadyPlayers())
@@ -267,12 +267,12 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 					{
 						continue;
 					}
-					
+
 					if (!serverPlayerState.sessionConfig.isRealTimeUpdatesEnabled())
 					{
 						continue;
 					}
-					
+
 					DhVec3d playerPosition = serverPlayerState.getServerPlayer().getPosition();
 					int distanceFromPlayer = DhSectionPos.getChebyshevSignedBlockDistance(data.getPos(), new DhBlockPos2D((int) playerPosition.x, (int) playerPosition.z)) / 16;
 					if (distanceFromPlayer <= serverPlayerState.sessionConfig.getMaxUpdateDistanceRadius())
@@ -283,45 +283,45 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 				}
 			});
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// debugging //
 	//===========//
-	
+
 	@Override
 	public void addDebugMenuStringsToList(List<String> messageList)
 	{
 		this.serverside.fullDataFileHandler.addDebugMenuStringsToList(messageList);
 		this.serverside.lodRequestModule.addDebugMenuStringsToList(messageList);
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
-	
+
 	@Override
 	public IServerLevelWrapper getServerLevelWrapper() { return this.serverLevelWrapper; }
-	
+
 	@Override
 	@NotNull
 	public ILevelWrapper getLevelWrapper() { return this.getServerLevelWrapper(); }
-	
+
 	@Override
 	public FullDataSourceProviderV2 getFullDataProvider() { return this.serverside.fullDataFileHandler; }
-	
+
 	@Override
 	public ISaveStructure getSaveStructure() { return this.serverside.saveStructure; }
-	
-	
-	
+
+
+
 	//==========//
 	// shutdown //
 	//==========//
-	
+
 	@Override
 	public void close()
 	{
@@ -330,7 +330,7 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		this.requestHandler.close();
 		LOGGER.info("Closed DHLevel for [" + this.getLevelWrapper() + "].");
 	}
-	
-	
-	
+
+
+
 }

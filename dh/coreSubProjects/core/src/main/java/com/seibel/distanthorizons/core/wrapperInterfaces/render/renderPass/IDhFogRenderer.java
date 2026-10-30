@@ -25,7 +25,7 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 
 public interface IDhFogRenderer extends IBindable
 {
-	
+
 	void render(RenderParams renderParams, DhApiFogRenderParam fogRenderParams);
-	
+
 }

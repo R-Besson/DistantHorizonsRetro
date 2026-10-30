@@ -26,19 +26,19 @@ public class ConfigUIButton extends AbstractConfigBase<Runnable>
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ConfigUIButton(Runnable runnable)
 	{ super(EConfigEntryAppearance.ONLY_IN_GUI, runnable); }
-	
-	
-	
+
+
+
 	//=========//
 	// actions //
 	//=========//
-	
-	/** 
-	 * Runs the action of the button. 
-	 * NOTE: This will run on the render thread 
+
+	/**
+	 * Runs the action of the button.
+	 * NOTE: This will run on the render thread
 	 * (so it can halt the main process if it takes too long and isn't offloaded to another thread)
 	 */
 	public void runAction() { this.value.run(); }

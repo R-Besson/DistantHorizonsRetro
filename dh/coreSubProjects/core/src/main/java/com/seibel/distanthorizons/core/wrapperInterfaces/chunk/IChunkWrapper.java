@@ -41,16 +41,16 @@ public interface IChunkWrapper extends IBindable
 {
 	/** useful for debugging, but can slow down chunk operations quite a bit due to being called every time. */
 	boolean RUN_RELATIVE_POS_INDEX_VALIDATION = ModInfo.IS_DEV_BUILD;
-	
-	
-	
+
+
+
 	DhChunkPos getChunkPos();
 
 	/** inclusive (IE if returning -64 the min block can be placed at -64) */
 	int getInclusiveMinBuildHeight();
 	/** exclusive (IE if returning 320 the max block can be placed at 319) */
 	int getExclusiveMaxBuildHeight();
-	
+
 	/**
 	 * returns the Y level for the last non-empty section in this chunk,
 	 * or {@link IChunkWrapper#getInclusiveMinBuildHeight()} if this chunk is completely empty.
@@ -61,9 +61,9 @@ public interface IChunkWrapper extends IBindable
 	 * or {@link IChunkWrapper#getExclusiveMaxBuildHeight()} if this chunk is completely empty.
 	 */
 	int getMaxNonEmptyHeight();
-	
+
 	void createDhHeightMaps();
-	
+
 	/** @return The highest y position of a solid block at the given relative chunk position. */
 	int getSolidHeightMapValue(int xRel, int zRel);
 	/**
@@ -71,49 +71,49 @@ public interface IChunkWrapper extends IBindable
 	 * Note: this includes water.
 	 */
 	int getLightBlockingHeightMapValue(int xRel, int zRel);
-	
+
 	int getMinBlockX();
 	int getMinBlockZ();
-	
+
 	void setIsDhBlockLightCorrect(boolean isDhLightCorrect);
 
 	boolean isDhBlockLightingCorrect();
-	
-	
+
+
 	int getDhSkyLight(int relX, int relY, int relZ);
 	void setDhSkyLight(int relX, int relY, int relZ, int lightValue);
 	void clearDhSkyLighting();
-	
+
 	int getDhBlockLight(int relX, int relY, int relZ);
 	void setDhBlockLight(int relX, int relY, int relZ, int lightValue);
 	void clearDhBlockLighting();
-	
-	
+
+
 	/** Note: don't modify this array, it will only be generated once and then shared between uses */
 	ArrayList<DhBlockPos> getWorldBlockLightPosList();
-	
+
 	String toString();
-	
-	
+
+
 	default IBlockStateWrapper getBlockState(DhBlockPos pos) { return this.getBlockState(pos.getX(), pos.getY(), pos.getZ()); }
 	IBlockStateWrapper getBlockState(int relX, int relY, int relZ);
-	/** @see #getBlockState(int, int, int, IBlockStateWrapper)  */
+	/** @see #getBlockState(int, int, int, IBlockStateWrapper) */
 	default IBlockStateWrapper getBlockState(DhBlockPos pos, IBlockStateWrapper guess) { return this.getBlockState(pos.getX(), pos.getY(), pos.getZ(), guess); }
-	/** 
+	/**
 	 * Can be faster than {@link IChunkWrapper#getBlockState} in some cases
 	 * due to directly passing in several shared objects.
 	 */
 	IBlockStateWrapper getBlockState(int relX, int relY, int relZ, IBlockStateWrapper guess);
-	
+
 	IMutableBlockPosWrapper getMutableBlockPosWrapper();
-	
+
 	IBiomeWrapper getBiome(int relX, int relZ);
-	
-	
+
+
 	//========================//
 	// default helper methods //
 	//========================//
-	
+
 	/** used to prevent accidentally attempting to get/set values outside this chunk's boundaries */
 	default void throwIndexOutOfBoundsIfRelativePosOutsideChunkBounds(int x, int y, int z) throws IndexOutOfBoundsException
 	{
@@ -128,12 +128,12 @@ public interface IChunkWrapper extends IBindable
 		int maxHeight = this.getExclusiveMaxBuildHeight() + 1;
 
 		if (x < 0 || x >= LodUtil.CHUNK_WIDTH
-				|| z < 0 || z >= LodUtil.CHUNK_WIDTH
-				|| y < minHeight || y > maxHeight)
+			|| z < 0 || z >= LodUtil.CHUNK_WIDTH
+			|| y < minHeight || y > maxHeight)
 		{
 			String errorMessage = "Relative position [" + x + "," + y + "," + z + "] out of bounds. \n" +
-					"X/Z must be between 0 and 15 (inclusive) \n" +
-					"Y must be between [" + minHeight + "] and [" + maxHeight + "] (inclusive).";
+				"X/Z must be between 0 and 15 (inclusive) \n" +
+				"Y must be between [" + minHeight + "] and [" + maxHeight + "] (inclusive).";
 			throw new IndexOutOfBoundsException(errorMessage);
 		}
 	}
@@ -147,46 +147,46 @@ public interface IChunkWrapper extends IBindable
 
 
 		if (x < 0 || x >= LodUtil.CHUNK_WIDTH
-				|| z < 0 || z >= LodUtil.CHUNK_WIDTH)
+			|| z < 0 || z >= LodUtil.CHUNK_WIDTH)
 		{
 			String errorMessage = "Relative position [" + x + "," + z + "] out of bounds. \n" +
-					"X/Z must be between 0 and 15 (inclusive).";
+				"X/Z must be between 0 and 15 (inclusive).";
 			throw new IndexOutOfBoundsException(errorMessage);
 		}
 	}
-	
+
 	default int getBlockBiomeHashCode()
 	{
 		int hash = 31;
 		int primeBlockMultiplier = 227;
 		int primeBiomeMultiplier = 701;
 		int primeHeightMultiplier = 137;
-		
+
 		int minBuildHeight = this.getMinNonEmptyHeight();
 		int maxBuildHeight = this.getMaxNonEmptyHeight();
-		
+
 		@SuppressWarnings("unused")
 		IMutableBlockPosWrapper mcBlockPos = this.getMutableBlockPosWrapper();
-		
+
 		IBlockStateWrapper previousBlockState = null;
-		
-		
+
+
 		// most blocks (only some blocks are sampled since checking every block is a very slow operation)
-		for (int x = 0; x < LodUtil.CHUNK_WIDTH; x+=2)
+		for (int x = 0; x < LodUtil.CHUNK_WIDTH; x += 2)
 		{
-			for (int z = 0; z < LodUtil.CHUNK_WIDTH; z+=2)
+			for (int z = 0; z < LodUtil.CHUNK_WIDTH; z += 2)
 			{
-				for (int y = minBuildHeight; y < maxBuildHeight; y+=2)
+				for (int y = minBuildHeight; y < maxBuildHeight; y += 2)
 				{
 					previousBlockState = this.getBlockState(x, y, z, previousBlockState);
-					
+
 					hash = (hash * primeBlockMultiplier) + previousBlockState.hashCode();
 					hash = (hash * primeBiomeMultiplier) + this.getBiome(x, z).hashCode();
 					hash = (hash * primeHeightMultiplier) + y;
 				}
 			}
 		}
-		
+
 		// surface (this should cover most cases for when users modify chunks)
 		for (int x = 0; x < LodUtil.CHUNK_WIDTH; x++)
 		{
@@ -194,45 +194,45 @@ public interface IChunkWrapper extends IBindable
 			{
 				int lightBlockingY = this.getLightBlockingHeightMapValue(x, z);
 				previousBlockState = this.getBlockState(x, lightBlockingY, z, previousBlockState);
-				
+
 				hash = (hash * primeBlockMultiplier) + previousBlockState.hashCode();
 				hash = (hash * primeBiomeMultiplier) + this.getBiome(x, z).hashCode();
 				hash = (hash * primeHeightMultiplier) + lightBlockingY;
-				
+
 				int solidY = this.getSolidHeightMapValue(x, z);
 				if (solidY != lightBlockingY)
 				{
 					previousBlockState = this.getBlockState(x, lightBlockingY, z, previousBlockState);
-					
+
 					hash = (hash * primeBlockMultiplier) + previousBlockState.hashCode();
 					hash = (hash * primeBiomeMultiplier) + this.getBiome(x, z).hashCode();
 					hash = (hash * primeHeightMultiplier) + solidY;
 				}
 			}
 		}
-		
+
 		// light emitting blocks (if the light changes then the LOD definitely needs to be updated)
-		final DhBlockPosMutable relPos = new DhBlockPosMutable(); 
+		final DhBlockPosMutable relPos = new DhBlockPosMutable();
 		ArrayList<DhBlockPos> lightPosList = this.getWorldBlockLightPosList();
 		for (int i = 0; i < lightPosList.size(); i++)
 		{
 			DhBlockPos pos = lightPosList.get(i);
 			pos.mutateToChunkRelativePos(relPos);
-			
+
 			hash = (hash * primeBlockMultiplier) + this.getBlockState(relPos.getX(), relPos.getY(), relPos.getZ()).hashCode();
 			hash = (hash * primeHeightMultiplier) + relPos.getY();
 		}
-		
-		
+
+
 		return hash;
 	}
-	
+
 	default List<BeaconBeamDTO> getAllActiveBeacons(ArrayList<IChunkWrapper> neighbourChunkList)
 	{
 		ArrayList<BeaconBeamDTO> beaconBeamList = new ArrayList<>();
-		
+
 		AdjacentChunkHolder adjacentChunkHolder = new AdjacentChunkHolder(this, neighbourChunkList);
-		
+
 		// find the beacon block positions,
 		// since beacons emit light we only need to check the positions that emit light
 		final DhBlockPosMutable relPos = new DhBlockPosMutable();
@@ -241,8 +241,8 @@ public interface IChunkWrapper extends IBindable
 		{
 			DhBlockPos pos = blockPosList.get(i);
 			pos.mutateToChunkRelativePos(relPos);
-			
-			
+
+
 			IBlockStateWrapper block = this.getBlockState(relPos);
 			if (block.isBeaconBlock())
 			{
@@ -256,23 +256,23 @@ public interface IChunkWrapper extends IBindable
 				}
 			}
 		}
-		
+
 		return beaconBeamList;
 	}
 	/** @return Null if the position isn't valid for a beacon beam. */
 	@Nullable
-	static Color getBeaconColor(DhBlockPos beaconPos, AdjacentChunkHolder chunkHolder) 
+	static Color getBeaconColor(DhBlockPos beaconPos, AdjacentChunkHolder chunkHolder)
 	{
 		DhBlockPos beaconRelPos = beaconPos.createChunkRelativePos();
-		DhBlockPosMutable baseRelPos = new DhBlockPosMutable(0, beaconRelPos.getY() -1, 0);
-		
-		
-		
+		DhBlockPosMutable baseRelPos = new DhBlockPosMutable(0, beaconRelPos.getY() - 1, 0);
+
+
+
 		//===========================//
 		// check for the base blocks //
 		//===========================//
-		
-		for (int x = -1; x<= 1; x++) 
+
+		for (int x = -1; x <= 1; x++)
 		{
 			for (int z = -1; z <= 1; z++)
 			{
@@ -292,22 +292,22 @@ public interface IChunkWrapper extends IBindable
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		//=========================//
 		// get the beacon color    //
 		// and check for occlusion //
 		//=========================//
-		
+
 		int red = 0;
 		int green = 0;
 		int blue = 0;
 		boolean beaconTintBlockFound = false;
-		
+
 		IChunkWrapper centerChunk = chunkHolder.getByBlockPos(beaconPos.getX(), beaconPos.getZ());
 		int maxY = centerChunk.getMaxNonEmptyHeight();
-		for (int y = beaconRelPos.getY() +1; y <= maxY; y++)
+		for (int y = beaconRelPos.getY() + 1; y <= maxY; y++)
 		{
 			IBlockStateWrapper block = centerChunk.getBlockState(beaconRelPos.getX(), y, beaconRelPos.getZ());
 			if (!block.allowsBeaconBeamPassage())
@@ -315,13 +315,13 @@ public interface IChunkWrapper extends IBindable
 				// beam is blocked by this block
 				return null;
 			}
-			
+
 			if (block.isBeaconTintBlock())
 			{
- 				red += block.getBeaconTintColor().getRed();
+				red += block.getBeaconTintColor().getRed();
 				green += block.getBeaconTintColor().getGreen();
 				blue += block.getBeaconTintColor().getBlue();
-				
+
 				if (beaconTintBlockFound)
 				{
 					red /= 2;
@@ -331,14 +331,14 @@ public interface IChunkWrapper extends IBindable
 				beaconTintBlockFound = true;
 			}
 		}
-		
+
 		return beaconTintBlockFound ? new Color(red, green, blue) : Color.WHITE;
 	}
-	
+
 	IChunkWrapper copy();
 	/** creates a copy with a different level wrapper reference */
 	IChunkWrapper copyWithLevel(ILevelWrapper levelWrapper);
-	
-	
-	
+
+
+
 }

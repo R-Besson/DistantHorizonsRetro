@@ -22,9 +22,9 @@ package com.seibel.distanthorizons.api.enums.rendering;
 /**
  * DISABLED,					<br>
  * COMPLETE,					<br>
- * 
- * @since API 2.0.0
+ *
  * @version 2026-05-19
+ * @since API 2.0.0
  */
 public enum EDhApiTransparency
 {

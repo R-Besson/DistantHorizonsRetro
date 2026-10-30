@@ -13,15 +13,15 @@ import java.util.concurrent.locks.ReentrantLock;
 public class KeyedLockContainer<TKey>
 {
 	protected final ReentrantLock[] lockArray;
-	
-	
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public KeyedLockContainer()
 	{
-		// the lock array's length is significantly higher than the number of CPU cores 
+		// the lock array's length is significantly higher than the number of CPU cores
 		// to reduce the number of unintended collisions
 		this(Runtime.getRuntime().availableProcessors() * 64);
 	}
@@ -33,13 +33,13 @@ public class KeyedLockContainer<TKey>
 			this.lockArray[i] = new ReentrantLock();
 		}
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
-	
+
 	public ReentrantLock getLockForPos(TKey key) { return this.lockArray[Math.abs(key.hashCode()) % this.lockArray.length]; }
-	
+
 }

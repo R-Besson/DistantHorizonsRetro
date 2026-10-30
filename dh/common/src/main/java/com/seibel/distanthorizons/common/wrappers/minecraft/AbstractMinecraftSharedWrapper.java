@@ -24,7 +24,7 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 	{
 		try
 		{
-			return Integer.parseInt(dimensionResourceLocation.substring(dimensionResourceLocation.indexOf(":")+1));
+			return Integer.parseInt(dimensionResourceLocation.substring(dimensionResourceLocation.indexOf(":") + 1));
 		}
 		catch (NumberFormatException e)
 		{
@@ -87,7 +87,7 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 		Arrays.sort(sortedNanoTicks);
 
 		// 99 percentile
-		int p99Index = (int)Math.ceil(0.99 * sortedNanoTicks.length) - 1;
+		int p99Index = (int) Math.ceil(0.99 * sortedNanoTicks.length) - 1;
 		double p99Ms = sortedNanoTicks[Math.max(0, p99Index)] * 1e-6; // convert from Nano to Milli
 
 		double avgMs = Arrays.stream(sortedNanoTicks).average().orElse(0) * 1e-6; // convert from Nano to Milli
@@ -98,7 +98,7 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 			slowTickCount++;
 		}
 
-		return new double[] { avgMs, p99Ms, slowTickCount };
+		return new double[]{avgMs, p99Ms, slowTickCount};
 	}
 
 	private long @Nullable [] getServerTickTimesNano()

@@ -23,7 +23,11 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.network.messages.AbstractNetworkMessage;
 import com.seibel.distanthorizons.core.network.messages.MessageRegistry;
-import com.seibel.distanthorizons.core.world.*;
+import com.seibel.distanthorizons.core.world.AbstractDhWorld;
+import com.seibel.distanthorizons.core.world.DhApiWorldProxy;
+import com.seibel.distanthorizons.core.world.DhClientServerWorld;
+import com.seibel.distanthorizons.core.world.DhServerWorld;
+import com.seibel.distanthorizons.core.world.IDhServerWorld;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IServerPlayerWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
@@ -37,33 +41,33 @@ import org.jetbrains.annotations.NotNull;
 public class ServerApi
 {
 	public static final ServerApi INSTANCE = new ServerApi();
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	private ServerApi() { }
-	
-	
-	
+
+
+
 	//===============//
 	// server events //
 	//===============//
-	
+
 	public void serverLoadEvent(boolean isDedicatedEnvironment)
 	{
 		LOGGER.debug("Server World loading with (dedicated?:" + isDedicatedEnvironment + ")");
 		SharedApi.setDhWorld(isDedicatedEnvironment ? new DhServerWorld() : new DhClientServerWorld());
 	}
-	
+
 	public void serverUnloadEvent()
 	{
 		LOGGER.debug("Server World " + SharedApi.getAbstractDhWorld() + " unloading");
-		
+
 		// shutdown the world if it isn't already,
 		// setDhWorld closes the old world so it shouldn't be closed here as well
 		if (SharedApi.getAbstractDhWorld() != null)
@@ -71,16 +75,16 @@ public class ServerApi
 			SharedApi.setDhWorld(null);
 		}
 	}
-	
-	
+
+
 	//==============//
 	// level events //
 	//==============//
-	
+
 	public void serverLevelLoadEvent(IServerLevelWrapper levelWrapper)
 	{
 		LOGGER.debug("Server Level " + levelWrapper + " loading");
-		
+
 		AbstractDhWorld serverWorld = SharedApi.getAbstractDhWorld();
 		if (serverWorld != null)
 		{
@@ -90,37 +94,37 @@ public class ServerApi
 	public void serverLevelUnloadEvent(IServerLevelWrapper level)
 	{
 		LOGGER.debug("Server Level " + level + " unloading");
-		
+
 		AbstractDhWorld serverWorld = SharedApi.getAbstractDhWorld();
 		if (serverWorld != null)
 		{
 			serverWorld.unloadLevel(level);
 		}
 	}
-	
-	
+
+
 	//=======================//
 	// chunk modified events //
 	//=======================//
-	
+
 	public void serverChunkLoadEvent(IChunkWrapper chunkWrapper, ILevelWrapper level) { SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, level, true); }
 	public void serverChunkSaveEvent(IChunkWrapper chunkWrapper, ILevelWrapper level) { SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, level, true); }
-	
-	
-	
+
+
+
 	//===============//
 	// player events //
 	//===============//
-	
+
 	public void serverPlayerJoinEvent(IServerPlayerWrapper player)
 	{
 		if (DhApiWorldProxy.INSTANCE.tryGetReadOnly())
 		{
 			return;
 		}
-		
+
 		IDhServerWorld serverWorld = SharedApi.tryGetDhServerWorld();
-		LOGGER.info("Player ["+player.getName()+"] joined.");
+		LOGGER.info("Player [" + player.getName() + "] joined.");
 		if (serverWorld != null)
 		{
 			serverWorld.addPlayer(player);
@@ -132,9 +136,9 @@ public class ServerApi
 		{
 			return;
 		}
-		
+
 		IDhServerWorld serverWorld = SharedApi.tryGetDhServerWorld();
-		LOGGER.info("Player ["+player.getName()+"] disconnected.");
+		LOGGER.info("Player [" + player.getName() + "] disconnected.");
 		if (serverWorld != null)
 		{
 			serverWorld.removePlayer(player);
@@ -146,9 +150,9 @@ public class ServerApi
 		{
 			return;
 		}
-		
+
 		IDhServerWorld serverWorld = SharedApi.tryGetDhServerWorld();
-		LOGGER.info("Player ["+player.getName()+"] changed level: ["+originLevel.getKeyedLevelDimensionName()+"] -> ["+destinationLevel.getKeyedLevelDimensionName()+"].");
+		LOGGER.info("Player [" + player.getName() + "] changed level: [" + originLevel.getKeyedLevelDimensionName() + "] -> [" + destinationLevel.getKeyedLevelDimensionName() + "].");
 		if (serverWorld != null)
 		{
 			// Levels find their players themselves (see AbstractDhServerLevel#getPlayersInLevel),
@@ -156,7 +160,7 @@ public class ServerApi
 			serverWorld.getOrLoadServerLevel(destinationLevel);
 		}
 	}
-	
+
 	/**
 	 * Forwards a decoded message into the registered handlers.
 	 *
@@ -168,12 +172,12 @@ public class ServerApi
 		{
 			return;
 		}
-		
+
 		IDhServerWorld serverWorld = SharedApi.tryGetDhServerWorld();
 		if (serverWorld != null)
 		{
 			serverWorld.getServerPlayerStateManager().handlePluginMessage(player, message);
 		}
 	}
-	
+
 }

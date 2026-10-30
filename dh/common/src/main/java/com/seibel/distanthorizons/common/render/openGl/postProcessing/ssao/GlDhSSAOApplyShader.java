@@ -38,7 +38,7 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Draws the SSAO texture onto DH's FrameBuffer. <br><br>
- * 
+ *
  * See Also: <br>
  * {@link GlDhSSAORenderer} - Parent to this shader. <br>
  * {@link GlDhSSAOShader} - draws the SSAO texture. <br>
@@ -46,13 +46,13 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 {
 	public static GlDhSSAOApplyShader INSTANCE = new GlDhSSAOApplyShader();
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-	
-	
+
+
 	public int ssaoTexture;
-	
+
 	// uniforms
 	public int uSourceColorTexture;
 	public int uSourceDepthTexture;
@@ -61,13 +61,13 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 	public int uNearClipPlane;
 	public int uFarClipPlane;
 	public int uIsReverseZDepth;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	@Override
 	public void onInit()
 	{
@@ -76,7 +76,7 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 			"assets/distanthorizons/shaders/ssao/gl/apply.frag",
 			"vPosition"
 		);
-		
+
 		// uniform setup
 		this.uSourceColorTexture = this.shader.getUniformLocation("uSourceColorTexture");
 		this.uSourceDepthTexture = this.shader.getUniformLocation("uSourceDepthTexture");
@@ -86,54 +86,54 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 		this.uFarClipPlane = this.shader.getUniformLocation("uFarClipPlane");
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// render prep //
 	//=============//
-	
+
 	@Override
 	protected void onApplyUniforms(RenderParams renderParams)
 	{
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId());
 		LWJGL.glUniform1i(this.uSourceDepthTexture, 0);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
 		GLMC.glBindTexture(this.ssaoTexture);
 		LWJGL.glUniform1i(this.uSourceColorTexture, 1);
-		
+
 		LWJGL.glUniform1i(this.uBlurRadius, 2);
-		
+
 		if (this.uViewSize >= 0)
 		{
 			LWJGL.glUniform2f(this.uViewSize,
-					MC_RENDER.getTargetFramebufferViewportWidth(),
-					MC_RENDER.getTargetFramebufferViewportHeight());
+				MC_RENDER.getTargetFramebufferViewportWidth(),
+				MC_RENDER.getTargetFramebufferViewportHeight());
 		}
-		
-		if (this.uNearClipPlane  >= 0)
+
+		if (this.uNearClipPlane >= 0)
 		{
 			LWJGL.glUniform1f(this.uNearClipPlane,
-					RenderUtil.getNearClipPlaneInBlocks());
+				RenderUtil.getNearClipPlaneInBlocks());
 		}
-		
+
 		if (this.uFarClipPlane >= 0)
 		{
 			float farClipPlane = RenderUtil.getFarClipPlaneDistanceInBlocks();
 			LWJGL.glUniform1f(this.uFarClipPlane, farClipPlane);
 		}
-		
+
 		LWJGL.glUniform1i(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	@Override
 	protected void onRender()
 	{
@@ -142,18 +142,18 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 		GLMC.glBlendFuncSeparate(GL11.GL_ZERO, GL11.GL_SRC_ALPHA, GL11.GL_ZERO, GL11.GL_ONE);
 
 		// Depth testing must be disabled otherwise this application shader won't apply anything.
-		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually, 
+		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually,
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
-		
-		// apply the rendered SSAO to the LODs 
+
+		// apply the rendered SSAO to the LODs
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, GlDhSSAOShader.INSTANCE.frameBuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, GlDhMetaRenderer.INSTANCE.getActiveFramebufferId());
-		
-		
+
+
 		GlScreenQuad.INSTANCE.render();
 	}
-	
-	
-	
+
+
+
 }

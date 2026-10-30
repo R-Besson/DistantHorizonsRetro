@@ -39,6 +39,7 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles rendering the normal LOD terrain.
+ *
  * @see LodQuadBuilder
  */
 public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiShaderProgram
@@ -47,64 +48,64 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	private static final IAngelicaAccessor ANGELICA_ACCESSOR = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
-	
+
 	private static final DhVec3f MODEL_POS = new DhVec3f();
 	/** single event object used to reduce GC pressure */
 	private static final DhApiBeforeBufferRenderEvent.EventParam BEFORE_BUFFER_RENDER_EVENT_PARAM = new DhApiBeforeBufferRenderEvent.EventParam();
-	
-	
-	
+
+
+
 	private boolean init = false;
-	
+
 	public GlAbstractVertexAttribute vao;
-	
+
 	/** used for TAA jitter, the 8 represents how many jitter points are available */
 	private int frameIndexMod8 = 0;
-	
-	
-	
+
+
+
 	// uniforms //
-	//region 
-	
+	//region
+
 	public int uCombinedMatrix = -1;
 	public int uModelOffset = -1;
 	public int uWorldYOffset = -1;
-	
+
 	public int uMircoOffset = -1;
 	public int uEarthRadius = -1;
-	
+
 	public int uFrameMod8 = -1;
 	public int uViewWidth = -1;
 	public int uViewHeight = -1;
-	
+
 	public int uLightMap = -1;
 	public int uBlockAtlas = -1;
-	
+
 	// fragment shader uniforms
 	public int uClipDistance = -1;
 	public int uDitherDhRendering = -1;
 	public int uVanillaChunkMask = -1;
 	public int uVanillaChunkMaskRadius = -1;
 	public int uCameraPosInChunk = -1;
-	
+
 	// Noise Uniforms
 	public int uNoiseEnabled = -1;
 	public int uNoiseSteps = -1;
 	public int uNoiseIntensity = -1;
 	public int uNoiseDropoff = -1;
-	
+
 	// Debug Uniform
 	public int uIsWhiteWorld = -1;
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public GlDhTerrainShaderProgram()
 	{
 		super(
@@ -113,15 +114,15 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			new String[]{"vPosition", "color", "irisData"}
 		);
 	}
-	
+
 	public void tryInit()
 	{
 		if (this.init)
 		{
 			return;
 		}
-		
-		
+
+
 		this.uCombinedMatrix = this.getUniformLocation("uCombinedMatrix");
 		this.uModelOffset = this.getUniformLocation("uModelOffset");
 		this.uWorldYOffset = this.getUniformLocation("uWorldYOffset");
@@ -131,27 +132,27 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		this.uCameraPosInChunk = this.getUniformLocation("uCameraPosInChunk");
 		this.uMircoOffset = this.getUniformLocation("uMircoOffset");
 		this.uEarthRadius = this.getUniformLocation("uEarthRadius");
-		
+
 		this.uFrameMod8 = this.getUniformLocation("uFrameMod8");
 		this.uViewWidth = this.getUniformLocation("uViewWidth");
 		this.uViewHeight = this.getUniformLocation("uViewHeight");
-		
+
 		this.uLightMap = this.getUniformLocation("uLightMap");
 		this.uBlockAtlas = this.getUniformLocation("uBlockAtlas");
-		
+
 		// Fog/Clip Uniforms
 		this.uClipDistance = this.getUniformLocation("uClipDistance");
-		
+
 		// Noise Uniforms
 		this.uNoiseEnabled = this.getUniformLocation("uNoiseEnabled");
 		this.uNoiseSteps = this.getUniformLocation("uNoiseSteps");
 		this.uNoiseIntensity = this.getUniformLocation("uNoiseIntensity");
 		this.uNoiseDropoff = this.getUniformLocation("uNoiseDropoff");
-		
+
 		// Debug Uniform
 		this.uIsWhiteWorld = this.getUniformLocation("uIsWhiteWorld");
-		
-		
+
+
 		if (GLProxy.getInstance().vertexAttributeBufferBindingSupported)
 		{
 			this.vao = new GlVertexAttributePostGL43(); // also binds AbstractVertexAttribute
@@ -161,7 +162,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			this.vao = new GlVertexAttributePreGL43(); // also binds AbstractVertexAttribute
 		}
 		this.vao.bind();
-		
+
 		// short: x, y, z, meta
 		//      meta: byte skylight, byte blocklight, byte microOffset
 		this.vao.setVertexAttribute(0, 0, GlVertexPointer.addUnsignedShortsPointer(4, false, true));
@@ -169,7 +170,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		this.vao.setVertexAttribute(0, 1, GlVertexPointer.addUnsignedBytesPointer(4, true, false));
 		// byte: iris material ID, normal index, 2 spacers
 		this.vao.setVertexAttribute(0, 2, GlVertexPointer.addUnsignedBytesPointer(4, true, true));
-		
+
 		try
 		{
 			int vertexByteCount = GlLodVertexFormat.DH_VERTEX_FORMAT.getByteSize();
@@ -180,22 +181,22 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			System.out.println(GlLodVertexFormat.DH_VERTEX_FORMAT);
 			throw e;
 		}
-		
+
 		// unbinding here is necessary to fix an issue when running on Legacy GL
 		this.vao.unbind();
-		
+
 		this.init = true;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// API methods //
 	//=============//
 	//region
-	
+
 	@Override
 	public void bind()
 	{
@@ -209,41 +210,41 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		super.unbind();
 		this.vao.unbind();
 	}
-	
+
 	@Override
 	public void free()
 	{
 		this.vao.free();
 		super.free();
 	}
-	
+
 	@Override
 	public void bindVertexBuffer(int vbo) { this.vao.bindBufferToAllBindingPoints(vbo); }
-	
+
 	@Override
 	public void fillUniformData(DhApiRenderParam renderParameters)
 	{
 		DhMat4f combinedMatrix = new DhMat4f(renderParameters.dhProjectionMatrix);
 		combinedMatrix.multiply(renderParameters.dhModelViewMatrix);
-		
+
 		super.bind();
-		
+
 		// uniforms
 		this.setUniform(this.uCombinedMatrix, combinedMatrix);
 		this.setUniform(this.uMircoOffset, 0.01f); // 0.01 block offset
-		
+
 		this.setUniform(this.uLightMap, LightMapWrapper.GL_BOUND_INDEX);
-		
+
 		boolean texturedLodsEnabled = Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get();
 		if (texturedLodsEnabled)
 		{
 			this.setUniform(this.uBlockAtlas, GlBlockTextureAtlas.GL_BOUND_INDEX);
 		}
-		
+
 		this.setUniform(this.uWorldYOffset, (float) renderParameters.worldYOffset);
-		
+
 		this.setUniform(this.uDitherDhRendering, Config.Client.Advanced.Graphics.Quality.ditherDhFade.get());
-		
+
 		float curveRatio = Config.Client.Advanced.Graphics.Experimental.earthCurveRatio.get();
 		if (curveRatio < -1.0f || curveRatio > 1.0f)
 		{
@@ -255,13 +256,13 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			curveRatio = 0.0f;
 		}
 		this.setUniform(this.uEarthRadius, curveRatio);
-		
-		
+
+
 		if (Config.Client.Advanced.Graphics.enableAntiAliasing.get()
 			&&
 			(
 				IRIS_ACCESSOR == null
-				|| !IRIS_ACCESSOR.isShaderPackInUse()
+					|| !IRIS_ACCESSOR.isShaderPackInUse()
 			)
 		)
 		{
@@ -272,25 +273,25 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		{
 			this.frameIndexMod8 = -1;
 		}
-		this.setUniform(this.uFrameMod8, (float)this.frameIndexMod8);
-		
+		this.setUniform(this.uFrameMod8, (float) this.frameIndexMod8);
+
 		int width = MC_RENDER.getTargetFramebufferViewportWidth();
 		int height = MC_RENDER.getTargetFramebufferViewportHeight();
 		this.setUniform(this.uViewWidth, (float) width);
 		this.setUniform(this.uViewHeight, (float) height);
-		
+
 		// Noise Uniforms
 		this.setUniform(this.uNoiseEnabled, Config.Client.Advanced.Graphics.NoiseTexture.enableNoiseTexture.get());
 		this.setUniform(this.uNoiseSteps, Config.Client.Advanced.Graphics.NoiseTexture.noiseSteps.get());
 		this.setUniform(this.uNoiseIntensity, Config.Client.Advanced.Graphics.NoiseTexture.noiseIntensity.get());
 		this.setUniform(this.uNoiseDropoff, Config.Client.Advanced.Graphics.NoiseTexture.noiseDropoff.get());
-		
+
 		// Debug
 		this.setUniform(this.uIsWhiteWorld, Config.Client.Advanced.Debugging.enableWhiteWorld.get());
-		
+
 		// Clip Uniform
 		this.setUniform(this.uClipDistance, RenderUtil.getLodFadeStartDistanceInBlocks());
-		
+
 		// LODs are always drawn in the chunks MC hasn't built yet,
 		// everywhere else they're clipped and dithered by distance
 		VanillaChunkMask chunkMask = VanillaChunkMask.INSTANCE;
@@ -302,32 +303,32 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			0.0f,
 			(float) (cameraPos.z - (chunkMask.getCameraChunkZ() * 16.0))));
 	}
-	
+
 	@Override
 	public void setModelOffsetPos(DhApiVec3f modelOffsetPos) { this.setUniform(this.uModelOffset, new DhVec3f(modelOffsetPos)); }
-	
+
 	@Override
 	public int getId() { return this.id; }
-	
+
 	/** The base DH render program should always render */
 	@Override
 	public boolean overrideThisFrame() { return true; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// rendering //
 	//===========//
 	//region
-	
+
 	public void render(RenderParams renderEventParam, boolean opaquePass, SortedArraySet<LodBufferContainer> bufferContainers)
 	{
 		//=======================//
 		// debug wireframe setup //
 		//=======================//
-		
+
 		boolean renderWireframe = Config.Client.Advanced.Debugging.renderWireframe.get();
 		if (renderWireframe)
 		{
@@ -339,7 +340,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			LWJGL.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
 			GLMC.enableFaceCulling();
 		}
-		
+
 		if (!opaquePass)
 		{
 			GLMC.enableBlend();
@@ -351,21 +352,21 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		{
 			GLMC.disableBlend();
 		}
-		
+
 		// needs to be explicitly called since Iris may disable color rendering and not re-enable it
 		// when boats are rendered in the scene (due to rendering out water inside the boat)
 		LWJGL.glColorMask(true, true, true, true);
-		
-		// needs to be triggered after DH attempts to set the GL state so that Iris 
+
+		// needs to be triggered after DH attempts to set the GL state so that Iris
 		// can override it as needed
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeRenderPassEvent.class, renderEventParam.apiCopy);
-		
-		
-		
+
+
+
 		//===========//
 		// rendering //
 		//===========//
-		
+
 		if (IRIS_ACCESSOR != null)
 		{
 			// done to fix a bug with Iris where face culling isn't properly set or reverted in the MC state manager
@@ -426,10 +427,10 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 				if (!bufferContainer.buffersUploaded)
 				{
 					// make sure we don't accidentally try
-					// rendering a buffer that is (or is going to be) freed 
+					// rendering a buffer that is (or is going to be) freed
 					continue;
 				}
-				
+
 				// set uniforms and fire events
 				{
 					DhVec3d camPos = renderEventParam.exactCameraPosition;
@@ -438,10 +439,10 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 						(float) (bufferContainer.minCornerBlockPos.getY() - camPos.y),
 						(float) (bufferContainer.minCornerBlockPos.getZ() - camPos.z));
 					BEFORE_BUFFER_RENDER_EVENT_PARAM.update(renderEventParam, MODEL_POS);
-					
+
 					GlDhMetaRenderer.INSTANCE.shaderProgramForThisFrame.bind();
 					GlDhMetaRenderer.INSTANCE.shaderProgramForThisFrame.setModelOffsetPos(MODEL_POS);
-					
+
 					ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeBufferRenderEvent.class, BEFORE_BUFFER_RENDER_EVENT_PARAM);
 
 					// the shader pack's program is bound now, it keeps uniform values so once per pass is enough
@@ -452,7 +453,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 						ANGELICA_ACCESSOR.uploadMissingShaderUniforms();
 					}
 				}
-				
+
 				IVertexBufferWrapper[] vertexBuffers = (opaquePass ? bufferContainer.vboOpaqueWrappers : bufferContainer.vboTransparentWrappers);
 				for (int vboIndex = 0; vboIndex < vertexBuffers.length; vboIndex++)
 				{
@@ -461,8 +462,8 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 					{
 						continue;
 					}
-					
-					
+
+
 					// for lock information please view the lock's javadocs
 					long vboReadStamp = vbo.renderStampLock.readLock();
 					long iboReadStamp = vbo.getQuadIBO().renderStampLock.readLock();
@@ -473,26 +474,26 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 						{
 							continue;
 						}
-						
+
 						// don't render deleted VBOs (this will crash the driver/game)
 						if (vbo.getId() == 0
 							|| vbo.getQuadIBO().getId() == 0)
 						{
 							continue;
 						}
-						
+
 						// 4 vertices per face, but 6 indices (IE 2 triangles) per face, aka need to multiply by 1.5
 						int indexCount = (int) (vbo.getVertexCount() * 1.5);
-						
+
 						vbo.bind();
 						vbo.getQuadIBO().bind();
-						
+
 						GlDhMetaRenderer.INSTANCE.shaderProgramForThisFrame.bindVertexBuffer(vbo.getId());
 						LWJGL.glDrawElements(
 							GL11.GL_TRIANGLES,
 							indexCount,
 							vbo.getQuadIBO().getGlType(), 0);
-						
+
 						vbo.unbind();
 						vbo.getQuadIBO().unbind();
 					}
@@ -507,7 +508,7 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 }

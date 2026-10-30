@@ -9,40 +9,40 @@ import java.util.TimerTask;
 public abstract class AbstractDelayedConfigEventHandler implements IConfigListener
 {
 	public static final long DEFAULT_TIMEOUT_IN_MS = 2_000L;
-	
+
 	/** how long to wait in milliseconds before applying the config changes */
 	private final long timeoutInMs;
 	private Timer timer;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public AbstractDelayedConfigEventHandler(long timeoutInMs) { this.timeoutInMs = timeoutInMs; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// abstract methods //
 	//==================//
 	//region
-	
+
 	public abstract void onConfigTimeout();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// events //
 	//========//
 	//region
-	
+
 	@Override
 	public void onConfigValueSet()
 	{
@@ -55,7 +55,7 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 			this.onConfigTimeout();
 		}
 	}
-	
+
 	/** Calling this method multiple times will reset the timer */
 	private synchronized void refreshRenderDataAfterTimeout() // synchronized to prevent potential threading issues when adding/removing the timer
 	{
@@ -64,7 +64,7 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 		{
 			this.timer.cancel();
 		}
-		
+
 		// create a new timer task
 		TimerTask timerTask = new TimerTask()
 		{
@@ -76,9 +76,9 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 		this.timer = TimerUtil.CreateTimer("AbstractDelayedConfigTimer");
 		this.timer.schedule(timerTask, this.timeoutInMs);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

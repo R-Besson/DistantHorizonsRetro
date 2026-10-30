@@ -111,8 +111,8 @@ public class ClientBlockStateTextureCache
 	public static BlockFaceTexture getFaceTexture(BlockStateWrapper blockStateWrapper, EDhDirection direction)
 	{
 		BlockFaceTexture[] faceTextures = TEXTURES_BY_BLOCK_WRAPPER.computeIfAbsent(
-				blockStateWrapper,
-				ClientBlockStateTextureCache::computeFaceTextures);
+			blockStateWrapper,
+			ClientBlockStateTextureCache::computeFaceTextures);
 		return faceTextures[direction.faceIndex];
 	}
 
@@ -299,7 +299,7 @@ public class ClientBlockStateTextureCache
 	{
 		if (!(newApiBlockState instanceof BlockStateWrapper))
 		{
-			throw new ClassCastException("Invalid ["+ IDhApiBlockStateWrapper.class.getSimpleName()+"] value given. Block State wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type ["+ BlockStateWrapper.class.getName()+"].");
+			throw new ClassCastException("Invalid [" + IDhApiBlockStateWrapper.class.getSimpleName() + "] value given. Block State wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type [" + BlockStateWrapper.class.getName() + "].");
 		}
 		BlockStateWrapper newBlockState = (BlockStateWrapper) newApiBlockState;
 
@@ -374,7 +374,7 @@ public class ClientBlockStateTextureCache
 		}
 		catch (Exception bakeError)
 		{
-			LOGGER.warn("Failed to bake face textures for block ["+blockStateWrapper.getSerialString()+"], error: ["+bakeError.getMessage()+"], block will render as hot pink.", bakeError);
+			LOGGER.warn("Failed to bake face textures for block [" + blockStateWrapper.getSerialString() + "], error: [" + bakeError.getMessage() + "], block will render as hot pink.", bakeError);
 		}
 		finally
 		{
@@ -536,7 +536,7 @@ public class ClientBlockStateTextureCache
 			{
 				int texelX = (u * spriteWidth) / TEXTURE_WIDTH_AND_HEIGHT;
 				int texelY = (v * spriteHeight) / TEXTURE_WIDTH_AND_HEIGHT;
-				pixels[TextureUtil.getPixelIndex(u,v)] = TextureAtlasSpriteWrapper.getPixelARGB(sprite, 0, texelX, texelY);
+				pixels[TextureUtil.getPixelIndex(u, v)] = TextureAtlasSpriteWrapper.getPixelARGB(sprite, 0, texelX, texelY);
 			}
 		}
 		return BlockFaceTexture.createTexture(TEXTURE_WIDTH_AND_HEIGHT, TEXTURE_WIDTH_AND_HEIGHT, pixels);
@@ -663,7 +663,7 @@ public class ClientBlockStateTextureCache
 		{
 			if (BROKEN_POSITIONED_BLOCK_STATES.add(blockStateWrapper))
 			{
-				LOGGER.warn("Failed to get the positioned textures for block ["+blockStateWrapper.getSerialString()+"], error: ["+e.getMessage()+"], it will use the same texture everywhere.", e);
+				LOGGER.warn("Failed to get the positioned textures for block [" + blockStateWrapper.getSerialString() + "], error: [" + e.getMessage() + "], it will use the same texture everywhere.", e);
 			}
 			return null;
 		}
@@ -894,7 +894,7 @@ public class ClientBlockStateTextureCache
 
 	/**
 	 * @param icons either one icon for the whole face,
-	 *              or four quarters (bottom left, bottom right, top right, top left) like Chisel's connected textures
+	 * or four quarters (bottom left, bottom right, top right, top left) like Chisel's connected textures
 	 * @return null if an icon is missing
 	 */
 	@Nullable
@@ -976,6 +976,7 @@ public class ClientBlockStateTextureCache
 				&& Arrays.deepEquals(this.iconsByFaceIndex, other.iconsByFaceIndex)
 				&& Arrays.deepEquals(this.sideIconsByRow, other.sideIconsByRow);
 		}
+
 	}
 
 	//endregion
@@ -1001,7 +1002,7 @@ public class ClientBlockStateTextureCache
 		}
 		catch (Exception e)
 		{
-			LOGGER.warn("Failed to get particle sprite for block ["+blockStateWrapper.getSerialString()+"], error: ["+e.getMessage()+"].", e);
+			LOGGER.warn("Failed to get particle sprite for block [" + blockStateWrapper.getSerialString() + "], error: [" + e.getMessage() + "].", e);
 			return null;
 		}
 	}

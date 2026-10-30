@@ -54,19 +54,19 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GLBuffer implements AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
-			.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
-			.build();
-	
+		.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
+		.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
+		.build();
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	// TODO move to a shared location that can be handled by both GL and Blaze3D buffers
 	/** if enabled the number of GC'ed buffers will be logged */
 	private static final boolean LOG_PHANTOM_RECOVERY = ModInfo.IS_DEV_BUILD;
 	/** If enabled buffers allocation/upload stacks will be logged when GC'ed. */
 	private static final boolean LOG_PHANTOM_ALLOCATION_STACKS = false; // disabled by default due to the increased GC load
-	
+
 	public static final double BUFFER_EXPANSION_MULTIPLIER = 1.3;
 	public static final double BUFFER_SHRINK_TRIGGER = BUFFER_EXPANSION_MULTIPLIER * BUFFER_EXPANSION_MULTIPLIER;
 
@@ -85,76 +85,79 @@ public class GLBuffer implements AutoCloseable
 	public static final int MAC_UPLOAD_CHUNK_THRESHOLD = MAC_UPLOAD_CHUNK_BYTES;
 	/** the number of active buffers, can be used for debugging */
 	public static AtomicInteger bufferCount = new AtomicInteger(0);
-	
+
 	private static final int PHANTOM_REF_CHECK_TIME_IN_MS = 5 * 1000;
 	private static final ConcurrentHashMap<PhantomReference<? extends GLBuffer>, Integer> PHANTOM_TO_BUFFER_ID = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<Integer, PhantomReference<? extends GLBuffer>> BUFFER_ID_TO_PHANTOM = new ConcurrentHashMap<>();
 	private static final ConcurrentHashMap<Integer, String> BUFFER_ID_TO_ALLOCATION_STRING = new ConcurrentHashMap<>();
 	private static final ReferenceQueue<GLBuffer> PHANTOM_REFERENCE_QUEUE = new ReferenceQueue<>();
 	private static final ThreadPoolExecutor CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("GLBuffer Cleanup");
-	
-	
+
+
 	protected volatile int id = 0;
 	public final int getId() { return this.id; }
 	protected int size = 0;
 	public int getSize() { return this.size; }
 	protected boolean bufferStorage;
 	protected boolean isMapped = false;
-	
+
 	/**
 	 * Locking on the render thread isn't great, but is needed due to an inconsistent
 	 * race condition where VBOs can be marked as deleted outside the render thread. <br><br>
-	 * 
+	 *
 	 * But, due to being a read-write lock the chance of freezing
 	 * the render thread is very low
 	 * and since this is a stamped lock, the optimistic read time is basically zero.
 	 * (The optimistic lock time doesn't even appear in the profiler).
 	 */
 	public final StampedLock renderStampLock = new StampedLock();
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
-	static { CLEANUP_THREAD.execute(GLBuffer::runPhantomReferenceCleanupLoop); }
-	
+
+	static
+	{
+		CLEANUP_THREAD.execute(GLBuffer::runPhantomReferenceCleanupLoop);
+	}
+
 	public GLBuffer(boolean isBufferStorage) { this.destroyOldAndCreate(isBufferStorage); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
 	//region
-	
+
 	// Should be override by subclasses
 	public int getBufferBindingTarget() { return GL31.GL_COPY_READ_BUFFER; }
-	
+
 	public void bind() { LWJGL.glBindBuffer(this.getBufferBindingTarget(), this.id); }
 	public void unbind() { LWJGL.glBindBuffer(this.getBufferBindingTarget(), 0); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//====================//
 	// create and destroy //
 	//====================//
 	//region
-	
+
 	protected void destroyOldAndCreate(boolean asBufferStorage)
 	{
 		if (!GLProxy.runningOnRenderThread())
 		{
-			LodUtil.assertNotReach("Thread ["+Thread.currentThread()+"] tried to create a GLBuffer outside the MC render thread.");
+			LodUtil.assertNotReach("Thread [" + Thread.currentThread() + "] tried to create a GLBuffer outside the MC render thread.");
 		}
-		
-		
+
+
 		// lock to prevent the render thread from accessing the buffer's ID
 		// while we are removing it
 		long writeStamp = this.renderStampLock.writeLock();
@@ -162,9 +165,9 @@ public class GLBuffer implements AutoCloseable
 		{
 			final int oldId = this.id;
 			this.id = GLMC.glGenBuffers();
-			
+
 			// destroy the old buffer
-			// after the new one has been created 
+			// after the new one has been created
 			// to hopefully prevent a rare race conditions where the old ID
 			// is still used somewhere
 			if (oldId != 0)
@@ -173,15 +176,15 @@ public class GLBuffer implements AutoCloseable
 				tryRemoveBufferIdFromPhantom(oldId);
 				destroyBufferIdNow(oldId, "destroyOldAndCreate");
 			}
-			
-			
+
+
 			this.bufferStorage = asBufferStorage;
 			bufferCount.getAndIncrement();
-			
+
 			PhantomReference<GLBuffer> phantom = new PhantomReference<>(this, PHANTOM_REFERENCE_QUEUE);
 			PHANTOM_TO_BUFFER_ID.put(phantom, this.id);
 			BUFFER_ID_TO_PHANTOM.put(this.id, phantom);
-			
+
 			this.updateAllocationStackTrace();
 		}
 		finally
@@ -189,7 +192,7 @@ public class GLBuffer implements AutoCloseable
 			renderStampLock.unlock(writeStamp);
 		}
 	}
-	
+
 	protected void destroyAsync()
 	{
 		// lock to prevent the render thread from accessing the buffer's ID
@@ -202,19 +205,19 @@ public class GLBuffer implements AutoCloseable
 				// the buffer has already been closed
 				return;
 			}
-			
+
 			final int idToDelete = this.id; // saving the ID to a separate variable is necessary so it can be captured by the lambda
-			
+
 			// remove the phantom tracking now so the phantom doesn't have the chance to
 			// get garbage collected before the render thread task runs
 			// (this can happen if MC is running at extremely low framerates like 1 fps via mods)
 			tryRemoveBufferIdFromPhantom(idToDelete);
-			
+
 			// mark the old data is invalid before deleting to prevent a rare race condition
 			// where the queued on render thread task runs before the ID is cleared
 			this.id = 0;
 			this.size = 0;
-			
+
 			RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer destroyAsync", () -> destroyBufferIdNow(idToDelete, "destroyAsync"));
 		}
 		finally
@@ -222,31 +225,31 @@ public class GLBuffer implements AutoCloseable
 			renderStampLock.unlock(writeStamp);
 		}
 	}
-	
+
 	private static void destroyBufferIdNow(int id, String cause)
 	{
 		// only delete valid buffers
 		if (id == 0)
 		{
-			LOGGER.warn("Attempted to destroy a buffer with ID 0, VRAM memory leaks may occur, cause: ["+cause+"].");
+			LOGGER.warn("Attempted to destroy a buffer with ID 0, VRAM memory leaks may occur, cause: [" + cause + "].");
 			return;
 		}
-		
+
 		bufferCount.decrementAndGet();
 		GLMC.glDeleteBuffers(id);
-		
+
 		if (Config.Client.Advanced.Debugging.logBufferGarbageCollection.get())
 		{
-			LOGGER.info("destroyed buffer [" + id + "], remaining: [" + BUFFER_ID_TO_PHANTOM.size() + "], cause: ["+cause+"].");
+			LOGGER.info("destroyed buffer [" + id + "], remaining: [" + BUFFER_ID_TO_PHANTOM.size() + "], cause: [" + cause + "].");
 		}
 	}
-	
+
 	/** should be called before {@link GLBuffer#destroyBufferIdNow} */
 	private static void tryRemoveBufferIdFromPhantom(int id)
 	{
 		// will contain nothing if stack tracking isn't enabled
 		BUFFER_ID_TO_ALLOCATION_STRING.remove(id);
-		
+
 		PhantomReference<? extends GLBuffer> phantom = BUFFER_ID_TO_PHANTOM.remove(id);
 		if (phantom != null)
 		{
@@ -254,60 +257,60 @@ public class GLBuffer implements AutoCloseable
 			// this can cause a race condition were we accidentally delete an in-use buffer and cause NVIDIA
 			// to throw an EXCEPTION_ACCESS_VIOLATION when we attempt to render it
 			phantom.clear();
-			
+
 			Integer phantomId = PHANTOM_TO_BUFFER_ID.remove(phantom);
 			if (phantomId == null)
 			{
-				LOGGER.warn("No Phantom->ID binding stored for ID ["+id+"]");
+				LOGGER.warn("No Phantom->ID binding stored for ID [" + id + "]");
 			}
 		}
 		else
 		{
-			LOGGER.warn("Unable to remove phantom GLBuffer with ID ["+id+"], buffer may have already been deleted.");
+			LOGGER.warn("Unable to remove phantom GLBuffer with ID [" + id + "], buffer may have already been deleted.");
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// buffer uploading //
 	//==================//
 	//region
-	
-	/** 
-	 * Assumes the GL Context is already bound. <br> 
+
+	/**
+	 * Assumes the GL Context is already bound. <br>
 	 * Will create the VBO if one exist.
 	 */
 	public void uploadBuffer(ByteBuffer bb, EDhApiGpuUploadMethod uploadMethod, int maxExpansionSize, int bufferHint)
 	{
 		LodUtil.assertTrue(!uploadMethod.useEarlyMapping, "UploadMethod signal that this should use Mapping instead of uploadBuffer!");
 		int bbSize = bb.limit() - bb.position();
-		if (bbSize > maxExpansionSize) 
-		{ 
-			LodUtil.assertNotReach("maxExpansionSize is [" + maxExpansionSize + "] but buffer size is [" + bbSize + "]!"); 
+		if (bbSize > maxExpansionSize)
+		{
+			LodUtil.assertNotReach("maxExpansionSize is [" + maxExpansionSize + "] but buffer size is [" + bbSize + "]!");
 		}
-		
+
 		// Don't upload an empty buffer
 		if (bbSize == 0)
 		{
 			return;
 		}
-		
-		
-		
+
+
+
 		// the previously bound buffers are re-bound afterwards,
 		// otherwise MC's own rendering (IE the main menu and UI) can break
 		int vao = LWJGL.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING);
 		int vbo = LWJGL.glGetInteger(GL15.GL_ARRAY_BUFFER_BINDING);
 		int ebo = LWJGL.glGetInteger(GL15.GL_ELEMENT_ARRAY_BUFFER_BINDING);
-		
+
 		try
 		{
 			// make sure the buffer is ready for uploading
 			this.createOrChangeBufferTypeForUpload(uploadMethod);
-			
+
 			switch (uploadMethod)
 			{
 				case AUTO:
@@ -329,14 +332,14 @@ public class GLBuffer implements AutoCloseable
 		{
 			LWJGL.glBindVertexArray(GL30.glIsVertexArray(vao) ? vao : 0);
 			LWJGL.glBindBuffer(GL15.GL_ARRAY_BUFFER, GL15.glIsBuffer(vbo) ? vbo : 0);
-			LWJGL.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, GL15.glIsBuffer(ebo) ? ebo: 0);
+			LWJGL.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, GL15.glIsBuffer(ebo) ? ebo : 0);
 		}
 	}
 	/** Requires the buffer to be bound */
 	protected void uploadBufferStorage(ByteBuffer bb)
 	{
 		LodUtil.assertTrue(this.bufferStorage, "Buffer is not bufferStorage but its trying to use bufferStorage upload method!");
-		
+
 		int bbSize = bb.limit() - bb.position();
 		this.destroyOldAndCreate(true);
 		this.bind();
@@ -347,10 +350,10 @@ public class GLBuffer implements AutoCloseable
 	protected void uploadBufferData(ByteBuffer bb, int bufferDataHint)
 	{
 		LodUtil.assertTrue(!this.bufferStorage, "Buffer is bufferStorage but its trying to use bufferData upload method!");
-		
+
 		int bbSize = bb.limit() - bb.position();
 		int target = this.getBufferBindingTarget();
-		
+
 		if (shouldUploadToGpuInChunks(bbSize))
 		{
 			// Two-step path used on macOS to dodge the Apple OpenGL -> Metal
@@ -366,14 +369,14 @@ public class GLBuffer implements AutoCloseable
 			LWJGL.glBufferData(target, bb, bufferDataHint);
 		}
 		this.size = bbSize;
-		
+
 		this.updateAllocationStackTrace();
 	}
 	/** Requires the buffer to be bound */
 	protected void uploadSubData(ByteBuffer bb, int maxExpansionSize, int bufferDataHint)
 	{
 		LodUtil.assertTrue(!this.bufferStorage, "Buffer is bufferStorage but its trying to use subData upload method!");
-		
+
 		int bbSize = bb.limit() - bb.position();
 		int target = this.getBufferBindingTarget();
 		if (this.size < bbSize || this.size > bbSize * BUFFER_SHRINK_TRIGGER)
@@ -383,12 +386,12 @@ public class GLBuffer implements AutoCloseable
 			{
 				newSize = maxExpansionSize;
 			}
-			
+
 			// allocate-only — no memcpy, safe on macOS regardless of size
 			LWJGL.glBufferData(target, newSize, bufferDataHint);
 			this.size = newSize;
 		}
-		
+
 		if (shouldUploadToGpuInChunks(bbSize))
 		{
 			subDataUploadInChunks(target, 0, bb, MAC_UPLOAD_CHUNK_BYTES);
@@ -397,39 +400,39 @@ public class GLBuffer implements AutoCloseable
 		{
 			LWJGL.glBufferSubData(target, 0, bb);
 		}
-		
+
 		this.updateAllocationStackTrace();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public void close() { this.destroyAsync(); }
-	
+
 	@Override
 	public String toString()
 	{
 		return (this.bufferStorage ? "" : "Static-") + this.getClass().getSimpleName() +
-				"[id:" + this.id + ",size:" + this.size + (this.isMapped ? ",MAPPED" : "") + "]";
+			"[id:" + this.id + ",size:" + this.size + (this.isMapped ? ",MAPPED" : "") + "]";
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	//region
-	
-	/** 
+
+	/**
 	 * Makes sure the buffer exists and is of the correct format
 	 * before uploading.
 	 */
@@ -451,11 +454,11 @@ public class GLBuffer implements AutoCloseable
 			{
 				this.destroyOldAndCreate(this.bufferStorage);
 			}
-			
+
 			this.bind();
 		}
 	}
-	
+
 	/**
 	 * macOS-only mitigation for the SIGBUS in
 	 * {@code libsystem_platform.dylib _platform_memmove} that happens when the
@@ -469,7 +472,7 @@ public class GLBuffer implements AutoCloseable
 		return EPlatform.get() == EPlatform.MACOS
 			&& byteCount > MAC_UPLOAD_CHUNK_THRESHOLD;
 	}
-	
+
 	/**
 	 * Uploads {@code bb} into the currently bound buffer at {@code baseOffset}
 	 * using a sequence of {@link GL15#glBufferSubData(int, long, ByteBuffer)}
@@ -507,8 +510,8 @@ public class GLBuffer implements AutoCloseable
 			bb.position(origPos);
 		}
 	}
-	
-	/** 
+
+	/**
 	 * used to help track down leaks where the buffer isn't properly closed
 	 * Note: this probably needs extending to accept a stack trace from outside where it's being called
 	 * since it's often called on the render thread in an un-helpful location.
@@ -518,7 +521,7 @@ public class GLBuffer implements AutoCloseable
 		if (LOG_PHANTOM_ALLOCATION_STACKS)
 		{
 			String stack;
-			
+
 			RenderThreadTaskHandler.QueuedRunnable parentQueuedRunnable;
 			// if this is running on the render thread, try getting the render task's stack trace instead
 			// since it's a lot more helpful than wherever the render thread tasks themselves are being run from
@@ -536,50 +539,52 @@ public class GLBuffer implements AutoCloseable
 				StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 				stack = StringUtil.join("\n", stackTraceElements).intern();
 			}
-			
+
 			BUFFER_ID_TO_ALLOCATION_STRING.put(this.id, stack);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// static cleanup //
 	//================//
 	//region
-	
+
 	private static void runPhantomReferenceCleanupLoop()
 	{
 		// these arrays are stored here so they don't have to be re-allocated each loop
 		ArrayList<Pair<String, AtomicInteger>> allocationStackTraceCountPairList = new ArrayList<>();
-		
+
 		while (true)
 		{
 			allocationStackTraceCountPairList.clear();
-			
+
 			try
 			{
 				try
 				{
 					Thread.sleep(PHANTOM_REF_CHECK_TIME_IN_MS);
 				}
-				catch (InterruptedException ignore) { }
-				
+				catch (InterruptedException ignore)
+				{
+				}
+
 				int collectedCount = 0;
-				
+
 				Reference<? extends GLBuffer> phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 				while (phantomRef != null)
 				{
 					// destroy the buffer if it hasn't been cleared yet
-					Integer idRef = PHANTOM_TO_BUFFER_ID.remove((PhantomReference<? extends GLBuffer>)phantomRef); // cast to make IntelliJ happy
+					Integer idRef = PHANTOM_TO_BUFFER_ID.remove((PhantomReference<? extends GLBuffer>) phantomRef); // cast to make IntelliJ happy
 					if (idRef != null)
 					{
 						BUFFER_ID_TO_PHANTOM.remove(idRef);
 						final int id = idRef;
 						RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer phantom destroy", () -> destroyBufferIdNow(id, "runPhantomReferenceCleanupLoop"));
-							
+
 						if (LOG_PHANTOM_ALLOCATION_STACKS) // stack trace shouldn't be null, but just in case
 						{
 							String stack = BUFFER_ID_TO_ALLOCATION_STRING.get(idRef);
@@ -588,23 +593,23 @@ public class GLBuffer implements AutoCloseable
 					}
 					else
 					{
-						LOGGER.warn("Failed to find Buffer ID for phantom reference: ["+phantomRef+"]");
+						LOGGER.warn("Failed to find Buffer ID for phantom reference: [" + phantomRef + "]");
 					}
-					
-					
+
+
 					collectedCount++;
 					phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 				}
-				
-				
-				
+
+
+
 				if (LOG_PHANTOM_RECOVERY)
 				{
 					// we only want to log when something has been returned
 					if (collectedCount != 0)
 					{
-						LOGGER.warn("GLBuffer phantom recovered: ["+ F3Screen.NUMBER_FORMAT.format(collectedCount)+"].");
-						
+						LOGGER.warn("GLBuffer phantom recovered: [" + F3Screen.NUMBER_FORMAT.format(collectedCount) + "].");
+
 						// log stack traces if present
 						if (LOG_PHANTOM_ALLOCATION_STACKS)
 						{
@@ -612,7 +617,7 @@ public class GLBuffer implements AutoCloseable
 						}
 					}
 				}
-				
+
 			}
 			catch (Exception e)
 			{
@@ -620,9 +625,9 @@ public class GLBuffer implements AutoCloseable
 			}
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

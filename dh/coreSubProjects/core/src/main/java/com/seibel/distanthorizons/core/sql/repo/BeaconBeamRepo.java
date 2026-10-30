@@ -35,75 +35,75 @@ import java.util.ArrayList;
 
 public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 {
-	
-	
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public BeaconBeamRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, BeaconBeamDTO.class);
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
-	
-	@Override 
+
+	@Override
 	public String getTableName() { return "BeaconBeam"; }
-	
+
 	@Override
 	protected String CreateParameterizedWhereString() { return "BlockPosX = ? AND BlockPosY = ? AND BlockPosZ = ?"; }
-	
+
 	@Override
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, DhBlockPos pos) throws SQLException
 	{
 		statement.setInt(index++, pos.getX());
 		statement.setInt(index++, pos.getY());
 		statement.setInt(index, pos.getZ());
-    }
-	
-	
-	
+	}
+
+
+
 	//=======================//
 	// repo required methods //
 	//=======================//
-	
-	@Override 
+
+	@Override
 	@Nullable
 	public BeaconBeamDTO convertResultSetToDto(ResultSet resultSet) throws ClassCastException, SQLException
 	{
 		int posX = resultSet.getInt("BlockPosX");
 		int posY = resultSet.getInt("BlockPosY");
 		int posZ = resultSet.getInt("BlockPosZ");
-		
+
 		int red = resultSet.getInt("ColorR");
 		int green = resultSet.getInt("ColorG");
 		int blue = resultSet.getInt("ColorB");
-		
-		
+
+
 		return new BeaconBeamDTO(new DhBlockPos(posX, posY, posZ), new Color(red, green, blue));
 	}
-	
+
 	private final String upsertSqlTemplate =
-		"INSERT INTO "+this.getTableName() + " (\n" +
-		"   BlockPosX, BlockPosY, BlockPosZ, \n" +
-		"   ColorR, ColorG, ColorB, \n" +
-		"   LastModifiedUnixDateTime, CreatedUnixDateTime) \n" +
-		"VALUES( \n" +
-		"    ?, ?, ?, \n" +
-		"    ?, ?, ?, \n" +
-		"    ?, ? \n" +
-		") \n" +
-		"ON CONFLICT(BlockPosX, BlockPosY, BlockPosZ) DO UPDATE SET\n" +
-		"    ColorR = excluded.ColorR \n" +
-		"   ,ColorG = excluded.ColorG \n" +
-		"   ,ColorB = excluded.ColorB \n" +
-		"   ,LastModifiedUnixDateTime = excluded.LastModifiedUnixDateTime";
-	@Override 
+		"INSERT INTO " + this.getTableName() + " (\n" +
+			"   BlockPosX, BlockPosY, BlockPosZ, \n" +
+			"   ColorR, ColorG, ColorB, \n" +
+			"   LastModifiedUnixDateTime, CreatedUnixDateTime) \n" +
+			"VALUES( \n" +
+			"    ?, ?, ?, \n" +
+			"    ?, ?, ?, \n" +
+			"    ?, ? \n" +
+			") \n" +
+			"ON CONFLICT(BlockPosX, BlockPosY, BlockPosZ) DO UPDATE SET\n" +
+			"    ColorR = excluded.ColorR \n" +
+			"   ,ColorG = excluded.ColorG \n" +
+			"   ,ColorB = excluded.ColorB \n" +
+			"   ,LastModifiedUnixDateTime = excluded.LastModifiedUnixDateTime";
+	@Override
 	public @Nullable PreparedStatement createUpsertStatement(BeaconBeamDTO dto) throws SQLException
 	{
 		PreparedStatement statement = this.createPreparedStatement(this.upsertSqlTemplate);
@@ -111,69 +111,69 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 		{
 			return null;
 		}
-		
-		
+
+
 		int i = 1;
 		statement.setInt(i++, dto.blockPos.getX());
 		statement.setInt(i++, dto.blockPos.getY());
 		statement.setInt(i++, dto.blockPos.getZ());
-		
+
 		statement.setInt(i++, dto.color.getRed());
 		statement.setInt(i++, dto.color.getGreen());
 		statement.setInt(i++, dto.color.getBlue());
-		
+
 		statement.setLong(i++, System.currentTimeMillis()); // last modified Unix time
 		statement.setLong(i, System.currentTimeMillis()); // created Unix time
-		
+
 		return statement;
 	}
-	
-	
-	
+
+
+
 	//====================//
 	// additional methods //
 	//====================//
-	
+
 	public ArrayList<BeaconBeamDTO> getAllBeamsForPos(long pos)
 	{
 		int minBlockX = DhSectionPos.getMinCornerBlockX(pos);
 		int minBlockZ = DhSectionPos.getMinCornerBlockZ(pos);
 		int maxBlockX = minBlockX + DhSectionPos.getBlockWidth(pos);
 		int maxBlockZ = minBlockZ + DhSectionPos.getBlockWidth(pos);
-		
+
 		return this.getAllBeamsInBlockPosRange(
-				minBlockX, maxBlockX,
-				minBlockZ, maxBlockZ
-			);
+			minBlockX, maxBlockX,
+			minBlockZ, maxBlockZ
+		);
 	}
-	
+
 	private final String getAllBeamsInRangeTemplate =
-			"SELECT * " +
-			"FROM "+this.getTableName()+" " +
+		"SELECT * " +
+			"FROM " + this.getTableName() + " " +
 			"WHERE " +
 			"? <= BlockPosX AND BlockPosX <= ? AND " +
 			"? <= BlockPosZ AND BlockPosZ <= ?";
 	public ArrayList<BeaconBeamDTO> getAllBeamsInBlockPosRange(
-			int minBlockX, int maxBlockX,
-			int minBlockZ, int maxBlockZ
-		)
+		int minBlockX, int maxBlockX,
+		int minBlockZ, int maxBlockZ
+	)
 	{
 		ArrayList<BeaconBeamDTO> beamList = new ArrayList<>();
-		
-		try(PreparedStatement statement = this.createPreparedStatement(this.getAllBeamsInRangeTemplate))
+
+		try (PreparedStatement statement = this.createPreparedStatement(this.getAllBeamsInRangeTemplate))
 		{
-			if(statement == null)
+			if (statement == null)
 			{
 				return beamList;
 			}
-			
+
 			int i = 1;
 			statement.setInt(i++, minBlockX);
 			statement.setInt(i++, maxBlockX);
 			statement.setInt(i++, minBlockZ);
 			statement.setInt(i, maxBlockZ);
-			
-			
+
+
 			try (ResultSet result = this.query(statement))
 			{
 				while (result != null && result.next())
@@ -190,12 +190,12 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 			{
 				return beamList;
 			}
-			
+
 			throw new RuntimeException(e);
 		}
-		
+
 		return beamList;
 	}
-	
-	
+
+
 }

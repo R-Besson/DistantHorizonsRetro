@@ -37,7 +37,7 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Draws the Fog texture onto DH's FrameBuffer. <br><br>
- * 
+ *
  * See Also: <br>
  * {@link GlDhFogRenderer} - Parent to this shader. <br>
  * {@link GlDhFogShader} - draws the Fog texture. <br>
@@ -45,24 +45,24 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 {
 	public static GlDhFogApplyShader INSTANCE = new GlDhFogApplyShader();
-	
+
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-	
-	
+
+
 	public int fogTexture;
-	
+
 	// uniforms
 	public int colorTextureUniform;
 	public int depthTextureUniform;
 	public int uIsReverseZDepth;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	@Override
 	public void onInit()
 	{
@@ -71,60 +71,60 @@ public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 			"assets/distanthorizons/shaders/fog/gl/apply.frag",
 			"vPosition"
 		);
-		
+
 		// uniform setup
 		this.colorTextureUniform = this.shader.getUniformLocation("uColorTexture");
 		this.depthTextureUniform = this.shader.getUniformLocation("uDepthTexture");
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
-		
+
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// render prep //
 	//=============//
-	
+
 	@Override
 	protected void onApplyUniforms(RenderParams renderParams)
 	{
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(this.fogTexture);
 		LWJGL.glUniform1i(this.colorTextureUniform, 0);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
 		GLMC.glBindTexture(GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId());
 		LWJGL.glUniform1i(this.depthTextureUniform, 1);
-		
+
 		LWJGL.glUniform1i(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 	}
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	@Override
 	protected void onRender()
 	{
 		GLMC.enableBlend();
 		LWJGL.glBlendEquation(GL14.GL_FUNC_ADD);
 		GLMC.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		// Depth testing must be disabled otherwise this application shader won't apply anything.
-		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually, 
+		// setting this isn't necessary in vanilla, but some mods may change this, requiring it to be set manually,
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
-		
-		
+
+
 		// apply the rendered Fog to DH's framebuffer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, GlDhFogShader.INSTANCE.frameBuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, GlDhMetaRenderer.INSTANCE.getActiveFramebufferId());
-		
+
 		GlScreenQuad.INSTANCE.render();
-		
+
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, 0);
 	}
-	
+
 }

@@ -20,22 +20,22 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 	@Unique
 	private static final String MISSING_SPRITE_NAME = "missingno";
 
-    @Shadow
-    protected List<int[][]> framesTextureData;
-	
+	@Shadow
+	protected List<int[][]> framesTextureData;
+
 	/** contains the individual pixel data in ARGB format */
-    @Unique
-    private int[] distanthorizons$spriteData;
-    @Unique
-    private int[][] distanthorizons$spriteFrames;
-	
-	
-	
+	@Unique
+	private int[] distanthorizons$spriteData;
+	@Unique
+	private int[][] distanthorizons$spriteFrames;
+
+
+
 	//=====================//
 	// getters and setters //
 	//=====================//
 	//region
-	
+
 	@Inject(method = "loadSprite", at = @At("RETURN"))
 	private void injectLoadSprite(BufferedImage[] bufferedImages, AnimationMetadataSection p_147964_2_, boolean p_147964_3_, CallbackInfo ci)
 	{ this.distanthorizons$setSpriteData(); }
@@ -56,7 +56,7 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 		{
 			return;
 		}
-		
+
 		// the base mipmap of every frame, animated textures (IE lava) change brightness between frames
 		int[][] frames = new int[this.framesTextureData.size()][];
 		int frameCount = 0;
@@ -105,9 +105,9 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 			this.distanthorizons$setSpriteData();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

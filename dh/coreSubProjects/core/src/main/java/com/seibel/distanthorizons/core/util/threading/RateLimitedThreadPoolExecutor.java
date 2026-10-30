@@ -1,18 +1,18 @@
 /*
  *    This file is part of the Distant Horizons mod
  *    licensed under the GNU LGPL v3 License.
- *    
+ *
  *    Copyright (C) 2020 James Seibel
- *    
+ *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU Lesser General Public License as published by
  *    the Free Software Foundation, version 3.
- *    
+ *
  *    This program is distributed in the hope that it will be useful,
  *    but WITHOUT ANY WARRANTY; without even the implied warranty of
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *    GNU Lesser General Public License for more details.
- *    
+ *
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -22,7 +22,12 @@ package com.seibel.distanthorizons.core.util.threading;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -32,50 +37,50 @@ import java.util.function.Supplier;
 public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 {
 	public final ConfigEntry<Double> runTimeRatioConfig = Config.Common.MultiThreading.threadRunTimeRatio;
-	
+
 	/** When this thread started running its last task */
 	private final ThreadLocal<Long> runStartTime = ThreadLocal.withInitial(() -> -1L);
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public RateLimitedThreadPoolExecutor(int poolSize, ThreadFactory threadFactory, BlockingQueue<Runnable> workQueue)
 	{
 		super(poolSize, poolSize,
-				0L, TimeUnit.MILLISECONDS,
-				workQueue,
-				threadFactory);
+			0L, TimeUnit.MILLISECONDS,
+			workQueue,
+			threadFactory);
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
-	
+
 	@Override
 	protected void beforeExecute(Thread thread, Runnable runnable)
 	{
 		this.runStartTime.set(System.nanoTime());
-		
+
 		super.beforeExecute(thread, runnable);
 	}
-	
+
 	@Override
 	protected void afterExecute(Runnable runnable, Throwable throwable)
 	{
 		super.afterExecute(runnable, throwable);
-		
+
 		double ratio = this.runTimeRatioConfig.get();
 		if (ratio >= 1.0)
 		{
 			// Avoid sleeping for 0 time
 			return;
 		}
-		
+
 		try
 		{
 			long runTime = System.nanoTime() - this.runStartTime.get();
@@ -88,14 +93,14 @@ public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 			// we don't need to log that.
 		}
 	}
-	
+
 	@Override
-	protected void terminated() 
+	protected void terminated()
 	{
 		super.terminated();
 	}
-	
-	/** 
+
+	/**
 	 * Deprecated since most of the time this doesn't do what we want or need.
 	 * In James testing any tasks started with {@link CompletableFuture#runAsync(Runnable, Executor)}
 	 * or {@link CompletableFuture#supplyAsync(Supplier, Executor)} converted the {@link Runnable}
@@ -108,5 +113,5 @@ public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 	{
 		super.purge();
 	}
-	
+
 }

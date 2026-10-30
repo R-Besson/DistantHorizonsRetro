@@ -63,32 +63,32 @@ public abstract class AbstractModInitializer
 	protected abstract void subscribeClientStartedEvent(Runnable eventHandler);
 	protected abstract void subscribeServerStartingEvent(Consumer<MinecraftServer> eventHandler);
 	protected abstract void runDelayedSetup();
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===================//
 	// initialize events //
 	//===================//
 	//region initialize events
-	
+
 	public void onInitializeClient()
 	{
 		DependencySetup.createClientBindings();
 		this.createInitialClientBindings();
-		
+
 		LOGGER.info("Initializing " + ModInfo.READABLE_NAME + " client, firing DhApiBeforeDhInitEvent...");
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeDhInitEvent.class, null);
-		
+
 		this.startup();
 		this.logBuildInfo();
-		
+
 		this.createClientProxy().registerEvents();
 		this.createServerProxy(false).registerEvents();
-		
+
 		this.initializeModCompat();
-		
+
 		this.initConfig();
 		logIncompatibilityWarnings(); // needs to be called after config loading
 		setDisabledDhConfigBasedOnMods();
@@ -100,31 +100,31 @@ public abstract class AbstractModInitializer
 		this.subscribeClientStartedEvent(this::postInit);
 		this.subscribeClientStartedEvent(this::postClientInit);
 	}
-	
+
 	public void onInitializeServer()
 	{
 		DependencySetup.createServerBindings();
-		
+
 		LOGGER.info("Initializing " + ModInfo.READABLE_NAME + " server, firing DhApiBeforeDhInitEvent event...");
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeDhInitEvent.class, null);
-		
+
 		this.startup();
 		this.logBuildInfo();
-		
+
 		// This prevents returning uninitialized Config values,
 		// resulting from a circular reference mid-initialization in a static class
 		// noinspection ResultOfMethodCallIgnored
 		ThreadPresetConfigEventHandler.INSTANCE.toString();
-		
+
 		this.createServerProxy(true).registerEvents();
-		
+
 		this.initializeModCompat();
-		
+
 		LOGGER.info(ModInfo.READABLE_NAME + " server Initialized, adding event subscribers...");
 
 		this.subscribeServerStartingEvent(server ->
 		{
-			MinecraftServerWrapper.INSTANCE.dedicatedServer = (DedicatedServer)server;
+			MinecraftServerWrapper.INSTANCE.dedicatedServer = (DedicatedServer) server;
 
 			this.initConfig();
 			setUnsupportedConfigsBasedOnMcVersion();
@@ -137,27 +137,27 @@ public abstract class AbstractModInitializer
 			LOGGER.info(ModInfo.READABLE_NAME + " server Initialized");
 		});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========================//
 	// inner initializer methods //
 	//===========================//
 	//region inner initializer methods
-	
+
 	private void startup()
 	{
 		DependencySetup.createSharedBindings();
 		Initializer.preConfigInit();
 		this.createInitialSharedBindings();
 	}
-	
+
 	private void logBuildInfo()
 	{
 		LOGGER.info(ModInfo.READABLE_NAME + ", Version: " + ModInfo.VERSION);
-		
+
 		// if the build is stable the branch/commit/etc shouldn't be needed
 		if (ModInfo.IS_DEV_BUILD)
 		{
@@ -166,7 +166,7 @@ public abstract class AbstractModInitializer
 			LOGGER.info("DH Jar Build Source: " + ModJarInfo.Build_Source);
 		}
 	}
-	
+
 	protected <T extends IModAccessor> void tryCreateModCompatAccessor(String modId, Class<? super T> accessorClass, Supplier<T> accessorConstructor)
 	{
 		IModChecker modChecker = SingletonInjector.INSTANCE.get(IModChecker.class);
@@ -177,7 +177,7 @@ public abstract class AbstractModInitializer
 		}
 		else
 		{
-			LOGGER.debug("Skipping mod compatibility accessor for: ["+modId+"]");
+			LOGGER.debug("Skipping mod compatibility accessor for: [" + modId + "]");
 		}
 	}
 	@SuppressWarnings("unchecked")
@@ -186,35 +186,35 @@ public abstract class AbstractModInitializer
 		// logging is done internally
 		ModAccessorInjector.INSTANCE.bind((Class<? extends IModAccessor>) accessorClass, accessorConstructor.get());
 	}
-	
+
 	private void initConfig()
 	{
 		ConfigHandler.tryRunFirstTimeSetup();
 		Config.completeDelayedSetup();
 		DhLogger.runDelayedConfigSetup();
 	}
-	
-	
+
+
 	private void postInit()
 	{
 		LOGGER.info("Running Delayed setup...");
 		this.runDelayedSetup();
-		
+
 		LOGGER.info("Delayed setup complete, firing DhApiAfterDhInitEvent event...");
-		
+
 		// should be fired after all delayed setup so singletons and config can be accessed
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiAfterDhInitEvent.class, null);
 	}
-	
-	private void postClientInit() 
+
+	private void postClientInit()
 	{
 		CompletableFuture<Void> future = new CompletableFuture<>();
-		
+
 		// This method may be called from either the render thread,
 		// or some other random setup thread depending on the mod loader.
-		// In order to avoid confusion/inconsistent problems, we're always going 
+		// In order to avoid confusion/inconsistent problems, we're always going
 		// to run setup on our own thread.
-		Thread dhSetupThread = new Thread(() -> 
+		Thread dhSetupThread = new Thread(() ->
 		{
 			try
 			{
@@ -233,24 +233,24 @@ public abstract class AbstractModInitializer
 		});
 		dhSetupThread.setName(ThreadUtil.THREAD_NAME_PREFIX + "PostClientInit Thread");
 		dhSetupThread.start();
-		
+
 		future.join();
 	}
 	private void postServerInit() { SingletonInjector.INSTANCE.bind(AbstractDebugWireframeRenderer.class, new StubDebugWireframeRenderer()); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//======================//
 	// compatibility checks //
 	//======================//
 	//region compatibility checks
-	
+
 	// TODO merge with ClientApi.detectAndSendBootTimeWarnings
 	//  probably put in a separate class
-	
-	/** 
+
+	/**
 	 * Some mods will work with a few tweaks
 	 * or will partially work but have some known issues we can't solve.
 	 * This method will log (and display to chat if enabled)
@@ -272,23 +272,23 @@ public abstract class AbstractModInitializer
 		{
 			// get the currently selected rendering API
 			EDhApiRenderingEngine renderEngine = Config.Client.Advanced.Graphics.Experimental.renderingEngine.get();
-			
+
 			// Iris only supports native OpenGL
 			if (renderEngine == EDhApiRenderingEngine.BLAZE_3D)
 			{
-				String irisUnsupportedMessage = "Iris doesn't support DH when using the ["+ EDhApiRenderingEngine.BLAZE_3D+"] rendering engine, this will need to be fixed on Iris end. As a temporary fix please change the rendering engine to ["+ EDhApiRenderingEngine.OPEN_GL+"] or ["+ EDhApiRenderingEngine.AUTO+"] in the DH config file.";
+				String irisUnsupportedMessage = "Iris doesn't support DH when using the [" + EDhApiRenderingEngine.BLAZE_3D + "] rendering engine, this will need to be fixed on Iris end. As a temporary fix please change the rendering engine to [" + EDhApiRenderingEngine.OPEN_GL + "] or [" + EDhApiRenderingEngine.AUTO + "] in the DH config file.";
 				LOGGER.fatal(irisUnsupportedMessage);
 				NativeDialogUtil.showDialog(ModInfo.READABLE_NAME, irisUnsupportedMessage, "error");
-				
+
 				IMinecraftClientWrapper mc = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-				String errorMessage = "loading Distant Horizons. "+irisUnsupportedMessage;
+				String errorMessage = "loading Distant Horizons. " + irisUnsupportedMessage;
 				String exceptionError = "Distant Horizons conditional mod config Exception";
 				mc.crashMinecraft(errorMessage, new Exception(exceptionError));
 			}
 			else if (renderEngine == EDhApiRenderingEngine.AUTO)
 			{
 				Config.Client.Advanced.Graphics.Experimental.renderingEngine.setApiValue(EDhApiRenderingEngine.OPEN_GL, ModInfo.READABLE_NAME + " / " + IIrisAccessor.READABLE_NAME);
-				
+
 				EDhApiRenderingEngine recommendedEngine = versionConstants.getDefaultRenderingEngine();
 				if (recommendedEngine != EDhApiRenderingEngine.OPEN_GL)
 				{
@@ -296,7 +296,7 @@ public abstract class AbstractModInitializer
 				}
 			}
 		}
-		
+
 		//endregion
 
 	}
@@ -323,7 +323,7 @@ public abstract class AbstractModInitializer
 			Config.Common.WorldGenerator.generatorPlan.set(EDhApiGeneratorPlan.CHUNKS_ONLY);
 		}
 	}
-	
+
 	/**
 	 * Some DH configs should be disabled if a given
 	 * mod is present.
@@ -340,23 +340,24 @@ public abstract class AbstractModInitializer
 			Config.Client.Advanced.Graphics.Quality.transparency.setApiValue(EDhApiTransparency.COMPLETE, ModInfo.READABLE_NAME + " / " + IIrisAccessor.READABLE_NAME);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region helper classes
-	
+
 	public interface IEventProxy
 	{
 		void registerEvents();
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

@@ -33,40 +33,40 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles adding SSAO via {@link GlDhTaaShader} and {@link GlDhTaaSharpenShader}. <br><br>
- * 
+ *
  * {@link GlDhTaaShader} - draws the AntiAliasing to a texture. <br>
  * {@link GlDhTaaSharpenShader} - draws the AntiAliasing texture to DH's FrameBuffer. <br>
  */
 public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 {
 	public static GlDhTaaRenderer INSTANCE = new GlDhTaaRenderer();
-	
+
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	private boolean init = false;
-	
+
 	private int width = -1;
 	private int height = -1;
 	private int framebufferA = -1;
 	private int framebufferB = -1;
-	
+
 	private int colorTextureA = -1;
 	private int colorTextureB = -1;
-	
+
 	/** flips each frame */
 	private boolean textureAIsHistory = true;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private GlDhTaaRenderer() { }
-	
+
 	public void init()
 	{
 		if (this.init)
@@ -74,11 +74,11 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 			return;
 		}
 		this.init = true;
-		
+
 		GlDhTaaShader.INSTANCE.init();
 		GlDhTaaSharpenShader.INSTANCE.init();
 	}
-	
+
 	private void createFramebuffer(int width, int height)
 	{
 		if (this.framebufferA != -1)
@@ -88,7 +88,7 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 			this.framebufferA = -1;
 			this.framebufferB = -1;
 		}
-		
+
 		if (this.colorTextureA != -1)
 		{
 			GLMC.glDeleteTextures(this.colorTextureA);
@@ -96,11 +96,11 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 			this.colorTextureA = -1;
 			this.colorTextureB = -1;
 		}
-		
+
 		this.framebufferA = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.framebufferA);
 		this.colorTextureA = genTexture(width, height);
-		
+
 		this.framebufferB = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.framebufferB);
 		this.colorTextureB = genTexture(width, height);
@@ -114,24 +114,24 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, id, 0);
-			
+
 			// disable mip-mapping since DH is just going to draw straight to the screen
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_BASE_LEVEL, 0);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
 		}
-		
+
 		return id;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
+
 	@Override
 	@SuppressWarnings({"try", "unused"})
 	public void render(RenderParams renderParams)
@@ -140,7 +140,7 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 		try (GLState state = new GLState())
 		{
 			this.init();
-			
+
 			// resize the framebuffer if necessary
 			int width = MC_RENDER.getTargetFramebufferViewportWidth();
 			int height = MC_RENDER.getTargetFramebufferViewportHeight();
@@ -150,43 +150,43 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 				this.height = height;
 				this.createFramebuffer(width, height);
 			}
-			
+
 			int historyTextureId;
 			int outputTextureId;
 			int framebufferId;
 			if (this.textureAIsHistory)
 			{
 				historyTextureId = this.colorTextureA;
-				
+
 				outputTextureId = this.colorTextureB;
 				framebufferId = this.framebufferB;
 			}
 			else
 			{
 				historyTextureId = this.colorTextureB;
-				
+
 				outputTextureId = this.colorTextureA;
 				framebufferId = this.framebufferA;
 			}
-			
-			
+
+
 			GlDhTaaShader.INSTANCE.renderPrep(
 				framebufferId,
 				historyTextureId, outputTextureId
 			);
 			GlDhTaaShader.INSTANCE.render(renderParams);
-			
+
 			GlDhTaaSharpenShader.INSTANCE.render(renderParams);
-			
+
 			// post-render
 			GlDhTaaShader.INSTANCE.savePostRenderUniformObjects(renderParams);
 			this.textureAIsHistory = !this.textureAIsHistory;
-			
+
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

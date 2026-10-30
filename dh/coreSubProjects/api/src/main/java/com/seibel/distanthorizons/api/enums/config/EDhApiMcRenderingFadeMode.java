@@ -23,13 +23,13 @@ package com.seibel.distanthorizons.api.enums.config;
  * Handles how Minecraft's rendering
  * is faded out to smooth the transition
  * between MC and DH rendering. <br><br>
- * 
+ *
  * NONE, <br>
  * SINGLE_PASS, <br>
  * DOUBLE_PASS, <br>
  *
- * @since API 4.0.0
  * @version 2024-10-3
+ * @since API 4.0.0
  */
 public enum EDhApiMcRenderingFadeMode
 {
@@ -45,10 +45,10 @@ public enum EDhApiMcRenderingFadeMode
 	 * doesn't fade the opaque blocks underwater.
 	 */
 	SINGLE_PASS,
-	/** 
-	 * Fading runs after both opaque and translucent render passes. 
+	/**
+	 * Fading runs after both opaque and translucent render passes.
 	 * Slowest, but oceans and rivers look better.
 	 */
 	DOUBLE_PASS;
-	
+
 }

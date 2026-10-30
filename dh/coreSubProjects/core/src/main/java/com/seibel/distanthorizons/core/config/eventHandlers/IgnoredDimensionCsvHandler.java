@@ -33,31 +33,31 @@ import com.seibel.distanthorizons.coreapi.util.StringUtil;
 public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implements IConfigListener
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public static IgnoredDimensionCsvHandler INSTANCE = new IgnoredDimensionCsvHandler();
-	
+
 	private String[] dimensionNames = null;
-	
-	
-	
+
+
+
 	//=============//
- 	// constructor //
+	// constructor //
 	//=============//
-	
+
 	/** private since we only ever need one handler at a time */
 	private IgnoredDimensionCsvHandler() { }
-	
-	
-	
+
+
+
 	//=================//
 	// config handling //
 	//=================//
-	
+
 	@Override
 	public void onConfigValueSet()
 	{
 		String ignoredDimensionCsvString = Config.Client.Advanced.Graphics.Experimental.ignoredDimensionCsv.get();
-		if (ignoredDimensionCsvString == null 
+		if (ignoredDimensionCsvString == null
 			|| ignoredDimensionCsvString.isEmpty())
 		{
 			LOGGER.info("Dimension ignoring disabled, DH will render all dimensions.");
@@ -68,23 +68,23 @@ public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implement
 			try
 			{
 				this.dimensionNames = ignoredDimensionCsvString.split(",");
-				LOGGER.info("DH set to ignore dimensions: ["+ StringUtil.join(", ", this.dimensionNames)+"].");
+				LOGGER.info("DH set to ignore dimensions: [" + StringUtil.join(", ", this.dimensionNames) + "].");
 			}
 			catch (Exception e)
 			{
-				LOGGER.error("Failed to separate ignored dimensions from CSV string, error: ["+e.getMessage()+"].", e);
+				LOGGER.error("Failed to separate ignored dimensions from CSV string, error: [" + e.getMessage() + "].", e);
 				this.dimensionNames = null;
 			}
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	//===================//
 	// external handling //
 	//===================//
-	
+
 	@Override
 	public void beforeRender(DhApiCancelableEventParam<DhApiRenderParam> event)
 	{
@@ -101,22 +101,22 @@ public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implement
 			Config.Client.Advanced.Graphics.Quality.vanillaFadeMode.setApiValue(null, ModInfo.READABLE_NAME);
 		}
 	}
-	
+
 	public boolean dimensionNameShouldBeIgnored(String dimName)
 	{
-		if (this.dimensionNames == null 
+		if (this.dimensionNames == null
 			|| this.dimensionNames.length == 0)
 		{
 			return false;
 		}
-		
+
 		// remove the server hash if present so we can just compare the dimension name
 		int atIndex = dimName.indexOf('@');
 		if (atIndex >= 0)
 		{
 			dimName = dimName.substring(atIndex + 1);
 		}
-		
+
 		for (int i = 0; i < this.dimensionNames.length; i++)
 		{
 			String dimNameToIgnore = this.dimensionNames[i];
@@ -125,9 +125,9 @@ public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implement
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	
+
+
 }

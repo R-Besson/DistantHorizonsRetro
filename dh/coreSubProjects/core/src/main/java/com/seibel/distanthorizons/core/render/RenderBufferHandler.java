@@ -53,73 +53,73 @@ public class RenderBufferHandler implements AutoCloseable
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
-	
+
 	// static values for re-use to reduce GC pressure
 	private static final float[] JOML_TRANSPOSE_ARRAY = new float[16];
 	private static final Matrix4f WORLD_VIEW_JOML_MATRIX = new Matrix4f();
 	private static final Matrix4f WORLD_VIEW_PROJ_JOML_MATRIX = new Matrix4f();
 	private static final DhMat4f FRUSTOM_DH_MATRIX = new DhMat4f();
-	
-	
+
+
 	/** contains all relevant data */
 	public final LodQuadTree lodQuadTree;
-	
+
 	private final SortedArraySet<LodBufferContainer> loadedNearToFarBuffers;
 	/** temp array to prevent threading issues and prevent re-allocating the same array each frame */
 	private final ArrayList<LodRenderSection> tempProcessNodeList = new ArrayList<>();
-	
+
 	private int visibleBufferCount;
 	private int culledBufferCount;
 	private int shadowVisibleBufferCount;
 	private int shadowCulledBufferCount;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	public RenderBufferHandler(LodQuadTree lodQuadTree) 
-	{ 
+
+	public RenderBufferHandler(LodQuadTree lodQuadTree)
+	{
 		this.lodQuadTree = lodQuadTree;
-		
+
 		IDhApiCullingFrustum coreCameraFrustum = DhApi.overrides.get(IDhApiCullingFrustum.class, IOverrideInjector.CORE_PRIORITY);
 		if (coreCameraFrustum == null)
 		{
 			DhApi.overrides.bind(IDhApiCullingFrustum.class, new DhFrustumBounds());
 		}
-		
+
 		// by default the shadow pass shouldn't have any frustum culling
 		IDhApiShadowCullingFrustum coreShadowFrustum = DhApi.overrides.get(IDhApiShadowCullingFrustum.class, IOverrideInjector.CORE_PRIORITY);
 		if (coreShadowFrustum == null)
 		{
 			DhApi.overrides.bind(IDhApiShadowCullingFrustum.class, new NeverCullFrustum());
 		}
-		
+
 		this.loadedNearToFarBuffers = new SortedArraySet<>(this::sortBufferContainersNearToFar);
 	}
 	private int sortBufferContainersNearToFar(LodBufferContainer loadedBufferA, LodBufferContainer loadedBufferB)
 	{
 		DhBlockPos2D aPos = DhSectionPos.getCenterBlockPos(loadedBufferA.pos);
 		DhBlockPos2D bPos = DhSectionPos.getCenterBlockPos(loadedBufferB.pos);
-		
+
 		DhBlockPos2D centerPos = this.lodQuadTree.getCenterBlockPos();
-		
+
 		int aManhattanDistance = aPos.manhattanDist(centerPos);
 		int bManhattanDistance = bPos.manhattanDist(centerPos);
 		return aManhattanDistance - bManhattanDistance;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// render building //
 	//=================//
 	//region
-	
+
 	/**
 	 * The following buildRenderList sorting method is based on the following reddit post: <br>
 	 * <a href="https://www.reddit.com/r/VoxelGameDev/comments/a0l8zc/correct_depthordering_for_translucent_discrete/">correct_depth_ordering_for_translucent_discrete</a>
@@ -133,16 +133,16 @@ public class RenderBufferHandler implements AutoCloseable
 				LodUtil.assertNotReach("Should only be run on the render thread");
 			}
 		}
-		
+
 		// clear the old list so we can start fresh
 		this.loadedNearToFarBuffers.clear();
-		
-		
-		
+
+
+
 		//====================================//
 		// get and update the culling frustum //
 		//====================================//
-		
+
 		// get the culling frustum
 		boolean enableFrustumCulling;
 		IDhApiCullingFrustum frustum;
@@ -157,14 +157,14 @@ public class RenderBufferHandler implements AutoCloseable
 			enableFrustumCulling = !Config.Client.Advanced.Graphics.Culling.disableFrustumCulling.get();
 			frustum = DhApi.overrides.get(IDhApiCullingFrustum.class);
 		}
-		
-		
+
+
 		// update the frustum if necessary
 		if (enableFrustumCulling)
 		{
 			int worldMinY = renderParams.clientLevelWrapper.getMinHeight();
 			int worldHeight = renderParams.clientLevelWrapper.getMaxHeight();
-			
+
 			renderParams.mcModelViewMatrix.putValuesInArray(JOML_TRANSPOSE_ARRAY);
 			WORLD_VIEW_JOML_MATRIX
 				.setTransposed(JOML_TRANSPOSE_ARRAY)
@@ -172,7 +172,7 @@ public class RenderBufferHandler implements AutoCloseable
 					-(float) renderParams.exactCameraPosition.x,
 					-(float) renderParams.exactCameraPosition.y,
 					-(float) renderParams.exactCameraPosition.z);
-			
+
 			renderParams.dhProjectionMatrix.putValuesInArray(JOML_TRANSPOSE_ARRAY);
 			WORLD_VIEW_PROJ_JOML_MATRIX
 				.setTransposed(JOML_TRANSPOSE_ARRAY)
@@ -181,14 +181,14 @@ public class RenderBufferHandler implements AutoCloseable
 			FRUSTOM_DH_MATRIX.set(WORLD_VIEW_PROJ_JOML_MATRIX);
 			frustum.update(worldMinY, worldMinY + worldHeight, FRUSTOM_DH_MATRIX);
 		}
-		
-		
-		
+
+
+
 		//=========================//
 		// Update the section list //
 		//=========================//
 		//region
-		
+
 		if (isShadowPass)
 		{
 			this.shadowCulledBufferCount = 0;
@@ -197,7 +197,7 @@ public class RenderBufferHandler implements AutoCloseable
 		{
 			this.culledBufferCount = 0;
 		}
-		
+
 		// setup iterator with culling frustum
 		this.lodQuadTree.populateListWithEnabledRenderSections(this.tempProcessNodeList);
 		for (LodRenderSection renderSection : this.tempProcessNodeList)
@@ -206,8 +206,8 @@ public class RenderBufferHandler implements AutoCloseable
 			{
 				continue;
 			}
-			
-			
+
+
 			try
 			{
 				if (enableFrustumCulling)
@@ -226,7 +226,7 @@ public class RenderBufferHandler implements AutoCloseable
 						{
 							this.culledBufferCount++;
 						}
-						
+
 						continue;
 					}
 				}
@@ -234,10 +234,10 @@ public class RenderBufferHandler implements AutoCloseable
 			catch (Exception e)
 			{
 				// don't cull if there was an unexpected issue
-				LOGGER.error("Unexpected issue during culling for node pos: ["+DhSectionPos.toString(renderSection.pos)+"], error: ["+e.getMessage()+"].", e);
+				LOGGER.error("Unexpected issue during culling for node pos: [" + DhSectionPos.toString(renderSection.pos) + "], error: [" + e.getMessage() + "].", e);
 			}
-			
-			
+
+
 			try
 			{
 				LodBufferContainer bufferContainer = renderSection.renderBufferContainer;
@@ -247,15 +247,15 @@ public class RenderBufferHandler implements AutoCloseable
 					// shouldn't happen, but just in case
 					continue;
 				}
-				
+
 				this.loadedNearToFarBuffers.add(bufferContainer);
 			}
 			catch (Exception e)
 			{
-				LOGGER.error("Error updating QuadTree render source at [" + DhSectionPos.toString(renderSection.pos) + "], error: ["+e.getMessage()+"].", e);
+				LOGGER.error("Error updating QuadTree render source at [" + DhSectionPos.toString(renderSection.pos) + "], error: [" + e.getMessage() + "].", e);
 			}
 		}
-		
+
 		if (isShadowPass)
 		{
 			this.shadowVisibleBufferCount = this.loadedNearToFarBuffers.size();
@@ -264,31 +264,31 @@ public class RenderBufferHandler implements AutoCloseable
 		{
 			this.visibleBufferCount = this.loadedNearToFarBuffers.size();
 		}
-		
+
 		//endregion
-		
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// render methods //
 	//================//
 	//region
-	
+
 	public SortedArraySet<LodBufferContainer> getColumnRenderBuffers() { return this.loadedNearToFarBuffers; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// F3 menu //
 	//=========//
 	//region
-	
+
 	public String getVboRenderDebugMenuString()
 	{
 		String countText = F3Screen.NUMBER_FORMAT.format(this.visibleBufferCount);
@@ -305,7 +305,7 @@ public class RenderBufferHandler implements AutoCloseable
 		{
 			return null;
 		}
-		
+
 		String countText = F3Screen.NUMBER_FORMAT.format(this.shadowVisibleBufferCount);
 		if (!Config.Client.Advanced.Graphics.Culling.disableFrustumCulling.get())
 		{
@@ -313,21 +313,21 @@ public class RenderBufferHandler implements AutoCloseable
 		}
 		return "Shadow VBO Render Count: [" + countText + "]";
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// cleanup //
 	//=========//
 	//region
-	
+
 	@Override
 	public void close() { this.lodQuadTree.close(); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

@@ -21,15 +21,20 @@ package com.seibel.distanthorizons.common.render.openGl.glObject;
 
 import com.seibel.distanthorizons.common.render.openGl.glObject.enums.GLEnums;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 public class GLState implements AutoCloseable
 {
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	public int program;
 	public int vao;
 	public int vbo;
@@ -64,42 +69,42 @@ public class GLState implements AutoCloseable
 	public boolean cull;
 	public int cullMode;
 	public int polyMode;
-	
-	
-	
+
+
+
 	public GLState() { this.saveState(); }
-	
+
 	public void saveState()
 	{
 		this.program = LWJGL.glGetInteger(GL20.GL_CURRENT_PROGRAM);
 		this.vao = LWJGL.glGetInteger(GL30.GL_VERTEX_ARRAY_BINDING);
 		this.vbo = LWJGL.glGetInteger(GL15.GL_ARRAY_BUFFER_BINDING);
 		this.ebo = LWJGL.glGetInteger(GL15.GL_ELEMENT_ARRAY_BUFFER_BINDING);
-		
+
 		this.fbo = LWJGL.glGetInteger(GL30.GL_FRAMEBUFFER_BINDING);
-		
+
 		this.texture2D = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
 		this.activeTextureNumber = LWJGL.glGetInteger(GL13.GL_ACTIVE_TEXTURE);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		this.texture0 = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
 		this.texture1 = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE2); // problem with Iris
 		this.texture2 = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE3);
 		this.texture3 = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
-		
+
 		GLMC.glActiveTexture(this.activeTextureNumber);
-		
+
 		if (this.fbo != 0)
 		{
 			this.frameBufferTexture0 = LWJGL.glGetFramebufferAttachmentParameteri(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL30.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
 			this.frameBufferTexture1 = LWJGL.glGetFramebufferAttachmentParameteri(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL30.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME);
-			
+
 			int depthType = LWJGL.glGetFramebufferAttachmentParameteri(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE);
 			this.frameBufferDepthTexture = (depthType == GL11.GL_TEXTURE) ? LWJGL.glGetFramebufferAttachmentParameteri(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL30.GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME) : 0;
 		}
@@ -110,7 +115,7 @@ public class GLState implements AutoCloseable
 			this.frameBufferTexture1 = 0;
 			this.frameBufferDepthTexture = 0;
 		}
-		
+
 		this.blend = LWJGL.glIsEnabled(GL11.GL_BLEND);
 		this.scissor = LWJGL.glIsEnabled(GL11.GL_SCISSOR_TEST);
 		this.blendEqRGB = LWJGL.glGetInteger(GL20.GL_BLEND_EQUATION_RGB);
@@ -138,21 +143,21 @@ public class GLState implements AutoCloseable
 		LWJGL.glGetIntegerv(GL11.GL_POLYGON_MODE, polyModes);
 		this.polyMode = polyModes[0];
 	}
-	
-	@Override 
+
+	@Override
 	public void close()
 	{
 		// explicitly unbinding the frame buffer is necessary to prevent GL_CLEAR calls from hitting the wrong buffer
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
 		boolean frameBufferSet = false;
-		
+
 		if (this.fbo != 0 && GL30.glIsFramebuffer(this.fbo))
 		{
 			GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fbo);
 			frameBufferSet = true;
 		}
-		
-		
+
+
 		if (this.blend)
 		{
 			GLMC.enableBlend();
@@ -161,7 +166,7 @@ public class GLState implements AutoCloseable
 		{
 			GLMC.disableBlend();
 		}
-		
+
 		if (this.scissor)
 		{
 			GLMC.enableScissorTest();
@@ -170,22 +175,22 @@ public class GLState implements AutoCloseable
 		{
 			GLMC.disableScissorTest();
 		}
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(LWJGL.glIsTexture(this.texture0) ? this.texture0 : 0);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
 		GLMC.glBindTexture(LWJGL.glIsTexture(this.texture1) ? this.texture1 : 0);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE2);
 		GLMC.glBindTexture(LWJGL.glIsTexture(this.texture2) ? this.texture2 : 0);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE3);
 		GLMC.glBindTexture(LWJGL.glIsTexture(this.texture3) ? this.texture3 : 0);
-		
+
 		GLMC.glActiveTexture(this.activeTextureNumber);
 		GLMC.glBindTexture(LWJGL.glIsTexture(this.texture2D) ? this.texture2D : 0);
-		
+
 		// attempting to set textures on the default frame buffer (ID 0) will throw errors
 		if (frameBufferSet)
 		{
@@ -193,24 +198,24 @@ public class GLState implements AutoCloseable
 			{
 				LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.frameBufferTexture0, 0);
 			}
-			
+
 			if (this.frameBufferTexture1 != 0 && LWJGL.glIsTexture(this.frameBufferTexture1))
 			{
 				LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT1, GL11.GL_TEXTURE_2D, this.frameBufferTexture1, 0);
 			}
-			
+
 			if (LWJGL.glIsTexture(this.frameBufferDepthTexture))
 			{
 				LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, this.frameBufferDepthTexture, 0);
 			}
-				
+
 		}
-		
+
 		LWJGL.glBindVertexArray(GL30.glIsVertexArray(this.vao) ? this.vao : 0);
 		LWJGL.glBindBuffer(GL15.GL_ARRAY_BUFFER, GL15.glIsBuffer(this.vbo) ? this.vbo : 0);
-		LWJGL.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, GL15.glIsBuffer(this.ebo) ? this.ebo: 0);
+		LWJGL.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, GL15.glIsBuffer(this.ebo) ? this.ebo : 0);
 		LWJGL.glUseProgram(GL20.glIsProgram(this.program) ? this.program : 0);
-		
+
 		if (this.writeToDepthBuffer)
 		{
 			GLMC.enableDepthMask();
@@ -219,11 +224,11 @@ public class GLState implements AutoCloseable
 		{
 			GLMC.disableDepthMask();
 		}
-		
+
 		GLMC.glBlendFunc(this.blendSrcColor, this.blendDstColor);
 		LWJGL.glBlendEquationSeparate(this.blendEqRGB, this.blendEqAlpha);
 		GLMC.glBlendFuncSeparate(this.blendSrcColor, this.blendDstColor, this.blendSrcAlpha, this.blendDstAlpha);
-		
+
 		if (this.depth)
 		{
 			GLMC.enableDepthTest();
@@ -233,7 +238,7 @@ public class GLState implements AutoCloseable
 			GLMC.disableDepthTest();
 		}
 		GLMC.glDepthFunc(this.depthFunc);
-		
+
 		if (this.stencil)
 		{
 			LWJGL.glEnable(GL11.GL_STENCIL_TEST);
@@ -243,7 +248,7 @@ public class GLState implements AutoCloseable
 			LWJGL.glDisable(GL11.GL_STENCIL_TEST);
 		}
 		LWJGL.glStencilFunc(this.stencilFunc, this.stencilRef, this.stencilMask);
-		
+
 		GLMC.glViewport(this.view[0], this.view[1], this.view[2], this.view[3]);
 		if (this.cull)
 		{
@@ -256,7 +261,7 @@ public class GLState implements AutoCloseable
 		LWJGL.glCullFace(this.cullMode);
 		LWJGL.glPolygonMode(GL11.GL_FRONT_AND_BACK, this.polyMode);
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -275,7 +280,7 @@ public class GLState implements AutoCloseable
 			", cullMode=" + GLEnums.getString(this.cullMode) + ", polyMode=" + GLEnums.getString(this.polyMode) +
 			'}';
 	}
-	
-	
-	
+
+
+
 }

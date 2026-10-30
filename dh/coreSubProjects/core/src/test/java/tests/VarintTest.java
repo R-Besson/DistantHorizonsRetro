@@ -31,32 +31,32 @@ import java.io.IOException;
 
 public class VarintTest
 {
-	
+
 	@Test
 	public void Test()
 	{
 		Assert.assertEquals(0x80, 128);
-		
-		
+
+
 		// zig zag encoding is needed for varint handling, so test it first
 		for (int i = -256; i < 256; i++)
 		{
 			testZigZagEncoding(i);
 		}
-		
+
 		for (int i = -256; i < 256; i++)
 		{
 			testSingleVarint(i);
 		}
 	}
-	
+
 	private static void testZigZagEncoding(int value)
 	{
 		int encodedValue = VarintUtil.zigzagEncode(value);
 		int decodedValue = VarintUtil.zigzagDecode(encodedValue);
 		Assert.assertEquals(value, decodedValue);
 	}
-	
+
 	private static void testSingleVarint(int value)
 	{
 		// write to stream
@@ -69,10 +69,10 @@ public class VarintTest
 		catch (IOException e)
 		{
 			e.printStackTrace();
-			Assert.fail("Fail writing varint ["+value+"], error: ["+e.getMessage()+"]");
+			Assert.fail("Fail writing varint [" + value + "], error: [" + e.getMessage() + "]");
 		}
-		
-		
+
+
 		// read stream
 		try (DhDataInputStream inputStream = DhDataInputStream.create(byteArrayList, EDhApiDataCompressionMode.UNCOMPRESSED, null /*no checkout needed for uncompressed*/))
 		{
@@ -83,8 +83,8 @@ public class VarintTest
 		catch (IOException e)
 		{
 			e.printStackTrace();
-			Assert.fail("Fail reading varint ["+value+"], error: ["+e.getMessage()+"]");
+			Assert.fail("Fail reading varint [" + value + "], error: [" + e.getMessage() + "]");
 		}
 	}
-	
+
 }

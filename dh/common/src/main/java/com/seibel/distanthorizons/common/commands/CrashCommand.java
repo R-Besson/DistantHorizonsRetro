@@ -33,8 +33,8 @@ public class CrashCommand extends AbstractDhCommand
 
 		ServerPlayerState serverPlayerState =
 			world
-			.getServerPlayerStateManager()
-			.getConnectedPlayer(ServerPlayerWrapper.getWrapper((EntityPlayerMP) sender));
+				.getServerPlayerStateManager()
+				.getConnectedPlayer(ServerPlayerWrapper.getWrapper((EntityPlayerMP) sender));
 
 		if (serverPlayerState == null)
 		{

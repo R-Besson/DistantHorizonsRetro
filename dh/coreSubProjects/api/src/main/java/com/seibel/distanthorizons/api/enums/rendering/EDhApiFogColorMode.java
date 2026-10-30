@@ -32,10 +32,10 @@ public enum EDhApiFogColorMode
 	// Reminder:
 	// when adding items: up the API minor version
 	// when removing items: up the API major version
-	
+
 	/** Fog uses Minecraft's fog color. */
 	USE_WORLD_FOG_COLOR,
-	
+
 	/**
 	 * Replicates the effect of the clear sky mod.
 	 * Making the fog blend in with the sky better
@@ -44,5 +44,5 @@ public enum EDhApiFogColorMode
 	 * https://www.curseforge.com/minecraft/mc-mods/clear-skies-forge-port
 	 */
 	USE_SKY_COLOR,
-	
+
 }

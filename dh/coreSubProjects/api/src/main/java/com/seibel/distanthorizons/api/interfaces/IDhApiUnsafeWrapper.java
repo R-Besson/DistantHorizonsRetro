@@ -31,7 +31,7 @@ import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
  */
 public interface IDhApiUnsafeWrapper
 {
-	
+
 	/**
 	 * Returns the Minecraft object this wrapper contains. <br>
 	 * <strong>Warning</strong>: This object will be Minecraft
@@ -41,11 +41,11 @@ public interface IDhApiUnsafeWrapper
 	 * to use <code>obj.getClass()</code> when in your IDE
 	 * in order to determine what object this method returns for
 	 * the specific version of Minecraft you are developing for. <br><br>
-	 * 
+	 *
 	 * Note:<br>
 	 * This method may return null in some cases, IE {@link IDhApiBlockStateWrapper}
 	 * when it is wrapping air.
 	 */
 	Object getWrappedMcObject();
-	
+
 }

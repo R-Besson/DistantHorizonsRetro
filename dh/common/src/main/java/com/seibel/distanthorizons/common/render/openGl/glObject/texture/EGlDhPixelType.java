@@ -9,13 +9,13 @@ public enum EGlDhPixelType
 
 
 	private final int glFormat;
-	
-	
-	
+
+
+
 	EGlDhPixelType(int glFormat)
 	{
 		this.glFormat = glFormat;
-    }
+	}
 
 
 

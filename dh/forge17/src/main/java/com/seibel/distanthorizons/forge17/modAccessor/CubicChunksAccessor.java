@@ -130,7 +130,7 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 		}
 		lowestTopY = Math.max(lowestTopY, minHeight);
 		highestTopY = Math.min(highestTopY, maxHeight - 1);
-		return new int[] { lowestTopY >> 4, highestTopY >> 4 };
+		return new int[]{lowestTopY >> 4, highestTopY >> 4};
 	}
 
 	@Override

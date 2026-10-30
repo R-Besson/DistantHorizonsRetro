@@ -34,17 +34,17 @@ public class GlVertexFormats
 	public static final GlLodVertexFormatElement ELEMENT_LIGHT = new GlLodVertexFormatElement(0, GlLodVertexFormatElement.DataType.UBYTE, 1);
 	public static final GlLodVertexFormatElement ELEMENT_IRIS_MATERIAL_INDEX = new GlLodVertexFormatElement(0, GlLodVertexFormatElement.DataType.BYTE, 1);
 	public static final GlLodVertexFormatElement ELEMENT_IRIS_NORMAL_INDEX = new GlLodVertexFormatElement(0, GlLodVertexFormatElement.DataType.BYTE, 1);
-	
-	
+
+
 	public static final GlLodVertexFormat POSITION_COLOR_BLOCK_LIGHT_SKY_LIGHT_MATERIAL_ID_NORMAL_INDEX = new GlLodVertexFormat(ImmutableList.<GlLodVertexFormatElement>builder()
-			.add(ELEMENT_POSITION)
-			.add(ELEMENT_BYTE_PADDING)
-			.add(ELEMENT_LIGHT)
-			.add(ELEMENT_COLOR)
-			.add(ELEMENT_IRIS_MATERIAL_INDEX)
-			.add(ELEMENT_IRIS_NORMAL_INDEX)
-			.add(ELEMENT_BYTE_PADDING)
-			.add(ELEMENT_BYTE_PADDING) // padding is to make sure the format is a multiple of 4
-			.build());
-	
+		.add(ELEMENT_POSITION)
+		.add(ELEMENT_BYTE_PADDING)
+		.add(ELEMENT_LIGHT)
+		.add(ELEMENT_COLOR)
+		.add(ELEMENT_IRIS_MATERIAL_INDEX)
+		.add(ELEMENT_IRIS_NORMAL_INDEX)
+		.add(ELEMENT_BYTE_PADDING)
+		.add(ELEMENT_BYTE_PADDING) // padding is to make sure the format is a multiple of 4
+		.build());
+
 }

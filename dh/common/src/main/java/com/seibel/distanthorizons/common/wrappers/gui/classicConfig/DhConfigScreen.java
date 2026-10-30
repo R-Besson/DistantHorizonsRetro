@@ -7,7 +7,13 @@ import com.seibel.distanthorizons.common.wrappers.gui.GuiHelper;
 import com.seibel.distanthorizons.common.wrappers.gui.OnPressed;
 import com.seibel.distanthorizons.common.wrappers.gui.config.ConfigGuiInfo;
 import com.seibel.distanthorizons.core.config.ConfigHandler;
-import com.seibel.distanthorizons.core.config.types.*;
+import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
+import com.seibel.distanthorizons.core.config.types.ConfigCategory;
+import com.seibel.distanthorizons.core.config.types.ConfigEntry;
+import com.seibel.distanthorizons.core.config.types.ConfigUIButton;
+import com.seibel.distanthorizons.core.config.types.ConfigUIComment;
+import com.seibel.distanthorizons.core.config.types.ConfigUISpacer;
+import com.seibel.distanthorizons.core.config.types.ConfigUiLinkedEntry;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigValidity;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
@@ -23,12 +29,20 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.EnumChatFormatting;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.*;
+import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.MakeBtn;
+import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.TextOrLiteral;
+import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.TextOrTranslatable;
+import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.Translatable;
 
 class DhConfigScreen extends DhScreen
 {
@@ -291,7 +305,7 @@ class DhConfigScreen extends DhScreen
 	private static void setupBooleanMenuOption(ConfigEntry<Boolean> booleanConfigEntry)
 	{
 		// For boolean
-		Function<Object, String> func = value -> (((Boolean) value ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + Translatable("distanthorizons.general."+ value));
+		Function<Object, String> func = value -> (((Boolean) value ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + Translatable("distanthorizons.general." + value));
 
 		final ConfigGuiInfo configGuiInfo = ((ConfigGuiInfo) booleanConfigEntry.guiValue);
 
@@ -300,9 +314,9 @@ class DhConfigScreen extends DhScreen
 				(button) ->
 				{
 					button.enabled = !booleanConfigEntry.apiIsOverriding();
-					
+
 					booleanConfigEntry.uiSetWithoutSaving(!booleanConfigEntry.get());
-					
+
 					button.displayString = func.apply(booleanConfigEntry.get());
 				}, func);
 	}
@@ -322,12 +336,12 @@ class DhConfigScreen extends DhScreen
 					// get the currently selected enum and enum index
 					int startingIndex = enumList.indexOf(enumConfigEntry.get());
 					Enum<?> enumValue = enumList.get(startingIndex);
-					
+
 					boolean shiftPressed = GuiScreen.isShiftKeyDown();
-					
+
 					// move forward or backwards depending on if the shift key is pressed
 					int index = shiftPressed ? startingIndex - 1 : startingIndex + 1;
-					
+
 					// wrap around to the other side of the array when necessary
 					if (index >= enumList.size())
 					{
@@ -337,13 +351,13 @@ class DhConfigScreen extends DhScreen
 					{
 						index = enumList.size() - 1;
 					}
-					
-					
+
+
 					// walk through the enums to find the next selectable one
 					while (index != startingIndex)
 					{
 						enumValue = enumList.get(index);
-						
+
 						// does enum have ignored attribute?
 						boolean selectable = !AnnotationUtil.doesEnumHaveAnnotation(enumValue, DisallowSelectingViaConfigGui.class);
 						if (selectable)
@@ -355,17 +369,17 @@ class DhConfigScreen extends DhScreen
 								selectable = showEnumFunc.shouldShowEnum(enumValue);
 							}
 						}
-						
+
 						if (selectable)
 						{
 							// this enum is a valid option
 							break;
 						}
-						
-						
+
+
 						// move forward or backwards depending on if the shift key is pressed
 						index = shiftPressed ? index - 1 : index + 1;
-						
+
 						// wrap around to the other side of the array when necessary
 						if (index >= enumList.size())
 						{
@@ -376,18 +390,18 @@ class DhConfigScreen extends DhScreen
 							index = enumList.size() - 1;
 						}
 					}
-					
-					
+
+
 					if (index == startingIndex)
 					{
 						// one of the enums should be selectable, this is a programmer error
 						enumValue = enumList.get(startingIndex);
 						LOGGER.warn("Enum [" + enumValue.getClass() + "] doesn't contain any values that should be selectable via the UI, sticking to the currently selected value [" + enumValue + "].");
 					}
-					
-					
+
+
 					enumConfigEntry.uiSetWithoutSaving(enumValue);
-					
+
 					button.enabled = !enumConfigEntry.apiIsOverriding();
 					button.displayString = getEnumTranslatableFunc.apply(enumConfigEntry.get());
 				}, getEnumTranslatableFunc);
@@ -492,7 +506,7 @@ class DhConfigScreen extends DhScreen
 					resetButton,
 					null,
 					textComponent);
-				
+
 			}
 			else
 			{
@@ -507,10 +521,10 @@ class DhConfigScreen extends DhScreen
 				this.textFieldProcessors.put(widget, processor);
 
 				this.configListWidget.addButton(this, configEntry, widget, resetButton, null, textComponent);
-				
+
 			}
 			return true;
-			
+
 			//endregion
 		}
 
@@ -736,9 +750,9 @@ class DhConfigScreen extends DhScreen
 			for (ClassicConfigGUI.DhButtonEntry entry : this.configListWidget.children)
 			{
 				if (entry.button instanceof GuiButton
-					&& ((GuiButton)entry.button).visible)
+					&& ((GuiButton) entry.button).visible)
 				{
-					GuiButton btn = (GuiButton)entry.button;
+					GuiButton btn = (GuiButton) entry.button;
 
 					if (btn.mousePressed(this.mc, mouseX, mouseY))
 					{
@@ -752,14 +766,14 @@ class DhConfigScreen extends DhScreen
 					}
 				}
 				else if (entry.button instanceof GuiTextField
-					&& ((GuiTextField)entry.button).getVisible())
+					&& ((GuiTextField) entry.button).getVisible())
 				{
 					GuiTextField field = (GuiTextField) entry.button;
 					field.mouseClicked(mouseX, mouseY, mouseButton);
 				}
 
 				if (entry.resetButton instanceof GuiButton
-					&& ((GuiButton)entry.resetButton).visible)
+					&& ((GuiButton) entry.resetButton).visible)
 				{
 					GuiButton reset = (GuiButton) entry.resetButton;
 

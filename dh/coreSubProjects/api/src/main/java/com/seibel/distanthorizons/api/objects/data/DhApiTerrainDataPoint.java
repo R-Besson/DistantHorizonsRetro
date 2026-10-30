@@ -38,80 +38,80 @@ public class DhApiTerrainDataPoint
 	 * 2 = 4x4 blocks <br>
 	 * 4 = chunk (16x16 blocks) <br>
 	 * 9 = region (512x512 blocks) <br>
-	 * 
+	 *
 	 * @see EDhApiDetailLevel
 	 */
 	public final byte detailLevel;
-	
+
 	public final int blockLightLevel;
 	public final int skyLightLevel;
 	/**
-	 * An unsigned block position of the bottom vertex for this LOD relative to the level's minimum height. 
+	 * An unsigned block position of the bottom vertex for this LOD relative to the level's minimum height.
 	 * Should be greater than or equal to 0.
 	 */
 	public final int bottomYBlockPos;
 	public final int topYBlockPos;
-	
+
 	public final IDhApiBlockStateWrapper blockStateWrapper;
 	public final IDhApiBiomeWrapper biomeWrapper;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	/** @since API 3.0.0 */
 	public static DhApiTerrainDataPoint create(
-			byte detailLevel,
-			int blockLightLevel, int skyLightLevel,
-			int bottomYBlockPos, int topYBlockPos,
-			IDhApiBlockStateWrapper blockStateWrapper, IDhApiBiomeWrapper biomeWrapper
-		)
-	{ 
+		byte detailLevel,
+		int blockLightLevel, int skyLightLevel,
+		int bottomYBlockPos, int topYBlockPos,
+		IDhApiBlockStateWrapper blockStateWrapper, IDhApiBiomeWrapper biomeWrapper
+	)
+	{
 		return new DhApiTerrainDataPoint(
 			detailLevel, blockLightLevel, skyLightLevel,
 			bottomYBlockPos, topYBlockPos,
-			blockStateWrapper, biomeWrapper); 
+			blockStateWrapper, biomeWrapper);
 	}
-	
+
 	/** Only visible to internal DH methods */
 	private DhApiTerrainDataPoint(
-			byte detailLevel,
-			int blockLightLevel, int skyLightLevel,
-			int bottomYBlockPos, int topYBlockPos,
-			IDhApiBlockStateWrapper blockStateWrapper, IDhApiBiomeWrapper biomeWrapper
-		)
+		byte detailLevel,
+		int blockLightLevel, int skyLightLevel,
+		int bottomYBlockPos, int topYBlockPos,
+		IDhApiBlockStateWrapper blockStateWrapper, IDhApiBiomeWrapper biomeWrapper
+	)
 	{
 		this.detailLevel = detailLevel;
-		
+
 		this.blockLightLevel = blockLightLevel;
 		this.skyLightLevel = skyLightLevel;
 		this.bottomYBlockPos = bottomYBlockPos;
 		this.topYBlockPos = topYBlockPos;
-		
+
 		this.blockStateWrapper = blockStateWrapper;
 		this.biomeWrapper = biomeWrapper;
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
-	@Override 
+
+	@Override
 	public String toString()
 	{
-		return "Block:" + this.blockStateWrapper.getSerialString() + 
+		return "Block:" + this.blockStateWrapper.getSerialString() +
 			",Biome:" + this.biomeWrapper.getSerialString() +
 			",BottomY:" + this.bottomYBlockPos +
-			",TopY:" + this.topYBlockPos + 
+			",TopY:" + this.topYBlockPos +
 			",BlockLight:" + this.blockLightLevel +
 			",SkyLight:" + this.skyLightLevel
 			;
 	}
-	
-	
-	
+
+
+
 }

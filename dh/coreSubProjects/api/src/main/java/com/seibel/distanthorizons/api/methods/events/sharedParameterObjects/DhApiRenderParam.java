@@ -35,27 +35,27 @@ public class DhApiRenderParam implements IDhApiEventParam
 {
 	/** Indicates what render pass DH is currently rendering */
 	public EDhApiRenderPass renderPass;
-	
+
 	/** Indicates how far into this tick the frame is. */
 	public float partialTicks;
-	
+
 	/**
-	 * Indicates DH's near clip plane, measured in blocks. 
-	 * Note: this may change based on time, player speed, and other factors. 
+	 * Indicates DH's near clip plane, measured in blocks.
+	 * Note: this may change based on time, player speed, and other factors.
 	 */
 	public float nearClipPlane;
 	/**
-	 * Indicates DH's far clip plane, measured in blocks. 
-	 * Note: this may change based on time, player speed, and other factors. 
+	 * Indicates DH's far clip plane, measured in blocks.
+	 * Note: this may change based on time, player speed, and other factors.
 	 */
 	public float farClipPlane;
-	
+
 	/** The projection matrix Minecraft is using to render this frame. */
 	public final DhApiMat4f mcProjectionMatrix = new DhApiMat4f();
 	/** The model view matrix Minecraft is using to render this frame. */
 	public final DhApiMat4f mcModelViewMatrix = new DhApiMat4f();
 	public final DhApiMat4f mcInverseMvmProjectionMatrix = new DhApiMat4f();
-	
+
 	/** The projection matrix Distant Horizons is using to render this frame. */
 	public final DhApiMat4f dhProjectionMatrix = new DhApiMat4f();
 	/** The model view matrix Distant Horizons is using to render this frame. */
@@ -63,102 +63,102 @@ public class DhApiRenderParam implements IDhApiEventParam
 	/** combination of the MVM and projection matrices */
 	public final DhApiMat4f dhMvmProjMatrix = new DhApiMat4f();
 	public final DhApiMat4f dhInverseMvmProjectionMatrix = new DhApiMat4f();
-	
+
 	public int worldYOffset;
-	
+
 	/**
 	 * The level currently being rendered.
-	 * 
-	 * @since API 5.1.0 
+	 *
+	 * @since API 5.1.0
 	 */
 	public IDhApiLevelWrapper clientLevelWrapper;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
-	public DhApiRenderParam() {}
-	
+
+	public DhApiRenderParam() { }
+
 	/** Internal DH method */
-	public void update(DhApiRenderParam param) 
+	public void update(DhApiRenderParam param)
 	{
 		this.update(
 			param.renderPass,
 			param.partialTicks,
 			param.nearClipPlane, param.farClipPlane,
 			param.mcProjectionMatrix, param.mcModelViewMatrix,
-			param.dhProjectionMatrix, param.mcModelViewMatrix, 
+			param.dhProjectionMatrix, param.mcModelViewMatrix,
 			param.worldYOffset,
 			param.clientLevelWrapper
 		);
 	}
 	/** Internal DH method */
 	public void update(
-			EDhApiRenderPass renderPass,
-			float newPartialTicks,
-			float nearClipPlane, float farClipPlane,
-			DhApiMat4f newMcProjectionMatrix, DhApiMat4f newMcModelViewMatrix,
-			DhApiMat4f newDhProjectionMatrix, DhApiMat4f newDhModelViewMatrix,
-			int worldYOffset,
-			IDhApiLevelWrapper clientLevelWrapper
-		)
+		EDhApiRenderPass renderPass,
+		float newPartialTicks,
+		float nearClipPlane, float farClipPlane,
+		DhApiMat4f newMcProjectionMatrix, DhApiMat4f newMcModelViewMatrix,
+		DhApiMat4f newDhProjectionMatrix, DhApiMat4f newDhModelViewMatrix,
+		int worldYOffset,
+		IDhApiLevelWrapper clientLevelWrapper
+	)
 	{
 		this.renderPass = renderPass;
-		
+
 		this.partialTicks = newPartialTicks;
-		
+
 		this.farClipPlane = farClipPlane;
 		this.nearClipPlane = nearClipPlane;
-		
+
 		// mc matricies
 		{
 			this.mcProjectionMatrix.set(newMcProjectionMatrix);
 			this.mcModelViewMatrix.set(newMcModelViewMatrix);
-			
+
 			// inverse mvm Proj
 			this.mcInverseMvmProjectionMatrix.set(newMcProjectionMatrix);
 			this.mcInverseMvmProjectionMatrix.invert();
 		}
-		
+
 		// dh matricies
 		{
 			this.dhProjectionMatrix.set(newDhProjectionMatrix);
 			this.dhModelViewMatrix.set(newDhModelViewMatrix);
-			
+
 			// proj
 			this.dhMvmProjMatrix.set(this.dhProjectionMatrix);
 			this.dhMvmProjMatrix.multiply(this.dhModelViewMatrix);
-			
+
 			// inverse mvm Proj
 			this.dhInverseMvmProjectionMatrix.set(this.dhMvmProjMatrix);
 			this.dhInverseMvmProjectionMatrix.invert();
 		}
-		
+
 		this.worldYOffset = worldYOffset;
 		this.clientLevelWrapper = clientLevelWrapper;
-		
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public boolean getCopyBeforeFire() { return false; }
-	
+
 	@Override
 	public DhApiRenderParam copy() { return this; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

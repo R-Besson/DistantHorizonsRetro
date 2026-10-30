@@ -31,68 +31,68 @@ import java.sql.SQLException;
 
 public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 {
-	
-	
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ChunkHashRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, ChunkHashDTO.class);
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
-	
-	@Override 
+
+	@Override
 	public String getTableName() { return "ChunkHash"; }
-	
+
 	@Override
 	protected String CreateParameterizedWhereString() { return "ChunkPosX = ? AND ChunkPosZ = ?"; }
-	
+
 	@Override
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, DhChunkPos pos) throws SQLException
 	{
 		statement.setInt(index++, pos.getX());
 		statement.setInt(index, pos.getZ());
 	}
-	
-	
-	
+
+
+
 	//=======================//
 	// repo required methods //
 	//=======================//
-	
+
 	@Override
 	@Nullable
 	public ChunkHashDTO convertResultSetToDto(ResultSet resultSet) throws ClassCastException, SQLException
 	{
 		int posX = resultSet.getInt("ChunkPosX");
 		int posZ = resultSet.getInt("ChunkPosZ");
-		
+
 		int chunkHash = resultSet.getInt("ChunkHash");
-		
-		
+
+
 		return new ChunkHashDTO(new DhChunkPos(posX, posZ), chunkHash);
 	}
-	
+
 	private final String upsertSqlTemplate =
-		"INSERT INTO "+this.getTableName() + " (\n" +
-		"   ChunkPosX, ChunkPosZ, \n" +
-		"   ChunkHash, \n" +
-		"   LastModifiedUnixDateTime, CreatedUnixDateTime) \n" +
-		"VALUES( \n" +
-		"    ?, ?, \n" +
-		"    ?, \n" +
-		"    ?, ? \n" +
-		") \n" +
-		"ON CONFLICT(ChunkPosX, ChunkPosZ) DO UPDATE SET \n" +
-		"    ChunkHash = excluded.ChunkHash \n" +
-		"   ,LastModifiedUnixDateTime = excluded.LastModifiedUnixDateTime";
+		"INSERT INTO " + this.getTableName() + " (\n" +
+			"   ChunkPosX, ChunkPosZ, \n" +
+			"   ChunkHash, \n" +
+			"   LastModifiedUnixDateTime, CreatedUnixDateTime) \n" +
+			"VALUES( \n" +
+			"    ?, ?, \n" +
+			"    ?, \n" +
+			"    ?, ? \n" +
+			") \n" +
+			"ON CONFLICT(ChunkPosX, ChunkPosZ) DO UPDATE SET \n" +
+			"    ChunkHash = excluded.ChunkHash \n" +
+			"   ,LastModifiedUnixDateTime = excluded.LastModifiedUnixDateTime";
 	@Override
 	public PreparedStatement createUpsertStatement(ChunkHashDTO dto) throws SQLException
 	{
@@ -101,20 +101,20 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 		{
 			return null;
 		}
-		
-		
+
+
 		int i = 1;
 		statement.setObject(i++, dto.pos.getX());
 		statement.setObject(i++, dto.pos.getZ());
-		
+
 		statement.setObject(i++, dto.chunkHash);
-		
+
 		statement.setObject(i++, System.currentTimeMillis()); // last modified Unix time
 		statement.setObject(i, System.currentTimeMillis()); // created Unix time
-		
+
 		return statement;
 	}
-	
-	
-	
+
+
+
 }

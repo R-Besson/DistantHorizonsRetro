@@ -37,17 +37,17 @@ import java.util.HashMap;
 public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements IDhApiEventInjector // Note to self: Don't try adding a generic type to IDhApiEvent, the constructor won't accept it
 {
 	public static final ApiEventInjector INSTANCE = new ApiEventInjector();
-	
+
 	private static final Logger LOGGER = LogManager.getLogger(ApiEventInjector.class.getSimpleName());
-	
+
 	private final HashMap<Class<? extends IDhApiEvent>, Object> firedOneTimeEventParamsByEventInterface = new HashMap<>();
-	
-	
-	
+
+
+
 	private ApiEventInjector() { super(IDhApiEvent.class, true); }
-	
-	
-	
+
+
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void bind(Class<? extends IDhApiEvent> abstractEvent, IDhApiEvent eventImplementation) throws IllegalStateException, IllegalArgumentException
@@ -59,7 +59,7 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 			if (this.firedOneTimeEventParamsByEventInterface.containsKey(abstractEvent))
 			{
 				// the one time event has happened, fire the handler
-				
+
 				// this has to be an unsafe cast since the hash map can't hold the generic objects
 				Object parameter = this.firedOneTimeEventParamsByEventInterface.get(abstractEvent);
 				// one time events probably aren't cancelable, but just in case
@@ -67,19 +67,19 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 				eventImplementation.fireEvent(eventParam);
 			}
 		}
-		
+
 		// bind the event handler
 		super.bind(abstractEvent, eventImplementation);
 	}
-	
+
 	@Override
 	public boolean unbind(Class<? extends IDhApiEvent> abstractEvent, Class<? extends IDhApiEvent> eventClassToRemove) throws IllegalArgumentException
 	{
 		// make sure the given dependency implements the necessary interfaces
 		boolean implementsInterface = this.checkIfClassImplements(eventClassToRemove, abstractEvent) ||
-				this.checkIfClassExtends(eventClassToRemove, abstractEvent);
+			this.checkIfClassExtends(eventClassToRemove, abstractEvent);
 		boolean implementsBindable = this.checkIfClassImplements(eventClassToRemove, this.bindableInterface);
-		
+
 		// display any errors
 		if (!implementsInterface)
 		{
@@ -89,8 +89,8 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 		{
 			throw new IllegalArgumentException("The event handler [" + eventClassToRemove.getSimpleName() + "] doesn't implement the interface: [" + IBindable.class.getSimpleName() + "].");
 		}
-		
-		
+
+
 		// actually remove the dependency
 		if (this.dependencies.containsKey(abstractEvent))
 		{
@@ -105,28 +105,28 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 					break;
 				}
 			}
-			
+
 			if (indexToRemove != -1)
 			{
 				return dependencyList.remove(indexToRemove) != null;
 			}
 		}
-		
+
 		// no item was removed
 		return false;
 	}
-	
+
 	@Override
 	public <T, U extends IDhApiEvent<T>> boolean fireAllEvents(Class<U> abstractEventClass, T eventInput)
 	{
 		// if this is a one time event, record that it was called
 		if (IDhApiOneTimeEvent.class.isAssignableFrom(abstractEventClass) &&
-				!this.firedOneTimeEventParamsByEventInterface.containsKey(abstractEventClass))
+			!this.firedOneTimeEventParamsByEventInterface.containsKey(abstractEventClass))
 		{
 			this.firedOneTimeEventParamsByEventInterface.put(abstractEventClass, eventInput);
 		}
-		
-		
+
+
 		// fire each bound event
 		boolean cancelEvent = false;
 		ArrayList<U> eventList = this.getAll(abstractEventClass);
@@ -142,11 +142,11 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 				{
 					// fire each event and record if any of them
 					// request to cancel the event.
-					
-					
+
+
 					// attempt to clone the event input if possible
-					// this is done to reduce the likelihood that one event listener 
-					// will change the event parameter for other listeners 
+					// this is done to reduce the likelihood that one event listener
+					// will change the event parameter for other listeners
 					T input = eventInput;
 					if (eventInput instanceof IDhApiEventParam)
 					{
@@ -164,17 +164,17 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 							}
 						}
 					}
-					
-					
+
+
 					DhApiEventParam<T> eventParam = createEventParamWrapper(event, input);
 					event.fireEvent(eventParam);
-					
+
 					if (eventParam instanceof DhApiCancelableEventParam)
 					{
 						DhApiCancelableEventParam<T> cancelableEventParam = (DhApiCancelableEventParam<T>) eventParam;
 						cancelEvent |= cancelableEventParam.isEventCanceled();
 					}
-					
+
 					if (event.removeAfterFiring())
 					{
 						if (eventsToRemove == null)
@@ -190,8 +190,8 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 				}
 			}
 		}
-		
-		
+
+
 		// remove any removeAfterFire events
 		if (eventsToRemove != null)
 		{
@@ -200,15 +200,15 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 				this.unbind(abstractEventClass, eventToRemove.getClass());
 			}
 		}
-		
+
 		return cancelEvent;
 	}
-	
-	
-	/** 
+
+
+	/**
 	 * Wraps the event parameter object in a {@link DhApiCancelableEventParam} or {@link DhApiEventParam} depending on
 	 * if it should allow cancellation or not.
-	 * 
+	 *
 	 * @param event the event instance
 	 * @param parameter the event's parameter object
 	 * @param <T> the event parameter type
@@ -218,5 +218,5 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 	{
 		return (event instanceof IDhApiCancelableEvent) ? new DhApiCancelableEventParam<>(parameter) : new DhApiEventParam<>(parameter);
 	}
-	
+
 }

@@ -36,61 +36,61 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	public static final String MINIMUM_ANGELICA_VERSION = "2.1.5";
 	public static final VersionRange SUPPORTED_ANGELICA_RANGE = VersionParser
 		.parseRange("[" + MINIMUM_ANGELICA_VERSION + ",)");
-	
+
 	@Override
 	public String getModName() { return ANGELICA_MOD_ID; }
-	
-	
-	
+
+
+
 	//====================//
 	// version validation //
 	//====================//
 	//region
-	
+
 	public void throwIfUnsupportedAngelicaVersion()
 		throws IllegalStateException, AngelicaVersionGuiException
 	{
 		ModContainer angelica = Loader.instance()
 			.getIndexedModList()
 			.get(ANGELICA_MOD_ID);
-		
+
 		if (angelica == null)
 		{
 			throw new IllegalStateException("Angelica mod container could not be found.");
 		}
-		
+
 		String installedVersion = angelica.getVersion();
 		ArtifactVersion installedArtifactVersion = new DefaultArtifactVersion(installedVersion);
 		if (SUPPORTED_ANGELICA_RANGE.containsVersion(installedArtifactVersion))
 		{
 			return;
 		}
-		
+
 		throw new AngelicaVersionGuiException(installedVersion, MINIMUM_ANGELICA_VERSION);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// accessor methods //
 	//==================//
 	//region
-	
+
 	@Override
-	public int getDepthTextureId() 
-    {
-	    final Framebuffer framebuffer = Minecraft.getMinecraft().getFramebuffer();
-		return ((IRenderTargetExt) framebuffer).iris$getDepthTextureId(); 
+	public int getDepthTextureId()
+	{
+		final Framebuffer framebuffer = Minecraft.getMinecraft().getFramebuffer();
+		return ((IRenderTargetExt) framebuffer).iris$getDepthTextureId();
 	}
 
 	@Override
-    public boolean canDoFadeShader() { return AngelicaConfig.enableIris; }
+	public boolean canDoFadeShader() { return AngelicaConfig.enableIris; }
 
 	/** set if Angelica's renderer classes changed, so the failure is only paid for once */
 	private boolean chunkBuiltCheckUnsupported = false;
-	
+
 	@Override
 	public Boolean isChunkBuilt(int chunkX, int chunkZ, int minSectionY, int maxSectionY)
 	{
@@ -98,7 +98,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 		{
 			return null;
 		}
-		
+
 		try
 		{
 			CeleritasWorldRenderer worldRenderer = CeleritasWorldRenderer.getInstanceOrNull();
@@ -106,7 +106,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 			{
 				return null;
 			}
-			
+
 			// sections are only created inside the render distance,
 			// and empty (air) sections count as built once they've been processed
 			RenderSectionManager sectionManager = worldRenderer.getRenderSectionManager();
@@ -207,7 +207,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 		catch (Throwable e)
 		{
 			this.dhProjectionUploadFailed = true;
-			LOGGER.warn("Unable to upload the DH projection to the shader pack, LODs may not show up without a shadow pass. Error: ["+e.getMessage()+"].", e);
+			LOGGER.warn("Unable to upload the DH projection to the shader pack, LODs may not show up without a shadow pass. Error: [" + e.getMessage() + "].", e);
 		}
 	}
 	private boolean dhProjectionUploadFailed = false;
@@ -274,22 +274,22 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	}
 
 	@Override
-    public Color getFogColor() 
-    {
-        // Read the fog color buffer rather than GLStateManager.getFogColor(), which returns
-        // an org.joml.Vector3d. DH shades and relocates JOML, so calling that method would
-        // rewrite the descriptor in this class too and fail with a NoSuchMethodError against
-        // Angelica's un-relocated JOML. Angelica keeps this buffer in sync with the vector.
-        // Layout is (red, green, blue, alpha); the fog alpha isn't used here.
-        FloatBuffer fogColor = GLStateManager.getFogState().getFogColorBuffer();
-        return new Color(
-            Math.max(0.0f, Math.min(1.0f, fogColor.get(0))),
-            Math.max(0.0f, Math.min(1.0f, fogColor.get(1))),
-            Math.max(0.0f, Math.min(1.0f, fogColor.get(2))));
-    }
-	
+	public Color getFogColor()
+	{
+		// Read the fog color buffer rather than GLStateManager.getFogColor(), which returns
+		// an org.joml.Vector3d. DH shades and relocates JOML, so calling that method would
+		// rewrite the descriptor in this class too and fail with a NoSuchMethodError against
+		// Angelica's un-relocated JOML. Angelica keeps this buffer in sync with the vector.
+		// Layout is (red, green, blue, alpha); the fog alpha isn't used here.
+		FloatBuffer fogColor = GLStateManager.getFogState().getFogColorBuffer();
+		return new Color(
+			Math.max(0.0f, Math.min(1.0f, fogColor.get(0))),
+			Math.max(0.0f, Math.min(1.0f, fogColor.get(1))),
+			Math.max(0.0f, Math.min(1.0f, fogColor.get(2))));
+	}
+
 	//endregion
-	
-	
-	
+
+
+
 }

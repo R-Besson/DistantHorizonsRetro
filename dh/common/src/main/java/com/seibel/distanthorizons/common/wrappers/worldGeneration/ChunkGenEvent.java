@@ -35,10 +35,10 @@ import java.util.function.Consumer;
 
 public final class ChunkGenEvent
 {
-	
+
 	private static final AtomicInteger DEBUG_ID_REF = new AtomicInteger(0);
-	
-	
+
+
 	/** can be used for troubleshooting */
 	public final int id;
 
@@ -48,20 +48,20 @@ public final class ChunkGenEvent
 	public final EDhApiDistantGeneratorMode generatorMode;
 	public final CompletableFuture<Void> future;
 	public final Consumer<IChunkWrapper> resultConsumer;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ChunkGenEvent(
 		DhChunkPos minChunkPos, int widthInChunks,
 		EDhApiDistantGeneratorMode generatorMode, EDhApiWorldGenerationStep targetGenerationStep,
 		Consumer<IChunkWrapper> resultConsumer)
 	{
 		this.id = DEBUG_ID_REF.getAndIncrement();
-		
+
 		this.minChunkPos = minChunkPos;
 		this.widthInChunks = widthInChunks;
 		this.targetGenerationStep = targetGenerationStep;
@@ -70,13 +70,13 @@ public final class ChunkGenEvent
 		this.future = new CompletableFuture<>();
 		this.resultConsumer = resultConsumer;
 	}
-	
-	
-	
+
+
+
 	//=======//
 	// start //
 	//=======//
-	
+
 	/**
 	 * All chunk generation happens on the server thread, so a world gen task
 	 * spends almost all of its time blocked waiting for server ticks.
@@ -86,7 +86,7 @@ public final class ChunkGenEvent
 	 * The number of tasks in flight is limited by {@link DhChunkGenerator#getInProgressTasksPerThread()}.
 	 */
 	private static final ExecutorService SERVER_GEN_WAIT_POOL = ThreadUtil.makeThreadPool(32, "Server World Gen Waiter", Thread.NORM_PRIORITY, true);
-	
+
 	public static ChunkGenEvent start(
 		DhChunkPos minPos, int widthInChunks,
 		DhChunkGenerator genEnvironment,
@@ -96,7 +96,7 @@ public final class ChunkGenEvent
 		ChunkGenEvent genEvent = new ChunkGenEvent(minPos, widthInChunks,
 			generatorMode, target,
 			resultConsumer);
-		
+
 		try
 		{
 			worldGeneratorThreadPool.execute(() ->
@@ -115,7 +115,7 @@ public final class ChunkGenEvent
 		{
 			genEvent.future.completeExceptionally(e);
 		}
-		
+
 		return genEvent;
 	}
 	private static void runGenEvent(ChunkGenEvent genEvent, DhChunkGenerator genEnvironment)
@@ -156,22 +156,22 @@ public final class ChunkGenEvent
 		{
 			throwable = throwable.getCause();
 		}
-		
+
 		// Shutdown exceptions (interrupts, rejections, cancellations) aren't logged as errors,
 		// but the future must still complete, otherwise the world gen queue keeps
 		// counting this task as in progress forever and eventually stops generating.
 		generationEvent.future.completeExceptionally(throwable);
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public String toString() { return this.id + ":" + this.widthInChunks + "@" + this.minChunkPos + "(" + this.targetGenerationStep + ")"; }
-	
-	
-	
+
+
+
 }

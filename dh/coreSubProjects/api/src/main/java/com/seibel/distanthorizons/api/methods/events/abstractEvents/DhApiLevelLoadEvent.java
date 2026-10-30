@@ -36,30 +36,31 @@ public abstract class DhApiLevelLoadEvent implements IDhApiEvent<DhApiLevelLoadE
 {
 	/** Fired after Distant Horizons loads a new level. */
 	public abstract void onLevelLoad(DhApiEventParam<EventParam> input);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.onLevelLoad(input); }
-	
-	
+
+
 	//==================//
 	// parameter object //
 	//==================//
-	
+
 	public static class EventParam implements IDhApiEventParam
 	{
 		/** The newly loaded level. */
 		public final IDhApiLevelWrapper levelWrapper;
-		
+
 		public EventParam(IDhApiLevelWrapper newLevelWrapper) { this.levelWrapper = newLevelWrapper; }
-		
-		
+
+
 		@Override
 		public EventParam copy() { return new EventParam(this.levelWrapper); }
+
 	}
-	
+
 }

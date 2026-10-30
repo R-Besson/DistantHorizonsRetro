@@ -123,11 +123,11 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 			if (SharedApi.getEnvironment() == EWorldEnvironment.CLIENT_SERVER)
 			{
 				String cleanWorldFolderName = this.getWorldFolderName()
-						.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
-						.replace(" ", "_");
+					.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
+					.replace(" ", "_");
 
 				levelKeyPrefix += (!levelKeyPrefix.isEmpty() ? "_" : "") + cleanWorldFolderName
-						+ "_" + this.getHashedSeedEncoded();
+					+ "_" + this.getHashedSeedEncoded();
 			}
 
 			if (levelKeyPrefix.isEmpty())
@@ -138,8 +138,8 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 			String mainPart = "@" + dimensionName;
 
 			return levelKeyPrefix.substring(0, Math.min(
-					LevelInitMessage.MAX_LENGTH - mainPart.length(),
-					levelKeyPrefix.length()
+				LevelInitMessage.MAX_LENGTH - mainPart.length(),
+				levelKeyPrefix.length()
 			)) + mainPart;
 		}
 
@@ -156,7 +156,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 		}
 		catch (Exception e)
 		{
-			LOGGER.warn("Unable to get world folder name. LODs may not load or save correctly. Error: ["+e.getMessage()+"].", e);
+			LOGGER.warn("Unable to get world folder name. LODs may not load or save correctly. Error: [" + e.getMessage() + "].", e);
 			return "unknown_world";
 		}
 	}
@@ -255,7 +255,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 		IDhApiBiomeWrapper biomeWrapper,
 		int blockWorldPosX, int blockWorldPosY, int blockWorldPosZ,
 		IDhApiFullDataSource dataSource)
-	{ return DhApiResult.createFail("["+ServerLevelWrapper.class.getSimpleName()+"]'s cannot get block colors, please use a ["+ClientLevelWrapper.class.getSimpleName()+"] instead."); }
+	{ return DhApiResult.createFail("[" + ServerLevelWrapper.class.getSimpleName() + "]'s cannot get block colors, please use a [" + ClientLevelWrapper.class.getSimpleName() + "] instead."); }
 
 	//endregion
 

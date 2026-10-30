@@ -14,37 +14,37 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
 		.name(DelayedDataSourceSaveCache.class.getSimpleName())
 		.build();
-	
+
 	private final ISaveDataSourceFunc onSaveTimeoutAsyncFunc;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public DelayedDataSourceSaveCache(@NotNull ISaveDataSourceFunc onSaveTimeoutAsyncFunc, int saveDelayInMs)
 	{
 		super(saveDelayInMs);
 		this.onSaveTimeoutAsyncFunc = onSaveTimeoutAsyncFunc;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
 	//region
-	
+
 	public void writeToMemoryAndQueueSave(@NotNull FullDataSourceV2 inputObj) { super.writeToMemoryAndQueueSave(inputObj.getPos(), inputObj); }
-	
-	@Override 
+
+	@Override
 	protected DataSourceSaveObjContainer createEmptySaveObjContainer(long inputPos) { return new DataSourceSaveObjContainer(inputPos); }
-	
-	@Override 
+
+	@Override
 	protected void handleDataSourceRemoval(@NotNull DataSourceSaveObjContainer saveContainer)
 	{
 		FullDataSourceV2 removedDataSource = saveContainer.dataSource;
@@ -60,55 +60,56 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 				}
 				catch (Exception e)
 				{
-					LOGGER.error("Unable to close datasource ["+ DhSectionPos.toString(removedDataSource.getPos()) +"], error: ["+e.getMessage()+"].", e);
+					LOGGER.error("Unable to close datasource [" + DhSectionPos.toString(removedDataSource.getPos()) + "], error: [" + e.getMessage() + "].", e);
 				}
-				
+
 				return null;
 			});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	@FunctionalInterface
 	public interface ISaveDataSourceFunc
 	{
 		/** called after the timeout expires */
 		CompletableFuture<Void> saveAsync(@NotNull FullDataSourceV2 inputDataSource);
+
 	}
-	
+
 	public static class DataSourceSaveObjContainer extends AbstractSaveObjContainer<FullDataSourceV2>
 	{
 		private final @NotNull FullDataSourceV2 dataSource;
-		
+
 		public DataSourceSaveObjContainer(long inputPos)
 		{
 			this.dataSource = FullDataSourceV2.createEmpty(inputPos);
 		}
-		
-		@Override 
-		public void update(@Nullable FullDataSourceV2 newObj) 
+
+		@Override
+		public void update(@Nullable FullDataSourceV2 newObj)
 		{
 			// shouldn't happen, but just in case
 			if (newObj == null)
 			{
 				throw new NullPointerException();
 			}
-			
+
 			this.dataSource.updateFromDataSource(newObj);
 		}
-		
+
 	}
-	
+
 	//endregion
-	
-	
-	
-	
+
+
+
+
 }

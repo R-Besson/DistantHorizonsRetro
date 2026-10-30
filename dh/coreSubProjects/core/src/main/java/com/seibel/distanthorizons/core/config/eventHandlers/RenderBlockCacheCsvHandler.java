@@ -26,26 +26,26 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
 public class RenderBlockCacheCsvHandler extends AbstractDelayedConfigEventHandler
 {
 	public static RenderBlockCacheCsvHandler INSTANCE = new RenderBlockCacheCsvHandler();
-	
-	
-	
+
+
+
 	//=============//
- 	// constructor //
+	// constructor //
 	//=============//
 	//region
-	
+
 	/** private since we only ever need one handler at a time */
 	private RenderBlockCacheCsvHandler() { super(AbstractDelayedConfigEventHandler.DEFAULT_TIMEOUT_IN_MS); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// config handling //
 	//=================//
 	//region
-	
+
 	@Override
 	public void onConfigTimeout()
 	{
@@ -56,9 +56,9 @@ public class RenderBlockCacheCsvHandler extends AbstractDelayedConfigEventHandle
 			DhApi.Delayed.renderProxy.clearRenderDataCache();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

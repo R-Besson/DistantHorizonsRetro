@@ -49,18 +49,18 @@ import java.util.List;
 public class Initializer
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-	
+
 	public static void preConfigInit()
 	{
 		//============================//
 		// check referenced libraries //
 		//============================//
 		//region
-		
+
 		LOGGER.info("Running library validation...");
-		
+
 		// confirm that all referenced libraries are available to use
 		try
 		{
@@ -71,16 +71,16 @@ public class Initializer
 			Class.forName("it.unimi.dsi.fastutil.longs.LongArrayList");
 			Class.forName("org.sqlite.SQLiteConnection");
 			Class.forName("org.sqlite.core.NativeDB");
-			
+
 			byte[] testCompressByteArray = new byte[1024];
-			
+
 			for (int i = 0; i < testCompressByteArray.length; i++)
 			{
 				testCompressByteArray[i] = (byte) (i % 126);
 			}
 			byte[] compressedBytes = com.github.luben.zstd.Zstd.compress(testCompressByteArray);
 			com.github.luben.zstd.Zstd.decompress(compressedBytes, testCompressByteArray.length);
-			
+
 			if (!SQLiteJDBCLoader.initialize())
 			{
 				throw new RuntimeException("Failed to load SQLite native library. Hopefully SQLite logged a reason for this failure.");
@@ -90,16 +90,16 @@ public class Initializer
 		{
 			MC_CLIENT.crashMinecraft("Distant Horizons critical setup error: One or more libraries are either in-accessible, corrupted, or overwritten by another mod. Error: [" + e.getMessage() + "].", e);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//==========================//
 		// check resource directory //
 		//==========================//
 		//region
-		
+
 		try
 		{
 			int scriptCount = DatabaseUpdater.getAutoUpdateScriptCount();
@@ -112,29 +112,29 @@ public class Initializer
 		{
 			MC_CLIENT.crashMinecraft("Critical programmer error: Can't read SQL Scripts resource folder is either missing or malformed. Error: [" + e.getMessage() + "].", e);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//===========================//
-		// Java AWT Headless setting // 
+		// Java AWT Headless setting //
 		//===========================//
 		//region
-		
+
 		// if the client is null then we are headless
 		if (MC_CLIENT != null)
 		{
 			// AWT headless is necessary for Java Swing dialogs
 			boolean setAwtHeadless = MC_CLIENT.dialogNeedsAwtHeadless();
-			
+
 			if (EPlatform.get() == EPlatform.MACOS)
 			{
 				// setting AWT headless to "true" on Mac causes a lock-up
 				// due to a bug with Java.awt texture loading
 				setAwtHeadless = false;
 			}
-			
+
 			if (setAwtHeadless)
 			{
 				System.setProperty("java.awt.headless", "false");
@@ -148,16 +148,16 @@ public class Initializer
 				}
 			}
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//===================//
 		// API delayed setup //
 		//===================//
 		//region
-		
+
 		// link Core's config to the API
 		DhApi.Delayed.configs = DhApiConfig.INSTANCE;
 		DhApi.Delayed.terrainRepo = DhApiTerrainDataRepo.INSTANCE;
@@ -166,36 +166,36 @@ public class Initializer
 		DhApi.Delayed.wrapperFactory = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
 		if (DhApi.Delayed.wrapperFactory == null)
 		{
-			MC_CLIENT.crashMinecraft("Programmer Error: No ["+IWrapperFactory.class.getSimpleName()+"] assigned to the DhApi.", new Exception());
+			MC_CLIENT.crashMinecraft("Programmer Error: No [" + IWrapperFactory.class.getSimpleName() + "] assigned to the DhApi.", new Exception());
 		}
-		
+
 		DhApi.Delayed.customRenderObjectFactory = SingletonInjector.INSTANCE.get(IDhApiCustomRenderObjectFactory.class);
 		if (DhApi.Delayed.customRenderObjectFactory == null)
 		{
-			MC_CLIENT.crashMinecraft("Programmer Error: No ["+IDhApiCustomRenderObjectFactory.class.getSimpleName()+"] assigned to the DhApi.", new Exception());
+			MC_CLIENT.crashMinecraft("Programmer Error: No [" + IDhApiCustomRenderObjectFactory.class.getSimpleName() + "] assigned to the DhApi.", new Exception());
 		}
-		
+
 		DhApi.events.bind(DhApiBeforeRenderEvent.class, IgnoredDimensionCsvHandler.INSTANCE);
-		
+
 		//endregion
-		
+
 	}
-	
+
 	/** fired after DH's config has been set up */
 	public static void postConfigInit()
 	{
-		
-		
+
+
 		//==============================//
 		// G1 Garbage collector warning //
 		//==============================//
 		//region
-		
+
 		// log a warning if G1GC is being used
 		// (this garbage collector is known to cause stuttering)
 		{
 			boolean g1GcInUse = false;
-			
+
 			StringBuilder garbageCollectorNames = new StringBuilder();
 			List<GarbageCollectorMXBean> gcMxBeans = ManagementFactory.getGarbageCollectorMXBeans();
 			for (GarbageCollectorMXBean gcMxBean : gcMxBeans)
@@ -205,57 +205,56 @@ public class Initializer
 					garbageCollectorNames.append(", ");
 				}
 				garbageCollectorNames.append(gcMxBean.getName());
-				
+
 				// "G1 Young Generation" // "G1 Concurrent GC" // "G1 Old Generation"
 				if (gcMxBean.getName().toLowerCase().contains("g1 "))
 				{
 					g1GcInUse = true;
 				}
 			}
-			LOGGER.info("Garbage collectors: ["+garbageCollectorNames+"]");
-			
-			
+			LOGGER.info("Garbage collectors: [" + garbageCollectorNames + "]");
+
+
 			if (g1GcInUse)
 			{
 				String warningMessageHeader = "Distant Horizons: G1 Garbage collector detected.";
-				String warningMessageBody = 
+				String warningMessageBody =
 					"This can cause FPS stuttering. \n" +
-					"It's recommended to use a concurrent garbage collector \n" +
-					"like ZGC (Java 21+) or Shenandoah (Java 8 through 17) \n" +
-					"for a smoother experience. \n" +
-					"This warning can be disabled in the DH config."
-					;
-				
+						"It's recommended to use a concurrent garbage collector \n" +
+						"like ZGC (Java 21+) or Shenandoah (Java 8 through 17) \n" +
+						"for a smoother experience. \n" +
+						"This warning can be disabled in the DH config.";
+
 				if (Config.Common.Logging.Warning.logGarbageCollectorWarning.get())
 				{
 					LOGGER.warn(
 						warningMessageHeader + "\n" +
-						warningMessageBody);
+							warningMessageBody);
 				}
-				
+
 				if (Config.Common.Logging.Warning.showGarbageCollectorWarning.get())
 				{
 					ClientApi.INSTANCE.queueSlowChatMessage(
 						MinecraftTextFormat.ORANGE + warningMessageHeader + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-						warningMessageBody);
+							warningMessageBody);
 				}
 			}
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//==============================//
 		// Explicit GC disabled warning //
 		//==============================//
 		//region
-		
+
 		// disabling explicit GC can cause
 		// out of memory crashes
 		{
 			boolean explicitGcDisabled = false;
-			
+
 			RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
 			List<String> jvmArgs = runtimeMxBean.getInputArguments();
 			for (String arg : jvmArgs)
@@ -267,40 +266,39 @@ public class Initializer
 					break;
 				}
 			}
-			LOGGER.info("Explicit Garbage Collection: ["+(explicitGcDisabled ? "Disabled" : "Enabled")+"]");
-			
-			
+			LOGGER.info("Explicit Garbage Collection: [" + (explicitGcDisabled ? "Disabled" : "Enabled") + "]");
+
+
 			if (explicitGcDisabled)
 			{
 				String warningMessageHeader = "Distant Horizons: Explicit Garbage Collection Disabled.";
-				String warningMessageBody = 
+				String warningMessageBody =
 					"This can cause out of memory crashes. \n" +
-					"The reason explicit GC would be disabled is to prevent \n" +
-					"stuttering, which is better fixed by using a concurrent \n" +
-					"garbage collector like \n" +
-					"ZGC (Java 21+) or Shenandoah (Java 8 through 17). \n" +
-					"This warning can be disabled in the DH config."
-					;
-				
+						"The reason explicit GC would be disabled is to prevent \n" +
+						"stuttering, which is better fixed by using a concurrent \n" +
+						"garbage collector like \n" +
+						"ZGC (Java 21+) or Shenandoah (Java 8 through 17). \n" +
+						"This warning can be disabled in the DH config.";
+
 				if (Config.Common.Logging.Warning.logExplicitGcDisabledWarning.get())
 				{
 					LOGGER.warn(
 						warningMessageHeader + "\n" +
-						warningMessageBody);
+							warningMessageBody);
 				}
-				
+
 				if (Config.Common.Logging.Warning.showExplicitGcDisabledWarning.get())
 				{
 					ClientApi.INSTANCE.queueSlowChatMessage(
 						MinecraftTextFormat.ORANGE + warningMessageHeader + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-						warningMessageBody);
+							warningMessageBody);
 				}
 			}
 		}
-		
+
 		//endregion
-		
+
 	}
-	
-	
+
+
 }

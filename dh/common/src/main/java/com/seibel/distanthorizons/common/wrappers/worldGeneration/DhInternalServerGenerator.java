@@ -45,14 +45,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DhInternalServerGenerator
 {
 	public static final DhLogger LOGGER = new DhLoggerBuilder()
-			.name("LOD World Gen - Internal Server")
-			.fileLevelConfig(Config.Common.Logging.logWorldGenEventToFile)
-			.build();
+		.name("LOD World Gen - Internal Server")
+		.fileLevelConfig(Config.Common.Logging.logWorldGenEventToFile)
+		.build();
 
 	public static final DhLogger CHUNK_LOAD_LOGGER = new DhLoggerBuilder()
-			.name("LOD Chunk Loading")
-			.fileLevelConfig(Config.Common.Logging.logWorldGenChunkLoadEventToFile)
-			.build();
+		.name("LOD Chunk Loading")
+		.fileLevelConfig(Config.Common.Logging.logWorldGenChunkLoadEventToFile)
+		.build();
 
 	private static final IForgeMain FORGE_MAIN = SingletonInjector.INSTANCE.get(IForgeMain.class);
 
@@ -150,7 +150,7 @@ public class DhInternalServerGenerator
 		if (refCount == null)
 		{
 			// could happen during shutdown
-			CHUNK_LOAD_LOGGER.debug("Chunk ["+chunkPos+"] was released without being acquired.");
+			CHUNK_LOAD_LOGGER.debug("Chunk [" + chunkPos + "] was released without being acquired.");
 			return false;
 		}
 
@@ -214,7 +214,7 @@ public class DhInternalServerGenerator
 									// ignore expected shutdown exceptions
 									boolean isShutdownException =
 										ExceptionUtil.isShutdownException(actualThrowable)
-										|| throwableMessage.contains("Unloaded chunk");
+											|| throwableMessage.contains("Unloaded chunk");
 									if (!isShutdownException)
 									{
 										CHUNK_LOAD_LOGGER.warn("DistantHorizons: Couldn't load chunk [" + chunkPos + "] from server, error: [" + throwableMessage + "].", actualThrowable);
@@ -254,7 +254,7 @@ public class DhInternalServerGenerator
 			int maxSkyLight = this.dhServerLevel.getServerLevelWrapper().hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT;
 			for (int i = 0; i < chunkWrappers.size(); i++)
 			{
-				ChunkWrapper chunkWrapper = (ChunkWrapper)chunkWrappers.get(i);
+				ChunkWrapper chunkWrapper = (ChunkWrapper) chunkWrappers.get(i);
 
 				// pre-generated chunks should have lighting but new ones won't
 				if (!chunkWrapper.isDhBlockLightingCorrect())
@@ -318,7 +318,7 @@ public class DhInternalServerGenerator
 				}
 				catch (Exception e)
 				{
-					LOGGER.warn("Failed to drain internal server chunk unloads. Error: ["+e.getMessage()+"]", e);
+					LOGGER.warn("Failed to drain internal server chunk unloads. Error: [" + e.getMessage() + "]", e);
 				}
 
 				return null;
@@ -346,7 +346,7 @@ public class DhInternalServerGenerator
 		if (!DhApi.isDhThread()
 			&& ModInfo.IS_DEV_BUILD)
 		{
-			throw new IllegalStateException("Internal server generation should be called from one of DH's world gen thread. Current thread: ["+Thread.currentThread().getName()+"]");
+			throw new IllegalStateException("Internal server generation should be called from one of DH's world gen thread. Current thread: [" + Thread.currentThread().getName() + "]");
 		}
 	}
 
@@ -488,7 +488,7 @@ public class DhInternalServerGenerator
 			}
 			catch (Exception e)
 			{
-				LOGGER.warn("Failed to release chunk ["+chunkPos+"] back to internal server. Error: ["+e.getMessage()+"]", e);
+				LOGGER.warn("Failed to release chunk [" + chunkPos + "] back to internal server. Error: [" + e.getMessage() + "]", e);
 			}
 
 			return null;

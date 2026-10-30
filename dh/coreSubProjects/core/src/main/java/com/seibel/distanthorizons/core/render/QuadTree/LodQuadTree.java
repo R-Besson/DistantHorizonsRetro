@@ -58,8 +58,17 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.WillNotClose;
 import java.awt.*;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -70,11 +79,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRenderable, IConfigListener, AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final AbstractDebugWireframeRenderer DEBUG_RENDERER = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
-	
+
 	/**
-	 * How long the retrieval queue thread will sleep once it runs out of work 
+	 * How long the retrieval queue thread will sleep once it runs out of work
 	 * before checking again for new tasks.
 	 */
 	private static final long QUEUE_THREAD_IDLE_WAIT_MS = 100L;
@@ -89,15 +98,15 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	 * didn't fully generate (IE a chunk that couldn't be loaded) would stay a hole until the level is reloaded.
 	 */
 	private static final long MISSING_DATA_RECHECK_INTERVAL_MS = 30_000L;
-	
-	
+
+
 	public final int blockRenderDistanceDiameter;
 	@WillNotClose
 	private final FullDataSourceProviderV2 fullDataSourceProvider;
-	
+
 	/** there should only ever be one {@link LodQuadTree} so having the thread static should be fine */
 	private final ThreadPoolExecutor fullDataRetrievalQueueThread;
-	
+
 	/**
 	 * This holds every {@link DhSectionPos} that should be reloaded next tick. <br>
 	 * This is a {@link ConcurrentLinkedQueue} because new sections can be added to this list via the world generator threads.
@@ -106,20 +115,20 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	/** reload requests wait here until world gen stops updating them, see {@link SectionReloadBatcher} */
 	private final SectionReloadBatcher reloadBatcher = new SectionReloadBatcher();
 	private final IDhClientLevel level;
-	/** 
+	/**
 	 * Note: this doesn't lock all operations as some other threads/operations
 	 * that may traverse the tree while it's being modified.
 	 * IE {@link RenderBufferHandler} will walk through the tree each frame.
 	 */
 	private final ReentrantLock treeTickLock = new ReentrantLock();
-	
+
 	private final AtomicBoolean requeueAllRetrievalTasksRef = new AtomicBoolean(false);
 	private final AtomicBoolean queueThreadRunningRef = new AtomicBoolean(false);
 	private long lastMissingDataRecheckMs = System.currentTimeMillis();
-	
-	
+
+
 	/**
-	 * contains the list of beacons currently being rendered in this section 
+	 * contains the list of beacons currently being rendered in this section
 	 * if this list is modified the {@link LodQuadTree#beaconRenderHandler} should be updated to match.
 	 */
 	private final ArrayList<BeaconRenderHandler.BeaconBeamWithWidth> beaconList = new ArrayList<>();
@@ -130,94 +139,94 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	/** used to prevent updating the beacons concurrently */
 	@NotNull
 	private CompletableFuture<Void> beaconUpdateFuture = CompletableFuture.completedFuture(null);
-	
-	
-	/** 
+
+
+	/**
 	 * The smallest numerical detail level number that can be rendered. <Br>
 	 * Stored as an absolute detail level (ie the lowest numerical value is 0)
 	 */
 	private byte maxLeafRenderDetailLevel;
-	/** 
+	/**
 	 * the largest numerical detail level number that can be rendered. <Br>
 	 * Stored as an absolute detail level (ie the lowest numerical value is 0)
 	 */
 	private byte minRootRenderDetailLevel;
-	
+
 	/** used to calculate when a detail drop will occur */
 	private double detailDropOffDistanceUnit;
 	/** used to calculate when a detail drop will occur */
 	private double detailDropOffLogBase;
-	
+
 	/** the {@link DhSectionPos} that need to be retrieved/generated */
 	private final Set<Long> missingGenerationPosSet = Collections.newSetFromMap(new ConcurrentHashMap<>()); // concurrency is annoying but required due to needing to add/remove items in the world gen future
 	private final Set<Long> queuedGenerationPosSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	/** cached array to prevent having to re-allocate it each tick */
 	private final ArrayList<Long> sortedMissingPosList = new ArrayList<>();
-	
+
 	private long lastRegenTaskCountQueryMs = 0L;
 	private long cachedRegenTaskCount = 0L;
-	
+
 	private final ArrayList<LodRenderSection> debugNodeList = new ArrayList<>();
 	/** cached to prevent re-allocating each tick */
 	private final QuadTreeTickNodeHolder tickNodeHolder = new QuadTreeTickNodeHolder();
-	
+
 	/** list of sections that should be rendered */
 	private ArrayList<LodRenderSection> enabledSections = new ArrayList<>();
-	/** alternate list for thread safety  */
+	/** alternate list for thread safety */
 	private ArrayList<LodRenderSection> altEnabledSections = new ArrayList<>();
-	/** This lock should be very quick since it will be used on the render thread */ 
+	/** This lock should be very quick since it will be used on the render thread */
 	private final ReentrantLock enabledRenderSectionLock = new ReentrantLock();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region constructor
-	
+
 	public LodQuadTree(
-			IDhClientLevel level, int viewDiameterInBlocks,
-			int initialPlayerBlockX, int initialPlayerBlockZ,
-			FullDataSourceProviderV2 fullDataSourceProvider)
+		IDhClientLevel level, int viewDiameterInBlocks,
+		int initialPlayerBlockX, int initialPlayerBlockZ,
+		FullDataSourceProviderV2 fullDataSourceProvider)
 	{
-		super(viewDiameterInBlocks, FullDataSourceV2.WIDTH, 
+		super(viewDiameterInBlocks, FullDataSourceV2.WIDTH,
 			new DhBlockPos2D(initialPlayerBlockX, initialPlayerBlockZ), DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
-		
+
 		DEBUG_RENDERER.register(this, Config.Client.Advanced.Debugging.DebugWireframe.showQuadTreeRenderStatus);
-		
+
 		this.level = level;
 		this.fullDataSourceProvider = fullDataSourceProvider;
 		this.blockRenderDistanceDiameter = viewDiameterInBlocks;
-		
-		this.fullDataRetrievalQueueThread = ThreadUtil.makeSingleDaemonThreadPool("["+this.level.getLevelWrapper().getDimensionName()+"] LodQuadTree Data Retrieval Queue");
-		
+
+		this.fullDataRetrievalQueueThread = ThreadUtil.makeSingleDaemonThreadPool("[" + this.level.getLevelWrapper().getDimensionName() + "] LodQuadTree Data Retrieval Queue");
+
 		IDhGenericRenderer genericObjectRenderer = this.level.getGenericRenderer();
 		this.beaconRenderHandler = (genericObjectRenderer != null) ? new BeaconRenderHandler(genericObjectRenderer) : null;
-		
+
 		this.beaconBeamRepo = this.level.getBeaconBeamRepo();
-		
+
 		Config.Common.WorldGenerator.generatorPlan.addListener(this);
-		
+
 	}
-	
+
 	//endregion constructor
-	
-	
-	
+
+
+
 	//==================//
 	// property getters //
 	//==================//
 	//region property getters
-	
+
 	public void populateListWithEnabledRenderSections(ArrayList<LodRenderSection> tempProcessNodeList)
 	{
 		try
 		{
 			// lock for thread safety
 			this.enabledRenderSectionLock.lock();
-			
+
 			tempProcessNodeList.clear();
-			
+
 			// manual add and loop to reduce GC pressure due to addAll() doing unnecessary
 			// array copies
 			tempProcessNodeList.addAll(this.enabledSections);
@@ -227,18 +236,18 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			this.enabledRenderSectionLock.unlock();
 		}
 	}
-	
+
 	//endregion property getters
-	
-	
-	
+
+
+
 	//=============//
 	// tick update //
 	//=============//
 	//region tick update
-	
-	/** 
-	 * update the quadTree using the playerPos 
+
+	/**
+	 * update the quadTree using the playerPos
 	 * and queue any necessary work based on the tree's state.
 	 */
 	public void tryTick(DhBlockPos2D playerPos)
@@ -248,15 +257,15 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			// the quad tree was created before a level reference was created
 			return;
 		}
-		
-		
-		
+
+
+
 		// don't tick the tree if a modification is still going
 		if (this.treeTickLock.tryLock())
 		{
 			// this shouldn't be updated while the tree is being iterated through
 			this.updateDetailLevelVariables();
-			
+
 			try
 			{
 				this.updateAllRenderSections(playerPos);
@@ -275,15 +284,15 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	{
 		// this data will be updated as we walk through the tree
 		this.tickNodeHolder.clear();
-		
-		
+
+
 		//===================//
 		// recenter the tree //
 		//===================//
 		//region
-		
+
 		// remove out of bound sections
-		this.setCenterBlockPos(playerPos, 
+		this.setCenterBlockPos(playerPos,
 			// remove completely out of bound nodes
 			// (the root node is no longer in bounds)
 			(renderSection) ->
@@ -291,13 +300,13 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				if (renderSection != null)
 				{
 					this.fullDataSourceProvider.removeRetrievalRequestIf((long genPos) -> DhSectionPos.contains(renderSection.pos, genPos));
-					
+
 					// unfortunately we have to fully go through each set
 					// since a removed position may be larger than the multiple generated positions
 					// it contains
 					this.missingGenerationPosSet.removeIf((Long genPos) -> DhSectionPos.contains(renderSection.pos, genPos));
 					this.queuedGenerationPosSet.removeIf((Long genPos) -> DhSectionPos.contains(renderSection.pos, genPos));
-					
+
 					renderSection.close();
 				}
 			},
@@ -314,16 +323,16 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				}
 			}
 		);
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//=======================//
 		// walk through the tree //
 		//=======================//
 		//region
-		
+
 		// walk through each root node
 		LongIterator rootPosIterator = this.rootNodePosIterator();
 		while (rootPosIterator.hasNext())
@@ -334,23 +343,23 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			{
 				this.setValue(rootPos, new LodRenderSection(rootPos, this, this.level, this.fullDataSourceProvider));
 			}
-			
+
 			QuadNode<LodRenderSection> rootNode = this.getNode(rootPos);
 			LodUtil.assertTrue(rootNode != null, "All root nodes should have been created by this point.");
 			this.recursivelyUpdateRenderSectionNode(
-				playerPos, 
+				playerPos,
 				rootNode, null, rootNode, rootNode.sectionPos);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//============//
 		// queue work //
 		//============//
 		//region
-		
+
 		long nowMs = System.currentTimeMillis();
 		if (nowMs - this.lastMissingDataRecheckMs >= MISSING_DATA_RECHECK_INTERVAL_MS
 			&& this.fullDataSourceProvider.getGeneratorPlan().generationEnabled)
@@ -358,7 +367,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			this.lastMissingDataRecheckMs = nowMs;
 			this.requeueAllRetrievalTasksRef.set(true);
 		}
-		
+
 		if (this.requeueAllRetrievalTasksRef.getAndSet(false))
 		{
 			Iterator<QuadNode<LodRenderSection>> nodeIterator = this.nodeIterator();
@@ -369,92 +378,101 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				{
 					continue;
 				}
-				
+
 				node.value.queuedMissingSectionsForRetrieval = false;
 			}
 		}
-		
+
 		// reloading is for sections that have been loaded once already
 		this.reloadQueuedSections();
-		
+
 		// loading is for sections that haven't rendered yet
 		this.loadQueuedSections(playerPos, this.tickNodeHolder.getLoadSections());
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//==================//
 		// enable rendering //
 		//==================//
 		//region
-		
+
 		this.altEnabledSections.clear();
-		
+
 		for (QuadNode<LodRenderSection> node : this.tickNodeHolder.getEnabledNodes())
 		{
 			// shouldn't happen, but just in case
-			if (node == null || node.value == null) { continue; }
-			
+			if (node == null || node.value == null)
+			{
+				continue;
+			}
+
 			node.value.setRenderingEnabled(true);
 			this.altEnabledSections.add(node.value);
 		}
 		for (QuadNode<LodRenderSection> node : this.tickNodeHolder.getEnableDeleteChildrenNodes())
 		{
-			if (node == null || node.value == null) { continue; }
-			
+			if (node == null || node.value == null)
+			{
+				continue;
+			}
+
 			node.value.setRenderingEnabled(true);
 			this.altEnabledSections.add(node.value);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//====================//
 		// update render list //
 		//====================//
 		//region
-		
+
 		try
 		{
 			this.enabledRenderSectionLock.lock();
-			
+
 			ArrayList<LodRenderSection> temp = this.enabledSections;
-			this.enabledSections = this.altEnabledSections;	
+			this.enabledSections = this.altEnabledSections;
 			this.altEnabledSections = temp;
 		}
 		finally
 		{
 			this.enabledRenderSectionLock.unlock();
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//=========================//
 		// node disabling/deletion //
 		//=========================//
 		//region
-		
+
 		for (QuadNode<LodRenderSection> node : this.tickNodeHolder.getDisableNodes())
 		{
-			if (node == null || node.value == null) { continue; }
-			
+			if (node == null || node.value == null)
+			{
+				continue;
+			}
+
 			node.value.setRenderingEnabled(false);
 		}
-		
+
 		for (QuadNode<LodRenderSection> node : this.tickNodeHolder.getEnableDeleteChildrenNodes())
 		{
 			if (node == null
 				|| node.value == null
 				// only clear the children if there are children to clear
-				|| node.getDirectChildCount() == 0) 
+				|| node.getDirectChildCount() == 0)
 			{
-				continue; 
+				continue;
 			}
-			
+
 			// This runs here instead of on the render thread, which would lag it
 			// and let LOD-loading tasks for nodes that are no longer needed grow without limit.
 			node.deleteAllChildren((childRenderSection) ->
@@ -466,37 +484,37 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				}
 			});
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//=================//
 		// beacon enabling //
 		//=================//
 		//region
-		
+
 		this.tryRefreshRenderingBeaconsAsync(playerPos);
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//===================//
 		// world gen queuing //
 		//===================//
 		//region
-		
+
 		// queue full data retrieval (world gen) requests if needed
 		if (threadPoolCanAcceptWorldGenTasks()
 			&& this.fullDataSourceProvider.canQueueRetrievalNow()
 			&& !this.queueThreadRunningRef.get())
 		{
 			this.queueThreadRunningRef.set(true); // don't run multiple threads at once
-			
+
 			// needs to be called outside the queue thread to prevent concurrency issues
 			ArrayList<QuadNode<LodRenderSection>> worldGenNodes = this.tickNodeHolder.getWorldGenNodesNearToFar(playerPos);
-			
+
 			// running on a separate thread allows for faster loading
 			// of finished LODs
 			this.fullDataRetrievalQueueThread.execute(() ->
@@ -531,16 +549,16 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 							}
 						}
 					}
-					
+
 					// Keep looping as long as there's something to queue.
 					// This allows really fast generators to remain fed.
 					while (!Thread.interrupted())
 					{
 						int missingPosCountBeforeQueuing = this.missingGenerationPosSet.size();
-						
+
 						this.startQueuedRetrievalTasks(playerPos, true);
-						
-						
+
+
 						boolean workRemaining = !this.missingGenerationPosSet.isEmpty();
 						if (!workRemaining)
 						{
@@ -548,7 +566,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 							// The next tree tick will restart it when new work shows up.
 							break;
 						}
-						
+
 						boolean somethingQueued = this.missingGenerationPosSet.size() != missingPosCountBeforeQueuing;
 						if (!somethingQueued)
 						{
@@ -559,7 +577,10 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 							{
 								Thread.sleep(QUEUE_THREAD_IDLE_WAIT_MS);
 							}
-							catch (InterruptedException e) { break; }
+							catch (InterruptedException e)
+							{
+								break;
+							}
 						}
 					}
 				}
@@ -573,36 +594,36 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				}
 			});
 		}
-		
+
 		//endregion
-		
+
 	}
-	
+
 	//=========================//
 	// tick - recursive update //
 	//=========================//
 	//region
-	
+
 	/** @return true if the node at this position has uploaded its render data */
 	private boolean recursivelyUpdateRenderSectionNode(
-		@NotNull DhBlockPos2D playerPos, 
-		@NotNull QuadNode<LodRenderSection> rootNode, 
-		@Nullable QuadNode<LodRenderSection> parentNode, 
-		@Nullable QuadNode<LodRenderSection> quadNode, 
+		@NotNull DhBlockPos2D playerPos,
+		@NotNull QuadNode<LodRenderSection> rootNode,
+		@Nullable QuadNode<LodRenderSection> parentNode,
+		@Nullable QuadNode<LodRenderSection> quadNode,
 		long sectionPos // section pos is needed here since the quad node may be null
-		)
+	)
 	{
 		//=====================//
 		// get/create the node //
 		// and render section  //
 		//=====================//
 		//region
-		
+
 		quadNode = this.tryAddNodeToTree(rootNode, quadNode, sectionPos);
-		
-		
+
+
 		// Skip sections that are out-of-bounds.
-		// If not done some sections will appear and/or generate 
+		// If not done some sections will appear and/or generate
 		// outside the desired render distance
 		if (!this.isSectionPosInBounds(quadNode.sectionPos))
 		{
@@ -610,8 +631,8 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			this.recursivelyDisableChildNodes(quadNode);
 			return true;
 		}
-		
-		
+
+
 		// make sure the render section is created (shouldn't be necessary, but just in case)
 		LodRenderSection renderSection = quadNode.value;
 		if (renderSection == null)
@@ -619,42 +640,42 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			renderSection = new LodRenderSection(sectionPos, this, this.level, this.fullDataSourceProvider);
 			quadNode.setValue(sectionPos, renderSection);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//===============================//
 		// handle enabling, loading,     //
 		// and disabling render sections //
 		//===============================//
 		//region
-		
+
 		// load every node for rendering
 		if (!renderSection.gpuUploadInProgress()
 			&& !renderSection.gpuUploadComplete())
 		{
 			this.tickNodeHolder.addLoadSection(renderSection);
 		}
-		
-		
+
+
 		byte expectedDetailLevel = this.calcExpectedDetailLevel(playerPos, quadNode.sectionPos);
 		expectedDetailLevel = (byte) Math.min(expectedDetailLevel, this.minRootRenderDetailLevel);
 		expectedDetailLevel += DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
-		
+
 		if (DhSectionPos.getDetailLevel(quadNode.sectionPos) > expectedDetailLevel)
 		{
 			return this.onDetailLevelTooLow(playerPos, rootNode, quadNode);
 		}
-		// the (expectedDetailLevel-1) fixes corners being cut out due to distance calculations using the LOD center 
-		else if (DhSectionPos.getDetailLevel(quadNode.sectionPos) == expectedDetailLevel 
+		// the (expectedDetailLevel-1) fixes corners being cut out due to distance calculations using the LOD center
+		else if (DhSectionPos.getDetailLevel(quadNode.sectionPos) == expectedDetailLevel
 			|| DhSectionPos.getDetailLevel(quadNode.sectionPos) == expectedDetailLevel - 1)
 		{
 			return this.onDesiredDetailLevel(quadNode, parentNode);
 		}
 		else
 		{
-			// A zoomed in camera boosts detail directionally, 
+			// A zoomed in camera boosts detail directionally,
 			// so when a node intersects the zoom cone and we recurse down,
 			// its out-of-cone children can end up several
 			// detail levels finer than their own distance alone would request.
@@ -664,16 +685,16 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			{
 				return this.onDesiredDetailLevel(quadNode, parentNode);
 			}
-			
+
 			throw new IllegalStateException("LodQuadTree shouldn't be updating renderSections below the expected detail level: [" + expectedDetailLevel + "].");
 		}
-		
+
 		//endregion
 	}
 	/** @return true if the node at this position has uploaded its render data */
 	private boolean onDetailLevelTooLow(
-		@NotNull DhBlockPos2D playerPos, 
-		@NotNull QuadNode<LodRenderSection> rootNode, 
+		@NotNull DhBlockPos2D playerPos,
+		@NotNull QuadNode<LodRenderSection> rootNode,
 		@NotNull QuadNode<LodRenderSection> quadNode)
 	{
 		// recursively update each child node
@@ -682,7 +703,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		{
 			long childPos = DhSectionPos.getChildByIndex(quadNode.sectionPos, i);
 			QuadNode<LodRenderSection> childNode = quadNode.getChildByIndex(i);
-			
+
 			boolean childCanRender = this.recursivelyUpdateRenderSectionNode(
 				playerPos,
 				rootNode, quadNode, childNode, childPos);
@@ -692,7 +713,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				childNodeRenderCount++;
 			}
 		}
-		
+
 		boolean isRootNode = (quadNode == rootNode);
 		if (isRootNode)
 		{
@@ -707,7 +728,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		else if (childNodeRenderCount >= 4)
 		{
 			this.tickNodeHolder.addDisableNode(quadNode);
-			
+
 			// all children can render,
 			// the area will be filled when rendering
 			return true;
@@ -715,7 +736,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		else
 		{
 			boolean nodeCanRender = quadNode.value != null
-									&& quadNode.value.canRender();
+				&& quadNode.value.canRender();
 			if (nodeCanRender)
 			{
 				// not all child positions are loaded yet, this one should be rendered instead
@@ -726,25 +747,25 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			{
 				this.tickNodeHolder.addDisableNode(quadNode);
 			}
-			
+
 			return nodeCanRender;
 		}
 	}
-	
+
 	/** @return true if the node at this position has uploaded its render data */
 	private boolean onDesiredDetailLevel(
 		@NotNull QuadNode<LodRenderSection> quadNode,
 		@Nullable QuadNode<LodRenderSection> parentNode)
 	{
 		// Skip sections that are out-of-bounds.
-		// If not done some sections will appear and/or generate 
+		// If not done some sections will appear and/or generate
 		// outside the desired render distance
 		if (!this.isSectionPosInBounds(quadNode.sectionPos))
 		{
 			return true;
 		}
-		
-		if (quadNode.value != null 
+
+		if (quadNode.value != null
 			&& quadNode.value.canRender())
 		{
 			if (!this.tickNodeHolder.getEnabledNodes().contains(parentNode))
@@ -764,14 +785,14 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			return false;
 		}
 	}
-	
-	
+
+
 	@NotNull
 	private QuadNode<LodRenderSection> tryAddNodeToTree(
 		@NotNull QuadNode<LodRenderSection> rootNode,
 		@Nullable QuadNode<LodRenderSection> quadNode,
 		long sectionPos // section pos is needed here since the quad node may be null
-		)
+	)
 	{
 		// create the node
 		if (quadNode == null)
@@ -781,33 +802,33 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		}
 		if (quadNode == null)
 		{
-			LodUtil.assertNotReach("Unable to add node with pos ["+DhSectionPos.toString(sectionPos)+"] to tree root ["+rootNode+"].");
+			LodUtil.assertNotReach("Unable to add node with pos [" + DhSectionPos.toString(sectionPos) + "] to tree root [" + rootNode + "].");
 		}
-		
+
 		return quadNode;
 	}
-	
+
 	private void recursivelyDisableChildNodes(@NotNull QuadNode<LodRenderSection> quadNode)
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			QuadNode<LodRenderSection> childNode = quadNode.getChildByIndex(i);
 			this.tickNodeHolder.removeEnableAndDisableNode(childNode);
-			
+
 			if (childNode != null)
 			{
 				this.recursivelyDisableChildNodes(childNode);
 			}
 		}
 	}
-	
+
 	//endregion
-	
+
 	//=====================//
 	// tick - work queuing //
 	//=====================//
 	//region
-	
+
 	private void reloadQueuedSections()
 	{
 		this.reloadBatcher.releaseReady(this.sectionsToReload::add);
@@ -821,11 +842,11 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				// don't attempt to re-load positions that are already in the process of reloading
 				continue;
 			}
-			
+
 			LodRenderSection renderSection = this.tryGetValue(pos);
 			if (renderSection != null)
 			{
-				// the section only needs to be updated if a buffer is currently present 
+				// the section only needs to be updated if a buffer is currently present
 				if (renderSection.gpuUploadComplete())
 				{
 					if (renderSection.gpuUploadInProgress()
@@ -854,34 +875,34 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			{
 				return Byte.compare(bDetailLevel, aDetailLevel); // larger numbers first
 			}
-			
+
 			// closer LODs first
 			int aDist = DhSectionPos.getManhattanBlockDistance(a.pos, playerPos);
 			int bDist = DhSectionPos.getManhattanBlockDistance(b.pos, playerPos);
 			return Integer.compare(aDist, bDist); // smaller numbers first
 		});
-		
+
 		for (int i = 0; i < loadSectionList.size(); i++)
 		{
 			LodRenderSection renderSection = loadSectionList.get(i);
-			if (!renderSection.gpuUploadInProgress() 
+			if (!renderSection.gpuUploadInProgress()
 				&& !renderSection.gpuUploadComplete())
 			{
 				renderSection.uploadRenderDataToGpuAsync();
 			}
 		}
 	}
-	
+
 	//endregion
 	//endregion tick update
-	
-	
-	
+
+
+
 	//=================================//
 	// full data retrieval (world gen) //
 	//=================================//
 	//region world gen
-	
+
 	/**
 	 * Positions outside the generator's range (or past the server's request distance) are never retrieved,
 	 * queuing them just has them cancelled and put back as missing.
@@ -889,9 +910,9 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	private boolean canRetrievePos(long pos, DhBlockPos2D playerPos)
 	{
 		return WorldGenUtil.isPosInWorldGenRange(
-				pos,
-				Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
-				Config.Common.WorldGenerator.generationMaxChunkRadius.get())
+			pos,
+			Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
+			Config.Common.WorldGenerator.generationMaxChunkRadius.get())
 			&& this.fullDataSourceProvider.canRetrievePos(pos, playerPos);
 	}
 
@@ -908,13 +929,13 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			int bDist = DhSectionPos.getChebyshevSignedBlockDistance(posB, playerPos);
 			return Integer.compare(aDist, bDist);
 		});
-		
-		
-		
+
+
+
 		//==================================//
 		// add retrieval tasks to the queue //
 		//==================================//
-		
+
 		for (int i = 0; i < this.sortedMissingPosList.size(); i++)
 		{
 			long missingPos = this.sortedMissingPosList.get(i);
@@ -922,10 +943,10 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			{
 				continue;
 			}
-			
+
 			if (!this.fullDataSourceProvider.canQueueRetrievalNow())
 			{
-				// The queue is full. Since this list is sorted nearest first, 
+				// The queue is full. Since this list is sorted nearest first,
 				// replace a farther away request so holes near the player
 				// (failed tasks, newly loaded sections) are generated first.
 				if (!this.fullDataSourceProvider.tryMakeRoomForRetrieval(missingPos, playerPos)
@@ -934,19 +955,19 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					break;
 				}
 			}
-			
+
 			CompletableFuture<DataSourceRetrievalResult> genFuture = this.fullDataSourceProvider.queuePositionForRetrieval(missingPos);
 			boolean positionQueued = (genFuture != null && !genFuture.isCompletedExceptionally());
 			if (positionQueued)
 			{
 				this.queuedGenerationPosSet.add(missingPos);
 				this.missingGenerationPosSet.remove(missingPos);
-				
+
 				genFuture.exceptionally((Throwable throwable) ->
 				{
 					// gen task failed,
 					// requeue so we can try again in the future
-					
+
 					this.queuedGenerationPosSet.remove(missingPos);
 					this.missingGenerationPosSet.add(missingPos);
 					return null;
@@ -955,7 +976,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				{
 					// task finished
 					this.queuedGenerationPosSet.remove(missingPos);
-					
+
 					if (result.state == ERetrievalResultState.REQUIRES_SPLITTING)
 					{
 						DhSectionPos.forEachChild(missingPos, this::tryQueuePosForRetrieval);
@@ -963,9 +984,9 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				});
 			}
 		}
-		
-		
-		
+
+
+
 		if (!updateEstimates)
 		{
 			return;
@@ -979,7 +1000,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 
 		// calculate an estimate for the max number of chunks for the queue
 		long totalWorldGenChunkCount = 0;
-		
+
 		if (!this.sortedMissingPosList.isEmpty())
 		{
 			// count the missing LODs
@@ -996,7 +1017,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				// chunk count
 				long sectionWidthInChunks = DhSectionPos.getChunkWidth(missingPos);
 				totalWorldGenChunkCount += (sectionWidthInChunks * sectionWidthInChunks);
-				
+
 				// don't let any regeneration happen until
 				// all low-detail LODs have finished generating
 				if (DhSectionPos.getDetailLevel(missingPos) == DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL)
@@ -1004,13 +1025,13 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					highDetailRequestPresent = false;
 				}
 			}
-			
+
 			this.fullDataSourceProvider.setCanRegenerate(!highDetailRequestPresent);
 		}
 		else
 		{
 			// count the LODs that need re-generating
-			
+
 			if (WorldGenUtil.regenAllowed(this.fullDataSourceProvider))
 			{
 				// only query the DB every few seconds
@@ -1022,7 +1043,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					int maxRegenDistanceInBlocks = WorldGenUtil.getMaxRegenDistanceInBlocks();
 					totalWorldGenChunkCount = this.fullDataSourceProvider.repo.getRegenChunkCount(playerPos.x, playerPos.z, maxRegenDistanceInBlocks);
 					this.cachedRegenTaskCount = totalWorldGenChunkCount;
-					
+
 					this.lastRegenTaskCountQueryMs = System.currentTimeMillis();
 				}
 				else
@@ -1030,13 +1051,13 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					totalWorldGenChunkCount = this.cachedRegenTaskCount;
 				}
 			}
-			
+
 			this.fullDataSourceProvider.setCanRegenerate(true);
 		}
-		
+
 		this.fullDataSourceProvider.setEstimatedRemainingRetrievalChunkCount(totalWorldGenChunkCount);
 	}
-	
+
 	@Override
 	public void onConfigValueSet()
 	{
@@ -1045,19 +1066,19 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		// correct sized generator tasks
 		this.missingGenerationPosSet.clear();
 		this.queuedGenerationPosSet.clear();
-		
+
 		// don't allow regeneration until the next world gen tick
 		// this is done to prevent queuing chunks if there are still
 		// lower-detail LODs that need generating
 		this.fullDataSourceProvider.setCanRegenerate(false);
-		
-		
+
+
 		boolean generatorEnabled = this.fullDataSourceProvider.getGeneratorPlan().generationEnabled;
 		// world gen tasks will need to be re-queued
 		// since all the render sections will already have been loaded
 		this.requeueAllRetrievalTasksRef.set(generatorEnabled);
 	}
-	
+
 	/** Does nothing if the missing positions are already queued. */
 	private void tryQueuePosForRetrieval(long pos)
 	{
@@ -1067,7 +1088,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		{
 			return;
 		}
-		
+
 		for (int i = 0; i < missingPosList.size(); i++)
 		{
 			long missingPos = missingPosList.getLong(i);
@@ -1077,7 +1098,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			}
 		}
 	}
-	
+
 	/**
 	 * Prevents DH from
 	 * accidentally starting to queue chunks out of order
@@ -1093,22 +1114,22 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		{
 			return false;
 		}
-		
+
 		// don't queue additional world gen requests if the file handler is busy
 		PriorityTaskPicker.Executor fileHandlerExecutor = ThreadPoolUtil.getFileHandlerExecutor();
 		return fileHandlerExecutor != null
 			&& fileHandlerExecutor.getQueueSize() < FullDataUpdatePropagatorV2.getMaxPropagateTaskCount() / 2;
 	}
-	
+
 	//endregion world gen
-	
-	
-	
+
+
+
 	//=================//
 	// beacon handling //
 	//=================//
 	//region beacon handling
-	
+
 	/** gets the active beacon list and stops/starts beacon rendering as necessary */
 	private void tryRefreshRenderingBeaconsAsync(DhBlockPos2D playerPos)
 	{
@@ -1118,28 +1139,34 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		{
 			return;
 		}
-		
+
 		AbstractExecutorService executor = ThreadPoolUtil.getFileHandlerExecutor();
 		if (executor == null)
 		{
 			// shouldn't normally happen, but just in case
 			return;
 		}
-		
+
 		if (!this.beaconUpdateFuture.isDone())
 		{
 			return;
 		}
 		CompletableFuture<Void> future = new CompletableFuture<>();
 		this.beaconUpdateFuture = future;
-		
+
 		try
 		{
 			executor.execute(() ->
 			{
 				this.refreshRenderingBeacons(playerPos);
-				
-				try { Thread.sleep(2_000); } catch (InterruptedException ignore) { }
+
+				try
+				{
+					Thread.sleep(2_000);
+				}
+				catch (InterruptedException ignore)
+				{
+				}
 				future.complete(null);
 			});
 		}
@@ -1156,36 +1183,36 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		{
 			return;
 		}
-		
+
 		try
 		{
 			// Synchronized to prevent two threads for accessing the array at once
 			synchronized (this.beaconList)
 			{
 				// get beacons //
-				
+
 				int blockDistanceRadius = (this.blockRenderDistanceDiameter / 2);
 				int minBlockPosX = playerPos.x - blockDistanceRadius;
 				int minBlockPosZ = playerPos.z - blockDistanceRadius;
 				int maxBlockPosX = playerPos.x + blockDistanceRadius;
 				int maxBlockPosZ = playerPos.z + blockDistanceRadius;
-				
+
 				ArrayList<BeaconBeamDTO> dbBeacons = this.beaconBeamRepo.getAllBeamsInBlockPosRange(
 					minBlockPosX, maxBlockPosX,
 					minBlockPosZ, maxBlockPosZ
 				);
-				
-				
+
+
 				// convert DB beacons //
-				
+
 				ArrayList<BeaconRenderHandler.BeaconBeamWithWidth> newBeaconList = new ArrayList<>(this.beaconList.size());
 				for (BeaconBeamDTO beaconBeam : dbBeacons)
 				{
 					byte beaconDetailLevel = this.calcExpectedDetailLevel(playerPos, beaconBeam.blockPos.getX(), beaconBeam.blockPos.getZ());
 					newBeaconList.add(new BeaconRenderHandler.BeaconBeamWithWidth(beaconBeam, beaconDetailLevel));
 				}
-				
-				
+
+
 				boolean replaceBeacons = false;
 				if (this.beaconList.size() != newBeaconList.size())
 				{
@@ -1197,7 +1224,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					// sort the beacons so they can be compared
 					this.beaconList.sort(BeaconRenderHandler.NegativeInfiniteBlockPosComparator.INSTANCE);
 					newBeaconList.sort(BeaconRenderHandler.NegativeInfiniteBlockPosComparator.INSTANCE);
-					
+
 					for (int i = 0; i < this.beaconList.size(); i++)
 					{
 						BeaconRenderHandler.BeaconBeamWithWidth oldBeam = this.beaconList.get(i);
@@ -1209,8 +1236,8 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 						}
 					}
 				}
-				
-				
+
+
 				// only replace the beacons if something changed
 				// this is done to prevent constantly re-uploading the render data
 				if (replaceBeacons)
@@ -1223,19 +1250,19 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Unexpected issue updating beacons, error: ["+e.getMessage()+"].", e);
+			LOGGER.error("Unexpected issue updating beacons, error: [" + e.getMessage() + "].", e);
 		}
 	}
-	
+
 	//endregion beacon handling
-	
-	
-	
+
+
+
 	//====================//
 	// detail level logic //
 	//====================//
 	//region detail level logic
-	
+
 	/**
 	 * Determines the detail level expected for the given position based on player position.
 	 *
@@ -1250,14 +1277,14 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		double sectionBlockRadius = DhSectionPos.getBlockWidth(sectionPos) * (Math.sqrt(2.0) / 2.0);
 		return this.calcExpectedDetailLevel(playerPos, sectionPos, DhSectionPos.getCenterBlockPosX(sectionPos), DhSectionPos.getCenterBlockPosZ(sectionPos), sectionBlockRadius);
 	}
-	
+
 	public byte calcExpectedDetailLevel(DhBlockPos2D playerPos, int targetBlockPosX, int targetBlockPosZ)
 	{ return this.calcExpectedDetailLevel(playerPos, DhSectionPos.encodeContaining(DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL, new DhBlockPos(targetBlockPosX, 0, targetBlockPosZ)), targetBlockPosX, targetBlockPosZ, 0.0); }
-	
+
 	private byte calcExpectedDetailLevel(DhBlockPos2D playerPos, long targetSectionPos, int targetBlockPosX, int targetBlockPosZ, double targetBlockRadius)
 	{
 		double blockDistance = playerPos.dist(targetBlockPosX, targetBlockPosZ);
-		
+
 		// Don't allow zooming for LODs that will be missing child nodes.
 		// Doing so will cause holes/missing LODs.
 		boolean allowZooming = DhSectionPos.getDetailLevel(targetSectionPos) < FullDataUpdatePropagatorV2.HIGHEST_DOWNSAMPLE_DETAIL_LEVEL;
@@ -1269,36 +1296,36 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 				&& CameraZoom.INSTANCE.coneIntersectsCircle(playerPos.x, playerPos.z, targetBlockPosX, targetBlockPosZ, targetBlockRadius))
 			{
 				blockDistance /= CameraZoom.INSTANCE.magnification;
-				
+
 				EDhApiMaxHorizontalResolution maxHorizontalResolution = Config.Client.Advanced.Graphics.Quality.maxHorizontalResolution.get();
 				return this.calcDetailLevelFromDistance(blockDistance, maxHorizontalResolution.detailLevel);
 			}
 		}
-		
+
 		return this.calcDetailLevelFromDistance(blockDistance);
 	}
-	
+
 	private void updateDetailLevelVariables()
 	{
 		// Note: these detail levels are all absolute, not section.
 		// Section detail levels should be subtracted by "DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL".
-		
+
 		this.detailDropOffDistanceUnit = Config.Client.Advanced.Graphics.Quality.horizontalQuality.get().distanceUnitInBlocks * LodUtil.CHUNK_WIDTH;
 		this.detailDropOffLogBase = Math.log(Config.Client.Advanced.Graphics.Quality.horizontalQuality.get().quadraticBase);
-		
+
 		this.maxLeafRenderDetailLevel = Config.Client.Advanced.Graphics.Quality.maxHorizontalResolution.get().detailLevel;
-		
+
 		// The minimum detail level is done to prevent single corner sections rendering 1 detail level lower than the others.
 		// If not done corners may not be flush with the other LODs, which looks bad.
 		byte minSectionDetailLevel = this.calcDetailLevelFromDistance(this.blockRenderDistanceDiameter); // get the minimum allowed detail level
 		minSectionDetailLevel -= 1; // -1 so corners can't render lower than their adjacent neighbors. space
 		minSectionDetailLevel = (byte) Math.min(minSectionDetailLevel, this.treeRootDetailLevel); // don't allow rendering lower detail sections than what the tree contains
 		minSectionDetailLevel = (byte) Math.min(
-			minSectionDetailLevel, 
+			minSectionDetailLevel,
 			FullDataSourceProviderV2.ROOT_SECTION_DETAIL_LEVEL - DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL); // the tree can only provide LODs as low as the provider has
 		this.minRootRenderDetailLevel = (byte) Math.max(minSectionDetailLevel, this.maxLeafRenderDetailLevel); // respect the user's selected max resolution if it is lower detail (IE they want 2x2 block, but minSectionDetailLevel is specifically for 1x1 block render resolution)
 	}
-	
+
 	private byte calcDetailLevelFromDistance(double blockDistance)
 	{ return this.calcDetailLevelFromDistance(blockDistance, this.maxLeafRenderDetailLevel); }
 	private byte calcDetailLevelFromDistance(double blockDistance, byte maxDetailLevel)
@@ -1306,16 +1333,16 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		int detailLevel = (int) (Math.log(blockDistance / this.detailDropOffDistanceUnit) / this.detailDropOffLogBase);
 		return (byte) MathUtil.clamp(maxDetailLevel, detailLevel, FullDataSourceProviderV2.ROOT_SECTION_DETAIL_LEVEL);
 	}
-	
+
 	//endregion detail level logic
-	
-	
-	
+
+
+
 	//==========================//
 	// external render requests //
 	//==========================//
 	//region external render requests
-	
+
 	/**
 	 * Re-creates the color, render data.
 	 * This method should be called after resource packs are changed or LOD settings are modified.
@@ -1326,7 +1353,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		{
 			this.treeTickLock.lock();
 			LOGGER.info("Disposing render data...");
-			
+
 			// clear the tree
 			Iterator<QuadNode<LodRenderSection>> nodeIterator = this.nodeIterator();
 			while (nodeIterator.hasNext())
@@ -1338,7 +1365,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					quadNode.value = null;
 				}
 			}
-			
+
 			LOGGER.info("Render data cleared, please wait a moment for everything to reload...");
 		}
 		catch (Exception e)
@@ -1350,15 +1377,15 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			this.treeTickLock.unlock();
 		}
 	}
-	
+
 	/**
 	 * Can be called whenever a render section's data needs to be refreshed. <br>
 	 * This should be called whenever a world generation task is completed or if the connected server has new data to show.
 	 */
 	public void queuePosToReload(long pos)
-	{		
+	{
 		// queue reloads //
-		
+
 		// only queue each section for reloading
 		// after the cache has been cleared,
 		// this is done to prevent accidentally using old cached data
@@ -1374,25 +1401,25 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			this.reloadBatcher.request(adjacentPos);
 		}
 	}
-	
+
 	//endregion external render requests
-	
-	
-	
+
+
+
 	//===========//
 	// debugging //
 	//===========//
 	//region debugging
-	
+
 	@Override
 	public void debugRender(AbstractDebugWireframeRenderer debugRenderer)
 	{
 		this.populateListWithEnabledRenderSections(this.debugNodeList);
-		
+
 		for (int i = 0; i < this.debugNodeList.size(); i++)
 		{
 			LodRenderSection renderSection = this.debugNodeList.get(i);
-			
+
 			Color color = Color.BLACK;
 			if (renderSection.gpuUploadInProgress())
 			{
@@ -1415,41 +1442,41 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					color = Color.RED;
 				}
 			}
-			
-			
+
+
 			int levelMinY = this.level.getLevelWrapper().getMinHeight();
 			int levelMaxY = this.level.getLevelWrapper().getMaxHeight();
 			// show the wireframe a bit lower than world max height,
 			// since most worlds don't render all the way up to the max height
 			int levelHeightRange = (levelMaxY - levelMinY);
 			int maxY = levelMaxY - (levelHeightRange / 2);
-			
+
 			debugRenderer.renderBox(new AbstractDebugWireframeRenderer.Box(renderSection.pos, levelMinY, maxY, 0.05f, color));
 		}
 	}
-	
+
 	//endregion debugging
-	
-	
-	
+
+
+
 	//==============//
 	// base methods //
 	//==============//
 	//region base methods
-	
+
 	@Override
 	public void close()
 	{
 		DEBUG_RENDERER.unregister(this, Config.Client.Advanced.Debugging.DebugWireframe.showQuadTreeRenderStatus);
 		Config.Common.WorldGenerator.generatorPlan.removeListener(this);
-		
+
 		this.fullDataRetrievalQueueThread.shutdownNow();
-		
-		
+
+
 		ThreadPoolExecutor mainCleanupExecutor = ThreadPoolUtil.getCleanupExecutor();
 		// closing every node may take a few moments
 		// so this is run on a separate thread to prevent lagging the render thread
-		mainCleanupExecutor.execute(() -> 
+		mainCleanupExecutor.execute(() ->
 		{
 			this.treeTickLock.lock();
 			try
@@ -1473,9 +1500,9 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			}
 		});
 	}
-	
+
 	//endregion base methods
-	
-	
-	
+
+
+
 }

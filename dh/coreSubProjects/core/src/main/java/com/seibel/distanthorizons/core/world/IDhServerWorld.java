@@ -31,8 +31,8 @@ public interface IDhServerWorld extends IDhWorld
 	ServerPlayerStateManager getServerPlayerStateManager();
 	void addPlayer(IServerPlayerWrapper serverPlayer);
 	void removePlayer(IServerPlayerWrapper serverPlayer);
-	
+
 	@Nullable
 	default IDhServerLevel getOrLoadServerLevel(ILevelWrapper levelWrapper) { return (IDhServerLevel) this.getOrLoadLevel(levelWrapper); }
-	
+
 }

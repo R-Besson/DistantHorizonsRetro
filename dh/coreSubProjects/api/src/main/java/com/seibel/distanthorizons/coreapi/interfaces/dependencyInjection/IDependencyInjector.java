@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public interface IDependencyInjector<BindableType extends IBindable>
 {
-	
+
 	/**
 	 * Links the given implementation object to an interface, so it can be referenced later.
 	 *
@@ -41,8 +41,8 @@ public interface IDependencyInjector<BindableType extends IBindable>
 	boolean checkIfClassImplements(Class<?> classToTest, Class<?> interfaceToLookFor);
 	/** Checks if classToTest extends the given class. */
 	boolean checkIfClassExtends(Class<?> classToTest, Class<?> extensionToLookFor);
-	
-	
+
+
 	/**
 	 * Does not return incomplete dependencies. <Br>
 	 * See {@link #get(Class, boolean) get(Class, boolean)} for full documentation.
@@ -50,7 +50,7 @@ public interface IDependencyInjector<BindableType extends IBindable>
 	 * @see #get(Class, boolean)
 	 */
 	@SuppressWarnings("unchecked") <T extends BindableType> T get(Class<T> interfaceClass) throws ClassCastException;
-	
+
 	/**
 	 * Returns all dependencies of type T that have been bound. <br>
 	 * Returns an empty list if no dependencies have been bound.
@@ -63,7 +63,7 @@ public interface IDependencyInjector<BindableType extends IBindable>
 	 * (this shouldn't normally happen, unless the bound object changed somehow)
 	 */
 	<T extends BindableType> ArrayList<T> getAll(Class<T> interfaceClass) throws ClassCastException;
-	
+
 	/**
 	 * Returns a dependency of type T if one has been bound. <br>
 	 * Returns null if a dependency hasn't been bound. <br> <br>
@@ -79,15 +79,15 @@ public interface IDependencyInjector<BindableType extends IBindable>
 	 * (this shouldn't normally happen, unless the bound object changed somehow)
 	 */
 	@SuppressWarnings("unchecked") <T extends BindableType> T get(Class<T> interfaceClass, boolean allowIncompleteDependencies) throws ClassCastException;
-	
-	
-	
+
+
+
 	/** Removes all bound dependencies. */
 	void clear();
-	
-	
-	
+
+
+
 	/** Runs delayed setup for any dependencies that require it. */
 	void runDelayedSetup();
-	
+
 }

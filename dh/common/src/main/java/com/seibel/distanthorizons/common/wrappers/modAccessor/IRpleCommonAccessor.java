@@ -18,6 +18,7 @@
  */
 
 package com.seibel.distanthorizons.common.wrappers.modAccessor;
+
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IRpleAccessor;
 import net.minecraft.block.Block;
 
@@ -32,4 +33,5 @@ import net.minecraft.block.Block;
 public interface IRpleCommonAccessor extends IRpleAccessor
 {
 	int getColor(Block block, int meta);
+
 }

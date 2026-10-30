@@ -10,19 +10,19 @@ public abstract class AbstractNetworkMessage implements INetworkObject
 	//============//
 	// properties //
 	//============//
-	
+
 	private NetworkSession networkSession = null;
 	public NetworkSession getSession() { return this.networkSession; }
 	public void setSession(NetworkSession networkSession) { this.networkSession = networkSession; }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public String toString() { return this.toStringHelper().toString(); }
 	public MoreObjects.ToStringHelper toStringHelper() { return MoreObjects.toStringHelper(this); }
-	
+
 }

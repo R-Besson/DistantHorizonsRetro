@@ -26,15 +26,15 @@ public interface IDimensionTypeWrapper extends IDhApiDimensionTypeWrapper, IBind
 {
 	@Override
 	boolean hasCeiling();
-	
+
 	/** example: "minecraft:overworld" */
 	String getName();
-	
+
 	@Override
 	boolean hasSkyLight();
-	
+
 	boolean isTheEnd();
-	
+
 	double getCoordinateScale();
-	
+
 }

@@ -31,16 +31,16 @@ import com.seibel.distanthorizons.api.objects.math.DhApiVec3i;
 public class DhVec3i extends DhApiVec3i // extends the API object so it can be returned through the API
 {
 	// x,y,z variables are handled in the parent object
-	
-	
-	
+
+
+
 	public DhVec3i()
 	{
 		this.x = 0;
 		this.y = 0;
 		this.z = 0;
 	}
-	
+
 	public DhVec3i(int x, int y, int z)
 	{
 		this.x = x;

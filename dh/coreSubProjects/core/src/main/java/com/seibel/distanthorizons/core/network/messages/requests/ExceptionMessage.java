@@ -40,50 +40,50 @@ public class ExceptionMessage extends AbstractTrackableMessage
 		this.add(RequestRejectedException.class);
 		this.add(SectionRequiresSplittingException.class);
 	}};
-	
+
 	public Exception exception;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public ExceptionMessage() { }
 	public ExceptionMessage(Exception exception) { this.exception = exception; }
-	
-	
-	
+
+
+
 	//===============//
 	// serialization //
 	//===============//
-	
-	@Override 
+
+	@Override
 	protected void encodeInternal(ByteBuf out)
 	{
 		out.writeInt(EXCEPTION_LIST.indexOf(this.exception.getClass()));
 		this.writeString(this.exception.getMessage(), out);
 	}
-	
-	@Override 
+
+	@Override
 	protected void decodeInternal(ByteBuf in) throws Exception
 	{
 		int id = in.readInt();
 		String message = this.readString(in);
 		this.exception = EXCEPTION_LIST.get(id).getDeclaredConstructor(String.class).newInstance(message);
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public MoreObjects.ToStringHelper toStringHelper()
 	{
 		return super.toStringHelper()
-				.add("exception", this.exception);
+			.add("exception", this.exception);
 	}
-	
+
 }

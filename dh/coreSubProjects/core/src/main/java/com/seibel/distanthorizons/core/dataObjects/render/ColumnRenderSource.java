@@ -43,21 +43,22 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 {
 	/** measured in data columns */
 	public static final int WIDTH = 64;
-	
-	/** 
+
+	/**
 	 * Texture palettes are indexed by unsigned bytes. <Br>
 	 * This limitation is also done so a single LOD doesn't take
 	 * up every possible texture ID available to the world.
 	 */
 	public static final int MAX_TEXTURE_PALETTE_SIZE = 256;
-	
+
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Render Source");
-	
-	
-	
-	/** 
-	 * will be zero if an empty data source was created 
-	 * @see EDhApiVerticalQuality#calculateMaxNumberOfVerticalSlicesAtDetailLevel(byte) 
+
+
+
+	/**
+	 * will be zero if an empty data source was created
+	 *
+	 * @see EDhApiVerticalQuality#calculateMaxNumberOfVerticalSlicesAtDetailLevel(byte)
 	 */
 	public int maxVerticalSliceCount;
 	public long pos;
@@ -73,7 +74,7 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	 * the {@link RenderDataPointReducingList}.
 	 */
 	public final LongArrayList voidRenderDataContainer;
-	
+
 	/**
 	 * Parallel to {@link ColumnRenderSource#renderDataContainer},
 	 * each byte is an index into {@link ColumnRenderSource#texturePalette}. <br>
@@ -90,13 +91,13 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	/** the relative columns this source holds (max exclusive), see {@link #createEmptyPartial} */
 	public final int minX, maxX, minZ, maxZ;
 
-	
-	
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public static ColumnRenderSource createEmpty(long pos, int maxVertSliceCount)
 	{ return new ColumnRenderSource(pos, maxVertSliceCount, 0, WIDTH, 0, WIDTH); }
 	/**
@@ -161,61 +162,61 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		return Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
 			&& dataDetailLevel <= Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel.get();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========================//
 	// datapoint manipulation //
 	//========================//
 	//region
-	
-	public long getDataPoint(int posX, int posZ, int verticalIndex) 
+
+	public long getDataPoint(int posX, int posZ, int verticalIndex)
 	{ return this.renderDataContainer.getLong(this.getDatapointIndex(posX, posZ, verticalIndex)); }
-	
+
 	public void populateColumnView(ColumnRenderView view, int posX, int posZ) throws IllegalArgumentException
 	{
 		int dataOffset = this.getDatapointIndex(posX, posZ, 0);
 		int voidDataOffset = this.getVoidDatapointIndex(posX, posZ);
-		
+
 		// don't allow returning views that are outside this render source's bounds
 		if (posX < this.minX || posX >= this.maxX
 			|| posZ < this.minZ || posZ >= this.maxZ)
 		{
-			throw new IllegalArgumentException("Column View pos outside valid range ["+posX+","+posZ+"].");
+			throw new IllegalArgumentException("Column View pos outside valid range [" + posX + "," + posZ + "].");
 		}
 		else if (dataOffset >= this.renderDataContainer.size())
 		{
-			throw new IllegalArgumentException("Column Data View offset ["+dataOffset+"] greater than parent render data container ["+DhSectionPos.toString(this.pos)+"] size ["+this.renderDataContainer.size()+"].");
+			throw new IllegalArgumentException("Column Data View offset [" + dataOffset + "] greater than parent render data container [" + DhSectionPos.toString(this.pos) + "] size [" + this.renderDataContainer.size() + "].");
 		}
 		else if (voidDataOffset >= this.voidRenderDataContainer.size())
 		{
-			throw new IllegalArgumentException("Column Void View offset ["+voidDataOffset+"] greater than parent render data container ["+DhSectionPos.toString(this.pos)+"] size ["+this.voidRenderDataContainer.size()+"].");
+			throw new IllegalArgumentException("Column Void View offset [" + voidDataOffset + "] greater than parent render data container [" + DhSectionPos.toString(this.pos) + "] size [" + this.voidRenderDataContainer.size() + "].");
 		}
-		
+
 		view.populate(
-			this.renderDataContainer, this.voidRenderDataContainer, 
+			this.renderDataContainer, this.voidRenderDataContainer,
 			this.maxVerticalSliceCount,
-			dataOffset, voidDataOffset, 
+			dataOffset, voidDataOffset,
 			this.maxVerticalSliceCount);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// texture handling //
 	//==================//
 	//region
-	
+
 	/** @return true if this section is storing texture ids */
 	public boolean hasTextureSetIds() { return !this.textureSetPaletteIndices.isEmpty(); }
-	
+
 	/**
 	 * @return the {@link BlockTextureRegistry}
-	 *          set id for the given data point, the flat set id if this section isn't storing textures
+	 * set id for the given data point, the flat set id if this section isn't storing textures
 	 */
 	public short getTextureSetId(int posX, int posZ, int verticalIndex)
 	{
@@ -223,12 +224,12 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		{
 			return BlockTextureRegistry.UNTEXTURED_ID;
 		}
-		
-		int paletteIndex = this.textureSetPaletteIndices.getByte(this.getDatapointIndex(posX, posZ, verticalIndex)) 
+
+		int paletteIndex = this.textureSetPaletteIndices.getByte(this.getDatapointIndex(posX, posZ, verticalIndex))
 			& 0xFF; // convert from signed byte to unsigned int
 		return this.texturePalette.getShort(paletteIndex);
 	}
-	
+
 	/**
 	 * Stores the texture set id for the given data point,
 	 * does nothing if this section isn't storing textures.
@@ -239,12 +240,12 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		{
 			return;
 		}
-		
+
 		this.textureSetPaletteIndices.set(
 			this.getDatapointIndex(posX, posZ, verticalIndex),
 			this.getOrAddPaletteIndex(textureSetId));
 	}
-	
+
 	private byte getOrAddPaletteIndex(short textureSetId)
 	{
 		// linear search is fine, palettes hold the few dozen
@@ -259,27 +260,27 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 				return (byte) i;
 			}
 		}
-		
+
 		if (paletteSize >= MAX_TEXTURE_PALETTE_SIZE)
 		{
 			// sections with too many distinct blocks
 			// gracefully lose textures so they can't take up every possible ID
 			return BlockTextureRegistry.UNTEXTURED_ID;
 		}
-		
+
 		this.texturePalette.add(textureSetId);
 		return (byte) paletteSize;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====================//
 	// data helper methods //
 	//=====================//
 	//region
-	
+
 	public byte getDataDetailLevel() { return (byte) (DhSectionPos.getDetailLevel(this.pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL); }
 
 	private int getDatapointIndex(int posX, int posZ, int verticalIndex)
@@ -288,32 +289,32 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 			+ (posZ * this.maxVerticalSliceCount)
 			+ verticalIndex;
 	}
-	
+
 	private int getVoidDatapointIndex(int posX, int posZ)
 	{
 		return (posX * WIDTH)
 			+ posZ;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// base methods //
 	//==============//
 	//region
-	
+
 	@Override
 	public String toString()
 	{
 		String LINE_DELIMITER = "\n";
 		String SUBDATA_DELIMITER = ",";
 		StringBuilder stringBuilder = new StringBuilder();
-		
+
 		stringBuilder.append(DhSectionPos.toString(this.pos));
 		stringBuilder.append(LINE_DELIMITER);
-		
+
 		int size = 1;
 		for (int z = 0; z < size; z++)
 		{
@@ -330,9 +331,9 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		}
 		return stringBuilder.toString();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

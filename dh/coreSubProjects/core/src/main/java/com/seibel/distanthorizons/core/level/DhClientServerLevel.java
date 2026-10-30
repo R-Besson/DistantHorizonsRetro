@@ -39,33 +39,33 @@ import java.util.List;
 public class DhClientServerLevel extends AbstractDhServerLevel implements IDhClientLevel
 {
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-	
+
 	public final ClientLevelModule clientside;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public DhClientServerLevel(
-		ISaveStructure saveStructure, 
-		IServerLevelWrapper serverLevelWrapper, 
+		ISaveStructure saveStructure,
+		IServerLevelWrapper serverLevelWrapper,
 		ServerPlayerStateManager serverPlayerStateManager
-		) throws SQLException, IOException
+	) throws SQLException, IOException
 	{
 		super(saveStructure, serverLevelWrapper, serverPlayerStateManager, false);
-		
+
 		this.serverLevelWrapper.setDhLevel(this);
 		this.clientside = new ClientLevelModule(this);
 		this.runRepoReliantSetup();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// tick methods //
 	//==============//
@@ -81,51 +81,51 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 		{
 			return;
 		}
-		
+
 		this.clientside.clientTick();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
+
 	public void startRenderer() { this.clientside.startRenderer(); }
-	
+
 	public void stopRenderer() { this.clientside.stopRenderer(); }
-	
+
 	@Override
 	public boolean isRendering() { return this.clientside.isRendering(); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// level handling //
 	//================//
 	//region
-	
+
 	@Nullable
 	@Override
 	public IClientLevelWrapper getClientLevelWrapper() { return MC_CLIENT.getWrappedClientLevel(); }
-	
+
 	@Override
 	public void clearRenderCache() { this.clientside.clearRenderCache(); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// debugging //
 	//===========//
 	//region
-	
+
 	@Override
 	public void addDebugMenuStringsToList(List<String> messageList)
 	{
@@ -134,19 +134,19 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 		String g = MinecraftTextFormat.GREEN;
 		String r = MinecraftTextFormat.RED;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-		
-		
+
+
 		String dimName = this.serverLevelWrapper.getDhIdentifier();
-		boolean rendering = 
-			this.clientside.isRendering() 
-			&& !IgnoredDimensionCsvHandler.INSTANCE.dimensionNameShouldBeIgnored(dimName);
-		String renderingString = rendering ? (g+"yes"+cf) : (r+"no"+cf);
-		messageList.add("["+y+dimName+cf+"] rendering: "+renderingString);
-		
+		boolean rendering =
+			this.clientside.isRendering()
+				&& !IgnoredDimensionCsvHandler.INSTANCE.dimensionNameShouldBeIgnored(dimName);
+		String renderingString = rendering ? (g + "yes" + cf) : (r + "no" + cf);
+		messageList.add("[" + y + dimName + cf + "] rendering: " + renderingString);
+
 		super.addDebugMenuStringsToList(messageList);
 	}
-	
-	
+
+
 	@Override
 	public IDhGenericRenderer getGenericRenderer() { return this.clientside.genericRenderer; }
 	@Override
@@ -155,35 +155,35 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 		ClientLevelModule.ClientRenderState renderState = this.clientside.ClientRenderStateRef.get();
 		return (renderState != null) ? renderState.renderBufferHandler : null;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// data handling //
 	//===============//
 	//region
-	
+
 	@Override
 	public void onWorldGenTaskComplete(long pos)
 	{
 		super.onWorldGenTaskComplete(pos);
 		this.clientside.reloadPos(pos);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
-	public String toString() { return "DhClientServerLevel{"+this.serverLevelWrapper.getKeyedLevelDimensionName()+"}"; }
-	
+	public String toString() { return "DhClientServerLevel{" + this.serverLevelWrapper.getKeyedLevelDimensionName() + "}"; }
+
 	@Override
 	public void close()
 	{
@@ -192,9 +192,9 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 		this.serverside.close();
 		LOGGER.info("Closed " + this.getClass().getSimpleName() + " for " + this.getServerLevelWrapper());
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

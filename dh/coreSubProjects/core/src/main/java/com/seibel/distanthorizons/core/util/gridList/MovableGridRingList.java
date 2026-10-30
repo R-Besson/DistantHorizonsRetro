@@ -35,39 +35,39 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 {
 	/** the position of this grid closest to negative x/z infinity */
 	private final AtomicReference<Pos2D> minPosRef = new AtomicReference<>();
-	
+
 	/** width of this grid list */
 	private final int width;
 	/** radius or half-width of this grid list */
 	private final int halfWidth;
-	
+
 	private final ReentrantReadWriteLock moveLock = new ReentrantReadWriteLock();
-	
+
 	/** used to iterate over each item in the list in an in-to-out order */
 	private final Pos2D[] ringPositionIteratorArray;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public MovableGridRingList(int halfWidth, int centerX, int centerY)
 	{
 		super((halfWidth * 2 + 1) * (halfWidth * 2 + 1));
-		
+
 		this.width = halfWidth * 2 + 1;
 		this.halfWidth = halfWidth;
 		this.minPosRef.set(new Pos2D(centerX - halfWidth, centerY - halfWidth));
 		this.ringPositionIteratorArray = this.createRingIteratorList();
-		
+
 		this.clear();
 	}
 	private Pos2D[] createRingIteratorList()
 	{
 		Pos2D[] posArray = new Pos2D[this.width * this.width];
-		
+
 		int i = 0;
 		for (int xPos = -this.halfWidth; xPos <= this.halfWidth; xPos++)
 		{
@@ -77,7 +77,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 				i++;
 			}
 		}
-		
+
 		// sort the positions from nearest to farthest from the world origin
 		Arrays.sort(posArray, (a, b) ->
 		{
@@ -85,14 +85,14 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			long disSqrB = (long) b.getX() * b.getX() + (long) b.getY() * b.getY();
 			return Double.compare(disSqrA, disSqrB);
 		});
-		
+
 		//noinspection SuspiciousNameCombination
 		Pos2D halfPos = new Pos2D(this.halfWidth, this.halfWidth);
 		for (int j = 0; j < posArray.length; j++)
 		{
 			posArray[j] = posArray[j].add(halfPos);
 		}
-		
+
 		// assert all the positions are in the correct range
 		if (ModInfo.IS_DEV_BUILD)
 		{
@@ -102,19 +102,19 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 				LodUtil.assertTrue(pos2D.getY() >= 0 && pos2D.getY() < this.width);
 			}
 		}
-		
+
 		return posArray;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====================//
 	// getters and setters //
 	//=====================//
 	//region
-	
+
 	/** returns null if x,y is outside the grid */
 	public T get(int x, int y)
 	{
@@ -123,7 +123,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		{
 			return null;
 		}
-		
+
 		this.moveLock.readLock().lock();
 		try
 		{
@@ -143,8 +143,8 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			this.moveLock.readLock().unlock();
 		}
 	}
-	
-	
+
+
 	/** returns false if x,y is outside the grid */
 	public boolean set(int x, int y, T item)
 	{
@@ -153,7 +153,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		{
 			return false;
 		}
-		
+
 		this.moveLock.readLock().lock();
 		try
 		{
@@ -174,18 +174,18 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			this.moveLock.readLock().unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// list modifiers //
 	//================//
 	//region
-	
-	
-	
+
+
+
 	/** see {@link MovableGridRingList#clear(Consumer)} for full documentation */
 	@Override
 	public void clear() { this.clear(null); }
@@ -205,7 +205,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 					}
 				});
 			}
-			
+
 			super.clear();
 			super.ensureCapacity(this.width * this.width);
 			// fill the array with nulls so we can get/set indicies
@@ -219,7 +219,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			this.moveLock.writeLock().unlock();
 		}
 	}
-	
+
 	public boolean moveTo(int newCenterX, int newCenterY, Consumer<? super T> removedItemConsumer) { return this.moveTo(newCenterX, newCenterY, removedItemConsumer, null); }
 	/** Returns true if the grid was successfully moved, false otherwise */
 	public boolean moveTo(int newCenterX, int newCenterY, Consumer<? super T> removedItemConsumer, BiConsumer<Pos2D, ? super T> nullableRemovedItemConsumer)
@@ -231,7 +231,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		{
 			return false;
 		}
-		
+
 		this.moveLock.writeLock().lock();
 		try
 		{
@@ -242,7 +242,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			{
 				return false;
 			}
-			
+
 			// if the x or z offset is equal to or greater than
 			// the total width, just delete the current data
 			// and update the pos
@@ -257,18 +257,18 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 					for (int y = 0; y < this.width; y++)
 					{
 						Pos2D itemPos = new Pos2D(x + cPos.getX(), y + cPos.getY());
-						
+
 						if (x - deltaX < 0
-								|| y - deltaY < 0
-								|| x - deltaX >= this.width
-								|| y - deltaY >= this.width)
+							|| y - deltaY < 0
+							|| x - deltaX >= this.width
+							|| y - deltaY >= this.width)
 						{
 							T item = this.swapUnsafe(itemPos.getX(), itemPos.getY(), null);
 							if (item != null && removedItemConsumer != null)
 							{
 								removedItemConsumer.accept(item);
 							}
-							
+
 							if (nullableRemovedItemConsumer != null)
 							{
 								nullableRemovedItemConsumer.accept(itemPos, item);
@@ -281,7 +281,7 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 					}
 				}
 			}
-			
+
 			this.minPosRef.set(new Pos2D(newMinX, newMinY));
 			return true;
 		}
@@ -290,16 +290,16 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			this.moveLock.writeLock().unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// position getters //
 	//==================//
 	//region
-	
+
 	public Pos2D getCenter() { return new Pos2D(this.minPosRef.get().getX() + this.halfWidth, this.minPosRef.get().getY() + this.halfWidth); }
 
 	//endregion
@@ -314,19 +314,19 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	private boolean inRangeAcquired(int x, int y, Pos2D min)
 	{
 		return (x >= min.getX()
-				&& x < min.getX() + this.width
-				&& y >= min.getY()
-				&& y < min.getY() + this.width);
+			&& x < min.getX() + this.width
+			&& y >= min.getY()
+			&& y < min.getY() + this.width);
 	}
-	
+
 	private T getUnsafe(int x, int y) { return super.get(Math.floorMod(x, this.width) + Math.floorMod(y, this.width) * this.width); }
 	private void setUnsafe(int x, int y, T item) { super.set(Math.floorMod(x, this.width) + Math.floorMod(y, this.width) * this.width, item); }
 	private T swapUnsafe(int x, int y, T item) { return super.set(Math.floorMod(x, this.width) + Math.floorMod(y, this.width) * this.width, item); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// iterators //
 	//===========//
@@ -351,16 +351,16 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			this.moveLock.readLock().unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// base methods //
 	//==============//
 	//region
-	
+
 	@Override
 	public String toString()
 	{
@@ -369,61 +369,61 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	public static class Pos2D
 	{
 		private final int x;
 		public int getX() { return this.x; }
-		
+
 		private final int y;
 		public int getY() { return this.y; }
-		
-		
-		
+
+
+
 		//==============//
 		// constructors //
 		//==============//
 		//region
-		
+
 		public Pos2D(int x, int y)
 		{
 			this.x = x;
 			this.y = y;
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//======//
 		// math //
 		//======//
 		//region
-		
+
 		public Pos2D add(Pos2D other) { return new Pos2D(this.x + other.x, this.y + other.y); }
 
 		//endregion
-		
-		
-		
+
+
+
 		//================//
 		// base overrides //
 		//================//
 		//region
-		
+
 		@Override
 		public int hashCode() { return Objects.hash(this.x, this.y); }
-		
+
 		@Override
 		public String toString() { return "[" + this.x + ", " + this.y + "]"; }
-		
+
 		@Override
 		public boolean equals(Object otherObj)
 		{
@@ -436,12 +436,12 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 			}
 			return false;
 		}
-		
+
 		//endregion
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

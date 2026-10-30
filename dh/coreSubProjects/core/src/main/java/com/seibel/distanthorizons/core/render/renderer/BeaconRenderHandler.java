@@ -53,45 +53,45 @@ public class BeaconRenderHandler
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final IDhApiCustomRenderObjectFactory GENERIC_OBJECT_FACTORY = SingletonInjector.INSTANCE.get(IDhApiCustomRenderObjectFactory.class);
-	
+
 	/** how often should we check if a beacon should be culled? */
 	private static final int MAX_CULLING_FREQUENCY_IN_MS = 1_000;
-	
-	
-	
+
+
+
 	private final ReentrantLock updateLock = new ReentrantLock();
-	
+
 	/** only contains the beacons currently being rendered (culled beacons will be missing) */
 	private final IDhApiRenderableBoxGroup activeBeaconBoxRenderGroup;
 	/** contains all beacons that could be rendered (including those that are being culled) */
 	private final ArrayList<DhApiRenderableBox> fullBeaconBoxList = new ArrayList<>();
-	
+
 	private boolean cullingThreadRunning = false;
 	private boolean updateRenderDataNextFrame = false;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public BeaconRenderHandler(@NotNull IDhGenericRenderer renderer)
 	{
-		this.activeBeaconBoxRenderGroup = GENERIC_OBJECT_FACTORY.createAbsolutePositionedGroup(ModInfo.NAME+":Beacons", new ArrayList<>(0));
+		this.activeBeaconBoxRenderGroup = GENERIC_OBJECT_FACTORY.createAbsolutePositionedGroup(ModInfo.NAME + ":Beacons", new ArrayList<>(0));
 		this.activeBeaconBoxRenderGroup.setBlockLight(LodUtil.MAX_MC_LIGHT);
 		this.activeBeaconBoxRenderGroup.setSkyLight(LodUtil.MAX_MC_LIGHT);
 		this.activeBeaconBoxRenderGroup.setSsaoEnabled(false);
 		this.activeBeaconBoxRenderGroup.setShading(DhApiRenderableBoxGroupShading.getUnshaded());
 		this.activeBeaconBoxRenderGroup.setPreRenderFunc(this::beforeRender);
-		
+
 		renderer.add(this.activeBeaconBoxRenderGroup);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// before render //
 	//===============//
@@ -101,12 +101,12 @@ public class BeaconRenderHandler
 	{
 		if (Config.Client.Advanced.Graphics.Culling.disableBeaconDistanceCulling.get())
 		{
-			// this could be called only when the player moves, but it's an extremely cheap check, 
-			// so there isn't much of a reason to bother 
+			// this could be called only when the player moves, but it's an extremely cheap check,
+			// so there isn't much of a reason to bother
 			this.tryUpdateBeaconCullingAsync();
 		}
-		
-		
+
+
 		// this must be called on the render thread to prevent concurrency issues
 		if (this.updateRenderDataNextFrame)
 		{
@@ -123,7 +123,7 @@ public class BeaconRenderHandler
 			&& !this.cullingThreadRunning)
 		{
 			this.cullingThreadRunning = true;
-			
+
 			try
 			{
 				executor.execute(() ->
@@ -132,26 +132,28 @@ public class BeaconRenderHandler
 					{
 						Thread.sleep(MAX_CULLING_FREQUENCY_IN_MS);
 					}
-					catch (InterruptedException ignore) { }
-					
+					catch (InterruptedException ignore)
+					{
+					}
+
 					try
 					{
 						// lock to make sure we don't try adding beacons to the arrays while processing them
 						this.updateLock.lock();
-						
+
 						DhVec3d cameraPos = MC_RENDER.getCameraExactPosition();
-						
+
 						// fading by the overdraw prevention amount helps reduce beacons from rendering strangely
 						// on the border of DH's render distance
 						float dhFadeDistance = RenderUtil.getNearClipPlaneInBlocks();
-						
-						
+
+
 						// Clear the existing box group so we can re-populate it.
 						// Since the box group is only used when we trigger an update, clearing it here
 						// and repopulating it is fine.
 						this.activeBeaconBoxRenderGroup.clear();
-						
-						// While iterating over every beacon isn't a great way of doing this, 
+
+						// While iterating over every beacon isn't a great way of doing this,
 						// when 940 beacons were tested this only took ~0.9 Milliseconds, so as long as
 						// we aren't freezing the render thread this method of culling works just fine.
 						for (DhApiRenderableBox box : this.fullBeaconBoxList)
@@ -163,7 +165,7 @@ public class BeaconRenderHandler
 								this.activeBeaconBoxRenderGroup.add(box);
 							}
 						}
-						
+
 						this.updateRenderDataNextFrame = true;
 					}
 					catch (Exception e)
@@ -181,46 +183,46 @@ public class BeaconRenderHandler
 			{ /* If this happens that means everything is already shut down and no culling is necessary */ }
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// registration //
 	//==============//
 	//region
-	
+
 	public void replaceRenderingBeacons(ArrayList<BeaconBeamWithWidth> beaconList)
 	{
 		try
 		{
 			this.updateLock.lock();
-			
+
 			ArrayList<BeaconBeamWithWidth> sortedBeaconList = new ArrayList<>(beaconList);
-			
+
 			// merge distant beams if requested
 			if (Config.Client.Advanced.Graphics.GenericRendering.expandDistantBeacons.get())
 			{
 				// sort beacons from neg inf -> pos inf
 				// so we can consistently merge adjacent beacons
 				sortedBeaconList.sort(NegativeInfiniteBlockPosComparator.INSTANCE);
-				
+
 				// go through each beacon...
 				for (int outerIndex = 0; outerIndex < sortedBeaconList.size(); outerIndex++)
 				{
 					BeaconBeamWithWidth outerBeacon = sortedBeaconList.get(outerIndex);
 					DhBlockPos outerBlockPos = outerBeacon.blockPos;
-					
+
 					// ...and remove any beacons that are within the block width to prevent overlaps
 					for (int mergeIndex = outerIndex + 1; mergeIndex < sortedBeaconList.size(); mergeIndex++)
 					{
 						BeaconBeamWithWidth beaconToMerge = sortedBeaconList.get(mergeIndex);
 						DhBlockPos mergeBlockPos = beaconToMerge.blockPos;
-						
+
 						int xDiff = mergeBlockPos.getX() - outerBlockPos.getX();
 						int zDiff = mergeBlockPos.getZ() - outerBlockPos.getZ();
-						
+
 						// merge (remove) this beacon if
 						// it's close to the outer beacon
 						if (xDiff < beaconToMerge.beaconBlockWidth
@@ -232,11 +234,11 @@ public class BeaconRenderHandler
 					}
 				}
 			}
-			
-			
+
+
 			this.activeBeaconBoxRenderGroup.clear();
 			this.fullBeaconBoxList.clear();
-			
+
 			// add each beacon to the renderer
 			for (int i = 0; i < sortedBeaconList.size(); i++)
 			{
@@ -248,11 +250,11 @@ public class BeaconRenderHandler
 					beacon.color,
 					EDhApiBlockMaterial.ILLUMINATED
 				);
-				
+
 				this.activeBeaconBoxRenderGroup.add(beaconBox);
 				this.fullBeaconBoxList.add(beaconBox);
 			}
-			
+
 			this.activeBeaconBoxRenderGroup.triggerBoxChange();
 		}
 		finally
@@ -260,25 +262,25 @@ public class BeaconRenderHandler
 			this.updateLock.unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
- 	// helper classes //
- 	//================//
+	// helper classes //
+	//================//
 	//region
-	
+
 	public static class BeaconBeamWithWidth extends BeaconBeamDTO
 	{
 		public final int beaconBlockWidth;
-		
+
 		public BeaconBeamWithWidth(BeaconBeamDTO beaconBeamDTO, byte lodDetailLevel)
 		{
 			super(beaconBeamDTO.blockPos, beaconBeamDTO.color);
-		
-			
+
+
 			// how wide should each beacon be?
 			if (Config.Client.Advanced.Graphics.GenericRendering.expandDistantBeacons.get())
 			{
@@ -289,37 +291,37 @@ public class BeaconRenderHandler
 				this.beaconBlockWidth = 1;
 			}
 		}
-		
-		@Override 
+
+		@Override
 		public boolean equals(Object obj)
 		{
-			if (obj == null 
+			if (obj == null
 				|| obj.getClass() != this.getClass())
 			{
 				return false;
 			}
-			
+
 			BeaconBeamWithWidth that = (BeaconBeamWithWidth) obj;
 			if (that.beaconBlockWidth != this.beaconBlockWidth)
 			{
 				return false;
 			}
-			
+
 			return super.equals(that);
 		}
-		
+
 	}
-	
+
 	public static class NegativeInfiniteBlockPosComparator implements Comparator<BeaconBeamWithWidth>
 	{
 		public static final NegativeInfiniteBlockPosComparator INSTANCE = new NegativeInfiniteBlockPosComparator();
-		
+
 		@Override
 		public int compare(BeaconBeamWithWidth beacon1, BeaconBeamWithWidth beacon2)
 		{
 			DhBlockPos blockPos1 = beacon1.blockPos;
 			DhBlockPos blockPos2 = beacon2.blockPos;
-			
+
 			// sort by X, then by Z
 			if (blockPos1.getX() != blockPos2.getX())
 			{
@@ -327,10 +329,11 @@ public class BeaconRenderHandler
 			}
 			return Integer.compare(blockPos1.getZ(), blockPos2.getZ());
 		}
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

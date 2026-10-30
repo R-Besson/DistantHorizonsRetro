@@ -30,13 +30,13 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	//=========//
 	// methods //
 	//=========//
-	
+
 	String getSerialString();
-	
+
 	/**
 	 * Returning a value of 0 means the block is completely transparent. <br.
 	 * Returning a value of 15 means the block is completely opaque.
-	 * 
+	 *
 	 * @see LodUtil#BLOCK_FULLY_OPAQUE
 	 * @see LodUtil#BLOCK_FULLY_TRANSPARENT
 	 */
@@ -64,11 +64,12 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	default IBlockStateWrapper getPlantTopWithBottom(IBlockStateWrapper blockBelow) { return this; }
 
 	int getLightEmission();
-	
+
 	byte getMaterialId();
 
 	/**
 	 * What shape 1 block wide LODs should draw this block with.
+	 *
 	 * @see com.seibel.distanthorizons.core.util.RenderDataPointUtil#SHAPE_NONE
 	 */
 	default byte getLodShape() { return 0; }
@@ -76,19 +77,19 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	boolean isBeaconBlock();
 	/** IE a glass block that can affect the beacon beam color */
 	boolean isBeaconTintBlock();
-	/** 
+	/**
 	 * Returns true for any blocks that allow beacon beams to go through.
-	 * IE: glass, stairs, bedrock, chests, end portal frames, carpet, cake 
+	 * IE: glass, stairs, bedrock, chests, end portal frames, carpet, cake
 	 */
 	boolean allowsBeaconBeamPassage();
-	/** 
+	/**
 	 * The blocks used by a beacon's base
-	 * IE Iron, diamond, gold, etc. 
+	 * IE Iron, diamond, gold, etc.
 	 */
 	boolean isBeaconBaseBlock();
-	
+
 	boolean isIceBlock();
 
 	Color getBeaconTintColor();
-	
+
 }

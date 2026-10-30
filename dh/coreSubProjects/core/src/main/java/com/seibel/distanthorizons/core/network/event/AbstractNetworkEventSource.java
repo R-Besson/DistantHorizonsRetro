@@ -35,16 +35,20 @@ import com.seibel.distanthorizons.coreapi.ModInfo;
 import java.io.InvalidClassException;
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public abstract class AbstractNetworkEventSource
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
-			.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
-			.build();
-	
-	
+		.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
+		.build();
+
+
 	/**
 	 * Contains all message handlers. <br>
 	 * Grouped by: <br>
@@ -52,29 +56,29 @@ public abstract class AbstractNetworkEventSource
 	 * - {@link AbstractNetworkEventSource} <br>
 	 */
 	private final ConcurrentHashMap<
-			Class<? extends AbstractNetworkMessage>,
-			ConcurrentMap<AbstractNetworkEventSource, Set<INetworkMessageConsumer>>
-			> networkHandlerSetByMessageClass = new ConcurrentHashMap<>();
-	
-	
+		Class<? extends AbstractNetworkMessage>,
+		ConcurrentMap<AbstractNetworkEventSource, Set<INetworkMessageConsumer>>
+		> networkHandlerSetByMessageClass = new ConcurrentHashMap<>();
+
+
 	private final ConcurrentHashMap<Long, FutureResponseData> pendingFutureById = new ConcurrentHashMap<>();
 	/** automatically forgets about ID's after a set time span. */
 	private final Set<Long> cancelledFutureIdSet = Collections.newSetFromMap(
-			CacheBuilder.newBuilder()
+		CacheBuilder.newBuilder()
 			.expireAfterWrite(10, TimeUnit.SECONDS)
 			.<Long, Boolean>build()
 			.asMap());
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	protected void handleMessage(AbstractNetworkMessage message)
 	{
 		boolean handled = false;
-		
+
 		ConcurrentMap<AbstractNetworkEventSource, Set<INetworkMessageConsumer>> handlersByEventSource = this.networkHandlerSetByMessageClass.get(message.getClass());
 		if (handlersByEventSource != null)
 		{
@@ -87,16 +91,16 @@ public abstract class AbstractNetworkEventSource
 				}
 			}
 		}
-		
+
 		if (message instanceof AbstractTrackableMessage)
 		{
 			AbstractTrackableMessage trackableMessage = (AbstractTrackableMessage) message;
-			
+
 			FutureResponseData responseData = this.pendingFutureById.get(trackableMessage.futureId);
 			if (responseData != null)
 			{
 				handled = true;
-				
+
 				if (message instanceof ExceptionMessage)
 				{
 					responseData.future.completeExceptionally(((ExceptionMessage) message).exception);
@@ -115,33 +119,33 @@ public abstract class AbstractNetworkEventSource
 				handled = true;
 			}
 		}
-		
+
 		if (!handled && ModInfo.IS_DEV_BUILD)
 		{
 			LOGGER.warn("Unhandled message: [{}].", message);
 		}
 	}
-	
-	
-	
+
+
+
 	//==================//
 	// message handlers //
 	//==================//
-	
+
 	protected final <T extends AbstractNetworkMessage> void registerHandler(AbstractNetworkEventSource eventSource, Class<T> handlerClass, Consumer<T> handlerImplementation)
 	{
 		if (!AbstractInternalEvent.class.isAssignableFrom(handlerClass))
 		{
 			MessageRegistry.INSTANCE.getMessageId(handlerClass);
 		}
-		
+
 		//noinspection unchecked
 		this.networkHandlerSetByMessageClass
-				.computeIfAbsent(handlerClass, missingHandlerClass -> new ConcurrentHashMap<>())
-				.computeIfAbsent(eventSource, missingEventSource -> ConcurrentHashMap.newKeySet())
-				.add((m) -> handlerImplementation.accept((T) m));
+			.computeIfAbsent(handlerClass, missingHandlerClass -> new ConcurrentHashMap<>())
+			.computeIfAbsent(eventSource, missingEventSource -> ConcurrentHashMap.newKeySet())
+			.add((m) -> handlerImplementation.accept((T) m));
 	}
-	
+
 	protected void removeAllHandlers(AbstractNetworkEventSource eventSource)
 	{
 		for (ConcurrentMap<AbstractNetworkEventSource, Set<INetworkMessageConsumer>> handlerMap : this.networkHandlerSetByMessageClass.values())
@@ -149,13 +153,13 @@ public abstract class AbstractNetworkEventSource
 			handlerMap.remove(eventSource);
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// create message //
 	//================//
-	
+
 	protected <TResponse extends AbstractTrackableMessage> CompletableFuture<TResponse> createRequest(AbstractTrackableMessage msg, Class<TResponse> responseClass)
 	{
 		CompletableFuture<TResponse> responseFuture = new CompletableFuture<>();
@@ -166,24 +170,24 @@ public abstract class AbstractNetworkEventSource
 				this.cancelledFutureIdSet.add(msg.futureId);
 				msg.sendResponse(new CancelMessage());
 			}
-			
+
 			if (!(throwable instanceof SessionClosedException))
 			{
 				this.pendingFutureById.remove(msg.futureId);
 			}
 		});
-		
+
 		this.pendingFutureById.put(msg.futureId, new FutureResponseData(responseClass, responseFuture));
-		
+
 		return responseFuture;
 	}
-	
-	
-	
+
+
+
 	//==========//
 	// shutdown //
 	//==========//
-	
+
 	public void close()
 	{
 		this.networkHandlerSetByMessageClass.clear();
@@ -196,33 +200,34 @@ public abstract class AbstractNetworkEventSource
 			responseData.future.completeExceptionally(cause);
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	private static class FutureResponseData
 	{
 		public final Class<? extends AbstractTrackableMessage> responseClass;
 		public final CompletableFuture<AbstractTrackableMessage> future;
-		
+
 		private <T extends AbstractTrackableMessage> FutureResponseData(Class<T> responseClass, CompletableFuture<T> future)
 		{
 			this.responseClass = responseClass;
 			//noinspection unchecked
 			this.future = (CompletableFuture<AbstractTrackableMessage>) future;
 		}
-		
+
 	}
-	
+
 	/** Simple wrapper just to make the code here a bit more readable */
 	@FunctionalInterface
-	private interface INetworkMessageConsumer 
+	private interface INetworkMessageConsumer
 	{
 		void accept(AbstractNetworkMessage message);
+
 	}
-	
-	
+
+
 }

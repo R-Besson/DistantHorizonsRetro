@@ -8,10 +8,9 @@ import com.seibel.distanthorizons.api.objects.math.DhApiVec3d;
 import java.awt.*;
 
 /**
- * @see IDhApiRenderableBoxGroup
- * 
  * @author James Seibel
  * @version 2024-6-30
+ * @see IDhApiRenderableBoxGroup
  * @since API 3.0.0
  */
 public class DhApiRenderableBox
@@ -20,26 +19,26 @@ public class DhApiRenderableBox
 	public DhApiVec3d minPos;
 	/** the position closest to (+inf,+inf) */
 	public DhApiVec3d maxPos;
-	
+
 	public Color color;
 	/** @see EDhApiBlockMaterial */
 	public byte material;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public DhApiRenderableBox(DhApiVec3d minPos, float width, Color color, EDhApiBlockMaterial material)
 	{
 		this(minPos, new DhApiVec3d(
-				minPos.x + width,
-				minPos.y + width,
-				minPos.z + width
+			minPos.x + width,
+			minPos.y + width,
+			minPos.z + width
 		), color, material);
 	}
-	
+
 	public DhApiRenderableBox(DhApiVec3d minPos, DhApiVec3d maxPos, Color color, EDhApiBlockMaterial material)
 	{
 		this.minPos = minPos;
@@ -47,6 +46,6 @@ public class DhApiRenderableBox
 		this.color = color;
 		this.material = material.index;
 	}
-	
+
 }
-	
+

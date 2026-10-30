@@ -55,37 +55,37 @@ public interface IMinecraftRenderWrapper extends IBindable
 	DhVec3d getCameraExactPosition(DhVec3d output);
 
 	Color getFogColor();
-	
+
 	boolean isFogStateSpecial();
-	
+
 	Color getSkyColor();
-	
+
 	/** Measured in chunks */
 	int getRenderDistance();
-	
+
 	/**
 	 * The player's FOV, measured in degrees. <br>
 	 * Doesn't include FOV effects or zoom modifiers.
 	 */
 	double getFovSetting();
-	
+
 	int getFrameLimit();
-	
+
 	boolean mcRendersToFrameBuffer();
 	boolean runningLegacyOpenGL();
 	EDhApiDepthDirection getMcDepthDirection();
-	
+
 	/** @return -1 if no valid framebuffer is available yet */
 	int getTargetFramebuffer(); // Note: Iris is now hooking onto this for DH + Iris compat, try not to change (unless we wanna deal with some annoyances)
-								//          Iris commit: https://github.com/IrisShaders/Iris/commit/a76a240527e93780bbcba57c09bef377419d47a7#diff-7b9ded0c79bbcdb130010373387756a28ee8d3640d522c0a5b7acd0abbfc20aeR16
+	//          Iris commit: https://github.com/IrisShaders/Iris/commit/a76a240527e93780bbcba57c09bef377419d47a7#diff-7b9ded0c79bbcdb130010373387756a28ee8d3640d522c0a5b7acd0abbfc20aeR16
 	/** @return -1 if there was an issue or no texture exists */
 	int getGlDepthTextureId();
 	/** @return -1 if there was an issue or no texture exists */
 	int getGlColorTextureId();
 	int getTargetFramebufferViewportWidth();
 	int getTargetFramebufferViewportHeight();
-	
+
 	/** Can return null if the given level hasn't had a light map assigned to it */
 	ILightMapWrapper getLightmapWrapper();
-	
+
 }

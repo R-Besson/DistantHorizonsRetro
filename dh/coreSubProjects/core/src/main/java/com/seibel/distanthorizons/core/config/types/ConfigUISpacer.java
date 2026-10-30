@@ -30,12 +30,12 @@ public class ConfigUISpacer extends AbstractConfigBase<String>
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ConfigUISpacer()
 	{ super(EConfigEntryAppearance.ONLY_IN_GUI, ""); }
-	
-	
-	
+
+
+
 	//=========//
 	// setters //
 	//=========//
@@ -55,5 +55,5 @@ public class ConfigUISpacer extends AbstractConfigBase<String>
 		public ConfigUISpacer build() { return new ConfigUISpacer(); }
 
 	}
-	
+
 }

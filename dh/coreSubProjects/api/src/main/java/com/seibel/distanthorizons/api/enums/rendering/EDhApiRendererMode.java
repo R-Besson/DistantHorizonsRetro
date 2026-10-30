@@ -24,16 +24,16 @@ package com.seibel.distanthorizons.api.enums.rendering;
  * DEBUG_TRIANGLE <br>
  * DISABLED <br>
  *
- * @since API 2.0.0
  * @version 2026-03-23
+ * @since API 2.0.0
  */
 public enum EDhApiRendererMode
 {
 	DEFAULT,
 	DEBUG_TRIANGLE,
 	DISABLED;
-	
-	
+
+
 	/** Used by the config GUI to cycle through the available rendering options */
 	public static EDhApiRendererMode next(EDhApiRendererMode type)
 	{
@@ -47,7 +47,7 @@ public enum EDhApiRendererMode
 				return DEFAULT;
 		}
 	}
-	
+
 	/** Used by the config GUI to cycle through the available rendering options */
 	public static EDhApiRendererMode previous(EDhApiRendererMode type)
 	{
@@ -61,5 +61,5 @@ public enum EDhApiRendererMode
 				return DEBUG_TRIANGLE;
 		}
 	}
-	
+
 }

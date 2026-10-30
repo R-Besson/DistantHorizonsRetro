@@ -39,14 +39,14 @@ public interface INetworkObject
 	void encode(ByteBuf out);
 	/** Populates this object's from the given {@link ByteBuf} */
 	void decode(ByteBuf in);
-	
-	
-	
+
+
+
 	//========================//
 	// default/static methods //
 	//========================//
-	
-	/** 
+
+	/**
 	 * @param obj the empty object that will be populated by the incoming {@link ByteBuf}
 	 */
 	static <T extends INetworkObject> T decodeToInstance(T obj, ByteBuf inputByteBuf)
@@ -54,9 +54,9 @@ public interface INetworkObject
 		obj.decode(inputByteBuf);
 		return obj;
 	}
-	
-	
-	
+
+
+
 	@Contract("_, null -> false; _, !null -> true")
 	default boolean writeOptional(ByteBuf outputByteBuf, Object value)
 	{
@@ -64,18 +64,18 @@ public interface INetworkObject
 		outputByteBuf.writeBoolean(isNull);
 		return isNull;
 	}
-	
+
 	@Nullable
 	default <T> T readOptional(ByteBuf inputByteBuf, Supplier<T> decoder)
 	{
 		return inputByteBuf.readBoolean()
-				? decoder.get() 
-				: null;
+			? decoder.get()
+			: null;
 	}
-	
-	
+
+
 	// strings //
-	
+
 	default void writeString(String inputString, ByteBuf outputByteBuf) { INetworkObject.writeStringStatic(inputString, outputByteBuf); }
 	static void writeStringStatic(String inputString, ByteBuf outputByteBuf)
 	{
@@ -83,17 +83,17 @@ public interface INetworkObject
 		outputByteBuf.writeShort(bytes.length);
 		outputByteBuf.writeBytes(bytes);
 	}
-	
+
 	default String readString(ByteBuf inputByteBuf) { return INetworkObject.readStringStatic(inputByteBuf); }
 	static String readStringStatic(ByteBuf inputByteBuf)
 	{
 		int length = inputByteBuf.readUnsignedShort();
 		return inputByteBuf.readSlice(length).toString(StandardCharsets.UTF_8);
 	}
-	
-	
+
+
 	// collections //
-	
+
 	default void writeCollection(ByteBuf outputByteBuf, Collection<?> collection)
 	{
 		outputByteBuf.writeInt(collection.size());
@@ -107,39 +107,39 @@ public interface INetworkObject
 			codec.encode.accept(item, outputByteBuf);
 		}
 	}
-	
+
 	default <TCollection extends Collection<T>, T> TCollection readCollection(ByteBuf inputByteBuf, TCollection collection, Supplier<T> innerValueConstructor)
 	{
 		int size = inputByteBuf.readInt();
-		
+
 		Codec codec = null;
 		for (int i = 0; i < size; i++)
 		{
 			T item = innerValueConstructor.get();
-			
+
 			if (codec == null)
 			{
 				codec = Codec.getCodec(item.getClass());
 			}
 			//noinspection unchecked
 			item = (T) codec.decode.apply(item, inputByteBuf);
-			
+
 			collection.add(item);
 		}
-		
+
 		return collection;
 	}
 
-	
-	
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	/**
 	 * Defines (de)serialization for classes that cannot be directly edited,
 	 * specifically for primitives, Java and third-party library classes and other types.
-	 * <p> 
+	 * <p>
 	 * If you're able to edit the target class yourself, implement {@link INetworkObject} and use its methods where applicable instead.
 	 */
 	class Codec
@@ -147,57 +147,57 @@ public interface INetworkObject
 		private static final ConcurrentMap<Class<?>, Codec> CODEC_MAP = new ConcurrentHashMap<Class<?>, Codec>()
 		{{
 			// Primitives must be added manually here
-			this.put(Integer.class, new Codec((obj, outByteBuff) -> outByteBuff.writeInt((int)obj), (obj, inByteBuff) -> inByteBuff.readInt()));
+			this.put(Integer.class, new Codec((obj, outByteBuff) -> outByteBuff.writeInt((int) obj), (obj, inByteBuff) -> inByteBuff.readInt()));
 			this.put(Boolean.class, new Codec((obj, outByteBuff) -> outByteBuff.writeBoolean((boolean) obj), (obj, inByteBuff) -> inByteBuff.readBoolean()));
 			this.put(String.class, new Codec((obj, outByteBuff) -> INetworkObject.writeStringStatic((String) obj, outByteBuff), (obj, inByteBuff) -> INetworkObject.readStringStatic(inByteBuff)));
-			
+
 			this.put(INetworkObject.class, new Codec(INetworkObject::encode, INetworkObject::decodeToInstance));
 			this.put(Map.Entry.class, new Codec(
-					(obj, outByteBuff) -> 
-					{
-						Map.Entry<?, ?> entry = (Entry<?, ?>) obj;
-						getCodec(entry.getKey().getClass()).encode.accept(entry.getKey(), outByteBuff);
-						getCodec(entry.getValue().getClass()).encode.accept(entry.getValue(), outByteBuff);
-					},
-					(obj, inByteBuff) -> 
-					{
-						Map.Entry<?, ?> entry = (Entry<?, ?>) obj;
-						return new SimpleEntry<>(
-							getCodec(entry.getKey().getClass()).decode.apply(entry.getKey(), inByteBuff),
-							getCodec(entry.getValue().getClass()).decode.apply(entry.getValue(), inByteBuff)
-						);
-					}
+				(obj, outByteBuff) ->
+				{
+					Map.Entry<?, ?> entry = (Entry<?, ?>) obj;
+					getCodec(entry.getKey().getClass()).encode.accept(entry.getKey(), outByteBuff);
+					getCodec(entry.getValue().getClass()).encode.accept(entry.getValue(), outByteBuff);
+				},
+				(obj, inByteBuff) ->
+				{
+					Map.Entry<?, ?> entry = (Entry<?, ?>) obj;
+					return new SimpleEntry<>(
+						getCodec(entry.getKey().getClass()).decode.apply(entry.getKey(), inByteBuff),
+						getCodec(entry.getValue().getClass()).decode.apply(entry.getValue(), inByteBuff)
+					);
+				}
 			));
-			
+
 			this.put(Enum.class, new Codec(
 				(obj, outByteBuff) -> outByteBuff.writeByte(((Enum<?>) obj).ordinal()),
 				(obj, inByteBuff) -> ((Enum<?>) obj).getClass().getEnumConstants()[inByteBuff.readByte()]
 			));
 		}};
-		
-		
+
+
 		public final BiConsumer<Object, ByteBuf> encode;
 		public final BiFunction<Object, ByteBuf, Object> decode;
-		
-		
-		
+
+
+
 		//=============//
 		// constructor //
 		//=============//
-		
+
 		@SuppressWarnings("unchecked")
 		public <T> Codec(BiConsumer<T, ByteBuf> encode, BiFunction<T, ByteBuf, T> decode)
 		{
 			this.encode = (BiConsumer<Object, ByteBuf>) encode;
 			this.decode = (BiFunction<Object, ByteBuf, Object>) decode;
 		}
-		
-		
-		
+
+
+
 		//================//
 		// static methods //
 		//================//
-		
+
 		public static <T> Codec getCodec(Class<T> clazz)
 		{
 			return CODEC_MAP.computeIfAbsent(clazz, classToAdd -> {
@@ -210,10 +210,11 @@ public interface INetworkObject
 						return entry.getValue();
 					}
 				}
-				
+
 				throw new AssertionError("Class has no compatible codec: " + classToAdd.getSimpleName());
 			});
 		}
-		
+
 	}
+
 }

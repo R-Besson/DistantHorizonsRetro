@@ -14,7 +14,7 @@ import java.util.Set;
 public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 {
 	public static final Logger LOGGER = LogManager.getLogger("DistantHorizonsMixins");
-	
+
 	@Override
 	public void onLoad(String mixinPackage)
 	{
@@ -25,19 +25,19 @@ public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void acceptTargets(Set<String> myTargets, Set<String> otherTargets)
 	{
-		
+
 	}
-	
+
 	@Override
 	public List<String> getMixins()
 	{
@@ -45,7 +45,7 @@ public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 		// gets a chance to, so GTNHMixins' list would be dropped; supply it from here instead.
 		return IMixins.getEarlyMixins(Mixins.class, getLoadedTargetCoreMods());
 	}
-	
+
 	/** coremods are already on the classpath at this point, so checking for their class file is enough */
 	private static Set<String> getLoadedTargetCoreMods()
 	{
@@ -61,16 +61,16 @@ public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 		}
 		return loadedCoreMods;
 	}
-	
+
 	@Override
 	public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo)
 	{
-		
+
 	}
 	@Override
 	public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo)
 	{
-		
+
 	}
-	
+
 }

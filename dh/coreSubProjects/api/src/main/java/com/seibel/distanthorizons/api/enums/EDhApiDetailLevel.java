@@ -54,15 +54,15 @@ public enum EDhApiDetailLevel
 	 * width in Blocks: 512
 	 */
 	REGION(9, 512);
-	
-	
+
+
 	public final byte detailLevel;
 	public final byte widthInBlocks;
-	
+
 	EDhApiDetailLevel(int detailLevel, int widthInBlocks)
 	{
 		this.detailLevel = (byte) detailLevel;
 		this.widthInBlocks = (byte) widthInBlocks;
 	}
-	
+
 }

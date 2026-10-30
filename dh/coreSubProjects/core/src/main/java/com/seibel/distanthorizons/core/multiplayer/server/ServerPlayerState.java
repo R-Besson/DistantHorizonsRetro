@@ -27,65 +27,65 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerPlayerState implements Closeable
 {
 	private final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
-	
+
 	private final SessionConfig.AnyChangeListener configAnyChangeListener = new SessionConfig.AnyChangeListener(this::sendConfigMessage);
-	
+
 	private final String serverKeyWithoutId = Config.Server.serverKey.get();
 	private final String serverKey = (this.serverKeyWithoutId.isEmpty() ? "" : Config.Server.serverId.get() + "_" + this.serverKeyWithoutId.trim())
-			.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
-			.replace(" ", "_");
-	
-	
+		.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
+		.replace(" ", "_");
+
+
 	public final NetworkSession networkSession;
 	public IServerPlayerWrapper getServerPlayer() { return this.networkSession.serverPlayer; }
-	
+
 	@NotNull
 	public final SessionConfig sessionConfig = new SessionConfig();
 	public boolean isReady() { return this.sessionConfig.constrainingConfig != null; }
-	
+
 	public final FullDataPayloadSender fullDataPayloadSender;
-	
+
 	private final ConcurrentHashMap<AbstractDhServerLevel, RateLimiterSet> rateLimiterSets = new ConcurrentHashMap<>();
 	public RateLimiterSet getRateLimiterSet(AbstractDhServerLevel level) { return this.rateLimiterSets.computeIfAbsent(level, levelKey -> new RateLimiterSet()); }
-	
-	
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public ServerPlayerState(IServerPlayerWrapper serverPlayer, SharedBandwidthLimit sharedBandwidthLimit)
 	{
 		this.networkSession = new NetworkSession(serverPlayer);
 		this.fullDataPayloadSender = new FullDataPayloadSender(this.networkSession, this.sessionConfig::getPlayerBandwidthLimit, sharedBandwidthLimit);
-		
+
 		this.networkSession.registerHandler(SessionConfigMessage.class, (sessionConfigMessage) ->
 		{
 			this.sessionConfig.constrainingConfig = sessionConfigMessage.config;
 			this.sendConfigMessage();
 		});
-		
+
 		this.networkSession.registerHandler(RequestLevelInitMessage.class, msg ->
 		{
 			if (!Config.Server.sendLevelKeys.get())
 			{
 				return;
 			}
-			
+
 			IServerLevelWrapper serverLevelWrapper = MC_SHARED.getLevelWrapper(msg.dimensionResourceLocation);
 			if (serverLevelWrapper == null)
 			{
 				return;
 			}
-			
+
 			String levelKey = serverLevelWrapper.getKeyedLevelDimensionName();
 			this.networkSession.sendMessage(new LevelInitMessage(msg.dimensionResourceLocation, this.serverKey, levelKey));
 		});
-		
-		
+
+
 		this.networkSession.registerHandler(CloseInternalEvent.class, event -> {
 			// No-op. prevents "Unhandled message" log entries
 		});
-		
+
 		this.networkSession.registerHandler(IncompatibleMessageInternalEvent.class, event ->
 		{
 			// Client won't understand this message, but it's still enough to display incompatible protocol error
@@ -93,28 +93,28 @@ public class ServerPlayerState implements Closeable
 			this.close();
 		});
 	}
-	
-	
-	
+
+
+
 	//=================//
 	// client updating //
 	//=================//
-	
+
 	private void sendConfigMessage()
 	{
 		double coordinateScale = this.getServerPlayer().getLevel().getDimensionType().getCoordinateScale();
 		this.sessionConfig.constrainValue(Config.Common.WorldGenerator.generationCenterChunkX, (int) (Config.Common.WorldGenerator.generationCenterChunkX.get() / coordinateScale));
 		this.sessionConfig.constrainValue(Config.Common.WorldGenerator.generationCenterChunkZ, (int) (Config.Common.WorldGenerator.generationCenterChunkZ.get() / coordinateScale));
-		
+
 		this.networkSession.sendMessage(new SessionConfigMessage(this.sessionConfig));
 	}
-	
-	
-	
+
+
+
 	//==========//
 	// shutdown //
 	//==========//
-	
+
 	@Override
 	public void close()
 	{
@@ -122,25 +122,25 @@ public class ServerPlayerState implements Closeable
 		this.configAnyChangeListener.close();
 		this.networkSession.close();
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	public class RateLimiterSet
 	{
 		public final SupplierBasedRateAndConcurrencyLimiter<FullDataSourceRequestMessage> generationRequestRateLimiter = new SupplierBasedRateAndConcurrencyLimiter<>(
-				() -> Config.Server.generationRequestRateLimit.get(),
-				msg -> msg.sendResponse(new RateLimitedException("Full data request rate limit: " + ServerPlayerState.this.sessionConfig.getGenerationRequestRateLimit()))
+			() -> Config.Server.generationRequestRateLimit.get(),
+			msg -> msg.sendResponse(new RateLimitedException("Full data request rate limit: " + ServerPlayerState.this.sessionConfig.getGenerationRequestRateLimit()))
 		);
-		
+
 		public final SupplierBasedRateAndConcurrencyLimiter<FullDataSourceRequestMessage> syncOnLoginRateLimiter = new SupplierBasedRateAndConcurrencyLimiter<>(
-				() -> Config.Server.syncOnLoadRateLimit.get(),
-				msg -> msg.sendResponse(new RateLimitedException("Sync on login rate limit: " + ServerPlayerState.this.sessionConfig.getSyncOnLoginRateLimit()))
+			() -> Config.Server.syncOnLoadRateLimit.get(),
+			msg -> msg.sendResponse(new RateLimitedException("Sync on login rate limit: " + ServerPlayerState.this.sessionConfig.getSyncOnLoginRateLimit()))
 		);
-		
+
 	}
-	
+
 }

@@ -26,11 +26,11 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrap
 public interface IDhGenericRenderer extends IDhApiCustomRenderRegister, AutoCloseable
 {
 	void render(RenderParams renderEventParam, IProfilerWrapper profiler, boolean renderingWithSsao);
-	
+
 	String getVboRenderDebugMenuString();
-	
+
 	@Override void close(); // override to remove "throws exception"
-	
-	
-	
+
+
+
 }

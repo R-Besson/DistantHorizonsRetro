@@ -25,21 +25,22 @@ public interface IProfilerWrapper extends IBindable
 {
 	IProfileBlock push(String newSection);
 	void popPush(String newSection);
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	/** used to auto-pop blocks to prevent accidentally unevenly pushing/popping */
 	interface IProfileBlock extends AutoCloseable
 	{
 		@Override void close();
+
 	}
-	
+
 	//endregion
-	
-	
+
+
 }

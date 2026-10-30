@@ -16,21 +16,21 @@ public class ServerPlayerStateManager implements AutoCloseable
 {
 	private final ConcurrentMap<IServerPlayerWrapper, ServerPlayerState> connectedPlayerStateByPlayerWrapper = new ConcurrentHashMap<>();
 	private final ConcurrentMap<IServerPlayerWrapper, MessageQueueState> messageQueueByPlayerWrapper = new ConcurrentHashMap<>();
-	
+
 	private final SharedBandwidthLimit sharedBandwidthLimit = new SharedBandwidthLimit();
-	
-	
+
+
 	//========================//
 	// player joining/leaving //
 	//========================//
-	
+
 	public ServerPlayerState registerJoinedPlayer(IServerPlayerWrapper serverPlayer)
 	{
 		ServerPlayerState playerState = new ServerPlayerState(serverPlayer, this.sharedBandwidthLimit);
 		this.connectedPlayerStateByPlayerWrapper.put(serverPlayer, playerState);
 		return playerState;
 	}
-	
+
 	public void unregisterLeftPlayer(IServerPlayerWrapper serverPlayer)
 	{
 		// the queue holds the player wrapper (and through it the player), a rejoining player gets a new wrapper
@@ -42,13 +42,13 @@ public class ServerPlayerStateManager implements AutoCloseable
 			playerState.close();
 		}
 	}
-	
-	
-	
+
+
+
 	//==========//
 	// messages //
 	//==========//
-	
+
 	public void handlePluginMessage(IServerPlayerWrapper player, AbstractNetworkMessage message)
 	{
 		// done to prevent a rare null-pointer on Neo/Forge
@@ -56,60 +56,60 @@ public class ServerPlayerStateManager implements AutoCloseable
 		{
 			return;
 		}
-		
-		
+
+
 		MessageQueueState messageQueue = this.messageQueueByPlayerWrapper.computeIfAbsent(player, k -> new MessageQueueState());
 		messageQueue.messageQueue.add(message);
-		
+
 		ServerPlayerState playerState = this.connectedPlayerStateByPlayerWrapper.get(player);
 		if (playerState != null)
 		{
 			this.handlePluginMessagesFromQueue(playerState, messageQueue);
 		}
 	}
-	
+
 	public void handlePluginMessagesFromQueue(ServerPlayerState playerState)
 	{
 		MessageQueueState messageQueue = this.messageQueueByPlayerWrapper.computeIfAbsent(playerState.getServerPlayer(), k -> new MessageQueueState());
 		this.handlePluginMessagesFromQueue(playerState, messageQueue);
 	}
-	
+
 	private void handlePluginMessagesFromQueue(ServerPlayerState playerState, MessageQueueState messageQueueState)
 	{
 		while (!messageQueueState.messageQueue.isEmpty() && messageQueueState.isBeingDrained.compareAndSet(false, true))
 		{
 			AbstractNetworkMessage message = messageQueueState.messageQueue.poll();
 			playerState.networkSession.tryHandleMessage(message);
-			
+
 			messageQueueState.isBeingDrained.set(false);
 		}
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
-	
+
 	@Nullable
 	public ServerPlayerState getConnectedPlayer(IServerPlayerWrapper player) { return this.connectedPlayerStateByPlayerWrapper.get(player); }
 	public Collection<ServerPlayerState> getConnectedPlayers() { return this.connectedPlayerStateByPlayerWrapper.values(); }
 	public Iterable<ServerPlayerState> getReadyPlayers() { return this.getConnectedPlayers().stream().filter(ServerPlayerState::isReady)::iterator; }
-	
-	
+
+
 	private static class MessageQueueState
 	{
 		public final Queue<AbstractNetworkMessage> messageQueue = new ConcurrentLinkedQueue<>();
 		public final AtomicBoolean isBeingDrained = new AtomicBoolean();
-		
+
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	/** closes the state (and event handlers) of players still connected when the world closes */
 	@Override
 	public void close()
@@ -119,6 +119,6 @@ public class ServerPlayerStateManager implements AutoCloseable
 			this.unregisterLeftPlayer(playerWrapper);
 		}
 	}
-	
-	
+
+
 }

@@ -247,7 +247,7 @@ public class ShaderPackLodTextures
 
 	/**
 	 * @return true if the last loaded shader pack dithers vanilla terrain out by its "far" uniform
-	 *         and draws LODs past it (Complementary with TAA on, see VANILLA_SHOWN_FUNCTION)
+	 * and draws LODs past it (Complementary with TAA on, see VANILLA_SHOWN_FUNCTION)
 	 */
 	public static boolean isVanillaTerrainFadedAtFar() { return vanillaTerrainFadedAtFar; }
 

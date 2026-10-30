@@ -45,7 +45,7 @@ public interface IDhApiFarFogConfig extends IDhApiConfigGroup
 	 * 1.0 = fog starts at the edge of the fake chunk render distance <br>
 	 */
 	IDhApiConfigValue<Float> farFogStartDistance();
-	
+
 	/**
 	 * Defines where the fog ends as a percent of the radius
 	 * of the fake chunks render distance. <br>
@@ -55,17 +55,17 @@ public interface IDhApiFarFogConfig extends IDhApiConfigGroup
 	 * 1.0 = fog ends at the edge of the fake chunk render distance <br>
 	 */
 	IDhApiConfigValue<Float> farFogEndDistance();
-	
+
 	/** Defines how opaque the fog is at its thinnest point. */
 	IDhApiConfigValue<Float> farFogMinThickness();
-	
+
 	/** Defines how opaque the fog is at its thickest point. */
 	IDhApiConfigValue<Float> farFogMaxThickness();
-	
+
 	/** Defines how the fog changes in thickness. */
 	IDhApiConfigValue<EDhApiFogFalloff> farFogFalloff();
-	
+
 	/** Defines the fog density. */
 	IDhApiConfigValue<Float> farFogDensity();
-	
+
 }

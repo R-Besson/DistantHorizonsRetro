@@ -40,38 +40,38 @@ import java.util.function.LongConsumer;
  */
 public class QuadTree<T>
 {
-	
-	
-	/** 
+
+
+	/**
 	 * The largest numerical detail level this tree supports. <br>
 	 * IE: the detail level used by the root nodes.
 	 */
 	public final byte treeRootDetailLevel;
-	/** 
-	 * The smallest numerical detail level this tree supports. <br> 
+	/**
+	 * The smallest numerical detail level this tree supports. <br>
 	 * IE: the detail level used by the leaf nodes.
 	 */
 	public final byte treeLeafDetailLevel;
-	
+
 	private final int diameterInBlocks;
-	
+
 	/** contain the actual data in the quad tree structure */
 	private final MovableGridRingList<QuadNode<T>> topRingList;
-	
+
 	private DhBlockPos2D centerBlockPos;
-	/** 
+	/**
 	 * defines how many blocks the center needs to move in blocks
 	 * before we check for out-of-bound nodes.
 	 */
 	private final int blockDistanceForNodeClearing;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	/**
 	 * Constructor of the quadTree
 	 *
@@ -84,30 +84,30 @@ public class QuadTree<T>
 		this.centerBlockPos = centerBlockPos;
 		this.diameterInBlocks = diameterInBlocks;
 		this.blockDistanceForNodeClearing = blockDistanceForNodeClearing;
-		
+
 		this.treeLeafDetailLevel = treeLeafDetailLevel;
 		// the min detail level must be greater than 0 (to prevent divide by 0 errors) and greater than the maximum detail level
 		this.treeRootDetailLevel = (byte) Math.max(Math.max(1, this.treeLeafDetailLevel), MathUtil.log2(diameterInBlocks));
-		
+
 		int halfSizeInRootNodes = Math.floorDiv(this.diameterInBlocks, 2) / BitShiftUtil.powerOfTwo(this.treeRootDetailLevel);
-		halfSizeInRootNodes = halfSizeInRootNodes + 1; // always add 1 so nodes will always have a parent, even if the tree's center is offset from the root node grid 
-		
+		halfSizeInRootNodes = halfSizeInRootNodes + 1; // always add 1 so nodes will always have a parent, even if the tree's center is offset from the root node grid
+
 		MovableGridRingList.Pos2D ringListCenterPos = new MovableGridRingList.Pos2D(
-				BitShiftUtil.divideByPowerOfTwo(this.centerBlockPos.x, this.treeRootDetailLevel),
-				BitShiftUtil.divideByPowerOfTwo(this.centerBlockPos.z, this.treeRootDetailLevel));
+			BitShiftUtil.divideByPowerOfTwo(this.centerBlockPos.x, this.treeRootDetailLevel),
+			BitShiftUtil.divideByPowerOfTwo(this.centerBlockPos.z, this.treeRootDetailLevel));
 		this.topRingList = new MovableGridRingList<>(halfSizeInRootNodes, ringListCenterPos.getX(), ringListCenterPos.getY());
-		
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// property getters //
 	//==================//
 	//region
-	
+
 	/** @return the number of non-null nodes in the tree */
 	public int nodeCount()
 	{
@@ -118,7 +118,7 @@ public class QuadTree<T>
 			{
 				continue;
 			}
-			
+
 			Iterator<QuadNode<T>> nodeIterator = node.getNodeIterator();
 			while (nodeIterator.hasNext())
 			{
@@ -128,10 +128,10 @@ public class QuadTree<T>
 				}
 			}
 		}
-		
+
 		return count;
 	}
-	
+
 	/** @return the number of leaf nodes in the tree */
 	public int leafNodeCount()
 	{
@@ -142,7 +142,7 @@ public class QuadTree<T>
 			{
 				continue;
 			}
-			
+
 			Iterator<QuadNode<T>> leafNodeIterator = rootNode.getLeafNodeIterator();
 			while (leafNodeIterator.hasNext())
 			{
@@ -154,29 +154,29 @@ public class QuadTree<T>
 				}
 			}
 		}
-		
+
 		return count;
 	}
-	
-	
+
+
 	/**
-	 * A tree will always have 9 root nodes, 
+	 * A tree will always have 9 root nodes,
 	 * this is because the tree will grow all the way up to the top where it is a 3x3 grid.
 	 * If this is ever changed then these values must also change
 	 *
 	 */
 	public int ringListWidth() { return 3; }
 	public int diameterInBlocks() { return this.diameterInBlocks; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==========================//
 	// node getters and setters //
 	//==========================//
 	//region
-	
+
 	/** @return the value at the given section position. Null will be returned if the value is missing or the position is out of bounds. */
 	@Nullable
 	public final T tryGetValue(long pos)
@@ -188,16 +188,16 @@ public class QuadTree<T>
 		}
 		return null;
 	}
-	
+
 	/** @return the node at the given section position, null if out of bounds */
 	@Nullable
 	public final QuadNode<T> tryGetNode(long pos) { return this.getOrSetNode(pos, false, null, false); }
-	
-	
+
+
 	/** @return the node at the given section position */
 	@Nullable
 	public final QuadNode<T> getNode(long pos) throws IndexOutOfBoundsException { return this.getOrSetNode(pos, false, null, true); }
-	
+
 	/** @return the value at the given section position */
 	@Nullable
 	public final T getValue(long pos) throws IndexOutOfBoundsException
@@ -209,7 +209,7 @@ public class QuadTree<T>
 		}
 		return null;
 	}
-	
+
 	/** @return the value that was previously in the given position, null if nothing */
 	@Nullable
 	public final T setValue(long pos, T value) throws IndexOutOfBoundsException
@@ -218,7 +218,7 @@ public class QuadTree<T>
 		this.getOrSetNode(pos, true, value, true);
 		return previousValue;
 	}
-	
+
 	/** @param throwIfOutOfBounds if false returns null */
 	@Nullable
 	protected final QuadNode<T> getOrSetNode(long pos, boolean setNewValue, T newValue, boolean throwIfOutOfBounds) throws IndexOutOfBoundsException
@@ -238,13 +238,13 @@ public class QuadTree<T>
 				return null;
 			}
 		}
-		
-		
-		
+
+
+
 		long rootPos = DhSectionPos.convertToDetailLevel(pos, this.treeRootDetailLevel);
 		int ringListPosX = DhSectionPos.getX(rootPos);
 		int ringListPosZ = DhSectionPos.getZ(rootPos);
-		
+
 		QuadNode<T> rootQuadNode = this.topRingList.get(ringListPosX, ringListPosZ);
 		if (rootQuadNode == null)
 		{
@@ -252,21 +252,21 @@ public class QuadTree<T>
 			{
 				return null;
 			}
-			
+
 			rootQuadNode = new QuadNode<>(rootPos, this.treeLeafDetailLevel);
 			boolean successfullyAdded = this.topRingList.set(ringListPosX, ringListPosZ, rootQuadNode);
 			if (!successfullyAdded)
 			{
-				LodUtil.assertNotReach("Failed to add root quadTree node at position: ["+DhSectionPos.toString(rootPos)+"]");
+				LodUtil.assertNotReach("Failed to add root quadTree node at position: [" + DhSectionPos.toString(rootPos) + "]");
 			}
 		}
-		
+
 		if (!DhSectionPos.contains(rootQuadNode.sectionPos, pos))
 		{
 			LodUtil.assertNotReach("failed to get a root node that contains the input position: " + pos + " root node pos: " + rootQuadNode.sectionPos);
 		}
-		
-		
+
+
 		QuadNode<T> returnNode = rootQuadNode.getNode(pos);
 		if (setNewValue)
 		{
@@ -274,7 +274,7 @@ public class QuadTree<T>
 		}
 		return returnNode;
 	}
-	
+
 	public boolean isSectionPosInBounds(long testPos)
 	{
 		// check if the testPos is within the detail level limits of the tree
@@ -283,16 +283,16 @@ public class QuadTree<T>
 		{
 			return false;
 		}
-		
-		
+
+
 		// check if the testPos is within the X,Z boundary of the tree
 		DhBlockPos2D treeBlockCorner = this.centerBlockPos.add(new DhBlockPos2D(-this.diameterInBlocks / 2, -this.diameterInBlocks / 2));
 		long treeCornerPos = DhSectionPos.encode((byte) 0, treeBlockCorner.x, treeBlockCorner.z);
-		
+
 		long inputSectionCorner = DhSectionPos.convertToDetailLevel(testPos, (byte) 0);
 		long inputCornerPos = DhSectionPos.encode((byte) 0, DhSectionPos.getX(inputSectionCorner), DhSectionPos.getZ(inputSectionCorner));
 		int inputBlockWidth = BitShiftUtil.powerOfTwo(DhSectionPos.getDetailLevel(testPos));
-		
+
 		return DoSquaresOverlap(treeCornerPos, this.diameterInBlocks, inputCornerPos, inputBlockWidth);
 	}
 	private static boolean DoSquaresOverlap(long square1Min, int square1Width, long square2Min, int square2Width)
@@ -302,54 +302,54 @@ public class QuadTree<T>
 		float rect1MaxX = DhSectionPos.getX(square1Min) + square1Width;
 		float rect1MinZ = DhSectionPos.getZ(square1Min);
 		float rect1MaxZ = DhSectionPos.getZ(square1Min) + square1Width;
-		
+
 		float rect2MinX = DhSectionPos.getX(square2Min);
 		float rect2MaxX = DhSectionPos.getX(square2Min) + square2Width;
 		float rect2MinZ = DhSectionPos.getZ(square2Min);
 		float rect2MaxZ = DhSectionPos.getZ(square2Min) + square2Width;
-		
+
 		// Check if the squares overlap
 		return
-				rect1MinX < rect2MaxX &&
-						rect1MaxX > rect2MinX &&
-						rect1MinZ < rect2MaxZ &&
-						rect1MaxZ > rect2MinZ;
+			rect1MinX < rect2MaxX &&
+				rect1MaxX > rect2MinX &&
+				rect1MinZ < rect2MaxZ &&
+				rect1MaxZ > rect2MinZ;
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// iterators //
 	//===========//
 	//region
-	
+
 	/** can include null nodes */
 	public LongIterator rootNodePosIterator() { return new QuadTreeRootPosIterator(true, null); }
-	
+
 	/** @see INodeIteratorStoppingFunc */
 	public Iterator<QuadNode<T>> nodeIteratorWithStoppingFilter(INodeIteratorStoppingFunc<T> stoppingFilterFunc) { return new QuadTreeNodeIterator(false, stoppingFilterFunc); }
 	public Iterator<QuadNode<T>> nodeIterator() { return new QuadTreeNodeIterator(false, null); }
 	public Iterator<QuadNode<T>> leafNodeIterator() { return new QuadTreeNodeIterator(true, null); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// get/set center //
 	//================//
 	//region
-	
+
 	public void setCenterBlockPos(DhBlockPos2D newCenterPos) { this.setCenterBlockPos(newCenterPos, null, null); }
 	/**
 	 * @param removedConsumer fired when a root node is completely removed from the underlying data structure
 	 * @param mutateOutOfBoundConsumer fired when a child node is out of bounds, but not removed from the underlying data structure
 	 */
 	public void setCenterBlockPos(
-		DhBlockPos2D newCenterPos, 
-		@Nullable Consumer<? super T> removedConsumer, 
+		DhBlockPos2D newCenterPos,
+		@Nullable Consumer<? super T> removedConsumer,
 		@Nullable Consumer<? super T> mutateOutOfBoundConsumer)
 	{
 		// did we move significantly?
@@ -361,7 +361,7 @@ public class QuadTree<T>
 		{
 			ringListMoved = true;
 		}
-		
+
 		// did we move a little bit?
 		boolean recalculateOutOfBoundNodes = false;
 		int centerBlockDistance = this.centerBlockPos.manhattanDist(newCenterPos);
@@ -369,7 +369,7 @@ public class QuadTree<T>
 		{
 			recalculateOutOfBoundNodes = true;
 		}
-		
+
 		if (!ringListMoved
 			&& !recalculateOutOfBoundNodes)
 		{
@@ -377,31 +377,31 @@ public class QuadTree<T>
 			// to re-calculate anything
 			return;
 		}
-		
-		
-		
+
+
+
 		this.centerBlockPos = newCenterPos;
-		
+
 		// remove out of bound root nodes
 		this.topRingList.moveTo(newCenterPosX, newCenterPosZ, (quadNode) ->
 		{
 			if (quadNode != null)
 			{
 				quadNode.deleteAllChildren(removedConsumer);
-				
+
 				if (removedConsumer != null)
 				{
 					removedConsumer.accept(quadNode.value);
 				}
 			}
 		});
-		
+
 		// mutate out of bound child nodes
 		this.topRingList.forEach((rootNode) ->
-                this.mutateOutOfBoundChildNodes(rootNode, mutateOutOfBoundConsumer));
+			this.mutateOutOfBoundChildNodes(rootNode, mutateOutOfBoundConsumer));
 	}
-	/** 
-	 * we don't want to actually remove nodes or node data 
+	/**
+	 * we don't want to actually remove nodes or node data
 	 * since that can cause the {@link LodQuadTree} to
 	 * flash low-detail LODs when moving into previously-loaded
 	 * LODs, which is really disorienting.
@@ -413,7 +413,7 @@ public class QuadTree<T>
 		{
 			return;
 		}
-		
+
 		// go over each child node
 		for (int i = 0; i < 4; i++)
 		{
@@ -424,10 +424,10 @@ public class QuadTree<T>
 				// no need to go any deeper if this node is already empty
 				continue;
 			}
-			
+
 			// mutate nodes from the bottom up
 			this.mutateOutOfBoundChildNodes(childNode, mutateOutOfBoundConsumer);
-			
+
 			// mutate this node if out of bounds
 			if (!this.isSectionPosInBounds(childNode.sectionPos))
 			{
@@ -438,57 +438,58 @@ public class QuadTree<T>
 			}
 		}
 	}
-	
+
 	public final DhBlockPos2D getCenterBlockPos() { return this.centerBlockPos; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// base methods //
 	//==============//
 	//region
-	
+
 	@Override
-	public String toString() 
-	{ 
-		return "center block: " + this.centerBlockPos + 
-				", block width: " + this.diameterInBlocks + 
-				", detail level range: [" + this.treeLeafDetailLevel + "-" + this.treeRootDetailLevel + "], " +
-				"leaf #: " + this.leafNodeCount(); 
+	public String toString()
+	{
+		return "center block: " + this.centerBlockPos +
+			", block width: " + this.diameterInBlocks +
+			", detail level range: [" + this.treeLeafDetailLevel + "-" + this.treeRootDetailLevel + "], " +
+			"leaf #: " + this.leafNodeCount();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// iterator classes //
 	//==================//
 	//region
-	
-	/** @see INodeIteratorStoppingFunc#iteratorShouldStop(QuadNode)  */
+
+	/** @see INodeIteratorStoppingFunc#iteratorShouldStop(QuadNode) */
 	@FunctionalInterface
 	public interface INodeIteratorStoppingFunc<T>
 	{
 		/** if this function returns true then the iterator will stop walking down the tree */
 		boolean iteratorShouldStop(QuadNode<T> node);
+
 	}
-	
+
 	private class QuadTreeRootPosIterator implements LongIterator
 	{
 		private final LongArrayFIFOQueue iteratorPosQueue;
 		@Nullable
 		private final INodeIteratorStoppingFunc<T> stopIteratingFunc;
-		
-		
-		
+
+
+
 		public QuadTreeRootPosIterator(boolean includeNullNodes, @Nullable INodeIteratorStoppingFunc<T> stopIteratingFunc)
 		{
 			this.iteratorPosQueue = new LongArrayFIFOQueue();
 			this.stopIteratingFunc = stopIteratingFunc;
-			
+
 			QuadTree.this.topRingList.forEachPosOrdered((node, pos2D) ->
 			{
 				if (this.stopIteratingFunc != null
@@ -496,8 +497,8 @@ public class QuadTree<T>
 				{
 					return;
 				}
-				
-				if (node != null 
+
+				if (node != null
 					|| includeNullNodes)
 				{
 					long rootPos = DhSectionPos.encode(QuadTree.this.treeRootDetailLevel, pos2D.getX(), pos2D.getY());
@@ -508,12 +509,12 @@ public class QuadTree<T>
 				}
 			});
 		}// constructor
-		
-		
-		
+
+
+
 		@Override
 		public boolean hasNext() { return !this.iteratorPosQueue.isEmpty(); }
-		
+
 		@Override
 		public long nextLong()
 		{
@@ -523,85 +524,85 @@ public class QuadTree<T>
 			}
 
 
-            return this.iteratorPosQueue.dequeueLong();
+			return this.iteratorPosQueue.dequeueLong();
 		}
-		
-		
+
+
 		/** Unimplemented */
 		@Override
 		public void remove() { throw new UnsupportedOperationException("remove"); }
-		
+
 		@Override
 		public void forEachRemaining(LongConsumer action) { LongIterator.super.forEachRemaining(action); }
-		
+
 	}
-	
+
 	private class QuadTreeNodeIterator implements Iterator<QuadNode<T>>
 	{
 		private final QuadTreeRootPosIterator rootNodePosIterator;
 		private Iterator<QuadNode<T>> currentNodeIterator;
-		
+
 		private QuadNode<T> lastNode = null;
-		
+
 		private final boolean onlyReturnLeaves;
 		@Nullable
 		private final INodeIteratorStoppingFunc<T> stopIteratingFunc;
-		
-		
-		
+
+
+
 		public QuadTreeNodeIterator(boolean onlyReturnLeaves, @Nullable INodeIteratorStoppingFunc<T> stopIteratingFunc)
 		{
 			this.rootNodePosIterator = new QuadTreeRootPosIterator(false, stopIteratingFunc);
 			this.onlyReturnLeaves = onlyReturnLeaves;
-			
+
 			this.stopIteratingFunc = stopIteratingFunc;
 		}
-		
-		
-		
+
+
+
 		@Override
 		public boolean hasNext()
 		{
-			if (!this.rootNodePosIterator.hasNext() 
-				&& this.currentNodeIterator != null 
+			if (!this.rootNodePosIterator.hasNext()
+				&& this.currentNodeIterator != null
 				&& !this.currentNodeIterator.hasNext())
 			{
 				return false;
 			}
-			
-			
-			if (this.currentNodeIterator == null 
+
+
+			if (this.currentNodeIterator == null
 				|| !this.currentNodeIterator.hasNext())
 			{
 				this.currentNodeIterator = this.getNextChildNodeIterator();
 			}
-			
+
 			return this.currentNodeIterator != null && this.currentNodeIterator.hasNext();
 		}
-		
+
 		@Override
 		public QuadNode<T> next()
 		{
-			if (this.currentNodeIterator == null 
+			if (this.currentNodeIterator == null
 				|| !this.currentNodeIterator.hasNext())
 			{
 				this.currentNodeIterator = this.getNextChildNodeIterator();
 			}
-			
-			
+
+
 			this.lastNode = this.currentNodeIterator.next();
 			return this.lastNode;
 		}
-		
+
 		/** @return null if no new iterator could be found */
 		private Iterator<QuadNode<T>> getNextChildNodeIterator()
 		{
 			Iterator<QuadNode<T>> nodeIterator = null;
-			while ((nodeIterator == null || !nodeIterator.hasNext()) 
-					&& this.rootNodePosIterator.hasNext())
+			while ((nodeIterator == null || !nodeIterator.hasNext())
+				&& this.rootNodePosIterator.hasNext())
 			{
 				long sectionPos = this.rootNodePosIterator.nextLong();
-				
+
 				// try-get to prevent concurrency errors if the tree is being moved while we walk through it
 				QuadNode<T> rootNode = QuadTree.this.tryGetNode(sectionPos);
 				if (rootNode != null)
@@ -611,8 +612,8 @@ public class QuadTree<T>
 			}
 			return nodeIterator;
 		}
-		
-		
+
+
 		@Override
 		public void remove()
 		{
@@ -620,21 +621,21 @@ public class QuadTree<T>
 			{
 				throw new NoSuchElementException("No last node found.");
 			}
-			
-			
+
+
 			QuadNode<T> node = QuadTree.this.getOrSetNode(this.lastNode.sectionPos, true, null, false);
 			if (node != null)
 			{
 				node.deleteAllChildren();
 			}
 		}
-		
+
 		@Override
 		public void forEachRemaining(Consumer<? super QuadNode<T>> action) { Iterator.super.forEachRemaining(action); }
-		
+
 	}
-	
+
 	//endregion
-	
-	
+
+
 }

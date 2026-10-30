@@ -42,76 +42,76 @@ public class GlShaderProgram
 {
 	/** Stores the handle of the program. */
 	public final int id;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	public GlShaderProgram(String vertResourcePath, String fragResourcePath, String attribute) { this(vertResourcePath, fragResourcePath, new String[]{ attribute }); }
+
+	public GlShaderProgram(String vertResourcePath, String fragResourcePath, String attribute) { this(vertResourcePath, fragResourcePath, new String[]{attribute}); }
 	/**
-	 * @param vertResourcePath the relative path the vertex shader should be found 
-	 * @param fragResourcePath the relative path the fragment shader should be found 
+	 * @param vertResourcePath the relative path the vertex shader should be found
+	 * @param fragResourcePath the relative path the fragment shader should be found
 	 */
 	public GlShaderProgram(String vertResourcePath, String fragResourcePath, String[] attributes)
 	{
 		this.id = LWJGL.glCreateProgram();
-		
+
 		{
 			String shaderString = GlShader.loadFile(vertResourcePath, false);
 			GlShader vertShader = new GlShader(GL20.GL_VERTEX_SHADER, shaderString);
 			LWJGL.glAttachShader(this.id, vertShader.id);
 			vertShader.free();
 		}
-		
+
 		{
 			String shaderString = GlShader.loadFile(fragResourcePath, false);
 			GlShader fragShader = new GlShader(GL20.GL_FRAGMENT_SHADER, shaderString);
 			LWJGL.glAttachShader(this.id, fragShader.id);
 			fragShader.free();
 		}
-		
+
 		for (int i = 0; i < attributes.length; i++)
 		{
 			LWJGL.glBindAttribLocation(this.id, i, attributes[i]);
 		}
 		LWJGL.glLinkProgram(this.id);
-		
+
 		int status = LWJGL.glGetProgrami(this.id, GL20.GL_LINK_STATUS);
 		if (status != GL11.GL_TRUE)
 		{
-			String message = "Shader Link Error. Details: " + LWJGL.glGetProgramInfoLog(this.id,1024);
+			String message = "Shader Link Error. Details: " + LWJGL.glGetProgramInfoLog(this.id, 1024);
 			this.free(); // important!
 			throw new RuntimeException(message);
 		}
 		LWJGL.glUseProgram(this.id); // This HAVE to be a direct call to prevent calling the overloaded version
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// binding //
 	//=========//
 	//region
-	
+
 	public void bind() { LWJGL.glUseProgram(this.id); }
 	public void unbind() { LWJGL.glUseProgram(0); }
-	
+
 	public void free() { LWJGL.glDeleteProgram(this.id); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 //==========//
 	// uniforms //
 	//==========//
 	//region
-	
+
 	/**
 	 * WARNING: Slow native call! Cache it if possible!
 	 * Gets the location of a uniform variable with specified name.
@@ -130,12 +130,12 @@ public class GlShaderProgram
 		}
 		return i;
 	}
-	
+
 	// Same as above but without throwing errors.
 	// Return -1 if uniform doesn't exist or has been optimized out
 	public int tryGetUniformLocation(CharSequence name)
 	{ return LWJGL.glGetUniformLocation(this.id, name); }
-	
+
 	/** Requires a bound ShaderProgram. */
 	public void setUniform(int location, boolean value) { LWJGL.glUniform1i(location, value ? 1 : 0); }
 
@@ -167,17 +167,17 @@ public class GlShaderProgram
 		floatBuffer.put(bufferIndex(0, 1), matrix.m01);
 		floatBuffer.put(bufferIndex(0, 2), matrix.m02);
 		floatBuffer.put(bufferIndex(0, 3), matrix.m03);
-		
+
 		floatBuffer.put(bufferIndex(1, 0), matrix.m10);
 		floatBuffer.put(bufferIndex(1, 1), matrix.m11);
 		floatBuffer.put(bufferIndex(1, 2), matrix.m12);
 		floatBuffer.put(bufferIndex(1, 3), matrix.m13);
-		
+
 		floatBuffer.put(bufferIndex(2, 0), matrix.m20);
 		floatBuffer.put(bufferIndex(2, 1), matrix.m21);
 		floatBuffer.put(bufferIndex(2, 2), matrix.m22);
 		floatBuffer.put(bufferIndex(2, 3), matrix.m23);
-		
+
 		floatBuffer.put(bufferIndex(3, 0), matrix.m30);
 		floatBuffer.put(bufferIndex(3, 1), matrix.m31);
 		floatBuffer.put(bufferIndex(3, 2), matrix.m32);
@@ -191,15 +191,15 @@ public class GlShaderProgram
 	 */
 	public void setUniform(int location, Color value)
 	{
-		LWJGL.glUniform4f(location, 
-				value.getRed()   / 256.0f, 
-				value.getGreen() / 256.0f, 
-				value.getBlue()  / 256.0f, 
-				value.getAlpha() / 256.0f);
+		LWJGL.glUniform4f(location,
+			value.getRed() / 256.0f,
+			value.getGreen() / 256.0f,
+			value.getBlue() / 256.0f,
+			value.getAlpha() / 256.0f);
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 }

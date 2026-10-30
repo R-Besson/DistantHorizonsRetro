@@ -160,7 +160,7 @@ public class VanillaChunkMask
 			}
 		}
 
-        float vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
+		float vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
 		RenderUtil.setVanillaTerrainEndDistanceInBlocks(vanillaTerrainEndDistance);
 
 		this.upload(width);
@@ -229,7 +229,7 @@ public class VanillaChunkMask
 			return null;
 		}
 		lowestTopY = Math.max(lowestTopY, 0);
-		return new int[] { lowestTopY >> 4, Math.min(highestTopY >> 4, SECTION_COUNT - 1) };
+		return new int[]{lowestTopY >> 4, Math.min(highestTopY >> 4, SECTION_COUNT - 1)};
 	}
 	/** logged once per game, used to check the mask matches what MC actually drew */
 	private void tryLogDiagnostic(long nowMs, int renderDistance, boolean angelicaPresent)
@@ -248,7 +248,7 @@ public class VanillaChunkMask
 			return;
 		}
 		this.diagnosticLogged = true;
-		
+
 		int renderedCount = 0;
 		for (byte rendered : this.renderedByChunk)
 		{

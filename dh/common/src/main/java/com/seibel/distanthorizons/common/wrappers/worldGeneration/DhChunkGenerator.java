@@ -37,7 +37,12 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IChunkG
 import com.seibel.distanthorizons.coreapi.ModInfo;
 
 import java.util.Iterator;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 
@@ -139,7 +144,7 @@ public final class DhChunkGenerator implements IChunkGenerator
 
 						this.unknownExceptionCount++;
 						this.lastExceptionTriggerTime = System.nanoTime();
-						LOGGER.error("Batching World Generator event ["+event+"] threw an exception: "+e.getMessage(), e);
+						LOGGER.error("Batching World Generator event [" + event + "] threw an exception: " + e.getMessage(), e);
 					}
 				}
 
@@ -172,7 +177,7 @@ public final class DhChunkGenerator implements IChunkGenerator
 		if (!DhApi.isDhThread()
 			&& ModInfo.IS_DEV_BUILD)
 		{
-			throw new IllegalStateException("Batch world generation should be called from one of DH's world gen thread. Current thread: ["+Thread.currentThread().getName()+"]");
+			throw new IllegalStateException("Batch world generation should be called from one of DH's world gen thread. Current thread: [" + Thread.currentThread().getName() + "]");
 		}
 
 		// MC can only run world gen on the main thread
@@ -190,9 +195,9 @@ public final class DhChunkGenerator implements IChunkGenerator
 		ExecutorService worldGeneratorThreadPool, Consumer<IChunkWrapper> resultConsumer)
 	{
 		ChunkGenEvent genEvent = ChunkGenEvent.start(
-				new DhChunkPos(chunkPosMinX, chunkPosMinZ), chunkWidthCount, this,
-				generatorMode, targetStep, resultConsumer,
-				worldGeneratorThreadPool);
+			new DhChunkPos(chunkPosMinX, chunkPosMinZ), chunkWidthCount, this,
+			generatorMode, targetStep, resultConsumer,
+			worldGeneratorThreadPool);
 		this.generationEventQueue.add(genEvent);
 		return genEvent.future;
 	}

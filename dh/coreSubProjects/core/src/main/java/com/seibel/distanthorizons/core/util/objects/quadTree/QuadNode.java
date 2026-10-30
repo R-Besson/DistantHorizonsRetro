@@ -34,18 +34,18 @@ import java.util.function.Consumer;
 public class QuadNode<T>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
+
+
 	public final long sectionPos;
-	/** 
+	/**
 	 * this is the highest detail level this tree can provide.
 	 * IE the detail levels that the root nodes in the tree are.
 	 */
 	public final byte parentTreeLeafDetailLevel;
 	@Nullable
 	public T value;
-	
-	
+
+
 	/**
 	 * North West <br>
 	 * index 0 <br>
@@ -74,28 +74,40 @@ public class QuadNode<T>
 	 */
 	@Nullable
 	public QuadNode<T> seChild;
-	
-	
-	
+
+
+
 	public QuadNode(long sectionPos, byte parentTreeLeafDetailLevel)
 	{
 		this.sectionPos = sectionPos;
 		this.parentTreeLeafDetailLevel = parentTreeLeafDetailLevel;
 	}
-	
-	
-	
+
+
+
 	/** @return the number of non-null direct child nodes */
 	public int getDirectChildCount()
 	{
 		int count = 0;
-		if (this.nwChild != null) { count++; }
-		if (this.neChild != null) { count++; }
-		if (this.swChild != null) { count++; }
-		if (this.seChild != null) { count++; }
+		if (this.nwChild != null)
+		{
+			count++;
+		}
+		if (this.neChild != null)
+		{
+			count++;
+		}
+		if (this.swChild != null)
+		{
+			count++;
+		}
+		if (this.seChild != null)
+		{
+			count++;
+		}
 		return count;
 	}
-	
+
 	/**
 	 * Use {@link QuadNode#getNonNullChildCount()} if you want the number of non-null child values.
 	 *
@@ -113,7 +125,7 @@ public class QuadNode<T>
 		}
 		return count;
 	}
-	
+
 	/** @return the number of children that have non-null values */
 	public int getNonNullChildCount()
 	{
@@ -128,9 +140,9 @@ public class QuadNode<T>
 		}
 		return count;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Returns the DhLodPos 1 detail level lower <br><br>
 	 *
@@ -154,20 +166,20 @@ public class QuadNode<T>
 				return this.neChild;
 			case 3:
 				return this.seChild;
-			
+
 			default:
 				throw new IllegalArgumentException("child0to3 must be between 0 and 3");
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param sectionPos must be 1 detail level lower than this node's detail level
 	 * @return the node at the given position
 	 * @throws IllegalArgumentException if childSectionPos has the wrong detail level or is outside the bounds of this node
 	 */
 	public QuadNode<T> getNode(long sectionPos) throws IllegalArgumentException { return this.getOrSetValue(sectionPos, false, null); }
-	
+
 	/**
 	 * @param sectionPos must be 1 detail level lower than this node's detail level
 	 * @return the value at the given position before the new value was set
@@ -188,7 +200,7 @@ public class QuadNode<T>
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @param inputSectionPos must be 1 detail level lower than this node's detail level
 	 * @return the node at the given position before the new node was set (if the new node should be set)
@@ -197,30 +209,30 @@ public class QuadNode<T>
 	private QuadNode<T> getOrSetValue(long inputSectionPos, boolean replaceValue, T newValue) throws IllegalArgumentException
 	{
 		// debug validation
-		
+
 		if (!DhSectionPos.contains(this.sectionPos, inputSectionPos))
 		{
 			LOGGER.error((replaceValue ? "set " : "get ") + inputSectionPos + " center block: " + DhSectionPos.getCenterBlockPos(inputSectionPos) + ", this pos: " + this.sectionPos + " this center block: " + DhSectionPos.getCenterBlockPos(this.sectionPos));
 			throw new IllegalArgumentException("Input section pos " + inputSectionPos + " outside of this quadNode's pos: " + this.sectionPos + ", this node's blockPos: " + DhSectionPos.convertToDetailLevel(this.sectionPos, LodUtil.BLOCK_DETAIL_LEVEL) + " block width: " + DhSectionPos.getBlockWidth(this.sectionPos) + " input detail level: " + DhSectionPos.convertToDetailLevel(inputSectionPos, LodUtil.BLOCK_DETAIL_LEVEL) + " width: " + DhSectionPos.getBlockWidth(inputSectionPos));
 		}
-		
+
 		if (DhSectionPos.getDetailLevel(inputSectionPos) > DhSectionPos.getDetailLevel(this.sectionPos))
 		{
 			throw new IllegalArgumentException("detail level higher than this node. Node Detail level: " + DhSectionPos.getDetailLevel(this.sectionPos) + " input detail level: " + DhSectionPos.getDetailLevel(inputSectionPos));
 		}
-		
+
 		if (DhSectionPos.getDetailLevel(inputSectionPos) == DhSectionPos.getDetailLevel(this.sectionPos) && inputSectionPos != this.sectionPos)
 		{
 			throw new IllegalArgumentException("Node and input detail level are equal, however positions are not; this tree doesn't contain the requested position. Node pos: " + this.sectionPos + ", input pos: " + DhSectionPos.toString(inputSectionPos));
 		}
-		
+
 		if (DhSectionPos.getDetailLevel(inputSectionPos) < this.parentTreeLeafDetailLevel)
 		{
 			throw new IllegalArgumentException("Input position is requesting a detail level lower than what this node can provide. Tree leaf detail level: " + this.parentTreeLeafDetailLevel + ", input pos: " + DhSectionPos.toString(inputSectionPos));
 		}
-		
-		
-		
+
+
+
 		// get/set logic
 		if (DhSectionPos.getDetailLevel(inputSectionPos) == DhSectionPos.getDetailLevel(this.sectionPos))
 		{
@@ -240,20 +252,20 @@ public class QuadNode<T>
 			long swPos = DhSectionPos.getChildByIndex(this.sectionPos, 1);
 			long nePos = DhSectionPos.getChildByIndex(this.sectionPos, 2);
 			long sePos = DhSectionPos.getChildByIndex(this.sectionPos, 3);
-			
+
 			// look for the child that contains the input position (there may be a faster way to do this, but this works for now)
 			QuadNode<T> childNode;
 			if (DhSectionPos.contains(nwPos, inputSectionPos))
 			{
 				// there's a bunch of duplicate code between the 4 children, but the code works, so leaving it duplicated will be fine
-				
+
 				if (replaceValue && this.nwChild == null)
 				{
 					// if no node exists for this position, but we want to insert a new value at this position, create a new node
 					this.nwChild = new QuadNode<>(nwPos, this.parentTreeLeafDetailLevel);
 				}
 				childNode = this.nwChild;
-				
+
 				// childNode should only be null when replaceValue = false and the end of a node chain has been reached
 				return (childNode != null) ? childNode.getOrSetValue(inputSectionPos, replaceValue, newValue) : null;
 			}
@@ -265,7 +277,7 @@ public class QuadNode<T>
 					this.swChild = new QuadNode<>(swPos, this.parentTreeLeafDetailLevel);
 				}
 				childNode = this.swChild;
-				
+
 				// childNode should only be null when replaceValue = false and the end of a node chain has been reached
 				return (childNode != null) ? childNode.getOrSetValue(inputSectionPos, replaceValue, newValue) : null;
 			}
@@ -277,7 +289,7 @@ public class QuadNode<T>
 					this.neChild = new QuadNode<>(nePos, this.parentTreeLeafDetailLevel);
 				}
 				childNode = this.neChild;
-				
+
 				// childNode should only be null when replaceValue = false and the end of a node chain has been reached
 				return (childNode != null) ? childNode.getOrSetValue(inputSectionPos, replaceValue, newValue) : null;
 			}
@@ -289,7 +301,7 @@ public class QuadNode<T>
 					this.seChild = new QuadNode<>(sePos, this.parentTreeLeafDetailLevel);
 				}
 				childNode = this.seChild;
-				
+
 				// childNode should only be null when replaceValue = false and the end of a node chain has been reached
 				return (childNode != null) ? childNode.getOrSetValue(inputSectionPos, replaceValue, newValue) : null;
 			}
@@ -299,26 +311,26 @@ public class QuadNode<T>
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// iterators //
 	//===========//
-	
+
 	public Iterator<QuadNode<T>> getNodeIterator() { return new QuadTreeNodeIterator<>(this, false, null); }
 	public Iterator<QuadNode<T>> getNodeIterator(@Nullable QuadTree.INodeIteratorStoppingFunc<T> stopIteratingFunc) { return new QuadTreeNodeIterator<>(this, false, stopIteratingFunc); }
 	public Iterator<QuadNode<T>> getLeafNodeIterator() { return new QuadTreeNodeIterator<>(this, true, null); }
-	
+
 	/** positions can point to null children */
 	public LongIterator getChildPosIterator() { return new QuadNodeDirectChildPosIterator<>(this); }
-	
-	
-	
+
+
+
 	//==========//
 	// deletion //
 	//==========//
-	
+
 	public void deleteAllChildren() { this.deleteAllChildren(null); }
 	/** @param removedItemConsumer is only fired for non-null nodes, however the value passed in may be null */
 	public void deleteAllChildren(@Nullable Consumer<? super T> removedItemConsumer)
@@ -331,41 +343,41 @@ public class QuadNode<T>
 				childNode.deleteAllChildren(removedItemConsumer);
 			}
 		}
-		
-		
-		
+
+
+
 		if (this.nwChild != null && removedItemConsumer != null)
 		{
 			removedItemConsumer.accept(this.nwChild.value);
 		}
 		this.nwChild = null;
-		
+
 		if (this.neChild != null && removedItemConsumer != null)
 		{
 			removedItemConsumer.accept(this.neChild.value);
 		}
 		this.neChild = null;
-		
+
 		if (this.seChild != null && removedItemConsumer != null)
 		{
 			removedItemConsumer.accept(this.seChild.value);
 		}
 		this.seChild = null;
-		
+
 		if (this.swChild != null && removedItemConsumer != null)
 		{
 			removedItemConsumer.accept(this.swChild.value);
 		}
 		this.swChild = null;
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// base methods //
 	//==============//
-	
+
 	@Override
 	public String toString() { return "pos: " + DhSectionPos.toString(this.sectionPos) + ", children #: " + this.getTotalChildCount() + ", value: " + this.value; }
-	
+
 }

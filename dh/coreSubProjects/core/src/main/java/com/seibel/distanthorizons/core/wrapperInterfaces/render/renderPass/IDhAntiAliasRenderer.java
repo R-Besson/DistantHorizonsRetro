@@ -24,7 +24,7 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 
 public interface IDhAntiAliasRenderer extends IBindable
 {
-	
+
 	void render(RenderParams renderParams);
-	
+
 }

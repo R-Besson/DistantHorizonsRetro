@@ -35,9 +35,9 @@ import org.jetbrains.annotations.Nullable;
 public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 {
 	public static final BlockStateTextureProvider INSTANCE = new BlockStateTextureProvider();
-	
-	
-	
+
+
+
 	@Nullable
 	@Override
 	public BlockFaceTexture getFaceTexture(IBlockStateWrapper blockState, EDhDirection direction)
@@ -45,7 +45,7 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 		if (!(blockState instanceof BlockStateWrapper))
 		{
 			// shouldn't happen, but just in case
-			throw new UnsupportedOperationException("blockState must be a ["+BlockStateWrapper.class.getSimpleName()+"]");
+			throw new UnsupportedOperationException("blockState must be a [" + BlockStateWrapper.class.getSimpleName() + "]");
 		}
 		return ClientBlockStateTextureCache.getFaceTexture((BlockStateWrapper) blockState, direction);
 	}
@@ -103,9 +103,9 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 	}
 
 	@Override
-	public void clear() 
+	public void clear()
 	{
 		ClientBlockStateTextureCache.clearCache();
 	}
-	
+
 }

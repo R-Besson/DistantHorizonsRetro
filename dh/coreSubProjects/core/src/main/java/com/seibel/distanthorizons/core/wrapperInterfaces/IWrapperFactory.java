@@ -46,7 +46,7 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 	IChunkGenerator createChunkGenerator(IDhLevel targetLevel);
 
 	IBiomeWrapper deserializeBiomeWrapper(String str, ILevelWrapper levelWrapper) throws IOException;
-	IBiomeWrapper getPlainsBiomeWrapper(ILevelWrapper levelWrapper); 
+	IBiomeWrapper getPlainsBiomeWrapper(ILevelWrapper levelWrapper);
 	default IBiomeWrapper deserializeBiomeWrapperOrGetDefault(String str, ILevelWrapper levelWrapper)
 	{
 		IBiomeWrapper biome;
@@ -58,11 +58,11 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 		{
 			biome = this.getPlainsBiomeWrapper(levelWrapper);
 		}
-		
+
 		return biome;
 	}
-	
-	
+
+
 	IBlockStateWrapper deserializeBlockStateWrapper(String str) throws IOException;
 	IBlockStateWrapper getAirBlockStateWrapper();
 	IBlockStateWrapper getWaterBlockStateWrapper();
@@ -78,38 +78,38 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 		{
 			blockState = this.getAirBlockStateWrapper();
 		}
-		
+
 		return blockState;
 	}
-	
-	
+
+
 	/**
 	 * Returns the set of {@link IBlockStateWrapper}'s that shouldn't be rendered. <br>
-	 * Generally this contains blocks like: air, barriers, light blocks, etc. 
+	 * Generally this contains blocks like: air, barriers, light blocks, etc.
 	 */
 	ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredBlocks();
 	/**
 	 * Returns the set of {@link IBlockStateWrapper}'s that shouldn't be rendered in caves. <br>
-	 * Generally this contains blocks like: air, rails, glow lichen, etc. 
+	 * Generally this contains blocks like: air, rails, glow lichen, etc.
 	 */
 	ObjectOpenHashSet<IBlockStateWrapper> getRendererIgnoredCaveBlocks();
-	
+
 	ObjectOpenHashSet<IBlockStateWrapper> getWaterSubsurfaceReplacementBlocks();
 	ObjectOpenHashSet<IBlockStateWrapper> getWaterSurfaceReplacementBlocks();
 	/** clears the cached values */
 	void resetCachedIgnoredBlocksSets();
-	
-	
+
+
 	/**
 	 * Specifically designed to be used with the API.
 	 *
 	 * @throws ClassCastException with instructions on expected objects if the object couldn't be cast
 	 */
 	IChunkWrapper createChunkWrapper(Object[] objectArray) throws ClassCastException;
-	
+
 	IVertexBufferWrapper createVboWrapper();
 	ILodContainerUniformBufferWrapper createLodContainerUniformWrapper();
 	IDhGenericObjectVertexBufferContainer createGenericObjectVboContainer();
 	IDhGenericRenderer createGenericRenderer();
-	
+
 }

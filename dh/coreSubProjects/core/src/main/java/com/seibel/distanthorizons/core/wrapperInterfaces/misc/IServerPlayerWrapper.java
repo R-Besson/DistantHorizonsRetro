@@ -26,9 +26,9 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapp
 public interface IServerPlayerWrapper extends IDhApiUnsafeWrapper
 {
 	String getName();
-	
+
 	IServerLevelWrapper getLevel();
-	
+
 	DhVec3d getPosition();
-	
+
 }

@@ -183,7 +183,7 @@ public class BiomeWrapper implements IBiomeWrapper
 	public static IBiomeWrapper deserialize(String resourceLocationString, ILevelWrapper levelWrapper) throws IOException
 	{
 		// we need the final string for the concurrent hash map later
-		
+
 		if (resourceLocationString.equals(EMPTY_BIOME_STRING))
 		{
 			if (!emptyStringWarningLogged)
@@ -278,6 +278,7 @@ public class BiomeWrapper implements IBiomeWrapper
 			this.success = success;
 			this.biome = biome;
 		}
+
 	}
 
 	//endregion

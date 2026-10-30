@@ -34,39 +34,39 @@ public class DhVec3f extends DhApiVec3f
 	//==============//
 	// constructors //
 	//==============//
-	
-	public DhVec3f() { this(0,0,0); }
-	
+
+	public DhVec3f() { this(0, 0, 0); }
+
 	public DhVec3f(float x, float y, float z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	public DhVec3f(DhApiVec3f pos)
 	{
 		this.x = pos.x;
 		this.y = pos.y;
 		this.z = pos.z;
 	}
-	
+
 	public DhVec3f(DhVec3d pos)
 	{
 		this.x = (float) pos.x;
 		this.y = (float) pos.y;
 		this.z = (float) pos.z;
 	}
-	
-	
-	
-	
+
+
+
+
 	//==============//
 	// math methods //
 	//==============//
 
 	public float dotProduct(DhVec3f vector) { return this.x * vector.x + this.y * vector.y + this.z * vector.z; }
-	
+
 	/** @return true if normalization had to be done */
 	public boolean normalize()
 	{
@@ -90,14 +90,14 @@ public class DhVec3f extends DhApiVec3f
 	//==============//
 	// misc methods //
 	//==============//
-	
+
 	public void set(float x, float y, float z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	public DhVec3f copy() { return new DhVec3f(this.x, this.y, this.z); }
-	
+
 }

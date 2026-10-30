@@ -27,22 +27,22 @@ public class TestSingleKeyDto implements IBaseDTO<Integer>
 	public String value;
 	public long longValue;
 	public byte byteValue;
-	
-	
-	
-	
-	public TestSingleKeyDto(int id, String value, long longValue, byte byteValue) 
-	{ 
+
+
+
+
+	public TestSingleKeyDto(int id, String value, long longValue, byte byteValue)
+	{
 		this.id = id;
 		this.value = value;
 		this.longValue = longValue;
 		this.byteValue = byteValue;
 	}
-	
-	@Override 
+
+	@Override
 	public Integer getKey() { return this.id; }
-	
-	
+
+
 	@Override
 	public boolean equals(Object other)
 	{
@@ -53,24 +53,24 @@ public class TestSingleKeyDto implements IBaseDTO<Integer>
 		else
 		{
 			TestSingleKeyDto otherDto = (TestSingleKeyDto) other;
-			
+
 			return otherDto.id == this.id
-					&& otherDto.value.equals(this.value)
-					&& otherDto.longValue == this.longValue
-					&& otherDto.byteValue == this.byteValue;
+				&& otherDto.value.equals(this.value)
+				&& otherDto.longValue == this.longValue
+				&& otherDto.byteValue == this.byteValue;
 		}
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return this.id + ", " + this.value + ", " + this.longValue + ", " + this.byteValue;
 	}
-	
+
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-	
-	
-	
+
+
+
 }

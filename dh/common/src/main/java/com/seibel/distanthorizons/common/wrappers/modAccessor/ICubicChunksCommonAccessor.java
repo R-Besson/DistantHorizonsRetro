@@ -25,7 +25,7 @@ public interface ICubicChunksCommonAccessor extends IModAccessor
 	 * Doesn't load or generate anything.
 	 *
 	 * @return the storage of each loaded cube from minCubeY to maxCubeY (inclusive),
-	 *         null where the cube isn't loaded or is empty
+	 * null where the cube isn't loaded or is empty
 	 */
 	ExtendedBlockStorage[] getLoadedStorages(Chunk column, int minCubeY, int maxCubeY);
 
@@ -44,7 +44,7 @@ public interface ICubicChunksCommonAccessor extends IModAccessor
 	 * Doesn't load anything, the column's height map covers its unloaded cubes too.
 	 *
 	 * @return the lowest and highest cube Y holding the column's top blocks,
-	 *         null if the column has no blocks within DH's height range
+	 * null if the column has no blocks within DH's height range
 	 */
 	int @Nullable [] getSurfaceCubeRange(Chunk column);
 

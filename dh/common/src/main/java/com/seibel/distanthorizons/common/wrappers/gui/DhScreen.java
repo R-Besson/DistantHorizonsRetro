@@ -32,7 +32,8 @@ public class DhScreen extends GuiScreen
 		}
 	}
 
-	protected void DhDrawCenteredString(String text, int x, int y, int color) {
+	protected void DhDrawCenteredString(String text, int x, int y, int color)
+	{
 		if (StatCollector.canTranslate(text))
 		{
 			text = StatCollector.translateToLocal(text);
@@ -40,7 +41,8 @@ public class DhScreen extends GuiScreen
 		this.drawCenteredString(this.fontRendererObj, text, x, y, color);
 	}
 
-	protected void DhDrawString(String text, int x, int y, int color) {
+	protected void DhDrawString(String text, int x, int y, int color)
+	{
 		if (StatCollector.canTranslate(text))
 		{
 			text = StatCollector.translateToLocal(text);
@@ -57,4 +59,5 @@ public class DhScreen extends GuiScreen
 	{
 		drawHoveringText(Collections.singletonList(text), x, y, fontRendererObj);
 	}
+
 }

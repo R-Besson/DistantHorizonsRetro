@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Holds all the {@link ChunkUpdateQueueManager} for a loaded world.
  * Different queues are needed for each level to prevent
  * chunks from bleeding between levels (IE a nether chunk applied to the overworld).
- * 
+ *
  * @see ChunkUpdateQueueManager
  */
 public class WorldChunkUpdateManager
@@ -25,34 +25,34 @@ public class WorldChunkUpdateManager
 	public static final WorldChunkUpdateManager INSTANCE = new WorldChunkUpdateManager();
 
 
-	/** 
+	/**
 	 * Queues are only removed during world shutdown.
 	 * The assumption is that there will be a limited number of {@link ILevelWrapper}'s
 	 * for a given world.
 	 */
 	private final ConcurrentHashMap<ILevelWrapper, ChunkUpdateQueueManager> updateQueueByLevelWrapper = new ConcurrentHashMap<>();
-	
-	
-	
-	
+
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	private WorldChunkUpdateManager() {  }
-	
+
+	private WorldChunkUpdateManager() { }
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// manager methods //
 	//=================//
 	//region
-	
+
 	/**
-	 * @return null if the world is unloaded or the given level wrapper is the wrong type 
+	 * @return null if the world is unloaded or the given level wrapper is the wrong type
 	 */
 	@Nullable
 	public ChunkUpdateQueueManager getByLevelWrapper(ILevelWrapper levelWrapper)
@@ -63,7 +63,7 @@ public class WorldChunkUpdateManager
 			// world isn't loaded, no warnings need to be logged
 			return null;
 		}
-		
+
 		// we only want to load chunks for certain level wrappers
 		// this is done specifically on a local-server to prevent
 		// loading both the server and client level wrappers
@@ -78,21 +78,21 @@ public class WorldChunkUpdateManager
 		}
 		else if (
 			(world.environment == EWorldEnvironment.SERVER_ONLY
-			|| world.environment == EWorldEnvironment.CLIENT_SERVER)
+				|| world.environment == EWorldEnvironment.CLIENT_SERVER)
 				// when hosting a server we only care about the server wrappers
 				&& !(levelWrapper instanceof IServerLevelWrapper))
 		{
 			// ignore client updates on the server
 			return null;
 		}
-		
-		
+
+
 		ChunkUpdateQueueManager queueManager = this.updateQueueByLevelWrapper.get(levelWrapper);
 		if (queueManager != null)
 		{
 			return queueManager;
 		}
-		
+
 		return this.updateQueueByLevelWrapper.compute(levelWrapper,
 			(ILevelWrapper newLevelWrapper, ChunkUpdateQueueManager oldQueueManager) ->
 			{
@@ -100,43 +100,43 @@ public class WorldChunkUpdateManager
 				{
 					return oldQueueManager;
 				}
-				
+
 				oldQueueManager = new ChunkUpdateQueueManager(newLevelWrapper.getDhIdentifier());
 				return oldQueueManager;
 			});
 	}
-	
+
 	public int getTotalQueuedCount()
 	{
 		AtomicInteger queueCountRef = new AtomicInteger(0);
-		
+
 		this.updateQueueByLevelWrapper.forEach(
 			(ILevelWrapper levelWrapper, ChunkUpdateQueueManager updateManager) ->
-                    queueCountRef.addAndGet(updateManager.getQueuedCount()));
-		
+				queueCountRef.addAndGet(updateManager.getQueuedCount()));
+
 		return queueCountRef.get();
 	}
-	
-	public void clear() 
+
+	public void clear()
 	{
 		this.updateQueueByLevelWrapper.forEach((levelWrapper, updateManager) -> updateManager.close());
 		this.updateQueueByLevelWrapper.clear();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// F3 Menu //
 	//=========//
 	//region
-	
+
 	public ArrayList<String> getDebugMenuString()
 	{
 		ArrayList<String> stringList = new ArrayList<>();
 		stringList.add("");// placeholder for the total count
-		
+
 		// add each queue to the list
 		AtomicInteger totalQueueCountRef = new AtomicInteger(0);
 		AtomicInteger activeQueueCountRef = new AtomicInteger(0);
@@ -149,7 +149,7 @@ public class WorldChunkUpdateManager
 					updateManager.lastMsTimeShownActiveInF3Screen = System.currentTimeMillis();
 					activeQueueCountRef.incrementAndGet();
 				}
-				
+
 				// show this queue if it hasn't been empty long enough
 				// (done to prevent flickering on the F3 screen when the queue rapidly fills/empties)
 				long timeSinceQueueLastShownActiveMs = System.currentTimeMillis() - updateManager.lastMsTimeShownActiveInF3Screen;
@@ -157,19 +157,19 @@ public class WorldChunkUpdateManager
 				{
 					stringList.add(levelWrapper.getDimensionName() + ": " + updateManager.getDebugMenuString());
 				}
-				
+
 				totalQueueCountRef.incrementAndGet();
 			});
-		
+
 		// replace the first line with the number of total/active queues
 		// (helpful if we need to diagnose a leak due to a massive number of queue level wrappers)
-		stringList.set(0, "Chunk Update Queues: "+activeQueueCountRef.get()+"/"+totalQueueCountRef.get());
-		
+		stringList.set(0, "Chunk Update Queues: " + activeQueueCountRef.get() + "/" + totalQueueCountRef.get());
+
 		return stringList;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

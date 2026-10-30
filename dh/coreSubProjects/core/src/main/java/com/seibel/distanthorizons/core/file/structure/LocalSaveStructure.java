@@ -37,19 +37,19 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalSaveStructure implements ISaveStructure
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private final ConcurrentHashMap<ILevelWrapper, File> levelWrapperToFileMap = new ConcurrentHashMap<>();
-	
-	
-	
+
+
+
 	public LocalSaveStructure() { }
-	
-	
-	
+
+
+
 	//================//
 	// folder methods //
 	//================//
-	
+
 	@Override
 	public File getSaveFolder(ILevelWrapper levelWrapper)
 	{
@@ -57,8 +57,8 @@ public class LocalSaveStructure implements ISaveStructure
 		{
 			IServerLevelWrapper serverLevelWrapper = (IServerLevelWrapper) levelWrapper;
 			File saveFolder = serverLevelWrapper.getMcSaveFolder();
-			
-			
+
+
 			// Allow API users to override the save folder
 			IDhApiSaveStructure saveStructureOverride = OverrideInjector.INSTANCE.get(IDhApiSaveStructure.class);
 			if (saveStructureOverride != null)
@@ -70,24 +70,24 @@ public class LocalSaveStructure implements ISaveStructure
 					saveFolder = overrideFile;
 				}
 			}
-			
+
 			return saveFolder;
 		});
 	}
-	
+
 	@Override
 	public File getPre23SaveFolder(ILevelWrapper levelWrapper) { return this.getSaveFolder(levelWrapper); }
-	
-	
+
+
 	//==================//
 	// override methods //
 	//==================//
-	
+
 	@Override
 	public void close() throws Exception { }
-	
+
 	@Override
-	public String toString() 
+	public String toString()
 	{ return "[" + this.getClass().getSimpleName() + "@(" + StringUtil.join(";", this.levelWrapperToFileMap.values()) + ")]"; }
-	
+
 }

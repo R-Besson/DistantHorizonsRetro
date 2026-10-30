@@ -32,12 +32,12 @@ public class ConfigUiLinkedEntry extends AbstractConfigBase<AbstractConfigBase<?
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public ConfigUiLinkedEntry(AbstractConfigBase<?> value)
 	{ super(EConfigEntryAppearance.ONLY_IN_GUI, value); }
-	
-	
-	
+
+
+
 	//=========//
 	// setters //
 	//=========//

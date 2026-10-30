@@ -63,7 +63,7 @@ public class RenderDataPointUtil
 	// Reminder: bytes have range of [-128, 127].
 	// When converting to or from an int a 128 should be added or removed.
 	// If there is a bug with color then it's probably caused by this.
-	
+
 	public static final boolean RUN_VALIDATION = ModInfo.IS_DEV_BUILD;
 
 
@@ -72,29 +72,29 @@ public class RenderDataPointUtil
 	// the maximum valid Y value is the maximum min y + world height.
 	// min y is [-2032, 2031], height is < 4064.
 	public final static int MAX_WORLD_Y_SIZE = 2031 + 4064;
-	/** 
-	 * Render datapoints only have 10 bits for each Y value. 
+	/**
+	 * Render datapoints only have 10 bits for each Y value.
 	 * That's 4x the 1.7.10 world height, the rest is used for {@link #SHAPE_SHIFT}.
 	 */
 	public final static int MAX_RENDER_Y_SIZE = 1024;
-	
+
 	public final static int ALPHA_DOWNSIZE_SHIFT = 4;
-	
-	
+
+
 	public final static int IRIS_BLOCK_MATERIAL_ID_SHIFT = 60;
-	
+
 	public final static int COLOR_SHIFT = 32;
 	public final static int BLUE_SHIFT = COLOR_SHIFT;
 	public final static int GREEN_SHIFT = BLUE_SHIFT + 8;
 	public final static int RED_SHIFT = GREEN_SHIFT + 8;
 	public final static int ALPHA_SHIFT = RED_SHIFT + 8;
-	
+
 	public final static int SHAPE_SHIFT = 28;
 	public final static int MAX_Y_SHIFT = 18;
 	public final static int MIN_Y_SHIFT = 8;
 	public final static int BLOCK_LIGHT_SHIFT = 4;
 	public final static int SKY_LIGHT_SHIFT = 0;
-	
+
 	public final static long ALPHA_MASK = 0xF;
 	public final static long RED_MASK = 0xFF;
 	public final static long GREEN_MASK = 0xFF;
@@ -107,19 +107,19 @@ public class RenderDataPointUtil
 	public final static long BLOCK_LIGHT_MASK = 0xF;
 	public final static long SKY_LIGHT_MASK = 0xF;
 	public final static long IRIS_BLOCK_MATERIAL_ID_MASK = 0xF;
-	
+
 	public final static long MIN_Y_SHIFTED_MASK = MIN_Y_MASK << MIN_Y_SHIFT;
 
-	
-	
+
+
 	//========//
 	// shapes //
 	//========//
-	
+
 	// Shapes are only drawn by 1 block wide LODs, wider LODs are always full boxes.
 	// They're applied by DH's vertex shader as an inset from the block's edges (see LodQuadBuilder),
 	// shader packs get the same inset from the forge17 ShaderPackLodTextures patch.
-	
+
 	/** a full box */
 	public final static byte SHAPE_NONE = 0;
 	/** a 4/16 wide post, IE fences */
@@ -134,26 +134,26 @@ public class RenderDataPointUtil
 	 * they don't cover anything around them.
 	 */
 	public final static byte SHAPE_CROSS = 4;
-	
-	
-	
+
+
+
 	//========================//
 	// datapoint manipulation //
 	//========================//
-	
+
 	public static long createDataPoint(int maxY, int minY, int color, int lightSky, int lightBlock, int irisBlockMaterialId)
 	{ return createDataPoint(maxY, minY, color, lightSky, lightBlock, irisBlockMaterialId, SHAPE_NONE); }
-	
+
 	public static long createDataPoint(int maxY, int minY, int color, int lightSky, int lightBlock, int irisBlockMaterialId, byte shape)
 	{
 		return setShape(createDataPoint(
-				ColorUtil.getAlpha(color),
-				ColorUtil.getRed(color),
-				ColorUtil.getGreen(color),
-				ColorUtil.getBlue(color),
-				maxY, minY, lightSky, lightBlock, irisBlockMaterialId), shape);
+			ColorUtil.getAlpha(color),
+			ColorUtil.getRed(color),
+			ColorUtil.getGreen(color),
+			ColorUtil.getBlue(color),
+			maxY, minY, lightSky, lightBlock, irisBlockMaterialId), shape);
 	}
-	
+
 	public static long createDataPoint(int alpha, int red, int green, int blue, int maxY, int minY, int lightSky, int lightBlock, int irisBlockMaterialId)
 	{
 		if (RUN_VALIDATION)
@@ -167,7 +167,7 @@ public class RenderDataPointUtil
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with min Y [" + minY + "] out of range!");
 			}
-			
+
 			if (lightSky < 0 || lightSky >= 16)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with lightSky [" + lightSky + "] out of range!");
@@ -176,12 +176,12 @@ public class RenderDataPointUtil
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with lightBlock [" + lightBlock + "] out of range!");
 			}
-			
+
 			if (irisBlockMaterialId < 0 || irisBlockMaterialId >= 256)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with irisBlockMaterialId [" + irisBlockMaterialId + "] out of range!");
 			}
-			
+
 			if (alpha < 0 || alpha >= 256)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with alpha [" + alpha + "] out of range!");
@@ -198,8 +198,8 @@ public class RenderDataPointUtil
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with blue [" + blue + "] out of range!");
 			}
-			
-			
+
+
 			if (minY > maxY)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with min Y [" + minY + "] greater than max Y [" + maxY + "]!");
@@ -207,42 +207,42 @@ public class RenderDataPointUtil
 		}
 
 
-        return (long) (alpha >>> ALPHA_DOWNSIZE_SHIFT) << ALPHA_SHIFT
-		        | (red & RED_MASK) << RED_SHIFT
-		        | (green & GREEN_MASK) << GREEN_SHIFT
-		        | (blue & BLUE_MASK) << BLUE_SHIFT
-		        | (maxY & MAX_Y_MASK) << MAX_Y_SHIFT
-		        | (minY & MIN_Y_MASK) << MIN_Y_SHIFT
-		        | (lightBlock & BLOCK_LIGHT_MASK) << BLOCK_LIGHT_SHIFT
-		        | (lightSky & SKY_LIGHT_MASK) << SKY_LIGHT_SHIFT
-		        | (irisBlockMaterialId & IRIS_BLOCK_MATERIAL_ID_MASK) << IRIS_BLOCK_MATERIAL_ID_SHIFT;
+		return (long) (alpha >>> ALPHA_DOWNSIZE_SHIFT) << ALPHA_SHIFT
+			| (red & RED_MASK) << RED_SHIFT
+			| (green & GREEN_MASK) << GREEN_SHIFT
+			| (blue & BLUE_MASK) << BLUE_SHIFT
+			| (maxY & MAX_Y_MASK) << MAX_Y_SHIFT
+			| (minY & MIN_Y_MASK) << MIN_Y_SHIFT
+			| (lightBlock & BLOCK_LIGHT_MASK) << BLOCK_LIGHT_SHIFT
+			| (lightSky & SKY_LIGHT_MASK) << SKY_LIGHT_SHIFT
+			| (irisBlockMaterialId & IRIS_BLOCK_MATERIAL_ID_MASK) << IRIS_BLOCK_MATERIAL_ID_SHIFT;
 	}
-	
+
 	/** AKA the ending/top/highest Y value above {@link ILevelWrapper#getMinHeight()} ()} */
 	public static short getYMax(long dataPoint) { return (short) ((dataPoint >>> MAX_Y_SHIFT) & MAX_Y_MASK); }
 	/** AKA the starting/bottom/lowest Y value above {@link ILevelWrapper#getMinHeight()} */
 	public static short getYMin(long dataPoint) { return (short) ((dataPoint >>> MIN_Y_SHIFT) & MIN_Y_MASK); }
 	public static long setYMin(long dataPoint, int minY) { return (dataPoint & ~(MIN_Y_MASK << MIN_Y_SHIFT)) | (minY & MIN_Y_MASK) << MIN_Y_SHIFT; }
-	
+
 	/** 4 bits are kept (see {@link #ALPHA_DOWNSIZE_SHIFT}), times 17 maps them back onto 0-255 without rounding everything up */
 	public static short getAlpha(long dataPoint) { return (short) (((dataPoint >>> ALPHA_SHIFT) & ALPHA_MASK) * 17); }
 	public static short getRed(long dataPoint) { return (short) ((dataPoint >>> RED_SHIFT) & RED_MASK); }
 	public static short getGreen(long dataPoint) { return (short) ((dataPoint >>> GREEN_SHIFT) & GREEN_MASK); }
 	public static short getBlue(long dataPoint) { return (short) ((dataPoint >>> BLUE_SHIFT) & BLUE_MASK); }
-	
+
 	public static byte getLightSky(long dataPoint) { return (byte) ((dataPoint >>> SKY_LIGHT_SHIFT) & SKY_LIGHT_MASK); }
 	public static byte getLightBlock(long dataPoint) { return (byte) ((dataPoint >>> BLOCK_LIGHT_SHIFT) & BLOCK_LIGHT_MASK); }
-	
+
 	public static byte getBlockMaterialId(long dataPoint) { return (byte) ((dataPoint >>> IRIS_BLOCK_MATERIAL_ID_SHIFT) & IRIS_BLOCK_MATERIAL_ID_MASK); }
-	
+
 	public static byte getShape(long dataPoint) { return (byte) ((dataPoint >>> SHAPE_SHIFT) & SHAPE_MASK); }
 	public static long setShape(long dataPoint, byte shape) { return (dataPoint & ~(SHAPE_MASK << SHAPE_SHIFT)) | ((shape & SHAPE_MASK) << SHAPE_SHIFT); }
-	
-	
+
+
 	public static boolean hasZeroHeight(long dataPoint) { return (((dataPoint >>> MIN_Y_SHIFT) & MIN_MAX_Y_MASK) == 0); }
-	
+
 	public static boolean doesDataPointExist(long dataPoint) { return dataPoint != EMPTY_DATA; }
-	
+
 	public static int getColor(long dataPoint)
 	{
 		long alpha = getAlpha(dataPoint);
@@ -264,15 +264,15 @@ public class RenderDataPointUtil
 		else
 		{
 			return "Y+:" + getYMax(dataPoint) +
-					" Y-:" + getYMin(dataPoint) +
-					" argb:" + getAlpha(dataPoint) + "," + getRed(dataPoint) + "," + getGreen(dataPoint) + "," + getBlue(dataPoint) +
-					" BL:" + getLightBlock(dataPoint) +
-					" SL:" + getLightSky(dataPoint) +
-					" MAT:" + getBlockMaterialId(dataPoint) + "["+ EDhApiBlockMaterial.getFromIndex(getBlockMaterialId(dataPoint))+"]" +
-					" SHAPE:" + getShape(dataPoint);
+				" Y-:" + getYMin(dataPoint) +
+				" argb:" + getAlpha(dataPoint) + "," + getRed(dataPoint) + "," + getGreen(dataPoint) + "," + getBlue(dataPoint) +
+				" BL:" + getLightBlock(dataPoint) +
+				" SL:" + getLightSky(dataPoint) +
+				" MAT:" + getBlockMaterialId(dataPoint) + "[" + EDhApiBlockMaterial.getFromIndex(getBlockMaterialId(dataPoint)) + "]" +
+				" SHAPE:" + getShape(dataPoint);
 		}
 	}
-	
-	
-	
+
+
+
 }

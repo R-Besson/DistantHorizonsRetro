@@ -34,17 +34,17 @@ public class NumberUtil
 			return false;
 		}
 		Class<?> typeClass = a.getClass();
-		
+
 		if (typeClass == Byte.class) return a.byteValue() > b.byteValue();
 		if (typeClass == Short.class) return a.shortValue() > b.shortValue();
 		if (typeClass == Integer.class) return a.intValue() > b.intValue();
 		if (typeClass == Long.class) return a.longValue() > b.longValue();
 		if (typeClass == Double.class) return a.doubleValue() > b.doubleValue();
 		if (typeClass == Float.class) return a.floatValue() > b.floatValue();
-		
+
 		return false;
 	}
-	
+
 	/** Does a less than (<) operator on any number */
 	public static boolean lessThan(Number a, Number b)
 	{
@@ -53,15 +53,15 @@ public class NumberUtil
 			return false;
 		}
 		Class<?> typeClass = a.getClass();
-		
+
 		if (typeClass == Byte.class) return a.byteValue() < b.byteValue();
 		if (typeClass == Short.class) return a.shortValue() < b.shortValue();
 		if (typeClass == Integer.class) return a.intValue() < b.intValue();
 		if (typeClass == Long.class) return a.longValue() < b.longValue();
 		if (typeClass == Double.class) return a.doubleValue() < b.doubleValue();
 		if (typeClass == Float.class) return a.floatValue() < b.floatValue();
-		
+
 		return false;
 	}
-	
+
 }

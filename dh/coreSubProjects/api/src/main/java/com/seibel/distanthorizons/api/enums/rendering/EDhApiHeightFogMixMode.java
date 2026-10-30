@@ -22,7 +22,7 @@ package com.seibel.distanthorizons.api.enums.rendering;
 /**
  * SPHERICAL                    <br>
  * CYLINDRICAL                  <br>
- *                              <br>
+ * <br>
  * MAX                          <br>
  * ADDITION                     <br>
  * MULTIPLY                     <br>
@@ -41,7 +41,7 @@ public enum EDhApiHeightFogMixMode
 	/**
 	 * Basic just means the fog will be based on the fragment depth
 	 * not on any special height calculation IE spherical fog. <br><br>
-	 * 
+	 *
 	 * Not to be confused with {@link EDhApiHeightFogMixMode#CYLINDRICAL}
 	 * which causes fog to only apply based on horizontal distance.
 	 */
@@ -51,7 +51,7 @@ public enum EDhApiHeightFogMixMode
 	 * IE cylindrical fog.
 	 */
 	CYLINDRICAL(1),
-	
+
 	MAX(2),
 	ADDITION(3),
 	MULTIPLY(4),
@@ -60,14 +60,15 @@ public enum EDhApiHeightFogMixMode
 	MULTIPLY_ADDITION(7),
 	INVERSE_MULTIPLY_ADDITION(8),
 	AVERAGE(9);
-	
-	
-	/** 
-	 * Stable version of {@link EDhApiFogFalloff#ordinal()} 
+
+
+	/**
+	 * Stable version of {@link EDhApiFogFalloff#ordinal()}
+	 *
 	 * @since API 4.0.0
 	 */
 	public final int value;
-	
+
 	EDhApiHeightFogMixMode(int value) { this.value = value; }
-		
+
 }

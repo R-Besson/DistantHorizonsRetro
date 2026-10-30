@@ -23,23 +23,23 @@ import com.seibel.distanthorizons.api.interfaces.IDhApiUnsafeWrapper;
 
 /**
  * Holds a Blaze3D texture.
- * 
+ *
  * @author James Seibel
  * @version 2026-07-11
  * @since API 7.1.0
  */
 public interface IDhApiBlazeTextureWrapper extends IDhApiUnsafeWrapper
 {
-	/** 
+	/**
 	 * Roughly describes the purpose of this texture. <br/>
-	 * Not guaranteed to be unique. 
+	 * Not guaranteed to be unique.
 	 */
 	String getName();
-	
+
 	/** @return -1 if the texture is null */
 	int getWidth();
 	/** @return -1 if the texture is null */
 	int getHeight();
-	
-	
+
+
 }

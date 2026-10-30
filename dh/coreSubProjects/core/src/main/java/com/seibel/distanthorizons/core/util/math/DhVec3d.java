@@ -34,23 +34,23 @@ public class DhVec3d extends DhApiVec3d
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public DhVec3d() { }
-	
+
 	public DhVec3d(double x, double y, double z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	public DhVec3d(DhApiVec3d that)
 	{
 		this.x = that.x;
 		this.y = that.y;
 		this.z = that.z;
 	}
-	
+
 
 
 	//=========//
@@ -63,27 +63,27 @@ public class DhVec3d extends DhApiVec3d
 		this.y = that.y;
 		this.z = that.z;
 	}
-	
+
 	public void set(double x, double y, double z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	public double getDistance(DhApiVec3d other) { return getDistance(this, other); }
 	public static double getDistance(DhApiVec3d a, DhApiVec3d b)
 	{
 		return Math.sqrt(Math.pow(a.x - b.x, 2)
-				+ Math.pow(a.y - b.y, 2)
-				+ Math.pow(a.z - b.z, 2));
+			+ Math.pow(a.y - b.y, 2)
+			+ Math.pow(a.z - b.z, 2));
 	}
-	
+
 	/** Gets the distance between points A and B, ignoring Y height. */
 	public static double getHorizontalDistance(DhApiVec3d a, DhApiVec3d b)
 	{
 		return Math.sqrt(Math.pow(a.x - b.x, 2)
-				+ Math.pow(a.z - b.z, 2));
+			+ Math.pow(a.z - b.z, 2));
 	}
-	
+
 }

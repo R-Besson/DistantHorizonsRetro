@@ -31,8 +31,8 @@ import com.seibel.distanthorizons.coreapi.interfaces.config.IConverter;
 @Deprecated
 public class ApiFogDrawModeConverter implements IConverter<Boolean, EDhApiFogDrawMode>
 {
-	
-	@Override 
+
+	@Override
 	public Boolean convertToCoreType(EDhApiFogDrawMode renderingMode)
 	{
 		if (renderingMode == EDhApiFogDrawMode.USE_OPTIFINE_SETTING)
@@ -41,12 +41,12 @@ public class ApiFogDrawModeConverter implements IConverter<Boolean, EDhApiFogDra
 		}
 		else
 		{
-			return renderingMode == EDhApiFogDrawMode.FOG_ENABLED;	
+			return renderingMode == EDhApiFogDrawMode.FOG_ENABLED;
 		}
 	}
-	
-	@Override 
+
+	@Override
 	public EDhApiFogDrawMode convertToApiType(Boolean renderingEnabled)
 	{ return renderingEnabled ? EDhApiFogDrawMode.FOG_ENABLED : EDhApiFogDrawMode.FOG_DISABLED; }
-	
+
 }

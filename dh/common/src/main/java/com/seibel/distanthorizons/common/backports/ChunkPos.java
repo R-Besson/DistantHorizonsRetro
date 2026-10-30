@@ -5,31 +5,31 @@ package com.seibel.distanthorizons.common.backports;
  */
 public class ChunkPos
 {
-    public final int x;
-    public final int z;
-	
-	
-	
+	public final int x;
+	public final int z;
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
-    public ChunkPos(int x, int z) 
-    {
-        this.x = x;
-        this.z = z;
-    }
+
+	public ChunkPos(int x, int z)
+	{
+		this.x = x;
+		this.z = z;
+	}
 
 	//endregion
 
-	
-	
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -37,7 +37,7 @@ public class ChunkPos
 		final int j = 1664525 * (this.z ^ -559038737) + 1013904223;
 		return i ^ j;
 	}
-	
+
 	@Override
 	public boolean equals(Object object)
 	{
@@ -47,8 +47,8 @@ public class ChunkPos
 		}
 		else if (object instanceof ChunkPos)
 		{
-			ChunkPos pos = (ChunkPos)object;
-			return this.x == pos.x 
+			ChunkPos pos = (ChunkPos) object;
+			return this.x == pos.x
 				&& this.z == pos.z;
 		}
 		else
@@ -56,7 +56,7 @@ public class ChunkPos
 			return false;
 		}
 	}
-	
+
 	//endregion
 
 

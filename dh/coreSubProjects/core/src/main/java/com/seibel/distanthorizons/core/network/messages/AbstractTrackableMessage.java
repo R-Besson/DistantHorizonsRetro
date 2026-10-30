@@ -33,16 +33,16 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 {
 	/** Tracks every message we've sent */
 	private static final AtomicInteger LAST_MESSAGE_ID_REF = new AtomicInteger();
-	
+
 	/**
 	 * 32 bits - NetworkSession ID (not transmitted) <br>
 	 * 1 bit - Requesting side (client - 0, server - 1) <br>
 	 * 31 bits - Request/Message ID <br><br>
-	 * 
+	 *
 	 * SI = NetworkSession ID <br>
 	 * CS = Client/Server flag <br>
 	 * MI = Request/Message ID <br><br>
-	 * 
+	 *
 	 * <code>
 	 * =======Bit layout=======	<br>
 	 * SI SI SI SI  SI SI SI SI <-- Top bits <br>
@@ -56,68 +56,68 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 	 * </code>
 	 */
 	public long futureId;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public AbstractTrackableMessage()
 	{
 		EWorldEnvironment worldEnvironment = SharedApi.getEnvironment();
 		LodUtil.assertTrue(worldEnvironment != null, "Message can't be created if no world is loaded.");
-		
-		
+
+
 		// message/Request ID written as the least significant bits
 		long id = LAST_MESSAGE_ID_REF.getAndIncrement();
 		// write requesting side at bit 32
 		id |= ((worldEnvironment == EWorldEnvironment.SERVER_ONLY) ? 1 : 0) << 31;
 		this.futureId = id;
 	}
-	
-	
-	
+
+
+
 	//==================//
 	// abstract methods //
 	//==================//
-	
+
 	protected abstract void encodeInternal(ByteBuf out) throws Exception;
 	protected abstract void decodeInternal(ByteBuf in) throws Exception;
-	
-	
-	
+
+
+
 	//=================//
 	// getters/setters //
 	//=================//
-	
+
 	@Override
-    public void setSession(NetworkSession networkSession)
+	public void setSession(NetworkSession networkSession)
 	{
 		super.setSession(networkSession);
 		// Session ID is written in the most significant bits
 		this.futureId |= (long) networkSession.id << 32;
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// send message //
 	//==============//
-	
+
 	public void sendResponse(AbstractTrackableMessage responseMessage)
 	{
 		responseMessage.futureId = this.futureId;
 		this.getSession().sendMessage(responseMessage);
 	}
 	public void sendResponse(Exception e) { this.sendResponse(new ExceptionMessage(e)); }
-	
-	
-	
+
+
+
 	//=============//
 	// serializing //
 	//=============//
-	
+
 	@Override
 	public final void encode(ByteBuf out)
 	{
@@ -131,7 +131,7 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public final void decode(ByteBuf in)
 	{
@@ -145,18 +145,18 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
-	@Override 
+
+	@Override
 	public MoreObjects.ToStringHelper toStringHelper()
 	{
 		return super.toStringHelper()
-				.add("futureId", this.futureId);
+			.add("futureId", this.futureId);
 	}
-	
+
 }

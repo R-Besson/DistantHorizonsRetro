@@ -10,13 +10,13 @@ public class WorldGenPlanConfigEventHandler implements IConfigListener
 {
 	public static WorldGenPlanConfigEventHandler INSTANCE = new WorldGenPlanConfigEventHandler();
 	public static IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
-	
-	
+
+
 	/** private since we only ever need one handler at a time */
 	private WorldGenPlanConfigEventHandler() { }
-	
-	
-	
+
+
+
 	@Override
 	public void onConfigValueSet()
 	{
@@ -26,7 +26,7 @@ public class WorldGenPlanConfigEventHandler implements IConfigListener
 			// all options are available, we don't need to do anything;
 			return;
 		}
-		
+
 		EDhApiGeneratorPlan genPlan = Config.Common.WorldGenerator.generatorPlan.get();
 		if (genPlan.surfaceGenEnabled)
 		{
@@ -34,10 +34,10 @@ public class WorldGenPlanConfigEventHandler implements IConfigListener
 			Config.Common.WorldGenerator.generatorPlan.set(EDhApiGeneratorPlan.CHUNKS_ONLY);
 		}
 	}
-	
+
 	@Override
 	public void onUiModify() { /* do nothing, we only care about modified config values */ }
-	
+
 	public static Boolean setShowEnumOptionFunc(Enum<?> enumValue)
 	{
 		boolean supportsSurfaceGen = MC_SHARED.supportsSurfaceGeneration();
@@ -46,10 +46,10 @@ public class WorldGenPlanConfigEventHandler implements IConfigListener
 			// all options are available, we don't need to check anything;
 			return true;
 		}
-		
-		
-		EDhApiGeneratorPlan genPlan = (EDhApiGeneratorPlan)enumValue;
+
+
+		EDhApiGeneratorPlan genPlan = (EDhApiGeneratorPlan) enumValue;
 		return !genPlan.surfaceGenEnabled;
 	}
-	
+
 }

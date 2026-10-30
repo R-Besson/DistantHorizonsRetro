@@ -38,10 +38,18 @@ public class QuadMergeSortTest
 			int quadCount;
 			switch (run % 4)
 			{
-				case 0: quadCount = 1 + random.nextInt(100); break;
-				case 1: quadCount = 1 + random.nextInt(3000); break;
-				case 2: quadCount = 2000 + random.nextInt(20000); break;
-				default: quadCount = (run % 20 == 3) ? 65_000 + random.nextInt(60_000) : 1 + random.nextInt(5000); break;
+				case 0:
+					quadCount = 1 + random.nextInt(100);
+					break;
+				case 1:
+					quadCount = 1 + random.nextInt(3000);
+					break;
+				case 2:
+					quadCount = 2000 + random.nextInt(20000);
+					break;
+				default:
+					quadCount = (run % 20 == 3) ? 65_000 + random.nextInt(60_000) : 1 + random.nextInt(5000);
+					break;
 			}
 			int range = 4 + random.nextInt(run % 4 == 3 ? 400 : 60);
 			ArrayList<BufferQuad> packedQuads = new ArrayList<>();
@@ -111,4 +119,5 @@ public class QuadMergeSortTest
 		quad.set(x, y, z, widthEastWest, widthNorthSouth, color, (short) 0, (byte) 0, (byte) 15, (byte) 0, direction);
 		return quad;
 	}
+
 }

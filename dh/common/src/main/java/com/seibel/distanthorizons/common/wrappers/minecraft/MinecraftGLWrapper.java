@@ -67,7 +67,7 @@ public class MinecraftGLWrapper
 		LWJGL.glDisable(GL11.GL_DEPTH_TEST);
 	}
 
-	/** @see GL11#glDepthFunc(int)  */
+	/** @see GL11#glDepthFunc(int) */
 	public void glDepthFunc(int func)
 	{
 		LWJGL.glDepthFunc(func);
@@ -189,6 +189,7 @@ public class MinecraftGLWrapper
 
 	/**
 	 * Always binds to {@link GL11#GL_TEXTURE_2D}
+	 *
 	 * @see GL11#glBindTexture(int, int)
 	 */
 	public void glBindTexture(int texture)

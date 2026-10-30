@@ -37,7 +37,11 @@ import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,14 +50,14 @@ import java.util.function.IntSupplier;
 public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2DTO>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public FullDataSourceV2Repo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, FullDataSourceV2DTO.class);
@@ -151,49 +155,49 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
 	//region
-	
-	@Override 
+
+	@Override
 	public String getTableName() { return "FullData"; }
-	
+
 	@Override
 	protected String CreateParameterizedWhereString() { return "DetailLevel = ? AND PosX = ? AND PosZ = ?"; }
-	
+
 	@Override
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, Long pos) throws SQLException
 	{
 		int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL;
-		
+
 		statement.setInt(index++, detailLevel);
 		statement.setInt(index++, DhSectionPos.getX(pos));
 		statement.setInt(index, DhSectionPos.getZ(pos));
 
 	}
-	
-	
-	
+
+
+
 	@Override @Nullable
 	public FullDataSourceV2DTO convertResultSetToDto(ResultSet resultSet) throws ClassCastException, IOException, SQLException
 	{ return this.convertResultSetToDto(resultSet, true); }
-	
+
 	public FullDataSourceV2DTO convertResultSetToDto(ResultSet resultSet, boolean includeAdjacent) throws ClassCastException, IOException, SQLException
 	{
 		//======================//
 		// get statement values //
 		//======================//
-		
+
 		byte detailLevel = resultSet.getByte("DetailLevel");
 		byte sectionDetailLevel = (byte) (detailLevel + DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 		int posX = resultSet.getInt("PosX");
 		int posZ = resultSet.getInt("PosZ");
 		long pos = DhSectionPos.encode(sectionDetailLevel, posX, posZ);
-		
+
 		int dataChecksum = resultSet.getInt("DataChecksum");
 		// rows saved before this was used have 0, the vanilla min height
 		int savedMinY = resultSet.getInt("MinY");
@@ -224,7 +228,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		dto.compressedColumnGenStepByteArray = putAllBytes(resultSet.getBinaryStream("ColumnGenerationStep"), dto.compressedColumnGenStepByteArray);
 		dto.compressedWorldCompressionModeByteArray = putAllBytes(resultSet.getBinaryStream("ColumnWorldCompressionMode"), dto.compressedWorldCompressionModeByteArray);
 		dto.compressedMappingByteArray = putAllBytes(resultSet.getBinaryStream("Mapping"), dto.compressedMappingByteArray);
-		
+
 		// adjacent full data
 		if (includeAdjacent)
 		{
@@ -233,7 +237,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			dto.compressedEastAdjDataByteArray = putAllBytes(resultSet.getBinaryStream("EastAdjData"), dto.compressedEastAdjDataByteArray);
 			dto.compressedWestAdjDataByteArray = putAllBytes(resultSet.getBinaryStream("WestAdjData"), dto.compressedWestAdjDataByteArray);
 		}
-		
+
 		// set individual variables
 		{
 			dto.pos = pos;
@@ -248,14 +252,14 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 		return dto;
 	}
-	
+
 	@Nullable
 	public FullDataSourceV2DTO convertResultSetToAdjDto(long pos, ResultSet resultSet) throws ClassCastException, IOException, SQLException
 	{
 		//======================//
 		// get statement values //
 		//======================//
-		
+
 		int dataChecksum = resultSet.getInt("DataChecksum");
 		int savedMinY = resultSet.getInt("MinY");
 
@@ -284,7 +288,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		dto.compressedColumnGenStepByteArray = putAllBytes(resultSet.getBinaryStream("ColumnGenerationStep"), dto.compressedColumnGenStepByteArray);
 		dto.compressedWorldCompressionModeByteArray = putAllBytes(resultSet.getBinaryStream("ColumnWorldCompressionMode"), dto.compressedWorldCompressionModeByteArray);
 		dto.compressedMappingByteArray = putAllBytes(resultSet.getBinaryStream("Mapping"), dto.compressedMappingByteArray);
-		
+
 		// set individual variables
 		{
 			dto.pos = pos;
@@ -299,7 +303,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 		return dto;
 	}
-	
+
 	@Override
 	public PreparedStatement createUpsertStatement(FullDataSourceV2DTO dto) throws SQLException
 	{
@@ -309,60 +313,60 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		// update propagation is run.
 		String upsertSqlTemplate = (
 			"INSERT INTO " + this.getTableName() + " (\n" +
-			"   DetailLevel, PosX, PosZ, \n" +
-			"   MinY, DataChecksum, \n" +
-			"   Data, ColumnGenerationStep, ColumnWorldCompressionMode, Mapping, \n" +
-			"   NorthAdjData, SouthAdjData, EastAdjData, WestAdjData, \n" +
-			"   DataFormatVersion, CompressionMode, ApplyToParent, ApplyToChildren, Regenerate, \n" +
-			"   LastModifiedUnixDateTime, CreatedUnixDateTime) \n" +
-			"VALUES( \n" +
-			"    ?, ?, ?, \n" +
-			"    ?, ?, \n" +
-			"    ?, ?, ?, ?, \n" +
-			"    ?, ?, ?, ?, \n" +
-			"    ?, ?, ?, ?, ?, \n" +
-			"    ?, ? \n" +
-			") \n" +
-			"ON CONFLICT(DetailLevel, PosX, PosZ) DO UPDATE SET \n" +
-			"    DataChecksum = excluded.DataChecksum \n" +
-			// the data is always written relative to the current min height
-			"   ,MinY = excluded.MinY \n" +
-			
-			"   ,Data = excluded.Data \n" +
-			"   ,ColumnGenerationStep = excluded.ColumnGenerationStep \n" +
-			"   ,ColumnWorldCompressionMode = excluded.ColumnWorldCompressionMode \n" +
-			"   ,Mapping = excluded.Mapping \n" +
-			"   ,NorthAdjData = excluded.NorthAdjData, SouthAdjData = excluded.SouthAdjData \n" +
-			"   ,EastAdjData = excluded.EastAdjData, WestAdjData = excluded.WestAdjData \n" +
-			
-			"   ,DataFormatVersion = excluded.DataFormatVersion \n" +
-			"   ,CompressionMode = excluded.CompressionMode \n" +
-			// only update these values if they're present
-			(dto.applyToParent != null ? "   ,ApplyToParent = excluded.ApplyToParent \n" : "") +
-			(dto.applyToChildren != null ? "   ,ApplyToChildren = excluded.ApplyToChildren \n" : "") +
-			(dto.regenerate != null ? "   ,Regenerate = excluded.Regenerate \n" : "") +
-			
-			"   ,LastModifiedUnixDateTime = excluded.LastModifiedUnixDateTime \n"
+				"   DetailLevel, PosX, PosZ, \n" +
+				"   MinY, DataChecksum, \n" +
+				"   Data, ColumnGenerationStep, ColumnWorldCompressionMode, Mapping, \n" +
+				"   NorthAdjData, SouthAdjData, EastAdjData, WestAdjData, \n" +
+				"   DataFormatVersion, CompressionMode, ApplyToParent, ApplyToChildren, Regenerate, \n" +
+				"   LastModifiedUnixDateTime, CreatedUnixDateTime) \n" +
+				"VALUES( \n" +
+				"    ?, ?, ?, \n" +
+				"    ?, ?, \n" +
+				"    ?, ?, ?, ?, \n" +
+				"    ?, ?, ?, ?, \n" +
+				"    ?, ?, ?, ?, ?, \n" +
+				"    ?, ? \n" +
+				") \n" +
+				"ON CONFLICT(DetailLevel, PosX, PosZ) DO UPDATE SET \n" +
+				"    DataChecksum = excluded.DataChecksum \n" +
+				// the data is always written relative to the current min height
+				"   ,MinY = excluded.MinY \n" +
+
+				"   ,Data = excluded.Data \n" +
+				"   ,ColumnGenerationStep = excluded.ColumnGenerationStep \n" +
+				"   ,ColumnWorldCompressionMode = excluded.ColumnWorldCompressionMode \n" +
+				"   ,Mapping = excluded.Mapping \n" +
+				"   ,NorthAdjData = excluded.NorthAdjData, SouthAdjData = excluded.SouthAdjData \n" +
+				"   ,EastAdjData = excluded.EastAdjData, WestAdjData = excluded.WestAdjData \n" +
+
+				"   ,DataFormatVersion = excluded.DataFormatVersion \n" +
+				"   ,CompressionMode = excluded.CompressionMode \n" +
+				// only update these values if they're present
+				(dto.applyToParent != null ? "   ,ApplyToParent = excluded.ApplyToParent \n" : "") +
+				(dto.applyToChildren != null ? "   ,ApplyToChildren = excluded.ApplyToChildren \n" : "") +
+				(dto.regenerate != null ? "   ,Regenerate = excluded.Regenerate \n" : "") +
+
+				"   ,LastModifiedUnixDateTime = excluded.LastModifiedUnixDateTime \n"
 			// intern should help reduce memory overhead due to this string being dynamic
 		).intern();
-		
-		
+
+
 		PreparedStatement statement = this.createPreparedStatement(upsertSqlTemplate);
 		if (statement == null)
 		{
 			return null;
 		}
-		
-		
+
+
 		int i = 1;
 		statement.setInt(i++, DhSectionPos.getDetailLevel(dto.pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 		statement.setInt(i++, DhSectionPos.getX(dto.pos));
 		statement.setInt(i++, DhSectionPos.getZ(dto.pos));
-		
+
 		statement.setInt(i++, this.levelMinYGetter.getAsInt());
 
 		statement.setInt(i++, dto.dataChecksum);
-		
+
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedDataByteArray.elements()), dto.compressedDataByteArray.size());
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedColumnGenStepByteArray.elements()), dto.compressedColumnGenStepByteArray.size());
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedWorldCompressionModeByteArray.elements()), dto.compressedWorldCompressionModeByteArray.size());
@@ -372,43 +376,43 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedSouthAdjDataByteArray.elements()), dto.compressedSouthAdjDataByteArray.size());
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedEastAdjDataByteArray.elements()), dto.compressedEastAdjDataByteArray.size());
 		statement.setBinaryStream(i++, new ByteArrayInputStream(dto.compressedWestAdjDataByteArray.elements()), dto.compressedWestAdjDataByteArray.size());
-		
+
 		statement.setByte(i++, dto.dataFormatVersion);
 		statement.setByte(i++, dto.compressionModeValue);
 		// if nothing is present assume we don't need/want to propagate updates
 		statement.setBoolean(i++, BoolUtil.falseIfNull(dto.applyToParent));
 		statement.setBoolean(i++, BoolUtil.falseIfNull(dto.applyToChildren));
 		statement.setBoolean(i++, BoolUtil.falseIfNull(dto.regenerate));
-		
+
 		statement.setLong(i++, System.currentTimeMillis()); // last modified unix time
 		statement.setLong(i, System.currentTimeMillis()); // created unix time (only used if this is a fresh insert)
-		
+
 		return statement;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=================//
 	// partial selects //
 	//=================//
 	//region
-	
+
 	private final String getAdjForDirectionSqlTemplate =
-			"SELECT \n" +
-					"   MinY, DataChecksum, \n" +
-					"   ColumnGenerationStep, ColumnWorldCompressionMode, Mapping, \n" +
-					"   DataFormatVersion, CompressionMode, ApplyToParent, ApplyToChildren, Regenerate, \n" +
-					"   LastModifiedUnixDateTime, CreatedUnixDateTime, \n" +
-					"   DIRECTION_ENUM as AdjData \n" +
-					"FROM "+this.getTableName() + "\n" +
-					"   WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?; \n";
+		"SELECT \n" +
+			"   MinY, DataChecksum, \n" +
+			"   ColumnGenerationStep, ColumnWorldCompressionMode, Mapping, \n" +
+			"   DataFormatVersion, CompressionMode, ApplyToParent, ApplyToChildren, Regenerate, \n" +
+			"   LastModifiedUnixDateTime, CreatedUnixDateTime, \n" +
+			"   DIRECTION_ENUM as AdjData \n" +
+			"FROM " + this.getTableName() + "\n" +
+			"   WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?; \n";
 	private final String getAdjForNorthDirTemplate = this.getAdjForDirectionSqlTemplate.replace("DIRECTION_ENUM", "NorthAdjData");
 	private final String getAdjForSouthDirTemplate = this.getAdjForDirectionSqlTemplate.replace("DIRECTION_ENUM", "SouthAdjData");
 	private final String getAdjForEastDirTemplate = this.getAdjForDirectionSqlTemplate.replace("DIRECTION_ENUM", "EastAdjData");
 	private final String getAdjForWestDirTemplate = this.getAdjForDirectionSqlTemplate.replace("DIRECTION_ENUM", "WestAdjData");
-	
+
 	public FullDataSourceV2DTO getAdjByPosAndDirection(long pos, EDhDirection direction)
 	{
 		// parameters don't work in the select, doing so causes
@@ -429,7 +433,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			case WEST:
 				sql = this.getAdjForWestDirTemplate;
 				break;
-			
+
 			default:
 				throw new IllegalArgumentException();
 		}
@@ -442,22 +446,22 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 		long writeCount = (this.lookupCache != null) ? this.lookupCache.writeCount(pos) : 0;
 
-		try(PreparedStatement statement = this.createPreparedStatement(sql))
+		try (PreparedStatement statement = this.createPreparedStatement(sql))
 		{
 			if (statement == null)
 			{
 				return null;
 			}
-			
-			
-			
+
+
+
 			int i = 1;
 			statement.setInt(i++, DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-			
-			
-			try(ResultSet resultSet = this.query(statement))
+
+
+			try (ResultSet resultSet = this.query(statement))
 			{
 				if (resultSet == null)
 				{
@@ -481,47 +485,47 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		{
 			// a closed repo is expected during shutdown, so it isn't logged
 			if (!(e instanceof SQLException
-					&& DbConnectionClosedException.isClosedException(e)))
+				&& DbConnectionClosedException.isClosedException(e)))
 			{
-				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with pos ["+DhSectionPos.toString(pos)+"] and direction ["+direction+"]. Error: ["+e.getMessage()+"].", e);
+				LOGGER.warn("Unexpected issue deserializing DTO [" + this.dtoClass.getSimpleName() + "] with pos [" + DhSectionPos.toString(pos) + "] and direction [" + direction + "]. Error: [" + e.getMessage() + "].", e);
 			}
 			return null;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// updates //
 	//=========//
 	//region
-	
+
 	/** should be very similar to {@link FullDataSourceV2Repo#setApplyToChildrenSql} */
-	private final String setApplyToParentSql = 
-			"UPDATE "+this.getTableName()+" \n" +
+	private final String setApplyToParentSql =
+		"UPDATE " + this.getTableName() + " \n" +
 			"SET ApplyToParent = ? \n" +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
 	public void setApplyToParent(long pos, boolean applyToParent)
 	{ this.setApplyToFlag(pos, applyToParent, this.setApplyToParentSql); }
-	
+
 	/** should be very similar to {@link FullDataSourceV2Repo#setApplyToParentSql} */
 	private final String setApplyToChildrenSql =
-			"UPDATE "+this.getTableName()+" \n" +
+		"UPDATE " + this.getTableName() + " \n" +
 			"SET ApplyToChildren = ? \n" +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
 	public void setApplyToChild(long pos, boolean applyToChild)
 	{ this.setApplyToFlag(pos, applyToChild, this.setApplyToChildrenSql); }
-	
+
 	/** should be very similar to {@link FullDataSourceV2Repo#setApplyToParentSql} */
 	private final String setRegenerateToChildrenSql =
-			"UPDATE "+this.getTableName()+" \n" +
+		"UPDATE " + this.getTableName() + " \n" +
 			"SET Regenerate = ? \n" +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
 	public void setRegenerate(long pos, boolean regenerate)
 	{ this.setApplyToFlag(pos, regenerate, this.setRegenerateToChildrenSql); }
-	
+
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	private void setApplyToFlag(long pos, boolean applyFlag, String sql)
 	{
@@ -531,16 +535,16 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return;
 			}
-			
-			
+
+
 			int i = 1;
 			statement.setBoolean(i++, applyFlag);
-			
+
 			int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-			
+
 			try (ResultSet resultSet = this.query(statement))
 			{
 			}
@@ -550,52 +554,52 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
-	
+
+
+
 	/** should be very similar to {@link FullDataSourceV2Repo#getChildPositionsToUpdateSql} */
 	private final String getParentPositionsToUpdateSql =
-			"SELECT DetailLevel, PosX, PosZ, " +
+		"SELECT DetailLevel, PosX, PosZ, " +
 			"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
 			"FROM " + this.getTableName() + " " +
 			"WHERE ApplyToParent = 1 " +
 			// sorting by detail level first will reduce the total number of updates required
-			// but makes it feel less responsive since distant updates won't be seen until everything 
+			// but makes it feel less responsive since distant updates won't be seen until everything
 			// underneith is done
 			"ORDER BY Distance ASC " + // DetailLevel ASC,
 			"LIMIT ?; ";
 	public LongArrayList getParentPositionsToUpdate(int targetBlockPosX, int targetBlockPosZ, int returnCount)
 	{ return this.getPositionsToUpdate(targetBlockPosX, targetBlockPosZ, returnCount, this.getParentPositionsToUpdateSql); }
-	
+
 	/** should be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
 	private final String getChildPositionsToUpdateSql =
-			"SELECT DetailLevel, PosX, PosZ, " +
+		"SELECT DetailLevel, PosX, PosZ, " +
 			"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
 			"FROM " + this.getTableName() + " " +
 			"WHERE ApplyToChildren = 1 " +
-			"ORDER BY Distance ASC " + // DetailLevel ASC, 
+			"ORDER BY Distance ASC " + // DetailLevel ASC,
 			"LIMIT ?; ";
 	public LongArrayList getChildPositionsToUpdate(int targetBlockPosX, int targetBlockPosZ, int returnCount)
 	{ return this.getPositionsToUpdate(targetBlockPosX, targetBlockPosZ, returnCount, this.getChildPositionsToUpdateSql); }
-	
+
 	private LongArrayList getPositionsToUpdate(int targetBlockPosX, int targetBlockPosZ, int returnCount, String sql)
 	{
 		LongArrayList list = new LongArrayList();
-		
+
 		try (PreparedStatement statement = this.createPreparedStatement(sql))
 		{
 			if (statement == null)
 			{
 				return list;
 			}
-			
-			
+
+
 			int i = 1;
 			statement.setInt(i++, targetBlockPosX);
 			statement.setInt(i++, targetBlockPosZ);
-			
+
 			statement.setInt(i, returnCount);
-			
+
 			try (ResultSet result = this.query(statement))
 			{
 				while (result != null && result.next())
@@ -604,12 +608,12 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 					byte sectionDetailLevel = (byte) (detailLevel + DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 					int posX = result.getInt("PosX");
 					int posZ = result.getInt("PosZ");
-					
+
 					long pos = DhSectionPos.encode(sectionDetailLevel, posX, posZ);
 					list.add(pos);
 				}
 			}
-			
+
 			return list;
 		}
 		catch (SQLException e)
@@ -617,33 +621,33 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
+
 	/** should be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
 	private final String getRegenPositionsToUpdateSql =
 		"SELECT DetailLevel, PosX, PosZ, " +
-		"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
-		"FROM " + this.getTableName() + " " +
-		"WHERE Regenerate = 1 " +
-		"   AND Distance <= ? " +
-		"ORDER BY Distance ASC " +
-		"LIMIT ?; ";
+			"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
+			"FROM " + this.getTableName() + " " +
+			"WHERE Regenerate = 1 " +
+			"   AND Distance <= ? " +
+			"ORDER BY Distance ASC " +
+			"LIMIT ?; ";
 	public LongArrayList getChildPositionsToRegen(int targetBlockPosX, int targetBlockPosZ, int maxBlockDistanceFromTarget, int returnCount)
 	{
 		LongArrayList list = new LongArrayList();
-		
+
 		try (PreparedStatement statement = this.createPreparedStatement(this.getRegenPositionsToUpdateSql))
 		{
 			if (statement == null)
 			{
 				return list;
 			}
-			
-			
+
+
 			int i = 1;
 			statement.setInt(i++, targetBlockPosX);
 			statement.setInt(i++, targetBlockPosZ);
-			
+
 			if (maxBlockDistanceFromTarget < 0)
 			{
 				statement.setLong(i++, Long.MAX_VALUE); // get everything
@@ -652,9 +656,9 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				statement.setInt(i++, maxBlockDistanceFromTarget);
 			}
-			
+
 			statement.setInt(i, returnCount);
-			
+
 			try (ResultSet result = this.query(statement))
 			{
 				while (result != null && result.next())
@@ -663,12 +667,12 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 					byte sectionDetailLevel = (byte) (detailLevel + DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 					int posX = result.getInt("PosX");
 					int posZ = result.getInt("PosZ");
-					
+
 					long pos = DhSectionPos.encode(sectionDetailLevel, posX, posZ);
 					list.add(pos);
 				}
 			}
-			
+
 			return list;
 		}
 		catch (SQLException e)
@@ -676,13 +680,13 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
+
 	private final String getColumnGenerationStepSql =
-			"select ColumnGenerationStep, CompressionMode, MinY " +
-			"from "+this.getTableName()+" " +
+		"select ColumnGenerationStep, CompressionMode, MinY " +
+			"from " + this.getTableName() + " " +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
-	/** */
+	/**  */
 	public void getColumnGenerationStepForPos(long pos, ByteArrayList outputByteArray)
 	{
 		if (this.lookupCache != null
@@ -698,18 +702,18 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return;
 			}
-			
-			
+
+
 			int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
-			
-			
-			
+
+
+
 			int i = 1;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-			
-			
+
+
 			try (ResultSet result = this.query(statement))
 			{
 				if (result == null)
@@ -724,17 +728,17 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 					}
 					return;
 				}
-				
-				
+
+
 				byte compressionModeEnumValue = result.getByte("CompressionMode");
 				EDhApiDataCompressionMode compressionModeEnum = EDhApiDataCompressionMode.getFromValue(compressionModeEnumValue);
-				
+
 				// decompress the data
 				try
 				{
 					ByteArrayList byteArrayList = new ByteArrayList();
 					putAllBytes(result.getBinaryStream("ColumnGenerationStep"), byteArrayList);
-					try(PhantomArrayListCheckout checkout = FullDataSourceV2DTO.ARRAY_LIST_POOL.checkoutByteArrays(1);
+					try (PhantomArrayListCheckout checkout = FullDataSourceV2DTO.ARRAY_LIST_POOL.checkoutByteArrays(1);
 						DhDataInputStream compressedIn = DhDataInputStream.create(byteArrayList, compressionModeEnum, checkout))
 					{
 						putAllBytes(compressedIn, outputByteArray);
@@ -759,7 +763,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				catch (IOException e)
 				{
 					LOGGER.warn("Decompression issue when getting column gen steps for pos: [" + DhSectionPos.toString(pos) + "], deleting corrupted data.", e);
-					
+
 					this.deleteWithKey(pos);
 					ListUtil.clearAndSetSize(outputByteArray, FullDataSourceV2.WIDTH * FullDataSourceV2.WIDTH);
 				}
@@ -772,25 +776,25 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return;
 			}
-			
+
 			throw new RuntimeException(e);
 		}
 	}
-	
-	/** 
-	 * Uses the same math as {@link DataSourceRetrievalTask#DataSourceRetrievalTask(long, byte)} 
+
+	/**
+	 * Uses the same math as {@link DataSourceRetrievalTask#DataSourceRetrievalTask(long, byte)}
 	 * to determine chunk counts.
 	 */
 	private final String getRegenChunkCountLimitedSql =
 		"SELECT SUM(power(2, RegenList.SectionDetailLevel + 6)) as ChunkCount \n" +
-		"FROM \n" +
-		"( \n" +
-		"   select DetailLevel as SectionDetailLevel, \n" +
-		"       abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance \n" +
-		"   FROM "+this.getTableName()+" \n" +
-		"   WHERE Regenerate = 1 \n" +
-		"       AND Distance <= ? \n" +
-		") as RegenList;";
+			"FROM \n" +
+			"( \n" +
+			"   select DetailLevel as SectionDetailLevel, \n" +
+			"       abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance \n" +
+			"   FROM " + this.getTableName() + " \n" +
+			"   WHERE Regenerate = 1 \n" +
+			"       AND Distance <= ? \n" +
+			") as RegenList;";
 	public long getRegenChunkCount(int targetBlockPosX, int targetBlockPosZ, int maxBlockDistanceFromTarget)
 	{
 		try (PreparedStatement statement = this.createPreparedStatement(this.getRegenChunkCountLimitedSql))
@@ -799,11 +803,11 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return 0L;
 			}
-			
+
 			int i = 1;
 			statement.setInt(i++, targetBlockPosX);
 			statement.setInt(i++, targetBlockPosZ);
-			
+
 			if (maxBlockDistanceFromTarget < 0)
 			{
 				statement.setLong(i, Long.MAX_VALUE); // get everything
@@ -812,7 +816,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				statement.setInt(i, maxBlockDistanceFromTarget);
 			}
-			
+
 			try (ResultSet result = this.query(statement))
 			{
 				if (result == null || !result.next())
@@ -821,7 +825,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				}
 
 
-                return result.getLong("ChunkCount");
+				return result.getLong("ChunkCount");
 			}
 		}
 		catch (SQLException e)
@@ -831,23 +835,23 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return 0L;
 			}
-			
+
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// multiplayer //
 	//=============//
 	//region
-	
+
 	private final String getTimestampForPosSql =
-			"SELECT LastModifiedUnixDateTime " +
+		"SELECT LastModifiedUnixDateTime " +
 			"FROM " + this.getTableName() + " " +
 			"WHERE DetailLevel = ? " +
 			"AND PosX = ? " +
@@ -855,26 +859,26 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	@Nullable
 	public Long getTimestampForPos(long pos)
 	{
-		try(PreparedStatement preparedStatement = this.createPreparedStatement(this.getTimestampForPosSql))
+		try (PreparedStatement preparedStatement = this.createPreparedStatement(this.getTimestampForPosSql))
 		{
 			if (preparedStatement == null)
 			{
 				return null;
 			}
-			
-			
+
+
 			int i = 1;
 			preparedStatement.setInt(i++, DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 			preparedStatement.setInt(i++, DhSectionPos.getX(pos));
 			preparedStatement.setInt(i, DhSectionPos.getZ(pos));
-			
+
 			try (ResultSet result = this.query(preparedStatement))
 			{
 				if (result == null || !result.next())
 				{
 					return null;
 				}
-				
+
 				return result.getLong("LastModifiedUnixDateTime");
 			}
 		}
@@ -889,31 +893,31 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 	//===================//
 	// compression tests //
 	//===================//
 	//region
-	
-	private final String getAllPositionsSql = 
-			"select DetailLevel, PosX, PosZ " +
-			"from "+this.getTableName()+"; ";
+
+	private final String getAllPositionsSql =
+		"select DetailLevel, PosX, PosZ " +
+			"from " + this.getTableName() + "; ";
 	/** @return every position in this database */
 	public LongArrayList getAllPositions()
 	{
 		LongArrayList list = new LongArrayList();
-		
+
 		try (PreparedStatement statement = this.createPreparedStatement(this.getAllPositionsSql))
 		{
 			if (statement == null)
 			{
 				return list;
 			}
-			
-			
-			try(ResultSet result = this.query(statement))
+
+
+			try (ResultSet result = this.query(statement))
 			{
 				while (result != null && result.next())
 				{
@@ -921,11 +925,11 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 					byte sectionDetailLevel = (byte) (detailLevel + DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 					int posX = result.getInt("PosX");
 					int posZ = result.getInt("PosZ");
-					
+
 					long pos = DhSectionPos.encode(sectionDetailLevel, posX, posZ);
 					list.add(pos);
 				}
-				
+
 				return list;
 			}
 		}
@@ -934,40 +938,40 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
+
 	private final String getDataSizeInBytesSql =
-			"select LENGTH(Data) as dataSize " +
-			"from "+this.getTableName()+" " +
+		"select LENGTH(Data) as dataSize " +
+			"from " + this.getTableName() + " " +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
-	/** 
-	 * @return the size of the full data at the given position 
-	 *          (doesn't include the size of the mapping or any other column)
+	/**
+	 * @return the size of the full data at the given position
+	 * (doesn't include the size of the mapping or any other column)
 	 */
 	public long getDataSizeInBytes(long pos)
 	{
 		int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
-		
+
 		try (PreparedStatement statement = this.createPreparedStatement(this.getDataSizeInBytesSql))
 		{
 			if (statement == null)
 			{
 				return 0L;
 			}
-		
+
 			int i = 1;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-			
-			
+
+
 			try (ResultSet result = this.query(statement))
 			{
 				if (result == null || !result.next())
 				{
 					return 0L;
 				}
-				
+
 				return result.getLong("dataSize");
 			}
 		}
@@ -976,10 +980,10 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private final String getTotalDataSizeInBytesSql =
-			"select SUM(LENGTH(Data)) as dataSize " +
-			"from "+this.getTableName()+"; ";
+		"select SUM(LENGTH(Data)) as dataSize " +
+			"from " + this.getTableName() + "; ";
 	/** @return the total size in bytes of the full data for this entire database */
 	public long getTotalDataSizeInBytes()
 	{
@@ -990,7 +994,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return 0;
 			}
-			
+
 			return result.getLong("dataSize");
 		}
 		catch (SQLException e)
@@ -998,16 +1002,16 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	//region
-	
+
 	private static ByteArrayList putAllBytes(@Nullable InputStream inputStream, @Nullable ByteArrayList existingArrayList) throws IOException
 	{
 		if (existingArrayList == null)
@@ -1019,7 +1023,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		{
 			existingArrayList.clear();
 		}
-		
+
 		try
 		{
 			if (inputStream == null)
@@ -1051,14 +1055,15 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				}
 			}
 		}
-		catch (EOFException ignore) { /* shouldn't happen, but just in case */ }
+		catch (EOFException ignore)
+		{ /* shouldn't happen, but just in case */ }
 
 		return existingArrayList;
 	}
 	private static final ThreadLocal<byte[]> BULK_READ_BUFFER = ThreadLocal.withInitial(() -> new byte[8 * 1024]);
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

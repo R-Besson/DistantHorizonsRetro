@@ -18,6 +18,7 @@
  */
 
 package com.seibel.distanthorizons.common.wrappers.modAccessor;
+
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IHodgePodgeAccessor;
 import net.minecraft.world.World;
 
@@ -25,4 +26,5 @@ public interface IHodgePodgeCommonAccessor extends IHodgePodgeAccessor
 {
 	void preventChunkSimulation(World world, int x, int z);
 	void allowChunkSimulation(World world, int x, int z);
+
 }

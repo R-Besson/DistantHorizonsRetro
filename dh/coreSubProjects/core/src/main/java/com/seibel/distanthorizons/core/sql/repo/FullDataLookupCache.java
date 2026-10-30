@@ -45,6 +45,7 @@ public class FullDataLookupCache
 
 	/**
 	 * Copies the cached generation steps into {@code output} if the position is in the repo.
+	 *
 	 * @return false if this position's generation steps aren't cached
 	 */
 	public synchronized boolean getGenerationSteps(long pos, ByteArrayList output)
@@ -174,6 +175,7 @@ public class FullDataLookupCache
 		}
 
 		long sizeInBytes() { return ENTRY_OVERHEAD_BYTES + ((this.generationSteps != null) ? this.generationSteps.length : 0); }
+
 	}
 
 	//endregion

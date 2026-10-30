@@ -30,10 +30,10 @@ package com.seibel.distanthorizons.coreapi.interfaces.config;
  */
 public interface IConverter<CoreType, ApiType>
 {
-	
+
 	CoreType convertToCoreType(ApiType apiObject);
-	
+
 	ApiType convertToApiType(CoreType coreObject);
-	
+
 }
 

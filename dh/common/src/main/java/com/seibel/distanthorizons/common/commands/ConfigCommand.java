@@ -31,12 +31,12 @@ public class ConfigCommand extends AbstractDhCommand
 	{
 		Class<?> type = configEntry.getType();
 
-		if (type == Boolean.class)       ((ConfigEntry) configEntry).set(Boolean.parseBoolean(value));
-		else if (type == Integer.class)  ((ConfigEntry) configEntry).set(Integer.parseInt(value));
-		else if (type == Double.class)   ((ConfigEntry) configEntry).set(Double.parseDouble(value));
-		else if (type == Float.class)    ((ConfigEntry) configEntry).set(Float.parseFloat(value));
-		else if (type == Long.class)     ((ConfigEntry) configEntry).set(Long.parseLong(value));
-		else if (type == String.class)   ((ConfigEntry) configEntry).set(value);
+		if (type == Boolean.class) ((ConfigEntry) configEntry).set(Boolean.parseBoolean(value));
+		else if (type == Integer.class) ((ConfigEntry) configEntry).set(Integer.parseInt(value));
+		else if (type == Double.class) ((ConfigEntry) configEntry).set(Double.parseDouble(value));
+		else if (type == Float.class) ((ConfigEntry) configEntry).set(Float.parseFloat(value));
+		else if (type == Long.class) ((ConfigEntry) configEntry).set(Long.parseLong(value));
+		else if (type == String.class) ((ConfigEntry) configEntry).set(value);
 		else if (type.isEnum())
 		{
 			Enum<?> enumValue = Enum.valueOf((Class<Enum>) type, value);

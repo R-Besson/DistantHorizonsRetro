@@ -32,22 +32,21 @@ import java.awt.*;
  * A mutable version of {@link DhApiFogRenderParam} to allow
  * API modification of DH's fog rendering.
  *
+ * @author James Seibel
+ * @version 2026-05-20
  * @see IDhApiFogConfig
  * @see IDhApiFarFogConfig
  * @see IDhApiHeightFogConfig
  * @see DhApiFogRenderParam
- * 
- * @author James Seibel
- * @version 2026-05-20
  * @since API 7.0.0
  */
 public class DhApiMutableFogRenderParam extends DhApiFogRenderParam
 {
 	public void setFogColor(Color fogColor) { this.fogColor = fogColor; }
-	
+
 	// far fog //
 	//region
-	
+
 	/** @see IDhApiFarFogConfig#farFogFalloff() */
 	public void setFarFogFalloff(EDhApiFogFalloff farFogFalloff) { this.farFogFalloff = farFogFalloff; }
 	/** @see IDhApiFarFogConfig#farFogStartDistance() */
@@ -60,12 +59,12 @@ public class DhApiMutableFogRenderParam extends DhApiFogRenderParam
 	public void setFarFogMaxThickness(float farFogMaxThickness) { this.farFogMaxThickness = farFogMaxThickness; }
 	/** @see IDhApiFarFogConfig#farFogDensity() */
 	public void setFarFogDensity(float farFogDensity) { this.farFogDensity = farFogDensity; }
-	
+
 	//endregion
-	
+
 	// height fog //
 	//region
-	
+
 	/** @see IDhApiHeightFogConfig#heightFogFalloff() */
 	public void setHeightFogFalloff(EDhApiFogFalloff heightFogFalloff) { this.heightFogFalloff = heightFogFalloff; }
 	/** @see IDhApiHeightFogConfig#heightFogMixMode() */
@@ -84,34 +83,34 @@ public class DhApiMutableFogRenderParam extends DhApiFogRenderParam
 	public void setHeightFogMaxThickness(float heightFogMaxThickness) { this.heightFogMaxThickness = heightFogMaxThickness; }
 	/** @see IDhApiHeightFogConfig#heightFogDensity() */
 	public void setHeightFogDensity(float heightFogDensity) { this.heightFogDensity = heightFogDensity; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public DhApiMutableFogRenderParam(DhApiFogRenderParam parent)
 	{ super(parent); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public DhApiMutableFogRenderParam copy() { return new DhApiMutableFogRenderParam(this); }
-	
+
 	//endregion
-	
-	
-	
-	
+
+
+
+
 }

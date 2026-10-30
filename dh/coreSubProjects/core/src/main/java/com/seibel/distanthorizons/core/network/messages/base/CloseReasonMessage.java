@@ -31,37 +31,37 @@ public class CloseReasonMessage extends AbstractNetworkMessage
 {
 	public String reason;
 
-	
-	
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public CloseReasonMessage() { }
 	public CloseReasonMessage(String reason) { this.reason = reason; }
-	
-	
-	
+
+
+
 	//===============//
 	// serialization //
 	//===============//
-	
+
 	@Override
 	public void encode(ByteBuf out) { this.writeString(this.reason, out); }
 	@Override
 	public void decode(ByteBuf in) { this.reason = this.readString(in); }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public MoreObjects.ToStringHelper toStringHelper()
 	{
 		return super.toStringHelper()
-				.add("reason", this.reason);
+			.add("reason", this.reason);
 	}
-	
+
 }

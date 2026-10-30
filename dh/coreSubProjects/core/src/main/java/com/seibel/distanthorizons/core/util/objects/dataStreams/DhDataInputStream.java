@@ -30,7 +30,11 @@ import net.jpountz.lz4.LZ4FrameInputStream;
 import org.tukaani.xz.ResettableArrayCache;
 import org.tukaani.xz.XZInputStream;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Combines multiple different streams together for ease of use
@@ -45,15 +49,15 @@ import java.io.*;
 public class DhDataInputStream extends DataInputStream
 {
 	private static final ThreadLocal<ResettableArrayCache> LZMA_RESETTABLE_ARRAY_CACHE_GETTER = ThreadLocal.withInitial(() -> new ResettableArrayCache(new LzmaArrayCache()));
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public static DhDataInputStream create(ByteArrayList byteArrayList, EDhApiDataCompressionMode compressionMode, PhantomArrayListCheckout checkout) throws IOException
 	{ return create(byteArrayList.toByteArray(), compressionMode, checkout); }
 	public static DhDataInputStream create(byte[] byteArray, EDhApiDataCompressionMode compressionMode, PhantomArrayListCheckout checkout) throws IOException
@@ -105,10 +109,10 @@ public class DhDataInputStream extends DataInputStream
 					arrayCache.reset();
 					// Note: all LZMA/XZ compressors can be decompressed using this same InputStream
 					return new XZInputStream(stream, arrayCache);
-				
+
 				case Z_STD_STREAM: // deprecated, only used for legacy support
 					return new ZstdInputStream(stream, RecyclingBufferPool.INSTANCE);
-					
+
 				default:
 					throw new IllegalArgumentException("No compressor defined for [" + compressionMode + "]");
 			}
@@ -116,25 +120,25 @@ public class DhDataInputStream extends DataInputStream
 		catch (Error e)
 		{
 			// Should only happen if there's a library issue
-			LOGGER.error("Unexpected error when wrapping DhDataInputStream, error: ["+e.getMessage()+"].", e);
+			LOGGER.error("Unexpected error when wrapping DhDataInputStream, error: [" + e.getMessage() + "].", e);
 			throw e;
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
-	@Override 
+
+	@Override
 	public int read() throws IOException
 	{
 		try
 		{
 			return super.read();
 		}
-		catch (EOFException ignore) 
+		catch (EOFException ignore)
 		{
 			// there's a bug with XZInputStream
 			// where it throws an EOFException instead
@@ -155,7 +159,7 @@ public class DhDataInputStream extends DataInputStream
 			}
 		}
 	}
-	
-	
-	
+
+
+
 }

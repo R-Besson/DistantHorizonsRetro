@@ -31,13 +31,13 @@ import testItems.events.abstractObjects.AbstractDhApiTestEvent;
 public class DhTestEventHandler extends AbstractDhApiTestEvent
 {
 	public Boolean eventFiredValue = null;
-	
+
 	@Override
 	public void onTestEvent(DhApiEventParam<Boolean> input) { this.eventFiredValue = input.value; }
-	
-	
+
+
 	// test (non-standard) methods //
 	@Override
 	public Boolean getTestValue() { return this.eventFiredValue; }
-	
+
 }

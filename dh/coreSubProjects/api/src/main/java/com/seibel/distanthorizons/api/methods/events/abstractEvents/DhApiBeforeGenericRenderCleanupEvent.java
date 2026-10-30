@@ -35,13 +35,13 @@ public abstract class DhApiBeforeGenericRenderCleanupEvent implements IDhApiEven
 {
 	/** Fired before Distant Horizons starts the cleanup process once rendering has finished. */
 	public abstract void beforeCleanup(DhApiEventParam<DhApiRenderParam> event);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<DhApiRenderParam> event) { this.beforeCleanup(event); }
-	
+
 }

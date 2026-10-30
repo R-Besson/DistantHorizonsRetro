@@ -8,12 +8,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Tessellator.class)
-public class MixinTesselator 
+public class MixinTesselator
 {
-    @Inject(method = "draw", at = @At(value = "HEAD"))
-    void drawMixin(CallbackInfoReturnable<Integer> cir) 
-    { RenderHelper.UnbindAfterTesselatorDraw(); }
-	
-	
-	
+	@Inject(method = "draw", at = @At(value = "HEAD"))
+	void drawMixin(CallbackInfoReturnable<Integer> cir)
+	{ RenderHelper.UnbindAfterTesselatorDraw(); }
+
+
+
 }

@@ -29,39 +29,39 @@ import io.netty.buffer.ByteBuf;
 public class SessionConfigMessage extends AbstractNetworkMessage
 {
 	public SessionConfig config;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public SessionConfigMessage() { }
 	public SessionConfigMessage(SessionConfig config) { this.config = config; }
-	
-	
-	
+
+
+
 	//===============//
 	// serialization //
 	//===============//
-	
+
 	@Override
 	public void encode(ByteBuf out) { this.config.encode(out); }
-	
+
 	@Override
 	public void decode(ByteBuf in) { this.config = INetworkObject.decodeToInstance(new SessionConfig(), in); }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public MoreObjects.ToStringHelper toStringHelper()
 	{
 		return super.toStringHelper()
-				.add("config", this.config);
+			.add("config", this.config);
 	}
-	
+
 }

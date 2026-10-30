@@ -19,10 +19,10 @@
 
 package com.seibel.distanthorizons.api.interfaces.override.worldGenerator;
 
-import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGeneratorReturnType;
-import com.seibel.distanthorizons.api.interfaces.override.IDhApiOverrideable;
 import com.seibel.distanthorizons.api.enums.EDhApiDetailLevel;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiDistantGeneratorMode;
+import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiWorldGeneratorReturnType;
+import com.seibel.distanthorizons.api.interfaces.override.IDhApiOverrideable;
 import com.seibel.distanthorizons.api.objects.data.DhApiChunk;
 import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
 
@@ -41,13 +41,13 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	//============//
 	// parameters //
 	//============//
-	
+
 	/**
 	 * Defines the smallest datapoint size that can be generated at a time. <br>
 	 * Maximum detail level (smallest numerical value) is 0 (1 block) <br>
 	 * Default detail level is 0 <br>
 	 * For more information on what detail levels represent see: {@link EDhApiDetailLevel}. <br><br>
-	 * 
+	 *
 	 * @see EDhApiDetailLevel
 	 * @since API 1.0.0
 	 */
@@ -62,12 +62,12 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * @since API 1.0.0
 	 */
 	default byte getLargestDataDetailLevel() { return EDhApiDetailLevel.BLOCK.detailLevel; }
-	
-	/** 
-	 * Used if {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS} or {@link EDhApiWorldGeneratorReturnType#API_DATA_SOURCES}. <Br> 
+
+	/**
+	 * Used if {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS} or {@link EDhApiWorldGeneratorReturnType#API_DATA_SOURCES}. <Br>
 	 * If true DH will run additional validation on the {@link DhApiChunk} or {@link IDhApiFullDataSource}'s returned. <Br>
 	 * This should be disabled during release but should be enabled during development to help spot issues with your data format.
-	 * 
+	 *
 	 * @see #getReturnType()
 	 * @see DhApiChunk
 	 * @see IDhApiFullDataSource
@@ -75,13 +75,13 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * @since API 4.0.0
 	 */
 	default boolean runApiValidation() { return true; }
-	
-	
-	
+
+
+
 	//=================//
 	// world generator //
 	//=================//
-	
+
 	/**
 	 * This method is called by Distant Horizons to generate terrain over a given area when
 	 * {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#VANILLA_CHUNKS}. <br><br>
@@ -93,24 +93,21 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * Please run your generator in game at least once to confirm the objects you are returning are correct. <br><br>
 	 *
 	 * Consumer expected inputs (in order): <br>
-	 *  - [net.minecraft.world.chunk.Chunk] <br>
-	 *  - [net.minecraft.world.WorldServer] or [net.minecraft.client.multiplayer.WorldClient] <br>
-	 *
-	 * @implNote the default implementation of this method throws an {@link UnsupportedOperationException},
-	 * and must be overridden when {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#VANILLA_CHUNKS}.
-	 * since {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#VANILLA_CHUNKS} by default,
-	 * this method must also be overridden when {@link #getReturnType()} is NOT overridden.
+	 * - [net.minecraft.world.chunk.Chunk] <br>
+	 * - [net.minecraft.world.WorldServer] or [net.minecraft.client.multiplayer.WorldClient] <br>
 	 *
 	 * @param chunkPosMinX the chunk X position closest to negative infinity
 	 * @param chunkPosMinZ the chunk Z position closest to negative infinity
-	 * @param generationRequestChunkWidthCount how many chunks wide you should generate 
+	 * @param generationRequestChunkWidthCount how many chunks wide you should generate
 	 * @param targetDataDetail the LOD Detail level requested to generate. See {@link EDhApiDetailLevel} for additional information.
 	 * @param generatorMode how far into the world gen pipeline this method should run. See {@link EDhApiDistantGeneratorMode} for additional documentation.
 	 * @param worldGeneratorThreadPool the thread pool that should be used when generating the returned {@link CompletableFuture}.
 	 * @param resultConsumer the consumer that should be fired whenever a chunk finishes generating.
-	 *
 	 * @return a future that should run on the worldGeneratorThreadPool and complete once the given generation task has completed.
-	 *
+	 * @implNote the default implementation of this method throws an {@link UnsupportedOperationException},
+	 * and must be overridden when {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#VANILLA_CHUNKS}.
+	 * since {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#VANILLA_CHUNKS} by default,
+	 * this method must also be overridden when {@link #getReturnType()} is NOT overridden.
 	 * @since API 1.0.0
 	 */
 	default CompletableFuture<Void> generateChunks(
@@ -121,11 +118,11 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 		EDhApiDistantGeneratorMode generatorMode,
 		ExecutorService worldGeneratorThreadPool,
 		Consumer<Object[]> resultConsumer
-		) 
+	)
 	{
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/**
 	 * This method is called by Distant Horizons to generate terrain over a given area when
 	 * {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS}. <br><br>
@@ -134,9 +131,6 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * resultConsumer's {@link Consumer#accept(Object)} method.
 	 * Note: if air blocks aren't included in the with the {@link DhApiChunk} with proper lighting, lower detail levels will appear as black/unlit.
 	 *
-	 * @implNote the default implementation of this method throws an {@link UnsupportedOperationException},
-	 * and must be overridden when {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS}.
-	 *
 	 * @param chunkPosMinX the chunk X position closest to negative infinity
 	 * @param chunkPosMinZ the chunk Z position closest to negative infinity
 	 * @param generationRequestChunkWidthCount how many chunks wide you should generate
@@ -144,9 +138,9 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * @param generatorMode how far into the world gen pipeline this method should run. See {@link EDhApiDistantGeneratorMode} for additional documentation.
 	 * @param worldGeneratorThreadPool the thread pool that should be used when generating the returned {@link CompletableFuture}.
 	 * @param resultConsumer the consumer that should be fired whenever a chunk finishes generating.
-	 *
 	 * @return a future that should run on the worldGeneratorThreadPool and complete once the given generation task has completed.
-	 *
+	 * @implNote the default implementation of this method throws an {@link UnsupportedOperationException},
+	 * and must be overridden when {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS}.
 	 * @since API 2.0.0
 	 */
 	default CompletableFuture<Void> generateApiChunks(
@@ -157,11 +151,11 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 		EDhApiDistantGeneratorMode generatorMode,
 		ExecutorService worldGeneratorThreadPool,
 		Consumer<DhApiChunk> resultConsumer
-		) 
+	)
 	{
 		throw new UnsupportedOperationException();
 	}
-	
+
 	/**
 	 * This method is called by Distant Horizons to generate terrain over a given area when
 	 * {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_DATA_SOURCES}. <br><br>
@@ -170,24 +164,21 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * resultConsumer's {@link Consumer#accept(Object)} method.
 	 * Note: if air blocks aren't included in the {@link IDhApiFullDataSource} with proper lighting, lower detail levels will appear as black/unlit.
 	 *
-	 * @implNote the default implementation of this method throws an {@link UnsupportedOperationException},
-	 * and must be overridden when {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS}.
-	 *
 	 * @param chunkPosMinX the chunk X position closest to negative infinity
 	 * @param chunkPosMinZ the chunk Z position closest to negative infinity
 	 * @param lodPosX the LOD's X position, relative to the given {@link EDhApiDetailLevel}
 	 * @param lodPosZ the LOD's Z position, relative to the given {@link EDhApiDetailLevel}
 	 * @param detailLevel the LOD Detail level requested to generate. See {@link EDhApiDetailLevel} for additional information.
 	 * @param pooledFullDataSource The data source you should populate during your world generation.
-	 *                              This data source is pooled by DH and may be reused multiple times by different internal DH systems. <br>
-	 *                              This data source should <strong>not</strong> be referenced or stored outside of this method nor the executor provided by worldGeneratorThreadPool.
-	 *                              <strong>Attempting to do so will corrupt DH's data.</strong>
+	 * This data source is pooled by DH and may be reused multiple times by different internal DH systems. <br>
+	 * This data source should <strong>not</strong> be referenced or stored outside of this method nor the executor provided by worldGeneratorThreadPool.
+	 * <strong>Attempting to do so will corrupt DH's data.</strong>
 	 * @param generatorMode how far into the world gen pipeline this method should run. See {@link EDhApiDistantGeneratorMode} for additional documentation.
 	 * @param worldGeneratorThreadPool the thread pool that should be used when generating the returned {@link CompletableFuture}.
 	 * @param resultConsumer the consumer that should be fired whenever a chunk finishes generating.
-	 *
 	 * @return a future that should run on the worldGeneratorThreadPool and complete once the given generation task has completed.
-	 *
+	 * @implNote the default implementation of this method throws an {@link UnsupportedOperationException},
+	 * and must be overridden when {@link #getReturnType()} returns {@link EDhApiWorldGeneratorReturnType#API_CHUNKS}.
 	 * @since API 4.0.0
 	 */
 	default CompletableFuture<Void> generateLod(
@@ -197,7 +188,7 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 		EDhApiDistantGeneratorMode generatorMode,
 		ExecutorService worldGeneratorThreadPool,
 		Consumer<IDhApiFullDataSource> resultConsumer
-		) 
+	)
 	{
 		throw new UnsupportedOperationException();
 	}
@@ -211,13 +202,13 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * @since API 2.0.0
 	 */
 	default EDhApiWorldGeneratorReturnType getReturnType() { return EDhApiWorldGeneratorReturnType.VANILLA_CHUNKS; }
-	
-	
-	
+
+
+
 	//===============//
 	// event methods //
 	//===============//
-	
+
 	/**
 	 * Called before a new generator task is started. <br>
 	 * This can be used to run cleanup on existing tasks before new tasks are started.
@@ -225,18 +216,18 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 * @since API 1.0.0
 	 */
 	void preGeneratorTaskStart();
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
-	
-	// This is overridden to remove the "throws IOException" 
-	// that is present in the default Closeable.close() method 
+
+	// This is overridden to remove the "throws IOException"
+	// that is present in the default Closeable.close() method
 	@Override
 	void close();
-	
-	
-	
+
+
+
 }

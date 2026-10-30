@@ -18,60 +18,60 @@ import java.util.Set;
  */
 public class AutoClosableTrackingWrapper implements InvocationHandler
 {
-	/** 
+	/**
 	 * should be enabled during development to
 	 * notify if any resources are being leaked.
 	 */
 	public static final boolean TRACK_WRAPPERS = ModInfo.IS_DEV_BUILD;
-	
+
 	@NotNull
 	public final AutoCloseable wrappedClosable;
 	@NotNull
 	public final Set<AutoClosableTrackingWrapper> parentTrackingSet;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	@Nullable
 	public static <TStatic extends AutoCloseable> TStatic wrap(
-			@NotNull Class<?> clazz,
-			@Nullable TStatic wrappedClosable,
-			@NotNull Set<AutoClosableTrackingWrapper> trackingSet)
+		@NotNull Class<?> clazz,
+		@Nullable TStatic wrappedClosable,
+		@NotNull Set<AutoClosableTrackingWrapper> trackingSet)
 	{
 		if (!TRACK_WRAPPERS)
 		{
 			return wrappedClosable;
 		}
-		
+
 		// done to prevent null pointers
 		if (wrappedClosable == null)
 		{
 			return null;
 		}
-		
+
 		return (TStatic) Proxy.newProxyInstance(
-				wrappedClosable.getClass().getClassLoader(),
-				new Class[]{ clazz },
-				new AutoClosableTrackingWrapper(wrappedClosable, trackingSet)
+			wrappedClosable.getClass().getClassLoader(),
+			new Class[]{clazz},
+			new AutoClosableTrackingWrapper(wrappedClosable, trackingSet)
 		);
 	}
-	
+
 	private AutoClosableTrackingWrapper(@NotNull AutoCloseable wrappedClosable, @NotNull Set<AutoClosableTrackingWrapper> trackingSet)
 	{
 		this.wrappedClosable = wrappedClosable;
 		this.parentTrackingSet = trackingSet;
 		this.parentTrackingSet.add(this);
 	}
-	
-	
-	
+
+
+
 	//============//
 	// reflection //
 	//============//
-	
+
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
@@ -82,11 +82,11 @@ public class AutoClosableTrackingWrapper implements InvocationHandler
 			this.parentTrackingSet.remove(this);
 			return null;
 		}
-		
+
 		try
 		{
 			// Delegate all other methods to the wrapped object
-			return method.invoke(this.wrappedClosable, args);	
+			return method.invoke(this.wrappedClosable, args);
 		}
 		catch (InvocationTargetException e)
 		{
@@ -94,7 +94,7 @@ public class AutoClosableTrackingWrapper implements InvocationHandler
 			throw e.getTargetException();
 		}
 	}
-	
-	
-	
+
+
+
 }

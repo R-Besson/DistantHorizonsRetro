@@ -36,9 +36,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 {
 	public static final OverrideInjector INSTANCE = new OverrideInjector();
-	
+
 	private final HashMap<Class<? extends IDhApiOverrideable>, OverridePriorityListContainer> overrideContainerByInterface = new HashMap<>();
-	
+
 	/**
 	 * This is used to determine if an override is part of Distant Horizons'
 	 * Core or not.
@@ -48,33 +48,33 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 
 	/** overrides can be bound by other mods while DH's threads are reading them */
 	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public OverrideInjector()
 	{
 		String thisPackageName = this.getClass().getPackage().getName();
 		int secondPackageEndingIndex = StringUtil.nthIndexOf(thisPackageName, ".", 3);
-		
+
 		this.corePackagePath = thisPackageName.substring(0, secondPackageEndingIndex); // this should be "com.seibel.distanthorizons"
 	}
-	
+
 	public OverrideInjector(String newCorePackagePath) { this.corePackagePath = newCorePackagePath; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// binding //
- 	//=========//
+	//=========//
 	//region
-	
+
 	@Override
 	public void bind(Class<? extends IDhApiOverrideable> dependencyInterface, IDhApiOverrideable dependencyImplementation) throws IllegalStateException, IllegalArgumentException
 	{
@@ -88,10 +88,10 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 				overrideContainer = new OverridePriorityListContainer();
 				this.overrideContainerByInterface.put(dependencyInterface, overrideContainer);
 			}
-			
-			
+
+
 			// validate the new override //
-			
+
 			// check if this override is a core override
 			if (dependencyImplementation.getPriority() == CORE_PRIORITY)
 			{
@@ -102,13 +102,13 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 					throw new IllegalArgumentException("Only Distant Horizons internal objects can use the Override Priority [" + CORE_PRIORITY + "]. Please use a higher number.");
 				}
 			}
-			
+
 			// make sure the override has a valid priority
 			else if (dependencyImplementation.getPriority() < MIN_NON_CORE_OVERRIDE_PRIORITY)
 			{
 				throw new IllegalArgumentException("Invalid priority value [" + dependencyImplementation.getPriority() + "], override priorities must be [" + MIN_NON_CORE_OVERRIDE_PRIORITY + "] or greater.");
 			}
-			
+
 			// check if an override already exists with this priority
 			IDhApiOverrideable existingOverride = overrideContainer.getOverrideWithPriority(dependencyImplementation.getPriority());
 			if (existingOverride != null)
@@ -117,8 +117,8 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 				// Iris can try to un-bind the wrong objects otherwise
 				overrideContainer.removeOverride(existingOverride);
 			}
-			
-			
+
+
 			// bind the override
 			overrideContainer.addOverride(dependencyImplementation);
 		}
@@ -127,7 +127,7 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 			this.readWriteLock.writeLock().unlock();
 		}
 	}
-	
+
 	@Override
 	public void unbind(Class<? extends IDhApiOverrideable> dependencyInterface, IDhApiOverrideable dependencyImplementation)
 	{
@@ -145,7 +145,7 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 			this.readWriteLock.writeLock().unlock();
 		}
 	}
-	
+
 	@Override
 	public void unbindAll(Class<? extends IDhApiOverrideable> dependencyInterface)
 	{
@@ -163,16 +163,16 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 			this.readWriteLock.writeLock().unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends IDhApiOverrideable> T get(Class<T> interfaceClass) throws ClassCastException
@@ -188,7 +188,7 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 			this.readWriteLock.readLock().unlock();
 		}
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends IDhApiOverrideable> T get(Class<T> interfaceClass, int priority) throws ClassCastException
@@ -204,18 +204,18 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 			this.readWriteLock.readLock().unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==========//
 	// clearing //
 	//==========//
 	//region
-	
+
 	@Override
-	public void clear() 
+	public void clear()
 	{
 		this.readWriteLock.writeLock().lock();
 		try
@@ -227,9 +227,9 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 			this.readWriteLock.writeLock().unlock();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

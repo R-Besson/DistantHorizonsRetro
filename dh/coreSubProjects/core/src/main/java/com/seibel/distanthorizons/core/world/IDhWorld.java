@@ -28,12 +28,12 @@ import java.io.Closeable;
 
 /**
  * Shared base between all DH world objects. <br><br>
- * 
+ *
  * Independent from {@link AbstractDhServerWorld} so we don't
  * want to deal with generics floating around and so we can
  * have a shared interface between {@link IDhClientWorld}
  * and {@link IDhServerWorld}.
- * 
+ *
  * @see AbstractDhServerWorld
  * @see IDhClientWorld
  * @see IDhServerWorld
@@ -46,15 +46,15 @@ public interface IDhWorld extends Closeable
 	IDhLevel getLevel(@NotNull ILevelWrapper wrapper);
 	Iterable<? extends IDhLevel> getAllLoadedLevels();
 	int getLoadedLevelCount();
-	
+
 	/**
 	 * Returns
-	 * true if the level was unloaded, 
-	 * false if the level isn't present in this world 
-	 *       or couldn't be unloaded for some other reason 
+	 * true if the level was unloaded,
+	 * false if the level isn't present in this world
+	 * or couldn't be unloaded for some other reason
 	 */
 	boolean unloadLevel(@NotNull ILevelWrapper levelWrapper);
-	
-	
-	
+
+
+
 }

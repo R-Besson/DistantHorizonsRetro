@@ -20,38 +20,38 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhServerLevel> extends AbstractDhWorld implements IDhServerWorld
 {
-	/** 
+	/**
 	 * Concurrent since levels can be added/remove while other processing is happening.
 	 * (Otherwise we may need to just put the logic in a lock.
 	 */
 	protected final ConcurrentHashMap<ILevelWrapper, TDhServerLevel> dhLevelByLevelWrapper = new ConcurrentHashMap<>();
 	public final LocalSaveStructure saveStructure = new LocalSaveStructure();
-	
+
 	private final ServerPlayerStateManager serverPlayerStateManager;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public AbstractDhServerWorld(EWorldEnvironment worldEnvironment)
 	{
 		super(worldEnvironment);
 		this.serverPlayerStateManager = new ServerPlayerStateManager();
 	}
-	
-	
+
+
 	//=================//
 	// player handling //
 	//=================//
-	
+
 	@Override
 	public ServerPlayerStateManager getServerPlayerStateManager()
 	{
 		return this.serverPlayerStateManager;
 	}
-	
+
 	@Override
 	public void addPlayer(IServerPlayerWrapper serverPlayer)
 	{
@@ -68,50 +68,50 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 			TDhServerLevel level = it.next();
 			level.registerNetworkHandlers(playerState);
 		}
-		
+
 		this.serverPlayerStateManager.handlePluginMessagesFromQueue(playerState);
 	}
-	
+
 	@Override
 	public void removePlayer(IServerPlayerWrapper serverPlayer)
 	{
 		// each level reads its players from the player state manager (see AbstractDhServerLevel#getPlayersInLevel)
 		this.serverPlayerStateManager.unregisterLeftPlayer(serverPlayer);
-		
+
 		// If player's left, session is already closed
 	}
 
-	
-	
+
+
 	//================//
 	// level handling //
 	//================//
-	
+
 	@Override
 	public TDhServerLevel getLevel(@NotNull ILevelWrapper wrapper) { return this.dhLevelByLevelWrapper.get(wrapper); }
 	@Override
-	public Iterable<? extends IDhLevel> getAllLoadedLevels() 
+	public Iterable<? extends IDhLevel> getAllLoadedLevels()
 	{
 		// hash set wrapper is used to filter out duplicate levels,
 		// which can happen when on a singleplayer world and both a server/client level wrapper
 		// are active for the same dimension
-		return new HashSet<>(this.dhLevelByLevelWrapper.values()); 
+		return new HashSet<>(this.dhLevelByLevelWrapper.values());
 	}
 	@Override
 	public int getLoadedLevelCount() { return this.dhLevelByLevelWrapper.size(); }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public void close()
 	{
 		// needed to close player event handlers
 		this.serverPlayerStateManager.close();
-		
+
 		ArrayList<CompletableFuture<Void>> closeFutures = new ArrayList<>();
 		for (TDhServerLevel level : this.dhLevelByLevelWrapper.values())
 		{
@@ -122,8 +122,8 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 				serverLevelWrapper.onUnload();
 				ApiEventInjector.INSTANCE.fireAllEvents(DhApiLevelUnloadEvent.class, new DhApiLevelUnloadEvent.EventParam(serverLevelWrapper));
 			}
-			
-			
+
+
 			// close levels asynchronously to speed up
 			// shutdown on servers with a lot of levels
 			CompletableFuture<Void> closeFuture = new CompletableFuture<>();
@@ -135,15 +135,15 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 			closeThread.start();
 			closeFutures.add(closeFuture);
 		}
-		
+
 		// wait for all the levels to finish closing
 		for (CompletableFuture<Void> future : closeFutures)
 		{
 			future.join();
 		}
-		
+
 		this.dhLevelByLevelWrapper.clear();
 		LOGGER.info("Closed DhWorld of type [" + this.environment + "].");
 	}
-	
+
 }

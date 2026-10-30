@@ -30,19 +30,19 @@ import java.util.function.Consumer;
 public interface IChunkGenerator extends AutoCloseable
 {
 	void updateAllFutures();
-	
+
 	CompletableFuture<Void> queueGenEvent(
 		int chunkPosMinX, int chunkPosMinZ, int chunkWidthCount,
 		EDhApiDistantGeneratorMode generatorMode, EDhApiWorldGenerationStep targetStep,
 		ExecutorService worldGeneratorThreadPool, Consumer<IChunkWrapper> resultConsumer);
-	
+
 	void close();
-	
-	/** 
+
+	/**
 	 * How many world gen tasks can be in progress per world gen thread. <br>
 	 * Generators whose tasks mostly wait on another thread (IE the Minecraft server thread)
 	 * without holding a world gen thread can return more than 1 to keep that thread busy.
 	 */
 	default int getInProgressTasksPerThread() { return 1; }
-	
+
 }

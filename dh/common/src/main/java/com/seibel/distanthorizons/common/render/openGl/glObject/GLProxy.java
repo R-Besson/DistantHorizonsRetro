@@ -47,14 +47,14 @@ public class GLProxy
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-	
-	
+
+
 	public static final DhLogger LOGGER;
 	static
 	{
 		DhLoggerBuilder loggerBuilder = new DhLoggerBuilder();
 		loggerBuilder.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile);
-		
+
 		// don't send chat messages if Iris is present since
 		// Iris is known to cause (harmless) GL errors
 		// and this can confuse users
@@ -63,47 +63,47 @@ public class GLProxy
 		{
 			loggerBuilder.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat);
 		}
-		
+
 		LOGGER = loggerBuilder.build();
-		
+
 		if (irisPresent)
 		{
 			LOGGER.info("Iris detected, Distant Horizons OpenGL error logging won't be sent in the chat due to Iris throwing known (harmless) OpenGL errors. This is a bug with Iris, not Distant Horizons.");
 		}
 	}
-	
+
 	/**
 	 * disabled since GL 3.3 may not appear in the capabilities
 	 * but may still be accessible for our needs.
 	 */
 	private static final boolean CHECK_GL_VERSION_ON_STARTUP = false;
 
-	
-	
+
+
 	private static GLProxy instance = null;
-	
-	
+
+
 	public boolean bufferStorageSupported; // ~OpenGL 4.4
 	public boolean vertexAttributeBufferBindingSupported; // ~OpenGL 4.3
 	public boolean instancedArraysSupported;
 	public boolean vertexAttribDivisorSupported; // OpenGL 3.3 or newer
-	
+
 	private final EDhApiGpuUploadMethod preferredUploadMethod;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private GLProxy() throws IllegalStateException
 	{
 		if (RENDER_DEF.getRenderApi() != EDhApiRenderingApi.OPEN_GL)
 		{
-			throw new IllegalStateException("[" + GLProxy.class.getSimpleName() + "] was created with the wrong Rendering API ["+RENDER_DEF.getRenderApi()+"]!"); 
+			throw new IllegalStateException("[" + GLProxy.class.getSimpleName() + "] was created with the wrong Rendering API [" + RENDER_DEF.getRenderApi() + "]!");
 		}
-		
+
 		// this must be created on minecraft's render context to work correctly
 		if (!runningOnRenderThread())
 		{
@@ -112,24 +112,24 @@ public class GLProxy
 			MC_CLIENT.crashMinecraft(message, exception);
 			throw exception;
 		}
-		
+
 		LOGGER.info("Creating [" + GLProxy.class.getSimpleName() + "]... If this is the last message you see there must have been an OpenGL error.");
 		LOGGER.info("Lod Render OpenGL version [" + LWJGL.glGetString(GL11.GL_VERSION) + "].");
-		
-		
-		
-		
+
+
+
+
 		//============================//
 		// get Minecraft's GL context //
 		//============================//
-		
+
 		// crash the game if the GPU doesn't support OpenGL 3.3
 		if (CHECK_GL_VERSION_ON_STARTUP)
 		{
-			if (!LWJGL.isOpenGLVersionSupported(3,3))
+			if (!LWJGL.isOpenGLVersionSupported(3, 3))
 			{
 				String supportedVersionInfo = this.getFailedVersionInfo();
-				
+
 				// See full requirement at above.
 				String errorMessage = ModInfo.READABLE_NAME + " was initializing " + GLProxy.class.getSimpleName()
 					+ " and discovered this GPU doesn't meet the OpenGL requirements. Sorry I couldn't tell you sooner :(\n" +
@@ -138,30 +138,30 @@ public class GLProxy
 				MC.crashMinecraft(errorMessage, new UnsupportedOperationException("Distant Horizon OpenGL requirements not met"));
 			}
 		}
-	 	LOGGER.info("minecraftGlCapabilities:\n" + this.versionInfoToString());
+		LOGGER.info("minecraftGlCapabilities:\n" + this.versionInfoToString());
 
-		
-		
+
+
 		//======================//
 		// get GPU capabilities //
 		//======================//
-		
+
 		// Check if we can use the Buffer Storage (GL4.4), checked by function since drivers can have it on older GL versions
 		this.bufferStorageSupported = LWJGL.isFeatureSupported(EGLFeature.glBufferStorage);
 		if (!this.bufferStorageSupported)
 		{
 			LOGGER.info("This GPU doesn't support Buffer Storage (OpenGL 4.4), falling back to using other methods.");
 		}
-		
+
 		// Check if we can use the make-over version of Vertex Attribute (GL4.3), also checked by function
 		this.vertexAttributeBufferBindingSupported = LWJGL.isFeatureSupported(EGLFeature.glBindVertexBuffer);
-		
+
 		// used by instanced rendering
-		this.vertexAttribDivisorSupported = LWJGL.isOpenGLVersionSupported(3,3);
+		this.vertexAttribDivisorSupported = LWJGL.isOpenGLVersionSupported(3, 3);
 		// denotes if ARBInstancedArrays.glVertexAttribDivisorARB() is available or not
 		// can be used as a backup if MC didn't create a GL 3.3+ context
 		this.instancedArraysSupported = LWJGL.isExtensionSupported(EGLExtension.ARB_instanced_arrays);
-		
+
 		// get the best automatic upload method
 		String vendor = LWJGL.glGetString(GL11.GL_VENDOR).toUpperCase(); // example return: "NVIDIA CORPORATION"
 		if (EPlatform.get() != EPlatform.MACOS)
@@ -184,26 +184,26 @@ public class GLProxy
 			this.preferredUploadMethod = EDhApiGpuUploadMethod.DATA;
 		}
 		LOGGER.info("GPU Vendor [" + vendor + "] with OS [" + EPlatform.get().getName() + "], Preferred upload method is [" + this.preferredUploadMethod + "].");
-		
-		
-		
+
+
+
 		//==========//
 		// clean up //
 		//==========//
-		
+
 		// GLProxy creation success
 		LOGGER.info(GLProxy.class.getSimpleName() + " creation successful. OpenGL smiles upon you this day.");
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	/** @throws IllegalStateException if the Proxy hasn't been created yet and this is called outside the render thread */
 	public static GLProxy getInstance() throws IllegalStateException
 	{
@@ -211,47 +211,47 @@ public class GLProxy
 		{
 			instance = new GLProxy();
 		}
-		
+
 		return instance;
 	}
-	
+
 	public EDhApiGpuUploadMethod getGpuUploadMethod() { return this.preferredUploadMethod; }
-	
+
 	public static boolean runningOnRenderThread()
 	{
 		return LWJGL.isRunningOnRenderThread();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	//region
-	
+
 	private String getFailedVersionInfo()
 	{
 		return "Your OpenGL support:\n" +
-				"openGL version 3.3+: [" + LWJGL.isOpenGLVersionSupported(3,3) + "] <- REQUIRED\n" +
-				"Vertex Attribute Buffer Binding: [" + LWJGL.isOpenGLVersionSupported(4,3) + "] <- optional improvement\n" +
-				"Buffer Storage: [" + LWJGL.isExtensionSupported(EGLExtension.ARB_buffer_storage) + "] <- optional improvement\n" +
-				"If you noticed that your computer supports higher OpenGL versions"
-				+ " but not the required version, try running the game in compatibility mode."
-				+ " (How you turn that on, I have no clue~)";
+			"openGL version 3.3+: [" + LWJGL.isOpenGLVersionSupported(3, 3) + "] <- REQUIRED\n" +
+			"Vertex Attribute Buffer Binding: [" + LWJGL.isOpenGLVersionSupported(4, 3) + "] <- optional improvement\n" +
+			"Buffer Storage: [" + LWJGL.isExtensionSupported(EGLExtension.ARB_buffer_storage) + "] <- optional improvement\n" +
+			"If you noticed that your computer supports higher OpenGL versions"
+			+ " but not the required version, try running the game in compatibility mode."
+			+ " (How you turn that on, I have no clue~)";
 	}
-	
+
 	private String versionInfoToString()
 	{
 		return "Your OpenGL support:\n" +
-				"openGL version 3.3+: [" + LWJGL.isOpenGLVersionSupported(3,3) + "] <- REQUIRED\n" +
-				"Vertex Attribute Buffer Binding: [" + LWJGL.isOpenGLVersionSupported(4,3) + "] <- optional improvement\n" +
-				"Buffer Storage: [" + LWJGL.isExtensionSupported(EGLExtension.ARB_buffer_storage) + "] <- optional improvement\n";
+			"openGL version 3.3+: [" + LWJGL.isOpenGLVersionSupported(3, 3) + "] <- REQUIRED\n" +
+			"Vertex Attribute Buffer Binding: [" + LWJGL.isOpenGLVersionSupported(4, 3) + "] <- optional improvement\n" +
+			"Buffer Storage: [" + LWJGL.isExtensionSupported(EGLExtension.ARB_buffer_storage) + "] <- optional improvement\n";
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

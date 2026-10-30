@@ -36,54 +36,54 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * @version 12-02-2021
  */
 @Mixin(GuiOptions.class)
-public class MixinOptionsScreen extends GuiScreen 
+public class MixinOptionsScreen extends GuiScreen
 {
-    private static final ResourceLocation ICON_TEXTURE = new ResourceLocation(ModInfo.ID, "textures/gui/button.png");
-	
-    private static final int button_id = 99;
-	
-	
-	
-    @Inject(at = @At("HEAD"), method = "initGui")
-    private void lodconfig$init(CallbackInfo ci)
-    {
-	    if (Config.Client.showDhOptionsButtonInMinecraftUi.get())
-	    {
-		    this.buttonList.add(
-			    (new TexturedButtonWidget(
-				    button_id,
-				    // Where the button is on the screen
-				    this.width / 2 - 180,
-				    this.height / 6 - 12,
-				    // Width and height of the button
-				    20,
-				    20,
-				    // Offset
-				    0,
-				    0,
-				    // Some textuary stuff
-				    20,
-				    ICON_TEXTURE,
-				    20,
-				    40,
-				    // Create the button and tell it where to go
-				    // For now it goes to the client option by default
-				    // Add a title to the button
-				    "DH" /* ModInfo.ID + ".title" */ )
-			    )
-		    );
-	    }
-    }
+	private static final ResourceLocation ICON_TEXTURE = new ResourceLocation(ModInfo.ID, "textures/gui/button.png");
+
+	private static final int button_id = 99;
 
 
-    @Inject(at = @At("HEAD"), method = "actionPerformed", cancellable = true)
-    private void lodconfig$actionPerformed(GuiButton button, CallbackInfo ci) 
-    {
-        if (button.id == button_id) 
+
+	@Inject(at = @At("HEAD"), method = "initGui")
+	private void lodconfig$init(CallbackInfo ci)
+	{
+		if (Config.Client.showDhOptionsButtonInMinecraftUi.get())
+		{
+			this.buttonList.add(
+				(new TexturedButtonWidget(
+					button_id,
+					// Where the button is on the screen
+					this.width / 2 - 180,
+					this.height / 6 - 12,
+					// Width and height of the button
+					20,
+					20,
+					// Offset
+					0,
+					0,
+					// Some textuary stuff
+					20,
+					ICON_TEXTURE,
+					20,
+					40,
+					// Create the button and tell it where to go
+					// For now it goes to the client option by default
+					// Add a title to the button
+					"DH" /* ModInfo.ID + ".title" */)
+				)
+			);
+		}
+	}
+
+
+	@Inject(at = @At("HEAD"), method = "actionPerformed", cancellable = true)
+	private void lodconfig$actionPerformed(GuiButton button, CallbackInfo ci)
+	{
+		if (button.id == button_id)
 		{
 			DhScreenUtil.setScreen(GetConfigScreen.getScreen(this));
-            ci.cancel();
-        }
-    }
+			ci.cancel();
+		}
+	}
 
 }

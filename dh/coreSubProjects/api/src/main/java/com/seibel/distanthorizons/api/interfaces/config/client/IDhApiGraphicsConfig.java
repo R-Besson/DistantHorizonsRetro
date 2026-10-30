@@ -19,11 +19,15 @@
 
 package com.seibel.distanthorizons.api.interfaces.config.client;
 
-import com.seibel.distanthorizons.api.enums.config.*;
+import com.seibel.distanthorizons.api.enums.config.EDhApiBlocksToAvoid;
+import com.seibel.distanthorizons.api.enums.config.EDhApiHorizontalQuality;
+import com.seibel.distanthorizons.api.enums.config.EDhApiLodShading;
+import com.seibel.distanthorizons.api.enums.config.EDhApiMaxHorizontalResolution;
+import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiRendererMode;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiTransparency;
-import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigGroup;
+import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
 
 /**
  * Distant Horizons' graphics/rendering configuration.
@@ -37,22 +41,22 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	//===============//
 	// inner configs //
 	//===============//
-	
+
 	IDhApiFogConfig fog();
 	IDhApiAmbientOcclusionConfig ambientOcclusion();
 	IDhApiNoiseTextureConfig noiseTexture();
 	IDhApiTextureConfig texture();
 	IDhApiGenericRenderingConfig genericRendering();
-	
-	
-	
+
+
+
 	//========================//
 	// basic graphic settings //
 	//========================//
-	
+
 	/** The distance is the radius measured in chunks. */
 	IDhApiConfigValue<Integer> chunkRenderDistance();
-	
+
 	/**
 	 * Simplified version of {@link IDhApiGraphicsConfig#renderingMode()}
 	 * that only enables/disables the fake chunk rendering. <br><br>
@@ -60,7 +64,7 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * Changing this config also changes {@link IDhApiGraphicsConfig#renderingMode()}'s value.
 	 */
 	IDhApiConfigValue<Boolean> renderingEnabled();
-	
+
 	/**
 	 * Can be used to enable/disable fake chunk rendering or enable the debug renderer. <br><br>
 	 *
@@ -70,45 +74,45 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * Changing this config also changes {@link IDhApiGraphicsConfig#renderingEnabled()}'s value.
 	 */
 	IDhApiConfigValue<EDhApiRendererMode> renderingMode();
-	
-	
-	
+
+
+
 	//==================//
 	// graphic settings //
 	//==================//
-	
+
 	/** Defines how detailed fake chunks are in the horizontal direction */
 	IDhApiConfigValue<EDhApiMaxHorizontalResolution> maxHorizontalResolution();
-	
+
 	/** Defines how detailed fake chunks are in the vertical direction */
 	IDhApiConfigValue<EDhApiVerticalQuality> verticalQuality();
-	
+
 	/** Modifies the quadratic function fake chunks use for horizontal quality drop-off. */
 	IDhApiConfigValue<EDhApiHorizontalQuality> horizontalQuality();
-	
-	/** 
+
+	/**
 	 * If true DH will try to use the camera position when
 	 * determining LOD quality drop-off. <br>
 	 * If false DH will use the player's position.
 	 * <br><br>
 	 * Enabling helps free-cam mods render correctly. <br>
 	 * Disabling helps multi-camera mods render correctly (ie Immersive Portals or camera mods).
-	 * 
+	 *
 	 * @since API 7.0.0
 	 */
 	IDhApiConfigValue<Boolean> useCameraPositionForQualityDropOff();
-	
+
 	IDhApiConfigValue<EDhApiTransparency> transparency();
-	
+
 	/** Defines what blocks won't be rendered as LODs. */
 	IDhApiConfigValue<EDhApiBlocksToAvoid> blocksToAvoid();
-	
+
 	/**
 	 * Defines if the color of avoided blocks will color the block below them. <Br>
 	 * (IE: if flowers are avoided, should they color the grass below them?)
 	 */
 	IDhApiConfigValue<Boolean> tintWithAvoidedBlocks();
-	
+
 	/*
 	 * The same as vanilla Minecraft's biome blending. <br><br>
 	 *
@@ -118,13 +122,13 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * ...							<br>
 	 */
 	IDhApiConfigValue<Integer> getBiomeBlending();
-	
-	
-	
+
+
+
 	//===========================//
 	// advanced graphic settings //
 	//===========================//
-	
+
 	/**
 	 * Sets the radius used by the near clip shader to reduce
 	 * overdraw. <br>
@@ -134,42 +138,42 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * <br>
 	 * Setting this to 0 will reduce/prevent holes in the world due to clipping to close to the camera
 	 * but may cause overdraw issues with transparent or non-full blocks.
-	 * 
+	 *
 	 * @since API 2.0.0
 	 */
 	IDhApiConfigValue<Float> overdrawPreventionRadius();
-	
+
 	/**
 	 * Modifies how bright fake chunks are. <br>
 	 * This is done when generating the vertex data and is applied before any shaders.
 	 */
 	IDhApiConfigValue<Float> brightnessMultiplier();
-	
+
 	/**
 	 * Modifies how saturated fake chunks are. <br>
 	 * This is done when generating the vertex data and is applied before any shaders.
 	 */
 	IDhApiConfigValue<Float> saturationMultiplier();
-	
+
 	/** Defines if Distant Horizons should attempt to cull fake chunk cave geometry. */
 	IDhApiConfigValue<Boolean> caveCullingEnabled();
-	
+
 	/** Defines what height cave culling should be used below if enabled. */
 	IDhApiConfigValue<Integer> caveCullingHeight();
-	
+
 	/** This ratio is relative to Earth's real world curvature. */
 	IDhApiConfigValue<Integer> earthCurvatureRatio();
-	
+
 	/** If enabled vanilla chunk rendering is disabled and only fake chunks are rendered. */
 	IDhApiConfigValue<Boolean> lodOnlyMode();
-	
+
 	/**
 	 * Determines how LODs should be shaded.
 	 *
 	 * @since API 2.0.0
 	 */
 	IDhApiConfigValue<EDhApiLodShading> lodShading();
-	
+
 	/**
 	 * Sets whether LODs outside the view frustum culling will
 	 * be culled. <br><br>
@@ -179,21 +183,21 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * start/stop rendering incorrectly based on the camera direction,
 	 * but will also reduce FPS.
 	 *
-	 * @since API 2.0.0
 	 * @see IDhApiGraphicsConfig#disableShadowFrustumCulling()
+	 * @since API 2.0.0
 	 */
 	IDhApiConfigValue<Boolean> disableFrustumCulling();
-	
+
 	/**
 	 * Identical to the other frustum culling option, except that it is
 	 * only used when a shader mod is present using the DH API
 	 * and the shadow pass is being rendered. <br><br>
-	 * 
+	 *
 	 * Disable this if shadows render incorrectly.
 	 *
+	 * @see IDhApiGraphicsConfig#disableFrustumCulling()
 	 * @since API 2.0.0
-	 * @see IDhApiGraphicsConfig#disableFrustumCulling() 
 	 */
 	IDhApiConfigValue<Boolean> disableShadowFrustumCulling();
-	
+
 }

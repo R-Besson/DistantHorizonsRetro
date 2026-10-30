@@ -41,36 +41,36 @@ public class PhantomLoggingHelper
 				break;
 			}
 		}
-		
+
 		if (!pairFound)
 		{
 			allocationStackTraceCountPairList.add(new Pair<>(key, new AtomicInteger(1)));
 		}
 	}
-	
+
 	public static void LogAllocationStackTracePairCounts(DhLogger logger, String prefix, ArrayList<Pair<String, AtomicInteger>> allocationStackTraceCountPairList)
 	{
 		// high numbers first
 		allocationStackTraceCountPairList.sort((a, b) -> Integer.compare(b.second.get(), a.second.get()));
-		
+
 		StringBuilder stringBuilder = new StringBuilder();
 		for (int j = 0; j < allocationStackTraceCountPairList.size(); j++)
 		{
 			int count = allocationStackTraceCountPairList.get(j).second.get();
 			String stack = allocationStackTraceCountPairList.get(j).first;
-			
+
 			stringBuilder.append(count).append(". ").append(stack).append("\n");
 		}
 		logger.warn(prefix + " Stacks: [" + allocationStackTraceCountPairList.size() + "]\n" + stringBuilder);
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
 	//region
-	
+
 	/**
 	 * Can be quickly added to a {@link AutoCloseable} implementing
 	 * class to confirm it's being properly closed. <br>
@@ -80,7 +80,7 @@ public class PhantomLoggingHelper
 	public static class BasicPhantomReference implements AutoCloseable
 	{
 		private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-		
+
 		/** if enabled the number of GC'ed buffers will be logged */
 		private static final boolean LOG_PHANTOM_RECOVERY = true;
 		/**
@@ -92,68 +92,68 @@ public class PhantomLoggingHelper
 		 * for the render thread.
 		 */
 		private static final boolean LOG_PHANTOM_ALLOCATION_STACKS = true;
-		
+
 		private static final int PHANTOM_REF_CHECK_TIME_IN_MS = 5 * 1000;
 		private static final ReferenceQueue<BasicPhantomReference> PHANTOM_REFERENCE_QUEUE = new ReferenceQueue<>();
 		private static final ConcurrentHashMap<PhantomReference<? extends BasicPhantomReference>, Class<?>> PHANTOM_TO_PARENT_CLASS = new ConcurrentHashMap<>();
-		
+
 		private static final ThreadPoolExecutor CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("BasicPhantom Cleanup");
-		
-		
+
+
 		private final PhantomReference<? extends BasicPhantomReference> phantomReference;
-		
-		
-		
+
+
+
 		//==============//
 		// constructors //
 		//==============//
 		//region
-		
+
 		static
 		{
 			CLEANUP_THREAD.execute(BasicPhantomReference::runPhantomReferenceCleanupLoop);
 		}
-		
+
 		public BasicPhantomReference(Class<?> parentClass)
 		{
 			this.phantomReference = new PhantomReference<>(this, PHANTOM_REFERENCE_QUEUE);
 			PHANTOM_TO_PARENT_CLASS.put(this.phantomReference, parentClass);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//================//
 		// base overrides //
 		//================//
 		//region
-		
+
 		@Override
 		public void close()
 		{
 			this.phantomReference.clear();
 			PHANTOM_TO_PARENT_CLASS.remove(this.phantomReference);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//================//
 		// static cleanup //
 		//================//
 		//region
-		
+
 		private static void runPhantomReferenceCleanupLoop()
 		{
 			// these arrays are stored here so they don't have to be re-allocated each loop
 			ArrayList<Pair<String, AtomicInteger>> parentClassNameCountPairList = new ArrayList<>();
-			
+
 			while (true)
 			{
 				parentClassNameCountPairList.clear();
-				
+
 				try
 				{
 					try
@@ -163,9 +163,9 @@ public class PhantomLoggingHelper
 					catch (InterruptedException ignore)
 					{
 					}
-					
+
 					int collectedCount = 0;
-					
+
 					Reference<? extends BasicPhantomReference> phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 					while (phantomRef != null)
 					{
@@ -177,27 +177,27 @@ public class PhantomLoggingHelper
 							{
 								parentClassName = parentClass.getSimpleName();
 							}
-							
+
 							PhantomLoggingHelper.putAndIncrementTrackingString(parentClassName, parentClassNameCountPairList);
 						}
-						
+
 						collectedCount++;
 						phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 					}
-					
-					
-					
+
+
+
 					if (LOG_PHANTOM_RECOVERY)
 					{
 						// we only want to log when something has been returned
 						if (collectedCount != 0)
 						{
 							LOGGER.warn("Phantoms collected: [" + F3Screen.NUMBER_FORMAT.format(collectedCount) + "].");
-							
+
 							PhantomLoggingHelper.LogAllocationStackTracePairCounts(LOGGER, "Parent class", parentClassNameCountPairList);
 						}
 					}
-					
+
 				}
 				catch (Exception e)
 				{
@@ -205,14 +205,14 @@ public class PhantomLoggingHelper
 				}
 			}
 		}
-		
+
 		//endregion
-		
-		
+
+
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

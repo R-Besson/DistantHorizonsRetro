@@ -38,7 +38,14 @@ import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRen
 import com.seibel.distanthorizons.core.sql.repo.AbstractDhRepo;
 import com.seibel.distanthorizons.core.util.objects.Pair;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
-import com.seibel.distanthorizons.core.world.*;
+import com.seibel.distanthorizons.core.world.AbstractDhWorld;
+import com.seibel.distanthorizons.core.world.DhApiWorldProxy;
+import com.seibel.distanthorizons.core.world.DhClientServerWorld;
+import com.seibel.distanthorizons.core.world.DhClientWorld;
+import com.seibel.distanthorizons.core.world.DhServerWorld;
+import com.seibel.distanthorizons.core.world.EWorldEnvironment;
+import com.seibel.distanthorizons.core.world.IDhClientWorld;
+import com.seibel.distanthorizons.core.world.IDhServerWorld;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
@@ -52,36 +59,36 @@ import java.util.ArrayList;
 public class SharedApi
 {
 	public static final SharedApi INSTANCE = new SharedApi();
-	
+
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
 	public static final WorldChunkUpdateManager WORLD_CHUNK_UPDATE_MANAGER = WorldChunkUpdateManager.INSTANCE; // local fariable for quick access
-	
-	
+
+
 	@Nullable
 	private static AbstractDhWorld currentWorld;
 	private static final Object worldLockObject = new Object();
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region constructor
-	
+
 	private SharedApi() { }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// world methods //
 	//===============//
 	//region world methods
-	
+
 	public static EWorldEnvironment getEnvironment() { return (currentWorld == null) ? null : currentWorld.environment; }
-	
+
 	public static void setDhWorld(AbstractDhWorld newWorld)
 	{
 		synchronized (worldLockObject)
@@ -92,20 +99,20 @@ public class SharedApi
 				oldWorld.close();
 			}
 			currentWorld = newWorld;
-			
+
 			// starting and stopping the DataRenderTransformer is necessary to prevent attempting to
 			// access the MC level at inappropriate times, which can cause exceptions
 			if (currentWorld != null)
 			{
 				ThreadPoolUtil.setupThreadPools();
-				
+
 				ApiEventInjector.INSTANCE.fireAllEvents(DhApiWorldLoadEvent.class, new DhApiWorldLoadEvent.EventParam());
 			}
 			else
 			{
 				ThreadPoolUtil.shutdownThreadPools();
-				
-				// delayed get because SharedApi will be created before the singleton has been bound 
+
+				// delayed get because SharedApi will be created before the singleton has been bound
 				AbstractDebugWireframeRenderer debugWireframeRenderer = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
 				debugWireframeRenderer.clearRenderables();
 
@@ -115,42 +122,42 @@ public class SharedApi
 				WORLD_CHUNK_UPDATE_MANAGER.clear();
 				// generators are bound per level, none of the old world's levels exist anymore
 				WorldGeneratorInjector.INSTANCE.clear();
-				
+
 				RenderThreadTaskHandler.INSTANCE.clearDebugStats();
 				BlockTextureRegistry.INSTANCE.clear();
-				
+
 				// recommend that the garbage collector cleans up any objects from the old world and thread pools
 				System.gc();
-				
+
 				ApiEventInjector.INSTANCE.fireAllEvents(DhApiWorldUnloadEvent.class, new DhApiWorldUnloadEvent.EventParam());
-				
+
 				// fired after the unload event so API users can't change the read-only for any new worlds
 				DhApiWorldProxy.INSTANCE.setReadOnly(false, false);
 			}
 		}
 	}
-	
+
 	@Nullable
 	public static AbstractDhWorld getAbstractDhWorld() { return currentWorld; }
-	
+
 	/** returns null if the {@link SharedApi#currentWorld} isn't a {@link DhClientWorld} or {@link DhClientServerWorld} */
 	@Nullable
 	public static IDhClientWorld tryGetDhClientWorld() { return (currentWorld instanceof IDhClientWorld) ? (IDhClientWorld) currentWorld : null; }
-	
+
 	/** returns null if the {@link SharedApi#currentWorld} isn't a {@link DhServerWorld} or {@link DhClientServerWorld} */
 	@Nullable
 	public static IDhServerWorld tryGetDhServerWorld() { return (currentWorld instanceof IDhServerWorld) ? (IDhServerWorld) currentWorld : null; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// chunk update //
 	//==============//
 	//region chunk update
-	
-	/** 
+
+	/**
 	 * Used to prevent getting a full chunk from MC if it isn't necessary. <br>
 	 * This is important since asking MC for a chunk is slow and may block the render thread.
 	 */
@@ -161,10 +168,10 @@ public class SharedApi
 		{
 			return true;
 		}
-		
-		return manager.contains(new DhChunkPos(new DhBlockPos2D(blockPosX, blockPosZ))); 
+
+		return manager.contains(new DhChunkPos(new DhBlockPos2D(blockPosX, blockPosZ)));
 	}
-	
+
 	public static boolean isChunkAtChunkPosAlreadyUpdating(ILevelWrapper levelWrapper, int chunkPosX, int chunkPosZ)
 	{
 		ChunkUpdateQueueManager manager = WORLD_CHUNK_UPDATE_MANAGER.getByLevelWrapper(levelWrapper);
@@ -172,24 +179,24 @@ public class SharedApi
 		{
 			return true;
 		}
-		
-		return manager.contains(new DhChunkPos(chunkPosX, chunkPosZ)); 
+
+		return manager.contains(new DhChunkPos(chunkPosX, chunkPosZ));
 	}
-	
-	
-	
+
+
+
 	public void applyChunkUpdate(IChunkWrapper chunkWrapper, ILevelWrapper levelWrapper, boolean waitForLoadedWorld)
 	{
 		//===================//
 		// validation checks //
 		//===================//
-		
+
 		if (chunkWrapper == null)
 		{
 			// shouldn't happen, but just in case
 			return;
 		}
-		
+
 		AbstractDhWorld dhWorld = SharedApi.getAbstractDhWorld();
 		if (dhWorld == null)
 		{
@@ -200,17 +207,17 @@ public class SharedApi
 				IClientLevelWrapper clientLevel = (IClientLevelWrapper) levelWrapper;
 				ClientApi.INSTANCE.waitingChunkByClientLevelAndPos.put(new Pair<>(clientLevel, chunkWrapper.getChunkPos()), chunkWrapper);
 			}
-			
+
 			return;
 		}
-		
+
 		// ignore updates if the world is read-only
 		if (DhApiWorldProxy.INSTANCE.tryGetReadOnly())
 		{
 			return;
 		}
-		
-		
+
+
 		IDhLevel dhLevel;
 		if (waitForLoadedWorld)
 		{
@@ -224,24 +231,24 @@ public class SharedApi
 					IClientLevelWrapper clientLevel = (IClientLevelWrapper) levelWrapper;
 					ClientApi.INSTANCE.waitingChunkByClientLevelAndPos.put(new Pair<>(clientLevel, chunkWrapper.getChunkPos()), chunkWrapper);
 				}
-				
+
 				return;
 			}
 		}
 		else
 		{
-			// we want to apply the chunk to this level regardless of if the world/level is loaded, 
-			// this path may happen (and is needed) if the chunk is applied during level loading 
+			// we want to apply the chunk to this level regardless of if the world/level is loaded,
+			// this path may happen (and is needed) if the chunk is applied during level loading
 			// before the world has access to it
 			dhLevel = levelWrapper.getDhLevel();
 			if (dhLevel == null)
 			{
 				// shouldn't happen, but just in case
-				LOGGER.warn("No DH level provided by the ["+levelWrapper.getClass()+"], some chunks may not update properly.");
+				LOGGER.warn("No DH level provided by the [" + levelWrapper.getClass() + "], some chunks may not update properly.");
 				return;
 			}
 		}
-		
+
 		// ignore chunk updates if the network should handle them
 		if (dhLevel instanceof DhClientLevel)
 		{
@@ -250,47 +257,47 @@ public class SharedApi
 				return;
 			}
 		}
-		
+
 		// ignore chunk updates for non-rendered levels
 		String dimName = dhLevel.getLevelWrapper().getDimensionName();
 		if (IgnoredDimensionCsvHandler.INSTANCE.dimensionNameShouldBeIgnored(dimName))
 		{
 			return;
 		}
-		
+
 		ChunkUpdateQueueManager chunkManager = WORLD_CHUNK_UPDATE_MANAGER.getByLevelWrapper(levelWrapper);
 		// ignore the wrong level wrapper type or
 		// if the chunk is already queued for handling
-		if (chunkManager == null 
+		if (chunkManager == null
 			|| chunkManager.contains(chunkWrapper.getChunkPos()))
 		{
 			return;
 		}
-		
-		
+
+
 		queueChunkUpdate(chunkManager, chunkWrapper, dhLevel);
 	}
-	
+
 	private static void queueChunkUpdate(ChunkUpdateQueueManager chunkManager, IChunkWrapper chunkWrapper, IDhLevel dhLevel)
 	{
 		// add chunk update data to preUpdate queue
 		ChunkUpdateData updateData = new ChunkUpdateData(chunkWrapper, dhLevel);
 		chunkManager.addItemToPreUpdateQueue(chunkWrapper.getChunkPos(), updateData);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// F3 Menu //
 	//=========//
 	//region F3 Menu
-	
+
 	public ArrayList<String> getDebugMenuString() { return WORLD_CHUNK_UPDATE_MANAGER.getDebugMenuString(); }
-	
-	//endregion 
-	
-	
-	
+
+	//endregion
+
+
+
 }

@@ -37,21 +37,21 @@ public class GLIndexBuffer extends GLBuffer
 	protected int indicesCount = 0;
 	protected int glType = GL11.GL_UNSIGNED_INT;
 	public int getGlType() { return this.glType; }
-	
-	
-	
+
+
+
 	public GLIndexBuffer(boolean isBufferStorage) { super(isBufferStorage); }
-	
-	
-	
+
+
+
 	@Override
 	public void destroyAsync()
 	{
 		super.destroyAsync();
 		this.indicesCount = 0;
 	}
-	
+
 	@Override
 	public int getBufferBindingTarget() { return GL15.GL_ELEMENT_ARRAY_BUFFER; }
-	
+
 }

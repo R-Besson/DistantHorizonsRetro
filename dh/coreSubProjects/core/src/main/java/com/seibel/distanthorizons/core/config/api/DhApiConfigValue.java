@@ -47,21 +47,21 @@ import java.util.function.Consumer;
 public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<apiType>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	private static final Set<String> CONFIG_NAME_CALLED_DEPRECATED_API = Collections.newSetFromMap(new ConcurrentHashMap<>());
-	
-	
+
+
 	private final ConfigEntry<coreType> configBase;
-	
+
 	private final IConverter<coreType, apiType> configConverter;
-	
-	
-	
+
+
+
 	//==============//
- 	// constructors //
+	// constructors //
 	//==============//
 	//region
-	
+
 	/**
 	 * This constructor should only be called internally. <br>
 	 * There is no reason for API users to create this object. <br><br>
@@ -74,7 +74,7 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 		this.configBase = configBase;
 		this.configConverter = (IConverter<coreType, apiType>) new DefaultConverter<coreType>();
 	}
-	
+
 	/**
 	 * This constructor should only be called internally. <br>
 	 * There is no reason for API users to create this object. <br><br>
@@ -84,48 +84,48 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 		this.configBase = configBase;
 		this.configConverter = newConverter;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
- 	// overrides //
+	// overrides //
 	//===========//
 	//region
-	
+
 	@Override public apiType getValue() { return this.configConverter.convertToApiType(this.configBase.get()); }
 	@Override public apiType getTrueValue() { return this.configConverter.convertToApiType(this.configBase.getTrueValue()); }
-	@Override public apiType getApiValue() 
+	@Override public apiType getApiValue()
 	{
 		// if no API value is set, this should return null
 		if (this.configBase.getApiValue() == null)
 		{
 			return null;
 		}
-		
-		return this.configConverter.convertToApiType(this.configBase.getApiValue()); 
+
+		return this.configConverter.convertToApiType(this.configBase.getApiValue());
 	}
-	
+
 	@Deprecated
 	@Override
 	public boolean setValue(apiType newValue)
-	{ 
+	{
 		if (CONFIG_NAME_CALLED_DEPRECATED_API.add(this.configBase.name))
 		{
 			String callerClass = this.getCallerClassName();
-			LOGGER.warn("Config ["+this.configBase.name+"] was set by ["+callerClass+"] via the deprecated API method that doesn't define the API caller. \n" +
+			LOGGER.warn("Config [" + this.configBase.name + "] was set by [" + callerClass + "] via the deprecated API method that doesn't define the API caller. \n" +
 				"If you are a player this can be ignored. \n" +
 				"If you are a developer please make sure your mod passes in a display name so users can know what your mod controls."
 			);
 		}
-		
-		return this.setValue(newValue, "UNKNOWN"); 
+
+		return this.setValue(newValue, "UNKNOWN");
 	}
 	private String getCallerClassName()
 	{
 		StackTraceElement[] stack = new Throwable().getStackTrace();
-		
+
 		// find the first stack element that isn't part of this class
 		String thisClass = this.getClass().getName();
 		for (StackTraceElement element : stack)
@@ -135,10 +135,10 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 				return element.getClassName();
 			}
 		}
-		
+
 		return "UNKNOWN";
 	}
-	
+
 	@Override
 	public boolean setValue(apiType newValue, String apiUserDisplayName)
 	{
@@ -152,7 +152,7 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 			return false;
 		}
 	}
-	
+
 	@Override
 	public boolean clearValue()
 	{
@@ -167,25 +167,25 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 			return false;
 		}
 	}
-	
+
 	@Override
 	public boolean getCanBeOverrodeByApi() { return this.configBase.getAllowApiOverride(); }
-	
+
 	@Override public apiType getDefaultValue() { return this.configConverter.convertToApiType(this.configBase.getDefaultValue()); }
 	@Override public apiType getMaxValue() { return this.configConverter.convertToApiType(this.configBase.getMax()); }
 	@Override public apiType getMinValue() { return this.configConverter.convertToApiType(this.configBase.getMin()); }
-	
-	
+
+
 	@Override
-	public void addChangeListener(Consumer<apiType> onValueChangeFunc) 
+	public void addChangeListener(Consumer<apiType> onValueChangeFunc)
 	{
-		this.configBase.addValueChangeListener((coreValue) -> 
+		this.configBase.addValueChangeListener((coreValue) ->
 		{
 			apiType apiValue = this.configConverter.convertToApiType(coreValue);
 			onValueChangeFunc.accept(apiValue);
-		}); 
+		});
 	}
-	
+
 	//endregion
-	
+
 }

@@ -25,46 +25,46 @@ public class DhBlockPos2D
 	public static final DhBlockPos2D ZERO = new DhBlockPos2D(0, 0);
 	public final int x;
 	public final int z;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public DhBlockPos2D(int x, int z)
 	{
 		this.x = x;
 		this.z = z;
 	}
-	
+
 	public DhBlockPos2D(DhBlockPos blockPos)
 	{
 		this.x = blockPos.getX();
 		this.z = blockPos.getZ();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==========//
 	// mutators //
 	//==========//
 	//region
-	
+
 	public DhBlockPos2D add(DhBlockPos2D other) { return new DhBlockPos2D(this.x + other.x, this.z + other.z); }
 
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// calculations //
 	//==============//
 	//region
-	
+
 	public double dist(int x, int z) { return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.z - z, 2)); }
 
 	/**
@@ -75,19 +75,19 @@ public class DhBlockPos2D
 	 * where you can only drive along each street, instead of directly to the other point.
 	 */
 	public int manhattanDist(DhBlockPos2D other) { return Math.abs(this.x - other.x) + Math.abs(this.z - other.z); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public String toString() { return "(" + this.x + ", " + this.z + ")"; }
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -96,15 +96,15 @@ public class DhBlockPos2D
 			DhBlockPos2D other = (DhBlockPos2D) obj;
 			return this.x == other.x && this.z == other.z;
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() { return Integer.hashCode(this.x) ^ Integer.hashCode(this.z); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

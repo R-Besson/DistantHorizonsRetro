@@ -37,43 +37,43 @@ import java.util.function.Consumer;
 public class TestWorldGenerator implements IDhApiWorldGenerator
 {
 	public static final byte SMALLEST_DETAIL_LEVEL = 1;
-	
-	
+
+
 	// testable methods //
-	
+
 	@Override
 	public int getPriority() { return OverrideInjector.CORE_PRIORITY; }
-	
+
 	@Override
 	public byte getSmallestDataDetailLevel() { return SMALLEST_DETAIL_LEVEL; }
-	
-	
-	
-	
+
+
+
+
 	// not used when unit testing //
-	
+
 	//======================//
 	// generator parameters //
 	//======================//
-	
+
 	@Override
 	public byte getLargestDataDetailLevel() { return LodUtil.BLOCK_DETAIL_LEVEL; }
-	
-	
-	
+
+
+
 	//===================//
 	// generator methods //
 	//===================//
-	
+
 	@Override
 	public void close() { }
-	
+
 	@Override
 	public CompletableFuture<Void> generateChunks(int chunkPosMinX, int chunkPosMinZ, int generationRequestChunkWidthCount, byte targetDataDetail, EDhApiDistantGeneratorMode maxGenerationStep, ExecutorService executorService, Consumer<Object[]> resultConsumer) { return null; }
-	
+
 	@Override
 	public void preGeneratorTaskStart() { }
-	
-	
+
+
 }
 

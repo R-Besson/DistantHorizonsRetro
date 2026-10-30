@@ -50,7 +50,7 @@ import java.util.function.Consumer;
 
 /**
  * Formerly "BatchGenerator"
- * 
+ *
  * @author Leetom
  * @version 2022-12-10
  */
@@ -62,46 +62,46 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 
 	public final IChunkGenerator chunkGenerator;
 
-	
-	
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	public DhWorldGenerator(IDhServerLevel serverLevel)
 	{
 		this.serverLevelWrapper = serverLevel.getServerLevelWrapper();
-		
+
 		this.chunkGenerator = WRAPPER_FACTORY.createChunkGenerator(serverLevel);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====================//
-	// override parameters // 
+	// override parameters //
 	//=====================//
 	//region
-	
+
 	@Override
 	public int getPriority() { return IOverrideInjector.CORE_PRIORITY; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//======================//
 	// generator parameters //
 	//======================//
 	//region
-	
+
 	@Override
 	public byte getSmallestDataDetailLevel() { return LodUtil.BLOCK_DETAIL_LEVEL; }
 	@Override
-	public byte getLargestDataDetailLevel() 
-	{ 
+	public byte getLargestDataDetailLevel()
+	{
 		if (Config.Common.WorldGenerator.generatorPlan.get().surfaceGenEnabled)
 		{
 			// we can generate any LOD detail level
@@ -113,28 +113,28 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 			return LodUtil.BLOCK_DETAIL_LEVEL;
 		}
 	}
-	
+
 	@Override
 	public EDhApiWorldGeneratorReturnType getReturnType() { return EDhApiWorldGeneratorReturnType.API_DATA_SOURCES; }
-	
+
 	@Override
 	public boolean runApiValidation() { return ModInfo.IS_DEV_BUILD; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===================//
 	// generator methods //
 	//===================//
 	//region
-	
+
 	@Override
 	public void preGeneratorTaskStart() { this.chunkGenerator.updateAllFutures(); }
-	
+
 	/** @see IChunkGenerator#getInProgressTasksPerThread() */
 	public int getInProgressTasksPerThread() { return this.chunkGenerator.getInProgressTasksPerThread(); }
-	
+
 	@Override
 	public CompletableFuture<Void> generateLod(
 		int chunkPosMinX, int chunkPosMinZ,
@@ -145,7 +145,7 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	{
 		int widthInBlocks = BitShiftUtil.powerOfTwo(detailLevel + DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 		int widthInChunks = widthInBlocks / LodUtil.CHUNK_WIDTH;
-		
+
 		if (chunkGenAllowedForDetailLevel(detailLevel))
 		{
 			return this.generateChunksAsync(
@@ -156,45 +156,45 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 				worldGeneratorThreadPool,
 				resultConsumer);
 		}
-		
+
 		// 1.7.10 has no rough surface generator for areas larger than a chunk
 		throw new NullPointerException("No rough generator provided, this Minecraft version probably doesn't support rough surface generation.");
 	}
-	
-	/** @see WorldGenUtil#regenAllowed(FullDataSourceProviderV2)  */
+
+	/** @see WorldGenUtil#regenAllowed(FullDataSourceProviderV2) */
 	private static boolean chunkGenAllowedForDetailLevel(byte detailLevel)
 	{
 		EDhApiGeneratorPlan genPlan = Config.Common.WorldGenerator.generatorPlan.get();
 		EDhApiDistantGeneratorMode chunkGenMode = Config.Common.WorldGenerator.chunkGeneratorMode.get();
-		
+
 		if (!genPlan.chunkGenEnabled)
 		{
 			return false;
 		}
-		
+
 		if (detailLevel > 0)
 		{
 			// chunks can only be generated at detail level 0
 			return false;
 		}
-		
+
 		// If surface gen is enabled, ignore any
 		// pre-existing chunks since empty/missing chunks will replace the surface
 		// generated terrain.
 		return !genPlan.surfaceGenEnabled
 			|| chunkGenMode != EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY;
 	}
-	
+
 	private @NotNull CompletableFuture<Void> generateChunksAsync(
 		int chunkPosMinX, int chunkPosMinZ,
 		int widthInChunks,
-		IDhApiFullDataSource pooledApiDataSource, 
-		EDhApiDistantGeneratorMode generatorMode, 
-		ExecutorService worldGeneratorThreadPool, 
+		IDhApiFullDataSource pooledApiDataSource,
+		EDhApiDistantGeneratorMode generatorMode,
+		ExecutorService worldGeneratorThreadPool,
 		Consumer<IDhApiFullDataSource> resultConsumer)
 	{
-		FullDataSourceV2 pooledFullDataSource = (FullDataSourceV2) pooledApiDataSource; 
-		
+		FullDataSourceV2 pooledFullDataSource = (FullDataSourceV2) pooledApiDataSource;
+
 		EDhApiWorldGenerationStep targetStep;
 		switch (generatorMode)
 		{
@@ -210,18 +210,18 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 			case INTERNAL_SERVER:
 				targetStep = EDhApiWorldGenerationStep.LIGHT;
 				break;
-			
+
 			default:
-				throw new IllegalArgumentException("no target step defined for generator mode: ["+ generatorMode +"].");
+				throw new IllegalArgumentException("no target step defined for generator mode: [" + generatorMode + "].");
 		}
-		
-		
+
+
 		ArrayList<IChunkWrapper> chunkList = new ArrayList<>(widthInChunks * widthInChunks);
-		
+
 		CompletableFuture<Void> genFuture = this.chunkGenerator.queueGenEvent(
 			chunkPosMinX, chunkPosMinZ, widthInChunks,
 			generatorMode, targetStep,
-			worldGeneratorThreadPool, 
+			worldGeneratorThreadPool,
 			(IChunkWrapper chunkWrapper) ->
 			{
 				if (chunkWrapper != null)
@@ -229,7 +229,7 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 					chunkList.add(chunkWrapper);
 				}
 			});
-		
+
 		// separate future necessary to make sure the chunks
 		// are processed before this event is
 		// marked as completed, recycling the data source.
@@ -237,42 +237,42 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 		// runs on the world gen threads, which follow DH's thread count, instead of
 		// the server world gen waiter thread that completed the generation
 		return genFuture.handleAsync((voidObj, throwable) ->
+		{
+			for (int i = 0; i < chunkList.size(); i++)
 			{
-				for (int i = 0; i < chunkList.size(); i++)
+				IChunkWrapper chunkWrapper = chunkList.get(i);
+				try (FullDataSourceV2 dataSource = LodDataBuilder.createFromChunk(this.serverLevelWrapper, chunkWrapper))
 				{
-					IChunkWrapper chunkWrapper = chunkList.get(i);
-					try (FullDataSourceV2 dataSource = LodDataBuilder.createFromChunk(this.serverLevelWrapper, chunkWrapper))
+					if (dataSource != null)
 					{
-						if (dataSource != null)
-						{
-							pooledFullDataSource.updateFromDataSource(dataSource);
-						}
+						pooledFullDataSource.updateFromDataSource(dataSource);
 					}
 				}
-				pooledFullDataSource.recordLastSeen();
-				resultConsumer.accept(pooledFullDataSource);
-				
-				return null; // result ignored
-			}, worldGeneratorThreadPool);
+			}
+			pooledFullDataSource.recordLastSeen();
+			resultConsumer.accept(pooledFullDataSource);
+
+			return null; // result ignored
+		}, worldGeneratorThreadPool);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public void close()
 	{
 		this.chunkGenerator.close();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

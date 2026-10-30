@@ -34,55 +34,55 @@ import java.util.List;
 public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHandler<EDhApiThreadPreset>
 {
 	public static final ThreadPresetConfigEventHandler INSTANCE = new ThreadPresetConfigEventHandler();
-	
-	
+
+
 	public static int getDefaultThreadCount() { return getThreadCountByPercent(0.5); }
 	private final ConfigPresetOptions<EDhApiThreadPreset, Integer> threadCount = new ConfigPresetOptions<>(Config.Common.MultiThreading.numberOfThreads,
-			new HashMap<EDhApiThreadPreset, Integer>()
-			{{
-				this.put(EDhApiThreadPreset.MINIMAL_IMPACT, getThreadCountByPercent(0.1));
-				this.put(EDhApiThreadPreset.LOW_IMPACT, getThreadCountByPercent(0.25));
-				this.put(EDhApiThreadPreset.BALANCED, getDefaultThreadCount());
-				this.put(EDhApiThreadPreset.AGGRESSIVE, getThreadCountByPercent(0.75));
-				this.put(EDhApiThreadPreset.I_PAID_FOR_THE_WHOLE_CPU, getThreadCountByPercent(1.0));
-			}});
+		new HashMap<EDhApiThreadPreset, Integer>()
+		{{
+			this.put(EDhApiThreadPreset.MINIMAL_IMPACT, getThreadCountByPercent(0.1));
+			this.put(EDhApiThreadPreset.LOW_IMPACT, getThreadCountByPercent(0.25));
+			this.put(EDhApiThreadPreset.BALANCED, getDefaultThreadCount());
+			this.put(EDhApiThreadPreset.AGGRESSIVE, getThreadCountByPercent(0.75));
+			this.put(EDhApiThreadPreset.I_PAID_FOR_THE_WHOLE_CPU, getThreadCountByPercent(1.0));
+		}});
 	public static double getDefaultRunTimeRatio() { return 1.0; }
 	private final ConfigPresetOptions<EDhApiThreadPreset, Double> threadRunTime = new ConfigPresetOptions<>(Config.Common.MultiThreading.threadRunTimeRatio,
-			new HashMap<EDhApiThreadPreset, Double>()
-			{{
-				this.put(EDhApiThreadPreset.MINIMAL_IMPACT, 0.5);
-				this.put(EDhApiThreadPreset.LOW_IMPACT, 1.0);
-				this.put(EDhApiThreadPreset.BALANCED, getDefaultRunTimeRatio());
-				this.put(EDhApiThreadPreset.AGGRESSIVE, 1.0);
-				this.put(EDhApiThreadPreset.I_PAID_FOR_THE_WHOLE_CPU, 1.0);
-			}});
-	
-	
-	
+		new HashMap<EDhApiThreadPreset, Double>()
+		{{
+			this.put(EDhApiThreadPreset.MINIMAL_IMPACT, 0.5);
+			this.put(EDhApiThreadPreset.LOW_IMPACT, 1.0);
+			this.put(EDhApiThreadPreset.BALANCED, getDefaultRunTimeRatio());
+			this.put(EDhApiThreadPreset.AGGRESSIVE, 1.0);
+			this.put(EDhApiThreadPreset.I_PAID_FOR_THE_WHOLE_CPU, 1.0);
+		}});
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	/** private since we only ever need one handler at a time */
 	private ThreadPresetConfigEventHandler()
 	{
 		// add each config used by this preset
 		this.configList.add(this.threadCount);
 		this.configList.add(this.threadRunTime);
-		
+
 		for (ConfigPresetOptions<EDhApiThreadPreset, ?> config : this.configList)
 		{
 			// ignore try-using, the listeners should only ever be added once and should never be removed
 			new ConfigChangeListener<>(config.configEntry, (val) -> this.onConfigValueChanged());
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
-	
+
 	/**
 	 * Pre-computed values for your convenience: <br>
 	 * Format: percent: 4coreCpu-8coreCpu-16coreCpu <br><br>
@@ -101,27 +101,27 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 		{
 			throw new IllegalArgumentException("percent must be greater than 0 and less than or equal to 1.");
 		}
-		
+
 		// this is logical processor count, not physical CPU cores
 		int totalProcessorCount = Runtime.getRuntime().availableProcessors();
 		int coreCount = (int) Math.ceil(totalProcessorCount * percent);
 		return MathUtil.clamp(1, coreCount, totalProcessorCount);
 	}
-	
-	
-	
+
+
+
 	//==============//
 	// enum getters //
 	//==============//
-	
+
 	@Override
 	protected AbstractConfigBase<EDhApiThreadPreset> getPresetConfigEntry() { return Config.Client.threadPresetSetting; }
-	
+
 	@Override
 	protected List<EDhApiThreadPreset> getPresetEnumList() { return Arrays.asList(EDhApiThreadPreset.values()); }
 	@Override
 	protected EDhApiThreadPreset getCustomPresetEnum() { return EDhApiThreadPreset.CUSTOM; }
-	
-	
-	
+
+
+
 }

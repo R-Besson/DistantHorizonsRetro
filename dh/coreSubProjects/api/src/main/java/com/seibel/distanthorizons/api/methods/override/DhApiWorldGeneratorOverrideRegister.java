@@ -35,11 +35,11 @@ import com.seibel.distanthorizons.coreapi.DependencyInjection.WorldGeneratorInje
 public class DhApiWorldGeneratorOverrideRegister implements IDhApiWorldGeneratorOverrideRegister
 {
 	public static DhApiWorldGeneratorOverrideRegister INSTANCE = new DhApiWorldGeneratorOverrideRegister();
-	
+
 	private DhApiWorldGeneratorOverrideRegister() { }
-	
-	
-	
+
+
+
 	@Override
 	public DhApiResult<Void> registerWorldGeneratorOverride(IDhApiLevelWrapper levelWrapper, IDhApiWorldGenerator worldGenerator)
 	{
@@ -53,5 +53,5 @@ public class DhApiWorldGeneratorOverrideRegister implements IDhApiWorldGenerator
 			return DhApiResult.createFail(e.getMessage());
 		}
 	}
-	
+
 }

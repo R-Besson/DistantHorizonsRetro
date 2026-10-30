@@ -28,72 +28,72 @@ import java.util.ConcurrentModificationException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Compact, efficient storage for light levels. 
- * all blocks only take up 4 bits in total, 
+ * Compact, efficient storage for light levels.
+ * all blocks only take up 4 bits in total,
  * and if a 16x16x16 area is detected to have the same light level in all positions,
  * then we store a single byte for that light level, instead of 2 kilobytes.
- * 
+ *
  * @author Builderb0y
-*/
-public class ChunkLightStorage 
+ */
+public class ChunkLightStorage
 {
 	/** the minimum Y level in the chunk which this storage is storing light levels for (inclusive). */
 	public int minY;
 	/** the maximum Y level in the chunk which this storage is storing light levels for (exclusive). */
 	public int maxY;
-	
+
 	/** the data stored in this storage, split up into 16x16x16 areas. */
 	public LightSection[] lightSections;
-	
-	/** 
+
+	/**
 	 * If the get method is called on a Y position above what's stored
 	 * this value will be returned. <br><br>
-	 * 
+	 *
 	 * This needs to be manually defined since sky and block lights behave differently
 	 * for values both above and below what's defined.
 	 */
 	public int aboveMaxYValue;
 	/** @see ChunkLightStorage#aboveMaxYValue */
 	public int belowMinYValue;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
-	public static ChunkLightStorage createSkyLightStorage(IChunkWrapper chunkWrapper) { return createSkyLightStorage(chunkWrapper.getInclusiveMinBuildHeight(), chunkWrapper.getExclusiveMaxBuildHeight());  }
+
+	public static ChunkLightStorage createSkyLightStorage(IChunkWrapper chunkWrapper) { return createSkyLightStorage(chunkWrapper.getInclusiveMinBuildHeight(), chunkWrapper.getExclusiveMaxBuildHeight()); }
 	public static ChunkLightStorage createSkyLightStorage(int minY, int maxY)
 	{
 		return new ChunkLightStorage(
-				minY, maxY,
-				// positions above should be lit but positions below should be unlit
-				LodUtil.MAX_MC_LIGHT, LodUtil.MIN_MC_LIGHT);
+			minY, maxY,
+			// positions above should be lit but positions below should be unlit
+			LodUtil.MAX_MC_LIGHT, LodUtil.MIN_MC_LIGHT);
 	}
-	public static ChunkLightStorage createBlockLightStorage(IChunkWrapper chunkWrapper) { return createBlockLightStorage(chunkWrapper.getInclusiveMinBuildHeight(), chunkWrapper.getExclusiveMaxBuildHeight());  }
+	public static ChunkLightStorage createBlockLightStorage(IChunkWrapper chunkWrapper) { return createBlockLightStorage(chunkWrapper.getInclusiveMinBuildHeight(), chunkWrapper.getExclusiveMaxBuildHeight()); }
 	public static ChunkLightStorage createBlockLightStorage(int minY, int maxY)
 	{
 		return new ChunkLightStorage(
-				minY, maxY,
-				// positions above and below the handled area should be unlit
-				LodUtil.MIN_MC_LIGHT, LodUtil.MIN_MC_LIGHT);
+			minY, maxY,
+			// positions above and below the handled area should be unlit
+			LodUtil.MIN_MC_LIGHT, LodUtil.MIN_MC_LIGHT);
 	}
-	
-	public ChunkLightStorage(int minY, int maxY, int aboveMaxYValue, int belowMinYValue) 
+
+	public ChunkLightStorage(int minY, int maxY, int aboveMaxYValue, int belowMinYValue)
 	{
 		this.minY = minY;
 		this.maxY = maxY;
-		
+
 		this.aboveMaxYValue = aboveMaxYValue;
 		this.belowMinYValue = belowMinYValue;
 	}
-	
-	
-	
+
+
+
 	//=====================//
 	// getters and setters //
 	//=====================//
-	
+
 	public int get(int x, int y, int z)
 	{
 		if (y < this.minY)
@@ -102,10 +102,10 @@ public class ChunkLightStorage
 		}
 		else if (y >= this.maxY)
 		{
-			return  this.aboveMaxYValue;
+			return this.aboveMaxYValue;
 		}
-		
-		
+
+
 		if (this.lightSections != null)
 		{
 			int sectionIndex = BitShiftUtil.divideByPowerOfTwo(y - this.minY, 4);
@@ -119,30 +119,30 @@ public class ChunkLightStorage
 			}
 			catch (IndexOutOfBoundsException e)
 			{
-				throw new IndexOutOfBoundsException("Failed to get light at x:["+x+"], y:["+y+"], z:["+z+"], index:["+sectionIndex+"]. MinY:["+this.minY+"], maxY:["+this.maxY+"], section length:["+this.lightSections.length+"].  Original error: ["+e.getMessage()+"].");
+				throw new IndexOutOfBoundsException("Failed to get light at x:[" + x + "], y:[" + y + "], z:[" + z + "], index:[" + sectionIndex + "]. MinY:[" + this.minY + "], maxY:[" + this.maxY + "], section length:[" + this.lightSections.length + "].  Original error: [" + e.getMessage() + "].");
 			}
 		}
-		
+
 		return 0;
 	}
-	
+
 	public void set(int x, int y, int z, int lightLevel)
 	{
 		if (y < this.minY || y >= this.maxY)
 		{
 			return;
 		}
-		
+
 		//populate array if it doesn't exist.
 		if (this.lightSections == null)
 		{
 			int arrayLength = (this.maxY - this.minY) / 16;
 			this.lightSections = new LightSection[arrayLength];
 		}
-		
+
 		int index = (y - this.minY) >> 4;
 		LightSection lightSection = this.lightSections[index];
-		
+
 		//populate lightSection in array if it doesn't exist.
 		if (lightSection == null)
 		{
@@ -151,7 +151,7 @@ public class ChunkLightStorage
 		}
 		lightSection.set(x, y, z, lightLevel);
 	}
-	
+
 	public void clear()
 	{
 		if (this.lightSections != null)
@@ -170,48 +170,48 @@ public class ChunkLightStorage
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	public static class LightSection
 	{
 		public byte constantValue;
 		public long[] data;
 		public short[] counts;
-		
+
 		private final ReentrantLock concurrencyCheckLock = new ReentrantLock();
-		
-		
+
+
 		public LightSection(int initialValue)
 		{
 			if (initialValue < LodUtil.MIN_MC_LIGHT)
 			{
-				throw new IllegalArgumentException("The initial light value must be greater than ["+LodUtil.MIN_MC_LIGHT+"].");
+				throw new IllegalArgumentException("The initial light value must be greater than [" + LodUtil.MIN_MC_LIGHT + "].");
 			}
-			
+
 			this.constantValue = (byte) (initialValue);
 			this.counts = new short[16];
 			this.counts[initialValue] = 16 * 16 * 16;
 		}
-		
+
 		public int get(int x, int y, int z)
 		{
 			if (!this.concurrencyCheckLock.tryLock())
 			{
-				throw new ConcurrentModificationException("Thread ["+Thread.currentThread().getName()+"] attempted to get chunk light, lock: ["+this.concurrencyCheckLock+"].");
+				throw new ConcurrentModificationException("Thread [" + Thread.currentThread().getName() + "] attempted to get chunk light, lock: [" + this.concurrencyCheckLock + "].");
 			}
-			
+
 			try
 			{
 				if (this.constantValue >= 0)
 				{
 					return this.constantValue;
 				}
-				
+
 				x &= 15;
 				y &= 15;
 				z &= 15;
@@ -223,43 +223,43 @@ public class ChunkLightStorage
 				this.concurrencyCheckLock.unlock();
 			}
 		}
-		
+
 		public void set(int x, int y, int z, int lightLevel)
 		{
 			if (!this.concurrencyCheckLock.tryLock())
 			{
-				throw new ConcurrentModificationException("Thread ["+Thread.currentThread().getName()+"] attempted to set chunk light, lock: ["+this.concurrencyCheckLock+"].");
+				throw new ConcurrentModificationException("Thread [" + Thread.currentThread().getName() + "] attempted to set chunk light, lock: [" + this.concurrencyCheckLock + "].");
 			}
-			
+
 			try
 			{
 				int oldLightLevel = -1;
 				if (this.constantValue >= 0)
 				{
 					oldLightLevel = this.constantValue;
-					
+
 					//if the light level didn't change, then there's nothing to do.
 					if (oldLightLevel == lightLevel) return;
-					
+
 					//if we are a constant value and need to change something,
 					//then that means we need to convert to a non-constant value.
 					this.data = DataRecycler.get();
 					LodUtil.assertTrue(this.data != null);
-					
+
 					//repeat oldLightLevel 16 times as a bit pattern.
 					long payload = oldLightLevel;
 					payload |= payload << 4;
 					payload |= payload << 8;
 					payload |= payload << 16;
 					payload |= payload << 32;
-					
+
 					//fill our data with our constant value.
 					Arrays.fill(this.data, payload);
-					
+
 					//we are no longer a constant value.
 					this.constantValue = -1;
 				}
-				
+
 				x &= 15;
 				y &= 15;
 				z &= 15;
@@ -276,7 +276,7 @@ public class ChunkLightStorage
 				bits |= ((long) (lightLevel)) << (y << 2);
 				//store the updated bits in our data.
 				this.data[index] = bits;
-				
+
 				//we have one less of the old light level...
 				this.counts[oldLightLevel]--;
 				//...and one more of the new level.
@@ -287,7 +287,7 @@ public class ChunkLightStorage
 				{
 					this.constantValue = (byte) (lightLevel);
 					LodUtil.assertTrue(this.constantValue >= 0);
-					
+
 					DataRecycler.reclaim(this.data);
 					this.data = null;
 				}
@@ -297,20 +297,20 @@ public class ChunkLightStorage
 				this.concurrencyCheckLock.unlock();
 			}
 		}
-		
+
 	}
-	
+
 	static class DataRecycler
 	{
 		private static final ArrayList<long[]> ARRAY_LIST = new ArrayList<>(256);
 		private static final ReentrantLock ACCESS_LOCK = new ReentrantLock();
-		
+
 		static long[] get()
 		{
 			try
 			{
 				ACCESS_LOCK.lock();
-				
+
 				if (ARRAY_LIST.isEmpty())
 				{
 					return new long[256];
@@ -325,13 +325,13 @@ public class ChunkLightStorage
 				ACCESS_LOCK.unlock();
 			}
 		}
-		
-		static void reclaim(long[] data) 
-		{ 
+
+		static void reclaim(long[] data)
+		{
 			try
 			{
 				ACCESS_LOCK.lock();
-				
+
 				if (ARRAY_LIST.size() < 256)
 				{
 					ARRAY_LIST.add(data);
@@ -342,6 +342,7 @@ public class ChunkLightStorage
 				ACCESS_LOCK.unlock();
 			}
 		}
+
 	}
-	
+
 }

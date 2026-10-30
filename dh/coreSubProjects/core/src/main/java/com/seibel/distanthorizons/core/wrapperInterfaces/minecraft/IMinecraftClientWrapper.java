@@ -35,31 +35,31 @@ public interface IMinecraftClientWrapper extends IBindable
 	boolean clientConnectedToDedicatedServer();
 	/** for use with the Replay mod */
 	boolean connectedToReplay();
-	
+
 	String getCurrentServerName();
 	String getCurrentServerIp();
 	String getCurrentServerVersion();
-	
-	
-	
+
+
+
 	//=================//
 	// player handling //
 	//=================//
-	
+
 	boolean playerExists();
-	
+
 	/** @return (0,0,0) if no player is loaded */
 	DhBlockPos getPlayerBlockPos();
-	
+
 	/** @return (0,0) if no player is loaded */
 	DhChunkPos getPlayerChunkPos();
-	
-	
-	
+
+
+
 	//================//
 	// level handling //
 	//================//
-	
+
 	/**
 	 * Returns the level the client is currently in. <br>
 	 * Returns null if the client isn't in a level.
@@ -72,34 +72,34 @@ public interface IMinecraftClientWrapper extends IBindable
 	 */
 	@Nullable
 	IClientLevelWrapper getWrappedClientLevel(boolean bypassLevelKeyManager);
-	
-	
-	
+
+
+
 	//===========//
 	// messaging //
 	//===========//
-	
+
 	void sendChatMessage(String string);
-	
+
 	/** Will default to sending a chat message if overlay messages aren't supported. */
 	void sendOverlayMessage(String string);
-	
-	
-	
+
+
+
 	//==========================//
 	// vanilla option overrides //
 	//==========================//
-	
+
 	void disableVanillaClouds();
-	
-	
-	
+
+
+
 	//======//
 	// misc //
 	//======//
-	
+
 	IProfilerWrapper getProfiler();
-	
+
 	/**
 	 * Crashes Minecraft, displaying the given errorMessage <br> <br>
 	 * In the following format: <br>
@@ -109,19 +109,19 @@ public interface IMinecraftClientWrapper extends IBindable
 	 * Exit Code: -1  <br>
 	 */
 	void crashMinecraft(String errorMessage, Throwable exception);
-	
-	/** 
+
+	/**
 	 * This is only designed to be used internally by {@link RenderThreadTaskHandler}
 	 * since it handles task frame limiting (reducing/preventing stuttering)
-	 * whereas this method causes the task to be run whenever MC decides to 
+	 * whereas this method causes the task to be run whenever MC decides to
 	 * (likely all at once the next frame). <br><br>
-	 * 
-	 * Any tasks submitted here will be run on the render thread. 
-	 * 
-	 * @see RenderThreadTaskHandler 
+	 *
+	 * Any tasks submitted here will be run on the render thread.
+	 *
+	 * @see RenderThreadTaskHandler
 	 */
 	void executeOnRenderThread(Runnable runnable);
-	
+
 	void showDialog(String title, String message, String iconType);
 	boolean dialogNeedsAwtHeadless();
 

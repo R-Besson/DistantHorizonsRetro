@@ -27,19 +27,19 @@ import com.seibel.distanthorizons.core.config.api.DhApiConfigValue;
 public class DhApiMultiThreadingConfig implements IDhApiMultiThreadingConfig
 {
 	public static DhApiMultiThreadingConfig INSTANCE = new DhApiMultiThreadingConfig();
-	
+
 	private DhApiMultiThreadingConfig() { }
-	
-	
-	
+
+
+
 	@Override
 	public IDhApiConfigValue<Integer> threadCount()
 	{ return new DhApiConfigValue<>(Config.Common.MultiThreading.numberOfThreads); }
-	
+
 	@Override
 	public IDhApiConfigValue<Double> threadRuntimeRatio()
 	{ return new DhApiConfigValue<>(Config.Common.MultiThreading.threadRunTimeRatio); }
-	
-	
-	
+
+
+
 }

@@ -43,7 +43,12 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -78,7 +83,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 
 	/** cached method reference to reduce GC overhead */
 	private final Function<IBlockState, ClientBlockStateColorCache> createCachedBlockColorCacheFunc
-			= (blockState) -> new ClientBlockStateColorCache(blockState, this);
+		= (blockState) -> new ClientBlockStateColorCache(blockState, this);
 
 
 	private boolean cloudColorFailLogged = false;
@@ -131,7 +136,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		long currentTime = System.currentTimeMillis();
 
 		ArrayList<ClientLevelWrapper> levelsToUnload = new ArrayList<>();
-		synchronized(LEVEL_WRAPPER_REF_BY_CLIENT_LEVEL) // should only be run on one thread at a time, but just in case
+		synchronized (LEVEL_WRAPPER_REF_BY_CLIENT_LEVEL) // should only be run on one thread at a time, but just in case
 		{
 			for (WeakReference<ClientLevelWrapper> ref : LEVEL_WRAPPER_REF_BY_CLIENT_LEVEL.values())
 			{
@@ -153,7 +158,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		{
 			// Re-verify all conditions inside a synchronized block on the wrapper
 			// to ensure atomicity with respect to markAccessed()
-			synchronized(wrapper)
+			synchronized (wrapper)
 			{
 				long inactiveTimeMs = currentTime - wrapper.getLastAccessTime();
 				if (wrapper.level != clientLevel
@@ -303,8 +308,8 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		if (blockColorCache == null)
 		{
 			blockColorCache = this.blockColorCacheByBlockState.computeIfAbsent(
-					((BlockStateWrapper) blockWrapper).blockState,
-					this.createCachedBlockColorCacheFunc);
+				((BlockStateWrapper) blockWrapper).blockState,
+				this.createCachedBlockColorCacheFunc);
 		}
 
 		return blockColorCache.getColor((BiomeWrapper) biome, fullDataSource, blockWorldPos, allowApiOverride);
@@ -450,21 +455,21 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		// cast to core objects //
 		//region
 
-		if(!(blockStateWrapper instanceof IBlockStateWrapper))
+		if (!(blockStateWrapper instanceof IBlockStateWrapper))
 		{
-			return DhApiResult.createFail("Unable to cast ["+blockStateWrapper.getClass()+"] to ["+IBlockStateWrapper.class+"]");
+			return DhApiResult.createFail("Unable to cast [" + blockStateWrapper.getClass() + "] to [" + IBlockStateWrapper.class + "]");
 		}
-		IBlockStateWrapper coreBlockStateWrapper = (IBlockStateWrapper)blockStateWrapper;
+		IBlockStateWrapper coreBlockStateWrapper = (IBlockStateWrapper) blockStateWrapper;
 
-		if(!(biomeWrapper instanceof IBiomeWrapper))
+		if (!(biomeWrapper instanceof IBiomeWrapper))
 		{
-			return DhApiResult.createFail("Unable to cast ["+biomeWrapper.getClass()+"] to ["+IBiomeWrapper.class+"]");
+			return DhApiResult.createFail("Unable to cast [" + biomeWrapper.getClass() + "] to [" + IBiomeWrapper.class + "]");
 		}
 		IBiomeWrapper coreBiomeWrapper = (IBiomeWrapper) biomeWrapper;
 
-		if(!(dataSource instanceof FullDataSourceV2))
+		if (!(dataSource instanceof FullDataSourceV2))
 		{
-			return DhApiResult.createFail("Unable to cast ["+dataSource.getClass()+"] to ["+FullDataSourceV2.class+"]");
+			return DhApiResult.createFail("Unable to cast [" + dataSource.getClass() + "] to [" + FullDataSourceV2.class + "]");
 		}
 		FullDataSourceV2 coreDataSource = (FullDataSourceV2) dataSource;
 
@@ -519,7 +524,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		{
 			colorVec3 = this.level.getCloudColour(tickDelta);
 
-			Color color = new Color((float)colorVec3.xCoord, (float)colorVec3.yCoord, (float)colorVec3.zCoord);
+			Color color = new Color((float) colorVec3.xCoord, (float) colorVec3.yCoord, (float) colorVec3.zCoord);
 			this.cachedCloudColor = color;
 			this.cachedCloudColorWorldTime = worldTime;
 			this.cachedCloudColorTickDelta = tickDelta;
@@ -535,9 +540,9 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 				String colorString = "NULL";
 				if (colorVec3 != null)
 				{
-					colorString = "r["+(float)colorVec3.xCoord+"] g["+(float)colorVec3.yCoord+"] b["+(float)colorVec3.zCoord+"]";
+					colorString = "r[" + (float) colorVec3.xCoord + "] g[" + (float) colorVec3.yCoord + "] b[" + (float) colorVec3.zCoord + "]";
 				}
-				LOGGER.warn("Failed to get cloud color for ["+this.getDhIdentifier()+"]. vec3 ["+colorString+"], error: ["+e.getMessage()+"].", e);
+				LOGGER.warn("Failed to get cloud color for [" + this.getDhIdentifier() + "]. vec3 [" + colorString + "], error: [" + e.getMessage() + "].", e);
 			}
 
 			// default to white if there's an issue

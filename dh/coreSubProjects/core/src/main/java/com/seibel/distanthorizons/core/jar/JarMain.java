@@ -16,6 +16,7 @@
  *    You should have received a copy of the GNU Lesser General Public License
  *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 package com.seibel.distanthorizons.core.jar;
 
 
@@ -42,19 +43,19 @@ import java.util.List;
  * But in the off chance someone in the future wants to add this functionality
  * James will leave the code he's done so far here as a starting place.
  * <Br><Br>
- * 
+ *
  * Once built this would be in core/build/libs/DistantHorizons-<Version>-dev-all.jar
  */
 public class JarMain
 {
 	public static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
-	
-	
+
+
+
 	public static void main(String[] args)
 	{
 		List<String> argList = Arrays.asList(args);
-		
+
 		if (!argList.contains("--no-custom-logger"))
 		{
 			LoggerContext context = (LoggerContext) LogManager.getContext(false);
@@ -67,24 +68,24 @@ public class JarMain
 				LOGGER.error("Failed to set log4j config. Try running with the [--no-custom-logger] argument", e);
 			}
 		}
-		
+
 		LOGGER.debug("Running " + ModInfo.READABLE_NAME + " standalone jar");
 		LOGGER.warn("The standalone jar is still a massive WIP, expect bugs");
 		LOGGER.debug("Java version " + System.getProperty("java.version"));
-		
-		
-		
+
+
+
 		Byte exportDetailLevel = null;
 		Long exportPos = null;
-		
+
 		boolean showHelp = argList.contains("help");
 		if (!showHelp)
 		{
 			// assume something is wrong unless we find a valid arg set
 			showHelp = true;
-			
-			
-			
+
+
+
 			if (argList.size() == 1)
 			{
 				// only --export
@@ -93,7 +94,7 @@ public class JarMain
 			else if (argList.size() == 2)
 			{
 				// --export 0
-				
+
 				String detailLevelString = argList.get(1);
 				try
 				{
@@ -102,13 +103,13 @@ public class JarMain
 				}
 				catch (NumberFormatException e)
 				{
-					LOGGER.error("Unable to parse detail level ["+detailLevelString+"], error: ["+e.getMessage()+"].");
+					LOGGER.error("Unable to parse detail level [" + detailLevelString + "], error: [" + e.getMessage() + "].");
 				}
 			}
 			else if (argList.size() == 4)
 			{
 				// --export 0 1 -2
-				
+
 				String detailLevelString = argList.get(1);
 				String posXString = argList.get(2);
 				String posZString = argList.get(3);
@@ -117,79 +118,79 @@ public class JarMain
 					byte detailLevel = Byte.parseByte(detailLevelString);
 					int posX = Integer.parseInt(posXString);
 					int posZ = Integer.parseInt(posZString);
-					
+
 					exportPos = DhSectionPos.encode(detailLevel, posX, posZ);
 					showHelp = false;
 				}
 				catch (NumberFormatException e)
 				{
-					LOGGER.error("Unable to parse position ["+detailLevelString+"], ["+posXString+"], ["+posZString+"], error: ["+e.getMessage()+"].");
+					LOGGER.error("Unable to parse position [" + detailLevelString + "], [" + posXString + "], [" + posZString + "], error: [" + e.getMessage() + "].");
 				}
 			}
 		}
-		
+
 		if (showHelp)
 		{
 			LOGGER.info("--export parses the 'DistantHorizons.sqlite' file next to this jar and exports the given data into a CSV file. \n" +
-					"Usage: \n" +
-					"--export [LOD position Detail Level] [LOD position X] [LOD position Z] \n" +
-						"\tExport the given position's data if present. \n" +
-						"\tThe detail level should be absolute, IE 0 = block sized, 1 = 2x2 blocks, etc. \n" +
-					"--export [LOD position Detail Level]\n" +
-						"\tExport all data for a given detail level.\n" +
-						"\tThe detail level should be absolute, IE 0 = block sized, 1 = 2x2 blocks, etc. \n" +
-					"--export\n" +
-						"\tExport the entire database.\n");
+				"Usage: \n" +
+				"--export [LOD position Detail Level] [LOD position X] [LOD position Z] \n" +
+				"\tExport the given position's data if present. \n" +
+				"\tThe detail level should be absolute, IE 0 = block sized, 1 = 2x2 blocks, etc. \n" +
+				"--export [LOD position Detail Level]\n" +
+				"\tExport all data for a given detail level.\n" +
+				"\tThe detail level should be absolute, IE 0 = block sized, 1 = 2x2 blocks, etc. \n" +
+				"--export\n" +
+				"\tExport the entire database.\n");
 			return;
 		}
-		
-		
+
+
 		// find the database file
 		File dbFile = new File("./DistantHorizons.sqlite");
 		if (!dbFile.exists())
 		{
-			LOGGER.error("Unable to find a database to parse at: ["+dbFile.getAbsolutePath()+"].");
+			LOGGER.error("Unable to find a database to parse at: [" + dbFile.getAbsolutePath() + "].");
 			return;
 		}
-		
-		
-		
+
+
+
 		// set the export file
 		File exportFile = new File("DistantHorizons-export.csv");
 		if (exportFile.isDirectory())
 		{
-			LOGGER.error("Export file can't be a folder. Given path: ["+exportFile+"].");
+			LOGGER.error("Export file can't be a folder. Given path: [" + exportFile + "].");
 			return;
 		}
-		
-		
+
+
 		// create the export file
 		try
 		{
 			// we don't care if we're making new directories of if they already exist
 			//noinspection ResultOfMethodCallIgnored
 			exportFile.mkdirs();
-			
+
 			if (exportFile.exists())
 			{
-				LOGGER.error("Export file already exists: ["+exportFile.getAbsolutePath()+"].");
+				LOGGER.error("Export file already exists: [" + exportFile.getAbsolutePath() + "].");
 				return;
 			}
 			else if (exportFile.createNewFile())
 			{
-				LOGGER.error("Failed to create file: ["+exportFile.getAbsolutePath()+"].");
+				LOGGER.error("Failed to create file: [" + exportFile.getAbsolutePath() + "].");
 				return;
 			}
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Unable to create export file: ["+exportFile.getAbsolutePath()+"].");
+			LOGGER.error("Unable to create export file: [" + exportFile.getAbsolutePath() + "].");
 			return;
 		}
-		
-		LOGGER.info("LOD data will be exported to ["+exportFile.getAbsolutePath()+"].");
-		
-		
+
+		LOGGER.info("LOD data will be exported to [" + exportFile.getAbsolutePath() + "].");
+
+
 		FullDataSourceV2Repo repo;
 		try
 		{
@@ -197,10 +198,10 @@ public class JarMain
 		}
 		catch (SQLException | IOException e)
 		{
-			LOGGER.error("Failed to initialize connection with database: ["+exportFile.getAbsolutePath()+"], error: ["+e.getMessage()+"].", e);
+			LOGGER.error("Failed to initialize connection with database: [" + exportFile.getAbsolutePath() + "], error: [" + e.getMessage() + "].", e);
 			return;
 		}
-		
+
 		if (exportPos != null)
 		{
 			exportLodDataAtPosition(repo, exportFile, exportPos);
@@ -214,16 +215,16 @@ public class JarMain
 			exportEntireDatabase(repo, exportFile);
 		}
 	}
-	
+
 	@SuppressWarnings("unused") // unfinished export stub
 	private static void exportLodDataAtPosition(FullDataSourceV2Repo repo, File exportFile, long pos)
 	{
 		FullDataSourceV2DTO dto = repo.getByKey(pos);
 		if (dto == null)
 		{
-			LOGGER.error("Unable to find any data at the position ["+DhSectionPos.toString(pos)+"].");
+			LOGGER.error("Unable to find any data at the position [" + DhSectionPos.toString(pos) + "].");
 		}
-		
+
 		// TODO finishing this needs a way to create datasources (specifically data mappings) without a MC level object to deserialize with,
 		//  or exporting the mapping data as the raw string data it's stored as.
 
@@ -238,7 +239,7 @@ public class JarMain
 	{
 		throw new UnsupportedOperationException("Method Not Implemented");
 	}
-	
-	
-	
+
+
+
 }

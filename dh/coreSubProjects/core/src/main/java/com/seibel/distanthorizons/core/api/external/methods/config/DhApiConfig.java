@@ -34,11 +34,11 @@ import com.seibel.distanthorizons.core.api.external.methods.config.common.DhApiW
 public class DhApiConfig implements IDhApiConfig
 {
 	public static final DhApiConfig INSTANCE = new DhApiConfig();
-	
+
 	private DhApiConfig() { }
-	
-	
-	
+
+
+
 	@Override
 	public IDhApiGraphicsConfig graphics() { return DhApiGraphicsConfig.INSTANCE; }
 	@Override
@@ -49,5 +49,5 @@ public class DhApiConfig implements IDhApiConfig
 	public IDhApiMultiThreadingConfig multiThreading() { return DhApiMultiThreadingConfig.INSTANCE; }
 	@Override
 	public IDhApiDebuggingConfig debugging() { return DhApiDebuggingConfig.INSTANCE; }
-	
+
 }

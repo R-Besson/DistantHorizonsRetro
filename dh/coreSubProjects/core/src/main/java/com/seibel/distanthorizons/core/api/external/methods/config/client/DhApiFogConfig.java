@@ -33,26 +33,26 @@ import com.seibel.distanthorizons.core.config.api.converters.InvertedBoolConvert
 public class DhApiFogConfig implements IDhApiFogConfig
 {
 	public static DhApiFogConfig INSTANCE = new DhApiFogConfig();
-	
+
 	private DhApiFogConfig() { }
-	
-	
-	
+
+
+
 	//===============//
 	// inner configs //
 	//===============//
-	
+
 	@Override
 	public IDhApiFarFogConfig farFog() { return DhApiFarFogConfig.INSTANCE; }
 	@Override
 	public IDhApiHeightFogConfig heightFog() { return DhApiHeightFogConfig.INSTANCE; }
-	
-	
-	
+
+
+
 	//====================//
 	// basic fog settings //
 	//====================//
-	
+
 	@Deprecated
 	@Override
 	public IDhApiConfigValue<EDhApiFogDrawMode> drawMode()
@@ -60,11 +60,11 @@ public class DhApiFogConfig implements IDhApiFogConfig
 	@Override
 	public IDhApiConfigValue<Boolean> enableDhFog()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.enableDhFog); }
-	
+
 	@Override
 	public IDhApiConfigValue<EDhApiFogColorMode> color()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.colorMode); }
-	
+
 	@Override
 	@Deprecated
 	public IDhApiConfigValue<Boolean> disableVanillaFog()
@@ -72,7 +72,7 @@ public class DhApiFogConfig implements IDhApiFogConfig
 	@Override
 	public IDhApiConfigValue<Boolean> enableVanillaFog()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.enableVanillaFog); }
-	
-	
-	
+
+
+
 }

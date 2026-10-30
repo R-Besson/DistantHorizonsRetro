@@ -28,56 +28,56 @@ import com.seibel.distanthorizons.api.objects.math.DhApiVec3f;
 /**
  * Called before Distant Horizons starts rendering a buffer. <br>
  * This event cannot be canceled, use {@link DhApiBeforeRenderEvent} if you want to cancel rendering.
- * 
+ *
  * @author James Seibel
  * @version 2023-1-31
- * @since API 2.0.0
- * 
  * @see DhApiBeforeRenderEvent
+ * @since API 2.0.0
  */
 public abstract class DhApiBeforeBufferRenderEvent implements IDhApiEvent<DhApiBeforeBufferRenderEvent.EventParam>
 {
 	/** Fired immediately before Distant Horizons starts rendering a buffer. */
 	public abstract void beforeRender(DhApiEventParam<EventParam> input);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.beforeRender(input); }
-	
-	
+
+
 	//==================//
 	// parameter object //
 	//==================//
-	
+
 	public static class EventParam extends DhApiRenderParam implements IDhApiEventParam
 	{
-		/** 
+		/**
 		 * Measured in blocks.
-		 * Should be applied to the model view matrix to move the buffer into its proper place. 
+		 * Should be applied to the model view matrix to move the buffer into its proper place.
 		 */
 		public DhApiVec3f modelPos;
-		
-		
-		
+
+
+
 		public EventParam() { }
-		
+
 		public void update(DhApiRenderParam parent, DhApiVec3f modelPos)
 		{
 			super.update(parent);
 			this.modelPos = modelPos;
 		}
-		
-		
-		
-		@Override 
+
+
+
+		@Override
 		public boolean getCopyBeforeFire() { return false; }
-		
+
 		@Override
 		public EventParam copy() { return this; }
+
 	}
-	
+
 }

@@ -10,11 +10,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Chunk.class)
 public class MixinChunk
 {
-    @Inject(method = "fillChunk", at = @At("RETURN"))
-    private void distanthorizons$afterFillChunk(byte[] data, int hasStorageBits, int hasMsbStorageBits,
-        boolean hasSkyLight, CallbackInfo ci) 
-    { ForgeClientProxy.onClientChunkFilled((Chunk) (Object) this); }
-	
-	
-	
+	@Inject(method = "fillChunk", at = @At("RETURN"))
+	private void distanthorizons$afterFillChunk(
+		byte[] data, int hasStorageBits, int hasMsbStorageBits,
+		boolean hasSkyLight, CallbackInfo ci)
+	{ ForgeClientProxy.onClientChunkFilled((Chunk) (Object) this); }
+
+
+
 }

@@ -29,7 +29,7 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
 /**
  * Fired before DH renders its fog.
  * Canceling this event disables fog for that frame.
- * 
+ *
  * @author James Seibel
  * @version 2026-05-20
  * @since API 7.0.0
@@ -38,68 +38,68 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 {
 	/** Fired before fog is generated. */
 	public abstract void beforeRender(DhApiCancelableEventParam<DhApiBeforeFogRenderEvent.EventParam> event);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<DhApiBeforeFogRenderEvent.EventParam> event) { this.beforeRender(event); }
-	
-	
-	
+
+
+
 	//==================//
 	// parameter object //
 	//==================//
-	
+
 	public static class EventParam implements IDhApiEventParam
 	{
 		private DhApiRenderParam renderParam;
 		private DhApiFogRenderParam originalFogRenderParam;
 		private DhApiMutableFogRenderParam fogRenderParam;
-		
-		
-		
+
+
+
 		//=============//
 		// constructor //
 		//=============//
 		//region
-		
-		public EventParam() {}
-		
+
+		public EventParam() { }
+
 		public void update(DhApiRenderParam renderParam, DhApiFogRenderParam fogRenderParam)
 		{
 			this.renderParam = renderParam;
 			this.originalFogRenderParam = fogRenderParam;
 			this.fogRenderParam = new DhApiMutableFogRenderParam(fogRenderParam);
 		}
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//=================//
 		// getters/setters //
 		//=================//
 		//region
-		
+
 		public DhApiRenderParam getRenderParam() { return this.renderParam; }
-		
+
 		/** immutable, stores what DH would do without API intervention so API users have a reference point */
 		public DhApiFogRenderParam getOriginalFogRenderParam() { return this.originalFogRenderParam; }
 		/** mutable, can be modified by API users */
 		public DhApiMutableFogRenderParam getFogRenderParam() { return this.fogRenderParam; }
-		
+
 		//endregion
-		
-		
-		
+
+
+
 		//==========================//
 		// base api event overrides //
 		//==========================//
 		//region
-		
+
 		/**
 		 * Returns the same instance of this event.
 		 * Copying this event isn't supported
@@ -109,15 +109,15 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 		 */
 		@Override
 		public DhApiBeforeFogRenderEvent.EventParam copy() { return this; }
-		
+
 		@Override
 		public boolean getCopyBeforeFire() { return false; }
-		
+
 		//endregion
-		
-		
-		
+
+
+
 	}
-	
-	
+
+
 }

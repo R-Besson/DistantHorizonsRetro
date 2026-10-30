@@ -7,13 +7,13 @@ import java.awt.*;
 public class TestBlockStateWrapper implements IBlockStateWrapper
 {
 	private final String name;
-	
-	
+
+
 	public TestBlockStateWrapper(String name)
 	{ this.name = name; }
-	
-	
-	
+
+
+
 	@Override public boolean isAir() { return false; }
 	@Override public boolean isSolid() { return true; }
 	@Override public boolean isLiquid() { return false; }
@@ -27,22 +27,22 @@ public class TestBlockStateWrapper implements IBlockStateWrapper
 	@Override public boolean isBeaconBaseBlock() { return false; }
 	@Override public boolean isIceBlock() { return false; }
 	@Override public Color getBeaconTintColor() { return Color.MAGENTA; }
-	
+
 	@Override public Object getWrappedMcObject() { return this; }
-	
-	
-	@Override 
+
+
+	@Override
 	public int hashCode()
 	{ return this.name.hashCode(); }
-	@Override 
+	@Override
 	public boolean equals(Object obj)
 	{
 		if (!(obj instanceof TestBlockStateWrapper))
 		{
 			return false;
 		}
-		
-		return this.name.equals(((TestBlockStateWrapper)obj).name);
+
+		return this.name.equals(((TestBlockStateWrapper) obj).name);
 	}
-	
+
 }

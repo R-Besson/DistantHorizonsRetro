@@ -13,19 +13,20 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MixinTextureMap
 {
 	// a plain redirect since the mixin annotation processor only remaps the method name for Mixin's own injectors
-    @Redirect(
-        method = "loadTextureAtlas",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;load(Lnet/minecraft/client/resources/IResourceManager;Lnet/minecraft/util/ResourceLocation;)Z",
-            remap = false))
-    private boolean load(TextureAtlasSprite instance, IResourceManager manager, ResourceLocation location)
-    {
-        boolean returnValue = instance.load(manager, location);
+	@Redirect(
+		method = "loadTextureAtlas",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;load(Lnet/minecraft/client/resources/IResourceManager;Lnet/minecraft/util/ResourceLocation;)Z",
+			remap = false))
+	private boolean load(TextureAtlasSprite instance, IResourceManager manager, ResourceLocation location)
+	{
+		boolean returnValue = instance.load(manager, location);
 
-        IMixinTextureAtlasSprite mixinSprite = (IMixinTextureAtlasSprite) instance;
-        mixinSprite.distanthorizons$setSpriteData();
+		IMixinTextureAtlasSprite mixinSprite = (IMixinTextureAtlasSprite) instance;
+		mixinSprite.distanthorizons$setSpriteData();
 
-        return returnValue;
-    }
+		return returnValue;
+	}
+
 }

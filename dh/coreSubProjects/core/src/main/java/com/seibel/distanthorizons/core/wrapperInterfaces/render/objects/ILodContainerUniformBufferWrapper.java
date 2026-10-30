@@ -28,5 +28,5 @@ public interface ILodContainerUniformBufferWrapper extends AutoCloseable
 {
 
 	@Override void close();
-	
+
 }

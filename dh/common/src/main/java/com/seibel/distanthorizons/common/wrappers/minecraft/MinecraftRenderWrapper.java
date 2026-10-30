@@ -60,6 +60,7 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	{
 		private static final IIrisAccessor IRIS = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 		private static final IAngelicaAccessor ANGELICA = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
+
 	}
 
 	/** {@link LightMapWrapper} queries MC directly, so one instance can be shared by every level. */
@@ -104,18 +105,18 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	}
 
 	/**
-     * percentage of time into the current client tick. <br><br>
-     *
-     * Can be converted to a millisecond frametime
-     * (IE time between frames in milliseconds) using the formula: <br>
-     * <code>
-     * (partialTickTime/20*1000)
-     * </code> <br>
-     * IE 60 FPS = 16.6 MS <br>
-     *
-     * @link <a href="https://fpstoms.com/">...</a>
-     * @see com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState#partialTickTime
-     */
+	 * percentage of time into the current client tick. <br><br>
+	 *
+	 * Can be converted to a millisecond frametime
+	 * (IE time between frames in milliseconds) using the formula: <br>
+	 * <code>
+	 * (partialTickTime/20*1000)
+	 * </code> <br>
+	 * IE 60 FPS = 16.6 MS <br>
+	 *
+	 * @link <a href="https://fpstoms.com/">...</a>
+	 * @see com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState#partialTickTime
+	 */
 	public float getPartialTickTime()
 	{
 		return Minecraft.getMinecraft().timer.renderPartialTicks;

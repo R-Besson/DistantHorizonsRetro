@@ -28,5 +28,5 @@ import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindab
 public interface IModAccessor extends IBindable
 {
 	String getModName();
-	
+
 }

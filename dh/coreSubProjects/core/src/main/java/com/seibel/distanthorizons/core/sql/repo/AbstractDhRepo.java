@@ -34,33 +34,45 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Handles interfacing with SQL databases.
- * 
- * @param <TDTO> DTO stands for "Data Transfer Object" 
+ *
+ * @param <TDTO> DTO stands for "Data Transfer Object"
  */
 public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implements AutoCloseable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	public static final String DEFAULT_DATABASE_TYPE = "jdbc:sqlite";
-	/** 
+	/**
 	 * a value of 0 is supposed to mean there is no timeout
 	 * but this doesn't appear to be the case for SQLite,
 	 * so we're just setting a large value and calling it a day.
 	 */
 	public static final int TIMEOUT_SECONDS = 600;
-	
+
 	private static final ConcurrentHashMap<AbstractDhRepo<?, ?>, String> ACTIVE_CONNECTION_STRINGS_BY_REPO = new ConcurrentHashMap<>();
 	private static final Set<String> CORRUPTED_DB_PATHS = Collections.newSetFromMap(new ConcurrentHashMap<>());
-	
-	/** 
+
+	/**
 	 * Should only be used for performance testing. <br>
 	 * Nothing is saved to the disk (duh).
 	 */
@@ -71,56 +83,56 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	/** address space only, the memory is the OS's page cache */
 	private static final long SQLITE_MMAP_SIZE_BYTES = 256L * 1024 * 1024;
 
-	
-	
+
+
 	private final String connectionString;
 	private String getConnectionString() { return this.connectionString; }
 	private final ConcurrentHashMap<Thread, Connection> connectionByThread = new ConcurrentHashMap<>();
-	
+
 	public final String databaseType;
 	public final File databaseFile;
-	
+
 	public final Set<AutoClosableTrackingWrapper> openClosables = ConcurrentHashMap.newKeySet();
-	
+
 	public final Class<? extends TDTO> dtoClass;
-	
+
 	private final AtomicBoolean databaseCorruptedRef = new AtomicBoolean(false);
 	private final AtomicBoolean repoClosedRef = new AtomicBoolean(false);
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	/** @throws SQLException if the repo is unable to access the database or has trouble updating said database. */
 	public AbstractDhRepo(String databaseType, File databaseFile, Class<? extends TDTO> dtoClass) throws SQLException, IOException
 	{
 		this.databaseType = databaseType;
 		this.databaseFile = databaseFile;
 		this.dtoClass = dtoClass;
-		
-		
+
+
 		try
 		{
 			// needed by Forge to load the Java database connection
-			Class.forName("org.sqlite.JDBC");	
+			Class.forName("org.sqlite.JDBC");
 		}
 		catch (ClassNotFoundException e)
 		{
 			throw new RuntimeException(e);
 		}
-		
-		
-		
+
+
+
 		//==========================//
 		// database file validation //
 		//==========================//
 
 		if (USE_MEMORY_DATABASE)
 		{
-			this.connectionString = "jdbc:sqlite:file:"+this.databaseFile.getPath()+"?mode=memory&cache=shared";
+			this.connectionString = "jdbc:sqlite:file:" + this.databaseFile.getPath() + "?mode=memory&cache=shared";
 		}
 		else
 		{
@@ -136,7 +148,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 						throw new IOException("Unable to create the necessary parent folders for the database file at location [" + databaseFile.getPath() + "].");
 					}
 				}
-				
+
 				if (!databaseFile.exists())
 				{
 					try
@@ -149,11 +161,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					}
 				}
 			}
-			
+
 			if (!databaseFile.exists())
 			{
 				String databaseFilePath = databaseFile.getPath();
-				
+
 				String windowsLongFileWarning = "";
 				// windows has issues at 260 characters, but checking a few characters shorter should make sure we catch this issue
 				if (databaseFilePath.length() > 250
@@ -166,11 +178,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 							"Windows only supports file paths up to 260 chars normally. \n" +
 							"Please enable long file paths in Windows. \n";
 					ClientApi.INSTANCE.queueSlowChatMessage(message);
-					
+
 					// add additional info to the log
 					windowsLongFileWarning = "Potential fix: enable long file paths in Windows.";
 				}
-				
+
 				throw new IOException("Unable to create database file at location [" + databaseFile.getPath() + "], please make sure the folder and file has the correct permissions. " + windowsLongFileWarning);
 			}
 			if (!databaseFile.canRead())
@@ -181,37 +193,37 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			{
 				throw new IOException("Unable to write database file at location [" + databaseFile.getPath() + "], please make sure the folder and file aren't set to read-only.");
 			}
-			
-			this.connectionString = this.databaseType+":"+this.databaseFile.getPath();
+
+			this.connectionString = this.databaseType + ":" + this.databaseFile.getPath();
 		}
-		
-		
-		
+
+
+
 		ACTIVE_CONNECTION_STRINGS_BY_REPO.put(this, this.connectionString);
-		
+
 		DatabaseUpdater.runAutoUpdateScripts(this);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==================//
 	// abstract methods //
 	//==================//
 	//region
-	
+
 	public abstract String getTableName();
-	
+
 	@Nullable
 	public abstract TDTO convertResultSetToDto(ResultSet resultSet) throws ClassCastException, IOException, SQLException;
-	
+
 	/** should not start with WHERE */
 	protected abstract String CreateParameterizedWhereString();
-	
+
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, TKey key) throws SQLException { this.setPreparedStatementWhereClause(statement, 1, key); }
 	protected abstract void setPreparedStatementWhereClause(PreparedStatement statement, int parameterIndex, TKey key) throws SQLException;
-	
+
 	/**
 	 * upsert = update/insert <br>
 	 * This is slightly faster than checking if the DTO exists
@@ -219,26 +231,26 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	 */
 	@Nullable
 	public abstract PreparedStatement createUpsertStatement(TDTO dto) throws SQLException;
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// high level DB //
 	//===============//
 	//region
-	
+
 	public TDTO getByKey(TKey primaryKey)
 	{
-		try(PreparedStatement statement = this.createSelectStatementByKey(primaryKey);
+		try (PreparedStatement statement = this.createSelectStatementByKey(primaryKey);
 			ResultSet resultSet = this.query(statement))
 		{
 			if (resultSet != null && resultSet.next())
 			{
 				return this.convertResultSetToDto(resultSet);
 			}
-			else 
+			else
 			{
 				return null;
 			}
@@ -249,18 +261,18 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			if (!(e instanceof SQLException
 				&& DbConnectionClosedException.isClosedException(e)))
 			{
-				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with primary key ["+primaryKey+"]. Error: ["+e.getMessage()+"].", e);
+				LOGGER.warn("Unexpected issue deserializing DTO [" + this.dtoClass.getSimpleName() + "] with primary key [" + primaryKey + "]. Error: [" + e.getMessage() + "].", e);
 			}
 			return null;
 		}
 	}
-	
-	
+
+
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void save(TDTO dto)
 	{
 		//noinspection EmptyTryBlock
-		try(PreparedStatement statement = this.createUpsertStatement(dto);
+		try (PreparedStatement statement = this.createUpsertStatement(dto);
 			ResultSet resultSet = this.query(statement))
 		{
 		}
@@ -270,13 +282,13 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 		catch (SQLException e)
 		{
-			String message = "Unexpected DTO save error: ["+e.getMessage()+"].";
+			String message = "Unexpected DTO save error: [" + e.getMessage() + "].";
 			LOGGER.error(message);
 			throw new RuntimeException(message, e);
 		}
 	}
-	
-	
+
+
 	public void delete(TDTO dto) { this.deleteWithKey(dto.getKey()); }
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void deleteWithKey(TKey key)
@@ -290,14 +302,14 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/** With great power comes great responsibility... */
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void deleteAll()
 	{
 		String sql = "DELETE FROM " + this.getTableName();
 		try (PreparedStatement statement = this.createPreparedStatement(sql);
-			ResultSet resultSet =this.query(statement))
+			ResultSet resultSet = this.query(statement))
 		{
 		}
 		catch (SQLException e)
@@ -305,10 +317,10 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			throw new RuntimeException(e);
 		}
 	}
-	
-	
+
+
 	public boolean exists(TDTO dto) { return this.existsWithKey(dto.getKey()); }
-	public boolean existsWithKey(TKey key) 
+	public boolean existsWithKey(TKey key)
 	{
 		try
 		{
@@ -323,32 +335,32 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			return false;
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// low level DB //
 	//==============//
 	//region
-	
-	/** 
+
+	/**
 	 * This can only run 1 command at a time. <br><br>
-	 * 
+	 *
 	 * Note: {@link AbstractDhRepo#query(PreparedStatement)} with a {@link PreparedStatement}
 	 * should be used if the query will be run often.
 	 * This reduces GC pressure due to the {@link String} and {@link Map} allocation cost.
 	 */
 	@Nullable
-	public Map<String, Object> queryDictionaryFirst(String sql) 
+	public Map<String, Object> queryDictionaryFirst(String sql)
 	{
 		List<Map<String, Object>> objectList = this.queryDictionary(sql);
 		return !objectList.isEmpty() ? objectList.get(0) : null;
 	}
 	/**
 	 * This can only run 1 command at a time. <br><br>
-	 * 
+	 *
 	 * Note: {@link AbstractDhRepo#query(PreparedStatement)} with a {@link PreparedStatement}
 	 * should be used if the query will be run often.
 	 * This reduces GC pressure due to the {@link String} and {@link Map} allocation cost.
@@ -360,11 +372,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			return new ArrayList<>();
 		}
-		
+
 		try (Statement statement = connection.createStatement())
 		{
 			statement.setQueryTimeout(TIMEOUT_SECONDS);
-			
+
 			// Note: this can only handle 1 command at a time
 			boolean resultSetPresent = statement.execute(sql);
 			try (ResultSet resultSet = AutoClosableTrackingWrapper.wrap(ResultSet.class, statement.getResultSet(), this.openClosables))
@@ -372,11 +384,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 				return this.convertResultSetToDictionaryList(resultSet, resultSetPresent);
 			}
 		}
-		catch(SQLException e)
+		catch (SQLException e)
 		{
-			// SQL exceptions generally only happen when something is wrong with 
+			// SQL exceptions generally only happen when something is wrong with
 			// the database or the query and should cause the system to blow up to notify the developer
-			
+
 			if (DbConnectionClosedException.isClosedException(e))
 			{
 				return new ArrayList<>();
@@ -389,11 +401,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			}
 		}
 	}
-	
-	
-	
-	/** 
-	 * Warning: both the returned {@link ResultSet} and incoming {@link PreparedStatement} 
+
+
+
+	/**
+	 * Warning: both the returned {@link ResultSet} and incoming {@link PreparedStatement}
 	 * must be wrapped in a try-resource block to prevent memory
 	 * leaks and issues with the DB becoming locked.
 	 */
@@ -406,31 +418,31 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			return null;
 		}
-		
+
 		// This is done so we don't have to add "if null" checks everywhere.
 		// Normally this should only happen once the DB has been closed.
 		if (statement == null)
 		{
 			return null;
 		}
-		
+
 		// don't let new queries start once the repo has been shut down
 		if (this.repoClosedRef.get())
 		{
 			return null;
 		}
-		
-		
-		
+
+
+
 		try
 		{
 			statement.setQueryTimeout(TIMEOUT_SECONDS);
-			
+
 			// Note: this can only handle 1 command at a time
 			boolean resultSetPresent = statement.execute();
 			if (resultSetPresent)
 			{
-				ResultSet resultSet = statement.getResultSet(); 
+				ResultSet resultSet = statement.getResultSet();
 				return AutoClosableTrackingWrapper.wrap(ResultSet.class, resultSet, this.openClosables);
 			}
 			else
@@ -438,11 +450,11 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 				return null;
 			}
 		}
-		catch(SQLException e)
+		catch (SQLException e)
 		{
-			// SQL exceptions generally only happen when something is wrong with 
+			// SQL exceptions generally only happen when something is wrong with
 			// the database or the query and should cause the system to blow up to notify the developer
-			
+
 			if (DbConnectionClosedException.isClosedException(e))
 			{
 				return null;
@@ -461,7 +473,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 							"All operations to this DB are disabled, DH may behave strangely if you continue playing. \n" +
 							"Please leave the world and delete the corrupted database file to fix. \n" +
 							"Error: [" + e.getMessage() + "]", e);
-						
+
 						ClientApi.INSTANCE.queueSlowChatMessage(
 							MinecraftTextFormat.DARK_RED + MinecraftTextFormat.BOLD + "DH database is corrupted." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
 								"DH will behave strangely if your continue playing. \n" +
@@ -471,7 +483,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 						);
 					}
 				}
-				
+
 				return null;
 			}
 			else
@@ -482,10 +494,10 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			}
 		}
 	}
-	
-	
-	
-	/** 
+
+
+
+	/**
 	 * @return Null if the database was closed
 	 * @throws RuntimeException if there was a problem with the given SQL string
 	 */
@@ -496,14 +508,14 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			return null;
 		}
-		
+
 		try
 		{
 			PreparedStatement statement = this.getConnection().prepareStatement(sql);
 			statement.setQueryTimeout(TIMEOUT_SECONDS);
 			return AutoClosableTrackingWrapper.wrap(PreparedStatement.class, statement, this.openClosables);
 		}
-		catch(SQLException e)
+		catch (SQLException e)
 		{
 			if (DbConnectionClosedException.isClosedException(e))
 			{
@@ -511,81 +523,81 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			}
 			else
 			{
-				// SQL exceptions generally only happen when something is wrong with 
+				// SQL exceptions generally only happen when something is wrong with
 				// the database or the query and should cause the system to blow up to notify the developer
-				
+
 				String message = "Unexpected error: [" + e.getMessage() + "], preparing statement: [" + sql + "].";
 				LOGGER.error(message);
 				throw new RuntimeException(message, e);
 			}
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=============//
 	// connections //
 	//=============//
 	//region
-	
+
 	/** Will be null if the repo is closed */
 	@Nullable
-	public Connection getConnection() 
+	public Connection getConnection()
 	{
-		// don't let new connections/queries happen once the repo has been closed 
+		// don't let new connections/queries happen once the repo has been closed
 		if (this.repoClosedRef.get())
 		{
 			return null;
 		}
-		
+
 		Thread thread = Thread.currentThread();
 		return this.connectionByThread.computeIfAbsent(thread, (Thread newThread) ->
 		{
 			try
 			{
 				Connection connection = DriverManager.getConnection(this.getConnectionString());
-				
+
 				try (Statement statement = connection.createStatement())
 				{
 					statement.setQueryTimeout(TIMEOUT_SECONDS);
-					
+
 					// the synchronization mode must be set for each connection
 					int syncMode = Config.Common.LodBuilding.databaseSyncMode.get().value;
-					statement.execute("PRAGMA synchronous = "+syncMode+";");
+					statement.execute("PRAGMA synchronous = " + syncMode + ";");
 
 					// there's one connection per thread and repo, so the per-connection page cache stays small.
 					// mmap is shared between all connections to the same file through the OS page cache instead.
-					statement.execute("PRAGMA cache_size = -"+SQLITE_CACHE_SIZE_KIB+";");
-					statement.execute("PRAGMA mmap_size = "+SQLITE_MMAP_SIZE_BYTES+";");
+					statement.execute("PRAGMA cache_size = -" + SQLITE_CACHE_SIZE_KIB + ";");
+					statement.execute("PRAGMA mmap_size = " + SQLITE_MMAP_SIZE_BYTES + ";");
 					statement.execute("PRAGMA temp_store = MEMORY;");
 				}
-				
+
 				return connection;
 			}
 			catch (SQLException e)
 			{
-				LOGGER.error("Failed to get connection for thread ["+newThread.getName()+"] with connection string ["+this.getConnectionString()+"].", e);
+				LOGGER.error("Failed to get connection for thread [" + newThread.getName() + "] with connection string [" + this.getConnectionString() + "].", e);
 				throw new RuntimeException(e);
 			}
 		});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//====================//
 	// connection closing //
 	//====================//
 	//region
-	
+
 	@Override
 	public void close()
 	{
 		this.repoClosedRef.set(true);
-		
+
 		try
 		{
 			// close this repo's connections
@@ -599,8 +611,8 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					// shouldn't happen, but just in case
 					continue;
 				}
-				
-				
+
+
 				// wait a few moments for any last queries to finish
 				int waitCount = 0;
 				while (!this.openClosables.isEmpty()
@@ -608,20 +620,26 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					&& waitCount < 10)
 				{
 					waitCount++;
-					try { Thread.sleep(100); } catch (Exception ignore) { }
+					try
+					{
+						Thread.sleep(100);
+					}
+					catch (Exception ignore)
+					{
+					}
 				}
-				
-				
+
+
 				// log any leaked objects
 				int openClosableCount = this.openClosables.size();
 				if (openClosableCount != 0)
 				{
 					LOGGER.warn("[" + openClosableCount + "] objects not closed for repo [" + this.getClass().getSimpleName() + "]-[" + this.getTableName() + "] with connection: [" + this.connectionString + "]. A memory leak may be present and closing this connection may take longer than normal.");
-					
+
 					// header
 					StringBuilder stringBuilder = new StringBuilder();
 					stringBuilder.append("Unclosed objects: \n");
-					
+
 					// leaked objects
 					HashMap<String, AtomicInteger> unclosedObjectCountsByString = this.getUnclosedObjectStringsAndCounts();
 					for (String objString : unclosedObjectCountsByString.keySet())
@@ -632,10 +650,10 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 							stringBuilder.append("[").append(countRef.get()).append("] - [").append(objString).append("] \n");
 						}
 					}
-					
+
 					LOGGER.warn(stringBuilder.toString());
 				}
-				
+
 				try
 				{
 					// don't try closing an already closed connection
@@ -658,49 +676,49 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			LOGGER.error("Unexpected issue closing repo with connection [" + this.connectionString + "], error: [" + e.getMessage() + "]");
 			throw new RuntimeException(e);
 		}
-		
+
 		// mark this repo as deactivated
 		ACTIVE_CONNECTION_STRINGS_BY_REPO.remove(this);
 	}
-	
+
 	/** can be used to make sure everything is closed when the world closes */
 	public static void closeAllConnections()
 	{
-		LOGGER.info("Closing all ["+ACTIVE_CONNECTION_STRINGS_BY_REPO.size()+"] databases...");
-		
+		LOGGER.info("Closing all [" + ACTIVE_CONNECTION_STRINGS_BY_REPO.size() + "] databases...");
+
 		Enumeration<AbstractDhRepo<?, ?>> repos = ACTIVE_CONNECTION_STRINGS_BY_REPO.keys();
 		while (repos.hasMoreElements())
 		{
 			AbstractDhRepo<?, ?> repo = repos.nextElement();
 			ACTIVE_CONNECTION_STRINGS_BY_REPO.remove(repo);
-			
+
 			try
 			{
 				repo.close();
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				// connection close failed.
-				LOGGER.error("Unable to close the repo ["+repo.connectionString+"], error: ["+e.getMessage()+"]");
+				LOGGER.error("Unable to close the repo [" + repo.connectionString + "], error: [" + e.getMessage() + "]");
 			}
 		}
-		
+
 		// should be empty, but just in case.
 		ACTIVE_CONNECTION_STRINGS_BY_REPO.clear();
-		
+
 		// clear the errors so they can be re-fired if needed
 		CORRUPTED_DB_PATHS.clear();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// helper methods //
 	//================//
 	//region
-	
+
 	private List<Map<String, Object>> convertResultSetToDictionaryList(ResultSet resultSet, boolean resultSetPresent) throws SQLException
 	{
 		if (resultSetPresent)
@@ -715,17 +733,17 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			{
 				resultSet.close();
 			}
-			
+
 			return new ArrayList<>();
 		}
 	}
 	private static List<Map<String, Object>> convertResultSetToDictionaryList(ResultSet resultSet) throws SQLException
 	{
 		List<Map<String, Object>> list = new ArrayList<>();
-		
+
 		ResultSetMetaData resultMetaData = resultSet.getMetaData();
 		int resultColumnCount = resultMetaData.getColumnCount();
-		
+
 		while (resultSet.next())
 		{
 			HashMap<String, Object> object = new HashMap<>();
@@ -734,10 +752,10 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 				String columnName = resultMetaData.getColumnName(columnIndex);
 				if (columnName == null || columnName.isEmpty())
 				{
-					throw new RuntimeException("SQL result set is missing a column name for column ["+resultMetaData.getTableName(columnIndex)+"."+columnIndex+"].");
+					throw new RuntimeException("SQL result set is missing a column name for column [" + resultMetaData.getTableName(columnIndex) + "." + columnIndex + "].");
 				}
-				
-				
+
+
 				// some values need explicit conversion
 				// Example: Long values that are within the bounds of an int would automatically be incorrectly returned as "Integer" objects
 				String columnType = resultMetaData.getColumnTypeName(columnIndex).toUpperCase();
@@ -757,22 +775,22 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 						columnValue = resultSet.getObject(columnIndex);
 						break;
 				}
-				
-				
+
+
 				object.put(columnName, columnValue);
 			}
-			
+
 			list.add(object);
 		}
-		
+
 		return list;
 	}
-	
+
 	/** used for logging leaked objects */
 	public HashMap<String, AtomicInteger> getUnclosedObjectStringsAndCounts()
 	{
 		HashMap<String, AtomicInteger> closableCountsByToString = new HashMap<>();
-		
+
 		for (AutoClosableTrackingWrapper closableWrapper : this.openClosables)
 		{
 			// custom to-strings for better merging
@@ -795,8 +813,8 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			{
 				str += " @ " + closableWrapper.wrappedClosable;
 			}
-			
-			
+
+
 			closableCountsByToString.compute(str, (stringVal, countRef) ->
 			{
 				if (countRef == null)
@@ -807,69 +825,69 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 				return countRef;
 			});
 		}
-		
+
 		return closableCountsByToString;
 	}
-	
+
 	private String selectSqlTemplate = null;
 	public PreparedStatement createSelectStatementByKey(TKey key) throws SQLException
 	{
 		// create shared template string
 		if (this.selectSqlTemplate == null)
 		{
-			this.selectSqlTemplate = "SELECT * FROM "+this.getTableName() + " WHERE " + this.CreateParameterizedWhereString();
+			this.selectSqlTemplate = "SELECT * FROM " + this.getTableName() + " WHERE " + this.CreateParameterizedWhereString();
 		}
-		
+
 		PreparedStatement statement = this.createPreparedStatement(this.selectSqlTemplate);
 		if (statement == null)
 		{
 			return null;
 		}
 		this.setPreparedStatementWhereClause(statement, key);
-		
+
 		return statement;
 	}
-	
+
 	private String existsSqlTemplate = null;
 	public PreparedStatement createExistsStatementByKey(TKey key) throws SQLException
 	{
 		// create shared template string
 		if (this.existsSqlTemplate == null)
 		{
-			this.existsSqlTemplate = "SELECT EXISTS(SELECT 1 FROM "+this.getTableName()+" WHERE "+this.CreateParameterizedWhereString()+") as 'existingCount'";
+			this.existsSqlTemplate = "SELECT EXISTS(SELECT 1 FROM " + this.getTableName() + " WHERE " + this.CreateParameterizedWhereString() + ") as 'existingCount'";
 		}
-		
+
 		PreparedStatement statement = this.createPreparedStatement(this.existsSqlTemplate);
 		if (statement == null)
 		{
 			return null;
 		}
 		this.setPreparedStatementWhereClause(statement, key);
-		
+
 		return statement;
 	}
-	
+
 	private String deleteSqlTemplate = null;
 	public PreparedStatement createDeleteStatementByKey(TKey key) throws SQLException
 	{
 		// create shared template string
 		if (this.deleteSqlTemplate == null)
 		{
-			this.deleteSqlTemplate = "DELETE FROM "+this.getTableName()+" WHERE " + this.CreateParameterizedWhereString();
+			this.deleteSqlTemplate = "DELETE FROM " + this.getTableName() + " WHERE " + this.CreateParameterizedWhereString();
 		}
-		
+
 		PreparedStatement statement = this.createPreparedStatement(this.deleteSqlTemplate);
 		if (statement == null)
 		{
 			return null;
 		}
 		this.setPreparedStatementWhereClause(statement, key);
-		
+
 		return statement;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

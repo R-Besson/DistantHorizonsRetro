@@ -37,22 +37,21 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Note: enabling this test will cause issues for {@link PooledDataSourceCheckoutTest}.
  * Probably due to creating additional checkouts in the global static state.
  * For now this issue can be ignored since this test is diabled.
- * 
+ *
  * @author James Seibel
  * @version 2025-10-02
- * 
  * @see PooledDataSourceCheckoutTest
  */
 @SuppressWarnings("unused") // disabled test, see above
 public class DelayedSaveCacheTest
-{	
+{
 	static
 	{
 		// allow all logging levels
 		Configurator.setRootLevel(Level.ALL);
 	}
-	
-	
+
+
 	/**
 	 * commented out for now since it makes the normal build take longer
 	 * and due to breaking {@link PooledDataSourceCheckoutTest}
@@ -62,35 +61,35 @@ public class DelayedSaveCacheTest
 	{
 		// how many times any data source has been "written to disk"
 		AtomicInteger diskSaveCountRef = new AtomicInteger(0);
-		
-		DelayedDataSourceSaveCache cache = new DelayedDataSourceSaveCache((FullDataSourceV2 fullDataSource) -> 
-				{
-					diskSaveCountRef.getAndIncrement();
-					return CompletableFuture.completedFuture(null);
-				}, 1_000);
-		
-		
-		
+
+		DelayedDataSourceSaveCache cache = new DelayedDataSourceSaveCache((FullDataSourceV2 fullDataSource) ->
+		{
+			diskSaveCountRef.getAndIncrement();
+			return CompletableFuture.completedFuture(null);
+		}, 1_000);
+
+
+
 		//==============================//
 		// single item and manual flush //
 		//==============================//
 
 		PhantomArrayListCheckout initialCheckout;
-		try (FullDataSourceV2 initialSource = FullDataSourceV2.createEmpty(DhSectionPos.encode((byte)6, 0, 0)))
+		try (FullDataSourceV2 initialSource = FullDataSourceV2.createEmpty(DhSectionPos.encode((byte) 6, 0, 0)))
 		{
 			initialCheckout = initialSource.getPhantomArrayCheckoutForUnitTesting();
-			cache.writeToMemoryAndQueueSave( initialSource);
+			cache.writeToMemoryAndQueueSave(initialSource);
 		}
 		Assert.assertEquals("only 1 item should be in the cache", 1, cache.getUnsavedCount());
 		Assert.assertEquals("no disk saves should have happened yet", 0, diskSaveCountRef.get());
-		
+
 		// manual flush
 		cache.flush();
 		Assert.assertEquals("memory cache should be empty after", 0, cache.getUnsavedCount());
 		Assert.assertEquals("1 manual flush was expected", 1, diskSaveCountRef.get());
-		
-		
-		
+
+
+
 		//======================//
 		// quick group position //
 		//======================//
@@ -102,21 +101,21 @@ public class DelayedSaveCacheTest
 			{
 				PhantomArrayListCheckout loopCheckout = loopSource.getPhantomArrayCheckoutForUnitTesting();
 				Assert.assertEquals(initialCheckout, loopCheckout);
-				
+
 				cache.writeToMemoryAndQueueSave(loopSource);
 			}
 		}
 		// each item writes to the same place
 		Assert.assertEquals("exactly 1 item should be in the cache", 1, cache.getUnsavedCount());
 		Assert.assertEquals("no new saves should have happened yet", 1, diskSaveCountRef.get());
-		
+
 		// wait for the cache to clear
 		Thread.sleep(4_000);
 		Assert.assertEquals("Cache should have automatically cleared due to inactivity", 0, cache.getUnsavedCount());
 		Assert.assertEquals("second save after timeout expected", 2, diskSaveCountRef.get());
-		
-		
-		
+
+
+
 		//=====================//
 		// slow group position //
 		//=====================//
@@ -128,24 +127,24 @@ public class DelayedSaveCacheTest
 			{
 				PhantomArrayListCheckout loopCheckout = loopSource.getPhantomArrayCheckoutForUnitTesting();
 				Assert.assertEquals(initialCheckout, loopCheckout);
-				
+
 				cache.writeToMemoryAndQueueSave(loopSource);
 			}
-			
+
 			// long enough to prevent a timeout, but short enough that they don't happen all at once
 			Thread.sleep(500);
 		}
 		// each item writes to the same place
 		Assert.assertEquals("exactly 1 item should be in the cache", 1, cache.getUnsavedCount());
 		Assert.assertEquals("no new saves should have happened yet", 2, diskSaveCountRef.get());
-		
+
 		// wait for the cache to clear
 		Thread.sleep(2_000);
 		Assert.assertEquals("Cache should have automatically cleared due to inactivity", 0, cache.getUnsavedCount());
 		Assert.assertEquals("third timeout expected", 3, diskSaveCountRef.get());
-		
+
 	}
-	
-	
-	
+
+
+
 }

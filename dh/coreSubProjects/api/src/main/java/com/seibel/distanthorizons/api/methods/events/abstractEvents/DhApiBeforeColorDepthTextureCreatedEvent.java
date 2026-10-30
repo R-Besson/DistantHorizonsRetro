@@ -24,28 +24,28 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiTextureCreatedParam;
 
 /**
- * Called before Distant Horizons (re)creates 
+ * Called before Distant Horizons (re)creates
  * the color and depth textures it renders to. <br>
- * 
+ *
  * @author James Seibel
  * @version 2025-6-9
  * @since API 4.1.0
  * @deprecated Only used for the legacy OpenGL renderer <Br>
- *             Using {@link DhApiAfterColorDepthTextureCreatedEvent} instead is recommended.
+ * Using {@link DhApiAfterColorDepthTextureCreatedEvent} instead is recommended.
  */
 @Deprecated
 public abstract class DhApiBeforeColorDepthTextureCreatedEvent implements IDhApiEvent<DhApiTextureCreatedParam>
 {
 	/** Fired before Distant Horizons creates. */
 	public abstract void onResize(DhApiEventParam<DhApiTextureCreatedParam> event);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<DhApiTextureCreatedParam> event) { this.onResize(event); }
-	
-	
+
+
 }

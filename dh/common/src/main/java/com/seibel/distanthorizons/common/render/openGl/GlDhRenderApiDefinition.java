@@ -21,22 +21,30 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRender
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IDhGenericObjectVertexBufferContainer;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.ILodContainerUniformBufferWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IVertexBufferWrapper;
-import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.*;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhAntiAliasRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhFarFadeRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhFogRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhGenericRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhMetaRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhSsaoRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTerrainRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTestTriangleRenderer;
+import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhVanillaFadeRenderer;
 
 public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 {
-	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class); 
-	
-	
-	
+	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	public String getEngineName() { return "OpenGL"; }
-	
-	public EDhApiDepthDirection getDepthDirection() 
+
+	public EDhApiDepthDirection getDepthDirection()
 	{
 		if (IRIS_ACCESSOR != null
 			&& IRIS_ACCESSOR.isShaderPackInUse()
@@ -44,32 +52,32 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 		{
 			// reversed Z shouldn't be used when shaders are active
 			// in order to maintain legacy behavior
-			return EDhApiDepthDirection.FORWARD_Z; 
+			return EDhApiDepthDirection.FORWARD_Z;
 		}
-		
+
 		// reverse Z is better behavior going forward because it prevents
 		// issues with clouds and other extremely far objects
 		return EDhApiDepthDirection.REVERSE_Z;
 	}
-	
+
 	public EDhApiDepthRange getDepthRange()
 	{
 		return EDhApiDepthRange.NEG_ONE_TO_POS_ONE;
 	}
-	
+
 	public EDhApiRenderingApi getRenderApi() { return EDhApiRenderingApi.OPEN_GL; }
 	public EDhApiRenderingEngine getRenderingEngine() { return EDhApiRenderingEngine.OPEN_GL; }
 	public boolean isNativeRenderer() { return true; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//============//
 	// singletons //
 	//============//
 	//region
-	
+
 	@Override public IDhMetaRenderer getMetaRenderer() { return GlDhMetaRenderer.INSTANCE; }
 	@Override public IDhTerrainRenderer getTerrainRenderer() { return GlDhTerrainRenderer.INSTANCE; }
 	@Override public IDhSsaoRenderer getSsaoRenderer() { return GlDhSSAORenderer.INSTANCE; }
@@ -77,27 +85,27 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 	@Override public IDhFarFadeRenderer getFarFadeRenderer() { return GlDhFarFadeRenderer.INSTANCE; }
 	@Override public IDhAntiAliasRenderer getAntiAliasRenderer() { return GlDhTaaRenderer.INSTANCE; }
 	@Override public AbstractDebugWireframeRenderer getDebugWireframeRenderer() { return GlDhDebugWireframeRenderer.INSTANCE; }
-	
+
 	@Override public IDhVanillaFadeRenderer getVanillaFadeRenderer() { return GlVanillaFadeRenderer.INSTANCE; }
 	@Override public IDhTestTriangleRenderer getTestTriangleRenderer() { return GlTestTriangleRenderer.INSTANCE; }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// factories //
 	//===========//
 	//region
-	
+
 	@Override public IDhGenericRenderer createGenericRenderer() { return new GlGenericObjectRenderer(); }
-	
+
 	@Override public IVertexBufferWrapper createVboWrapper() { return new GLVertexBuffer(); }
 	@Override public ILodContainerUniformBufferWrapper createLodContainerUniformWrapper() { return new GlDummyUniformData(); }
 	@Override public IDhGenericObjectVertexBufferContainer createGenericVboContainer() { return new GlGenericObjectVertexContainer(); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

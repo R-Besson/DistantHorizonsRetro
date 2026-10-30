@@ -34,7 +34,18 @@ import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import cpw.mods.fml.common.registry.GameData;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockBush;
+import net.minecraft.block.BlockColored;
+import net.minecraft.block.BlockDoublePlant;
+import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockGrass;
+import net.minecraft.block.BlockLeavesBase;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStainedGlass;
+import net.minecraft.block.BlockStainedGlassPane;
+import net.minecraft.block.BlockVine;
+import net.minecraft.block.BlockWall;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemDye;
 import net.minecraftforge.fluids.IFluidBlock;
@@ -42,8 +53,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -68,7 +82,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	 */
 	private static final int FAST_CACHE_MAX_BLOCK_ID = 4096;
 	private static final AtomicReferenceArray<BlockStateWrapper> WRAPPER_BY_SMALL_BLOCK_ID_AND_META = new AtomicReferenceArray<>(FAST_CACHE_MAX_BLOCK_ID * 16);
-    public static final ConcurrentHashMap<String, BlockStateWrapper> WRAPPER_BY_RESOURCE_LOCATION = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<String, BlockStateWrapper> WRAPPER_BY_RESOURCE_LOCATION = new ConcurrentHashMap<>();
 
 
 	// static blocks //
@@ -258,12 +272,15 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	private BlockStateWrapper(@Nullable IBlockState blockState, @Nullable DhApiBlockStateWrapperCreatedEvent.EventParam overrideEventParam)
 	{
 		this.blockState = blockState;
-		if (blockState != null && !isAir()) {
-			this.wrappedMcObject = new Object[] {
+		if (blockState != null && !isAir())
+		{
+			this.wrappedMcObject = new Object[]{
 				blockState.getBlock(),
 				blockState.getMeta()
 			};
-		} else {
+		}
+		else
+		{
 			this.wrappedMcObject = null;
 		}
 		this.serialString = serialize(blockState);
@@ -309,9 +326,9 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			{
 				this.opacity = calculateOpacity(this.blockState, isAir(this.blockState), this.isLiquid);
 			}
-			
+
 			this.lodShape = calculateLodShape(this.blockState);
-			
+
 			// an opacity override from the API is used for lighting too
 			this.lightOpacity = (overrideEventParam != null && overrideEventParam.getOpacity() != null)
 				? this.opacity
@@ -482,7 +499,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			|| lowercaseSerialString.contains("cactus")
 			|| lowercaseSerialString.contains("chorus_flower")
 			|| lowercaseSerialString.contains("mushroom")
-			)
+		)
 		{
 			return EDhApiBlockMaterial.LEAVES;
 		}
@@ -546,7 +563,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		if (blockState.getBlock().stepSound == Block.soundTypeWood
 			|| lowercaseSerialString.contains("root")
-			)
+		)
 		{
 			return EDhApiBlockMaterial.WOOD;
 		}
@@ -576,7 +593,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		if (blockState.getBlock() instanceof BlockGrass
 			|| lowercaseSerialString.contains("grass_slab")
-			)
+		)
 		{
 			return EDhApiBlockMaterial.GRASS;
 		}
@@ -592,11 +609,11 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		if (
 			lowercaseSerialString.contains("dirt")
-			|| lowercaseSerialString.contains("gravel")
-			|| lowercaseSerialString.contains("mud")
-			|| lowercaseSerialString.contains("podzol")
-			|| lowercaseSerialString.contains("mycelium")
-			)
+				|| lowercaseSerialString.contains("gravel")
+				|| lowercaseSerialString.contains("mud")
+				|| lowercaseSerialString.contains("podzol")
+				|| lowercaseSerialString.contains("mycelium")
+		)
 		{
 			return EDhApiBlockMaterial.DIRT;
 		}
@@ -697,18 +714,18 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		{
 			return LodUtil.BLOCK_FULLY_TRANSPARENT;
 		}
-		
+
 		// IE leaves are 1, so light under a tree is only a little darker like in MC
 		return Math.max(LodUtil.BLOCK_FULLY_TRANSPARENT, Math.min(blockState.getBlock().getLightOpacity(), LodUtil.BLOCK_FULLY_OPAQUE));
 	}
-	
+
 	private static byte calculateLodShape(@Nullable IBlockState blockState)
 	{
 		if (blockState == null)
 		{
 			return RenderDataPointUtil.SHAPE_NONE;
 		}
-		
+
 		Block block = blockState.getBlock();
 		if (block instanceof BlockFence)
 		{
@@ -731,10 +748,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			int layers = (blockState.getMeta() & 7) + 1;
 			return (layers == 4 || layers == 5) ? RenderDataPointUtil.SHAPE_BOTTOM_HALF : RenderDataPointUtil.SHAPE_NONE;
 		}
-		
+
 		return RenderDataPointUtil.SHAPE_NONE;
 	}
-	
+
 	private static boolean getCanOcclude(@Nullable IBlockState blockState)
 	{
 		// defaults to the value used by air
@@ -874,7 +891,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		waterBlock = BlockStateWrapper.deserializeOrDefault(WATER_RESOURCE_LOCATION_STRING);
 		if (waterBlock.equals(AIR))
 		{
-			LOGGER.warn("Failed to deserialize ["+WATER_RESOURCE_LOCATION_STRING+"], issues may occur.");
+			LOGGER.warn("Failed to deserialize [" + WATER_RESOURCE_LOCATION_STRING + "], issues may occur.");
 		}
 
 		return waterBlock;
@@ -891,7 +908,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		dirtBlock = BlockStateWrapper.deserializeOrDefault(DIRT_RESOURCE_LOCATION_STRING);
 		if (dirtBlock.equals(AIR))
 		{
-			LOGGER.warn("Failed to deserialize ["+DIRT_RESOURCE_LOCATION_STRING+"], issues may occur.");
+			LOGGER.warn("Failed to deserialize [" + DIRT_RESOURCE_LOCATION_STRING + "], issues may occur.");
 		}
 
 		return dirtBlock;
@@ -964,11 +981,11 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			}
 			catch (IOException e)
 			{
-				LOGGER.warn("Unable to deserialize block with the resource location: ["+blockResourceLocation+"]. Error: "+e.getMessage(), e);
+				LOGGER.warn("Unable to deserialize block with the resource location: [" + blockResourceLocation + "]. Error: " + e.getMessage(), e);
 			}
 			catch (Exception e)
 			{
-				LOGGER.warn("Unexpected error deserializing block with the resource location: ["+blockResourceLocation+"]. Error: "+e.getMessage(), e);
+				LOGGER.warn("Unexpected error deserializing block with the resource location: [" + blockResourceLocation + "]. Error: " + e.getMessage(), e);
 			}
 		}
 
@@ -1015,7 +1032,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 			// torches and fire are thin sprites too, as crosses they still show where the lights are at night.
 			// Only when textured, untextured crosses fill their block and a torch would be a big brown X
 			|| ((renderType == TORCH_RENDER_TYPE || renderType == FIRE_RENDER_TYPE)
-				&& Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get())
+			&& Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get())
 			// mod plants with their own renderer, which almost always draws crossed squares too
 			// (IE Biomes O' Plenty's grasses and flowers). Vanilla's other bushes (crops, lily pads)
 			// have vanilla render types and aren't crosses
@@ -1229,7 +1246,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 				// but just in case
 				if (foundWrapper.blockState instanceof FakeBlockState)
 				{
-					blockIdAndMeta = ((FakeBlockState)foundWrapper.blockState).getIdAndMeta();
+					blockIdAndMeta = ((FakeBlockState) foundWrapper.blockState).getIdAndMeta();
 				}
 
 				WRAPPER_BY_BLOCK_ID_AND_META.putIfAbsent(blockIdAndMeta, foundWrapper);

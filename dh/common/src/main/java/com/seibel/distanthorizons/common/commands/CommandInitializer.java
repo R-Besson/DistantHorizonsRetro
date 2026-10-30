@@ -1,4 +1,5 @@
 package com.seibel.distanthorizons.common.commands;
+
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -21,8 +22,8 @@ public class CommandInitializer
 			public String getCommandUsage(ICommandSender sender)
 			{
 				return DEBUG_CODEC_CRASH_MESSAGE
-						? "/dh <help|debug|config|crash|pregen>"
-						: "/dh <help|debug|config|pregen>";
+					? "/dh <help|debug|config|crash|pregen>"
+					: "/dh <help|debug|config|pregen>";
 			}
 
 
@@ -80,4 +81,5 @@ public class CommandInitializer
 		};
 
 	}
+
 }

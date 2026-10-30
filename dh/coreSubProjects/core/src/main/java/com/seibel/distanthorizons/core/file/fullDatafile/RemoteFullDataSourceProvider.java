@@ -51,33 +51,33 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 	@Nullable
 	private final SyncOnLoadRequestQueue syncOnLoadRequestQueue;
 	private final Set<Long> visitedPositions = Collections.newSetFromMap(CacheBuilder.newBuilder()
-			.expireAfterWrite(20, TimeUnit.MINUTES)
-			.<Long, Boolean>build()
-			.asMap());
-	
-	
-	
+		.expireAfterWrite(20, TimeUnit.MINUTES)
+		.<Long, Boolean>build()
+		.asMap());
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public RemoteFullDataSourceProvider(
-			IDhLevel level, ISaveStructure saveStructure, @Nullable File saveDirOverride,
-			@Nullable SyncOnLoadRequestQueue syncOnLoadRequestQueue,
-			@Nullable ClientNetworkState networkState
-		) throws SQLException, IOException
+		IDhLevel level, ISaveStructure saveStructure, @Nullable File saveDirOverride,
+		@Nullable SyncOnLoadRequestQueue syncOnLoadRequestQueue,
+		@Nullable ClientNetworkState networkState
+	) throws SQLException, IOException
 	{
 		super(level, saveStructure, saveDirOverride);
 		this.syncOnLoadRequestQueue = syncOnLoadRequestQueue;
 		this.networkState = networkState;
 	}
-	
-	
-	
+
+
+
 	//==================//
 	// override methods //
 	//==================//
-	
+
 	@Override
 	public EDhApiGeneratorPlan getGeneratorPlan()
 	{
@@ -88,7 +88,7 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 
 	@Override
 	public boolean canQueueRetrievalNow() { return this.canQueueRetrievalNow(true); }
-	
+
 	@Override
 	@Nullable
 	public FullDataSourceV2 get(long pos)
@@ -98,20 +98,20 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 			// we have local data, but networking is unavailable.
 			return super.get(pos);
 		}
-		
+
 		if (!this.visitedPositions.add(pos))
 		{
 			// This position has already been accessed before
 			return super.get(pos);
 		}
-		
-		
-		
+
+
+
 		//===========================//
 		// request timestamp updates //
 		// from server               //
 		//===========================//
-		
+
 		Long timestamp = this.getTimestampForPos(pos);
 		if (timestamp != null)
 		{
@@ -130,16 +130,16 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 					}
 				});
 		}
-		
+
 		return super.get(pos);
 	}
-	
-	
-	
+
+
+
 	//==========//
 	// shutdown //
 	//==========//
-	
+
 	@Override
 	public void close()
 	{
@@ -149,5 +149,5 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 		}
 		super.close();
 	}
-	
+
 }

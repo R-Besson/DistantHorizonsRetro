@@ -94,6 +94,7 @@ public class ClientApi
 	private static class DelayedAccessors
 	{
 		public static final IIrisAccessor IRIS = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
+
 	}
 
 	/** this includes the is dev build message and low allocated memory warning */
@@ -116,6 +117,7 @@ public class ClientApi
 
 	/**
 	 * 50ms = 20 FPS
+	 *
 	 * @link <a href="https://fpstoms.com/">...</a>
 	 * @see ClientApi#cameraSpeedRollingAverage
 	 */
@@ -149,6 +151,7 @@ public class ClientApi
 	 * to the rate at which we check for speed.
 	 * So if the ms_between is changed the number of points
 	 * tracked should also be to keep the ratio roughly the same.
+	 *
 	 * @see ClientApi#MIN_MS_BETWEEN_SPEED_CHECKS
 	 */
 	private final RollingAverage cameraSpeedRollingAverage = new RollingAverage(40);
@@ -210,7 +213,7 @@ public class ClientApi
 					MC_CLIENT.sendChatMessage(MinecraftTextFormat.ORANGE + "Distant Horizons: Replay detected." + MinecraftTextFormat.CLEAR_FORMATTING);
 					MC_CLIENT.sendChatMessage("DH may behave strangely or have missing functionality.");
 					MC_CLIENT.sendChatMessage("In order to use pre-generated LODs, put your DH database(s) in:");
-					MC_CLIENT.sendChatMessage(MinecraftTextFormat.GRAY +".Minecraft" + File.separator + ClientOnlySaveStructure.SERVER_DATA_FOLDER_NAME + File.separator + ClientOnlySaveStructure.REPLAY_SERVER_FOLDER_NAME + File.separator + "DIMENSION_NAME"+ MinecraftTextFormat.CLEAR_FORMATTING);
+					MC_CLIENT.sendChatMessage(MinecraftTextFormat.GRAY + ".Minecraft" + File.separator + ClientOnlySaveStructure.SERVER_DATA_FOLDER_NAME + File.separator + ClientOnlySaveStructure.REPLAY_SERVER_FOLDER_NAME + File.separator + "DIMENSION_NAME" + MinecraftTextFormat.CLEAR_FORMATTING);
 					MC_CLIENT.sendChatMessage("This message can be disabled in DH's config under Advanced -> Logging.");
 					MC_CLIENT.sendChatMessage("");
 				}
@@ -319,7 +322,7 @@ public class ClientApi
 				}
 				catch (Exception e)
 				{
-					LOGGER.warn("pluginMessageReceived unexpected error: ["+e.getMessage()+"]", e);
+					LOGGER.warn("pluginMessageReceived unexpected error: [" + e.getMessage() + "]", e);
 				}
 			});
 		}
@@ -351,7 +354,7 @@ public class ClientApi
 	private void renderLodLayer(boolean renderingDeferredLayer)
 	{
 		IProfilerWrapper profiler = MC_CLIENT.getProfiler();
-		try (IProfilerWrapper.IProfileBlock profileBlock =profiler.push("DH-RenderLevel"))
+		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("DH-RenderLevel"))
 		{
 
 
@@ -675,8 +678,8 @@ public class ClientApi
 			(
 				// only fade when requested
 				Config.Client.Advanced.Graphics.Quality.vanillaFadeMode.get() == EDhApiMcRenderingFadeMode.DOUBLE_PASS
-				// or if LOD-only mode is enabled (fading is used to remove the MC render pass)
-				|| Config.Client.Advanced.Debugging.lodOnlyMode.get()
+					// or if LOD-only mode is enabled (fading is used to remove the MC render pass)
+					|| Config.Client.Advanced.Debugging.lodOnlyMode.get()
 			)
 			&& shouldRenderFade())
 		{
@@ -704,10 +707,10 @@ public class ClientApi
 				(
 					// only fade when requested
 					Config.Client.Advanced.Graphics.Quality.vanillaFadeMode.get() != EDhApiMcRenderingFadeMode.NONE
-					// or if LOD-only mode is enabled (fading is used to remove the MC render pass)
-					|| Config.Client.Advanced.Debugging.lodOnlyMode.get()
+						// or if LOD-only mode is enabled (fading is used to remove the MC render pass)
+						|| Config.Client.Advanced.Debugging.lodOnlyMode.get()
 				)
-				&& shouldRenderFade();
+					&& shouldRenderFade();
 			if (renderFade)
 			{
 				RENDER_PARAMS.update(EDhApiRenderPass.TRANSPARENT, RENDER_STATE);
@@ -848,9 +851,9 @@ public class ClientApi
 
 			// remind the user that this is a development build
 			String message =
-					MinecraftTextFormat.DARK_GREEN + "Distant Horizons: nightly/unstable build, version: [" + ModInfo.VERSION+"]." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-							"Issues may occur with this version.\n" +
-							"Here be dragons!\n";
+				MinecraftTextFormat.DARK_GREEN + "Distant Horizons: nightly/unstable build, version: [" + ModInfo.VERSION + "]." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
+					"Issues may occur with this version.\n" +
+					"Here be dragons!\n";
 			MC_CLIENT.sendChatMessage(message);
 		}
 
@@ -871,8 +874,8 @@ public class ClientApi
 			if (maxMemoryInBytes < minimumRecommendedMemoryInBytes)
 			{
 				String message =
-						// orange text
-						MinecraftTextFormat.ORANGE + "Distant Horizons: Low memory detected." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
+					// orange text
+					MinecraftTextFormat.ORANGE + "Distant Horizons: Low memory detected." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
 						"Stuttering or low FPS may occur. \n" +
 						"Please increase Minecraft's available memory to 4 GB or more. \n" +
 						"This warning can be disabled in DH's config under Advanced -> Logging. \n";
@@ -895,12 +898,12 @@ public class ClientApi
 
 				String message =
 					MinecraftTextFormat.YELLOW + "Distant Horizons: High vanilla render distance detected." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-					"Using a high vanilla render distance uses a lot of CPU power \n" +
-					"and doesn't improve graphics much after about 12.\n" +
-					"Lowering your vanilla render distance will give you better FPS\n" +
-					"and reduce stuttering at a similar visual quality.\n" +
-					MinecraftTextFormat.GRAY + "A vanilla render distance of 8 is recommended." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-					"This message can be disabled in DH's config under Advanced -> Logging.\n";
+						"Using a high vanilla render distance uses a lot of CPU power \n" +
+						"and doesn't improve graphics much after about 12.\n" +
+						"Lowering your vanilla render distance will give you better FPS\n" +
+						"and reduce stuttering at a similar visual quality.\n" +
+						MinecraftTextFormat.GRAY + "A vanilla render distance of 8 is recommended." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
+						"This message can be disabled in DH's config under Advanced -> Logging.\n";
 				MC_CLIENT.sendChatMessage(message);
 			}
 		}

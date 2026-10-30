@@ -41,97 +41,101 @@ import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/** 
+/**
  * should only be created in a static context,
  * otherwise leaks will occur.
- * 
+ *
  * @see DhLoggerBuilder
  */
 public class DhLogger implements IConfigListener
 {
 	private static final List<WeakReference<DhLogger>> LOGGER_REF_LIST = Collections.synchronizedList(new LinkedList<>());
 	private static final ThreadPoolExecutor TICKER_THREAD = ThreadUtil.makeSingleDaemonThreadPool("Log Ticker");
-	
+
 	/**
 	 * This logger uses the base 4J logger so we don't have to worry about
 	 * setup order and can track errors when setting up DH loggers.
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
-	
-	
+
+
 	private static IMinecraftClientWrapper mc_client = null;
-	
+
 	// both global configs start at "all" so we don't accidentally loose any logging messages
 	private static EDhApiLoggerLevel globalMaxFileLevel = EDhApiLoggerLevel.ALL;
 	private static EDhApiLoggerLevel globalMaxChatLevel = EDhApiLoggerLevel.ALL;
-	
-	
+
+
 	private EDhApiLoggerLevel fileLevel;
 	private EDhApiLoggerLevel chatLevel;
-	
+
 	private boolean delayedSetupComplete = false;
-	
-	
+
+
 	@Nullable
 	private final ConfigEntry<EDhApiLoggerLevel> fileLevelConfig;
 	@Nullable
 	private final ConfigEntry<EDhApiLoggerLevel> chatLevelConfig;
-	
+
 	/** if less than 0 then this logger won't be rate limited */
 	private final int maxLogCountPerSecond;
 	private final AtomicInteger logCountsThisSecondRef = new AtomicInteger(0);
 	private final Logger logger;
-	
-	
-	
+
+
+
 	//==============//
 	// static setup //
 	//==============//
-	
-	static { TICKER_THREAD.execute(DhLogger::runTickerLoop); }
-	
-	/** 
+
+	static
+	{
+		TICKER_THREAD.execute(DhLogger::runTickerLoop);
+	}
+
+	/**
 	 * needs to be run at a later date since loggers
 	 * are created before the config is set up.
 	 */
 	public static void runDelayedConfigSetup()
 	{
 		LOGGER.info("Applying config to loggers");
-		
-		LOGGER_REF_LIST.forEach((loggerRef) -> 
+
+		LOGGER_REF_LIST.forEach((loggerRef) ->
 		{
-		 	DhLogger logger = loggerRef.get();
-			
-			if (logger != null 
+			DhLogger logger = loggerRef.get();
+
+			if (logger != null
 				&& !logger.delayedSetupComplete)
 			{
 				logger.delayedSetupComplete = true;
-				
+
 				Config.Common.Logging.globalChatMaxLevel.addListener(logger);
 				Config.Common.Logging.globalFileMaxLevel.addListener(logger);
-				
+
 				logger.onConfigValueSet();
 			}
 		});
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
-	public DhLogger(String loggerName, 
-			@Nullable ConfigEntry<EDhApiLoggerLevel> chatLevelConfig, @Nullable ConfigEntry<EDhApiLoggerLevel> fileLevelConfig,
-			int maxLogPerSec)
+
+	public DhLogger(
+		String loggerName,
+		@Nullable ConfigEntry<EDhApiLoggerLevel> chatLevelConfig, @Nullable ConfigEntry<EDhApiLoggerLevel> fileLevelConfig,
+		int maxLogPerSec)
 	{
 		this.logger = LogManager.getLogger(ModInfo.NAME + "-" + loggerName);
-		
+
 		this.maxLogCountPerSecond = maxLogPerSec;
-		
-		
+
+
 		// chat config //
-		
+
 		this.chatLevelConfig = chatLevelConfig;
 		if (this.chatLevelConfig != null)
 		{
@@ -143,10 +147,10 @@ public class DhLogger implements IConfigListener
 			// chat messages should only be sent when explicitly desired
 			this.chatLevel = EDhApiLoggerLevel.DISABLED;
 		}
-		
-		
+
+
 		// file config //
-		
+
 		this.fileLevelConfig = fileLevelConfig;
 		if (this.fileLevelConfig != null)
 		{
@@ -157,40 +161,40 @@ public class DhLogger implements IConfigListener
 		{
 			this.fileLevel = EDhApiLoggerLevel.ALL;
 		}
-		
-		
+
+
 		LOGGER_REF_LIST.add(new WeakReference<>(this));
 	}
-	
-	
-	
+
+
+
 	//========//
 	// events //
 	//========//
-	
+
 	@Override
 	public void onConfigValueSet()
-	{ 
+	{
 		if (this.fileLevelConfig != null)
 		{
 			this.fileLevel = this.fileLevelConfig.get();
 		}
-		
+
 		if (this.chatLevelConfig != null)
 		{
 			this.chatLevel = this.chatLevelConfig.get();
 		}
-		
+
 		globalMaxFileLevel = Config.Common.Logging.globalFileMaxLevel.get();
 		globalMaxChatLevel = Config.Common.Logging.globalChatMaxLevel.get();
 	}
-	
-	
-	
+
+
+
 	//===============//
 	// log filtering //
 	//===============//
-	
+
 	public boolean canLog()
 	{
 		// is this logger enabled?
@@ -199,54 +203,54 @@ public class DhLogger implements IConfigListener
 		{
 			return false;
 		}
-		
+
 		// is logging globally enabled?
 		if (globalMaxFileLevel == EDhApiLoggerLevel.DISABLED
 			&& globalMaxChatLevel == EDhApiLoggerLevel.DISABLED)
 		{
 			return false;
 		}
-		
+
 		// has this logger run to many times this second already?
 		return this.maxLogCountPerSecond <= 0
 			|| this.logCountsThisSecondRef.get() < this.maxLogCountPerSecond;
 	}
-	
-	
-	
+
+
+
 	//=========//
 	// logging //
 	//=========//
-	
+
 	public void fatal(String str, Object... param) { this.log(Level.FATAL, str, param); }
 	public void error(String str, Object... param) { this.log(Level.ERROR, str, param); }
-	public void warn(String str, Object... param){ this.log(Level.WARN, str, param); }
+	public void warn(String str, Object... param) { this.log(Level.WARN, str, param); }
 	public void info(String str, Object... param) { this.log(Level.INFO, str, param); }
 	public void debug(String str, Object... param) { this.log(Level.DEBUG, str, param); }
 	@SuppressWarnings("unused") // kept so every log level has a method
 	public void trace(String str, Object... param) { this.log(Level.TRACE, str, param); }
-	
+
 	public void log(Level level, String str, Object... param)
 	{
 		if (!this.canLog())
 		{
 			return;
 		}
-		
-		
+
+
 		Message msg = this.logger.getMessageFactory().newMessage(str, param);
 		String msgStr = msg.getFormattedMessage();
-		
+
 		boolean messageLogged = false;
-		
-		
+
+
 		// file
 		if (canLogThisLevel(this.fileLevel.level, globalMaxFileLevel.level, level))
 		{
 			// by default MC's console/file logging config doesn't include debug or trace
 			// logs, so to make sure our messages are included we need to set any lower levels as "info"
 			Level logLevel = loggingLevelIsLessSpecificThan(level, Level.INFO) ? Level.INFO : level;
-			
+
 			if (param.length > 0
 				&& param[param.length - 1] instanceof Throwable)
 			{
@@ -256,10 +260,10 @@ public class DhLogger implements IConfigListener
 			{
 				this.logger.log(logLevel, msgStr);
 			}
-			
+
 			messageLogged = true;
 		}
-		
+
 		// chat
 		if (canLogThisLevel(this.chatLevel.level, globalMaxChatLevel.level, level))
 		{
@@ -268,15 +272,15 @@ public class DhLogger implements IConfigListener
 			{
 				mc_client = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 			}
-			
+
 			if (mc_client != null)
 			{
 				this.logToChat(level, msgStr);
 				messageLogged = true;
 			}
 		}
-		
-		
+
+
 		if (messageLogged)
 		{
 			this.logCountsThisSecondRef.incrementAndGet();
@@ -287,7 +291,7 @@ public class DhLogger implements IConfigListener
 		// we can only continue if this logger's level and the global level
 		// are at the same or a higher level than the requested level
 		return thisLoggingLevel.intLevel() >= requestedLogLevel.intLevel()
-				&& thisGlobalLoggingLevel.intLevel() >= requestedLogLevel.intLevel();
+			&& thisGlobalLoggingLevel.intLevel() >= requestedLogLevel.intLevel();
 	}
 	private static boolean loggingLevelIsLessSpecificThan(Level thisLoggingLevel, Level requestedLogLevel)
 	{ return thisLoggingLevel.intLevel() >= requestedLogLevel.intLevel(); }
@@ -319,20 +323,20 @@ public class DhLogger implements IConfigListener
 		{
 			prefix += MinecraftTextFormat.WHITE;
 		}
-		
+
 		prefix += MinecraftTextFormat.BOLD + MinecraftTextFormat.WHITE;
 		prefix += logLevel.name();
 		prefix += MinecraftTextFormat.CLEAR_FORMATTING + " ";
-		
+
 		mc_client.sendChatMessage(prefix + message);
 	}
-	
-	
-	
+
+
+
 	//===============//
 	// static ticker //
 	//===============//
-	
+
 	private static void runTickerLoop()
 	{
 		while (true)
@@ -341,7 +345,7 @@ public class DhLogger implements IConfigListener
 			{
 				// tick once every second
 				Thread.sleep(1_000);
-				
+
 				LOGGER_REF_LIST.removeIf((logger) ->
 				{
 					boolean loggerGarbageCollected = logger.get() == null;
@@ -367,7 +371,7 @@ public class DhLogger implements IConfigListener
 			}
 		}
 	}
-	
-	
-	
+
+
+
 }

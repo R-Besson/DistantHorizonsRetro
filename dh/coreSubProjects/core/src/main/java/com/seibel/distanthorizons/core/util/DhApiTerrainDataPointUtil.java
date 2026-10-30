@@ -11,21 +11,21 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
  */
 public class DhApiTerrainDataPointUtil
 {
-	
+
 	public static DhApiTerrainDataPoint createApiDatapoint(int minLevelHeight, FullDataPointIdMap mapping, byte detailLevel, long dataPoint)
 	{
 		IBlockStateWrapper blockState = mapping.getBlockStateWrapper(FullDataPointUtil.getId(dataPoint));
 		IBiomeWrapper biomeWrapper = mapping.getBiomeWrapper(FullDataPointUtil.getId(dataPoint));
-		
+
 		int bottomY = FullDataPointUtil.getBottomY(dataPoint) + minLevelHeight;
 		int height = FullDataPointUtil.getHeight(dataPoint);
 		int topY = bottomY + height;
-		
+
 		return DhApiTerrainDataPoint.create(
-				detailLevel,
-				FullDataPointUtil.getBlockLight(dataPoint), FullDataPointUtil.getSkyLight(dataPoint),
-				bottomY, topY,
-				blockState, biomeWrapper);
+			detailLevel,
+			FullDataPointUtil.getBlockLight(dataPoint), FullDataPointUtil.getSkyLight(dataPoint),
+			bottomY, topY,
+			blockState, biomeWrapper);
 	}
-	
+
 }

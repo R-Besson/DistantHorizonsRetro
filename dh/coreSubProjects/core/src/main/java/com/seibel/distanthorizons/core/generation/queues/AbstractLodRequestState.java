@@ -19,49 +19,49 @@ import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/** 
- * Handles the {@link IFullDataSourceRetrievalQueue} and any other necessary world gen information. 
- * 
+/**
+ * Handles the {@link IFullDataSourceRetrievalQueue} and any other necessary world gen information.
+ *
  * @see LodRequestModule
  * @see IFullDataSourceRetrievalQueue
  */
 public abstract class AbstractLodRequestState
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	/** static so we only send the disable message once per session */
 	private static long firstProgressMessageSentMs = 0;
-	
-	
-	
+
+
+
 	public final IDhLevel dhLevel;
 	public final IFullDataSourceRetrievalQueue retrievalQueue;
-	
+
 	private final ThreadPoolExecutor progressUpdaterThread = ThreadUtil.makeSingleDaemonThreadPool("World Gen Progress Updater");
 	private boolean progressUpdateThreadRunning = false;
-	
-	
-	
+
+
+
 	//===========================//
 	// request queue and logging //
 	//===========================//
 	//region
-	
+
 	public AbstractLodRequestState(IDhLevel dhLevel, IFullDataSourceRetrievalQueue retrievalQueue)
 	{
 		this.dhLevel = dhLevel;
 		this.retrievalQueue = retrievalQueue;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========================//
 	// request queue and logging //
 	//===========================//
 	//region
-	
+
 	/** @param targetPosForRequest the position that world generation should be centered around */
 	public void startRequestQueueAndSetTargetPos(DhBlockPos2D targetPosForRequest)
 	{
@@ -74,7 +74,7 @@ public abstract class AbstractLodRequestState
 		if (!this.progressUpdateThreadRunning)
 		{
 			this.progressUpdateThreadRunning = true;
-			
+
 			this.progressUpdaterThread.execute(() ->
 			{
 				while (this.progressUpdateThreadRunning)
@@ -82,7 +82,7 @@ public abstract class AbstractLodRequestState
 					try
 					{
 						this.sendRetrievalProgress();
-						
+
 						// sleep so we only see an update once in a while
 						int sleepTimeInSec = Config.Common.WorldGenerator.generationProgressDisplayIntervalInSeconds.get();
 						Thread.sleep(sleepTimeInSec * 1_000L);
@@ -101,8 +101,8 @@ public abstract class AbstractLodRequestState
 		long remainingChunkCount = this.retrievalQueue.getRetrievalEstimatedRemainingChunkCount();
 		remainingChunkCount += this.retrievalQueue.getQueuedChunkCount();
 		String remainingChunkCountStr = F3Screen.NUMBER_FORMAT.format(remainingChunkCount);
-		
-		String message = "DH is "+this.retrievalQueue.getRetrievalTypeName()+". ";
+
+		String message = "DH is " + this.retrievalQueue.getRetrievalTypeName() + ". ";
 		if (this.dhLevel.getClass() == DhServerLevel.class)
 		{
 			// server levels can have multiple world generators running at once,
@@ -110,7 +110,7 @@ public abstract class AbstractLodRequestState
 			message += "For " + this.dhLevel.getLevelWrapper().getDimensionName() + " ";
 		}
 		message += remainingChunkCountStr + " left.";
-		
+
 		// show a message about how to disable progress logging if requested
 		int msToShowDisableInstructions = Config.Common.WorldGenerator.generationProgressDisableMessageDisplayTimeInSeconds.get() * 1_000;
 		if (msToShowDisableInstructions > 0)
@@ -125,20 +125,20 @@ public abstract class AbstractLodRequestState
 				message += " This message can be hidden in the DH config.";
 			}
 		}
-		
+
 		// add the remaining time estimate if available
 		double chunksPerSec = this.getEstimatedChunksPerSecond();
 		if (chunksPerSec > 0)
 		{
 			long estimatedRemainingTime = (long) (remainingChunkCount / chunksPerSec);
 			message += " ETA: " + FormatUtil.formatEta(Duration.ofSeconds(estimatedRemainingTime));
-			
+
 			if (Config.Common.WorldGenerator.generationProgressIncludeChunksPerSecond.get())
 			{
 				message += " at " + F3Screen.NUMBER_FORMAT.format(chunksPerSec) + " chunks/sec";
 			}
 		}
-		
+
 		if (Config.Common.WorldGenerator.generationProgressIncludeChunksPerSecond.get())
 		{
 			// troubleshooting info for when generation slows down or stops
@@ -151,7 +151,7 @@ public abstract class AbstractLodRequestState
 			}
 			message += "]";
 		}
-		
+
 		// only log if there are chunks needing to be generated
 		if (remainingChunkCount != 0)
 		{
@@ -170,8 +170,8 @@ public abstract class AbstractLodRequestState
 			{
 				LOGGER.info(message);
 			}
-			
-			
+
+
 			// mark when the first message was sent
 			if (firstProgressMessageSentMs == 0)
 			{
@@ -179,7 +179,7 @@ public abstract class AbstractLodRequestState
 			}
 		}
 	}
-	
+
 	/** @return -1 if this method isn't supported or available */
 	public double getEstimatedChunksPerSecond()
 	{
@@ -188,38 +188,38 @@ public abstract class AbstractLodRequestState
 		{
 			return -1;
 		}
-		
-		
+
+
 		PriorityTaskPicker.Executor executor = ThreadPoolUtil.getWorldGenExecutor();
 		int threadCount = 1;
 		if (executor != null)
 		{
 			threadCount = executor.getPoolSize();
 		}
-		
+
 		// convert chunk generation time in milliseconds to chunks per second
 		double chunksPerSecond = (1 / avg.getAverage()) * 1_000;
 		// estimate the number of chunks that can be processed per second by all threads
 		// Note: this is probably higher than the actual number, we might want to drop this by 1 or 2 to give a more realistic estimate
 		chunksPerSecond = threadCount * chunksPerSecond;
-		
+
 		return chunksPerSecond;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	public CompletableFuture<Void> closeAsync(boolean doInterrupt)
 	{
 		// this should stop the updater thread
 		this.progressUpdateThreadRunning = false;
-		
+
 		return this.retrievalQueue.startClosingAsync(true, doInterrupt)
 			.exceptionally(e ->
 				{
@@ -233,9 +233,9 @@ public abstract class AbstractLodRequestState
 				return null;
 			});
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

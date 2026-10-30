@@ -28,11 +28,11 @@ public class FakeWorld implements IBlockAccess
 {
 	private IBlockAccess realWorld;
 	private BiomeGenBase biome;
-	
+
 	private int blockX;
 	private int blockY;
 	private int blockZ;
-	
+
 	private FakeBlockState blockState;
 	/** neighboring biomes are read from here, null if unknown */
 	@Nullable
@@ -57,11 +57,11 @@ public class FakeWorld implements IBlockAccess
 		this.realWorld = realWorld;
 		this.biome = biome;
 		this.fullDataSource = fullDataSource;
-		
+
 		this.blockX = blockX;
 		this.blockY = blockY;
 		this.blockZ = blockZ;
-		
+
 		this.blockState = blockState;
 		if (this.biome == null)
 		{
@@ -85,19 +85,19 @@ public class FakeWorld implements IBlockAccess
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
 	//region
-	
+
 	@Override
 	public Block getBlock(int x, int y, int z)
 	{
-		if (x == this.blockX 
-			&& y == this.blockY 
+		if (x == this.blockX
+			&& y == this.blockY
 			&& z == this.blockZ)
 		{
 			return this.blockState.block;
@@ -116,8 +116,8 @@ public class FakeWorld implements IBlockAccess
 	@Override
 	public int getBlockMetadata(int x, int y, int z)
 	{
-		if (x == this.blockX 
-			&& y == this.blockY 
+		if (x == this.blockX
+			&& y == this.blockY
 			&& z == this.blockZ)
 		{
 			return this.blockState.meta;
@@ -277,7 +277,7 @@ public class FakeWorld implements IBlockAccess
 		}
 		return false;
 	}
-	private static final ForgeDirection[] HORIZONTAL_DIRECTIONS = { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST };
+	private static final ForgeDirection[] HORIZONTAL_DIRECTIONS = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST};
 
 	/** @return {@link FullDataPointUtil#EMPTY_DATA_POINT} if no data point covers this Y */
 	private static long getDataPointAtRelY(LongArrayList column, int relY)
@@ -327,7 +327,7 @@ public class FakeWorld implements IBlockAccess
 	}
 
 	//endregion
-	
-	
-	
+
+
+
 }

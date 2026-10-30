@@ -34,7 +34,7 @@ import org.junit.Test;
  */
 public class DhApiConfigTest
 {
-	
+
 	@Test
 	public void ConfigTest()
 	{
@@ -42,30 +42,30 @@ public class DhApiConfigTest
 			.set(EDhApiRendererMode.DEBUG_TRIANGLE)
 			.build();
 		coreConfig.name = "test";
-		
+
 		DhApiConfigValue<EDhApiRendererMode, Boolean> apiConfig = new DhApiConfigValue<>(coreConfig, new RenderModeEnabledConverter());
-		
+
 		// start with no API value
 		Assert.assertNull("API Value shouldn't be set yet", apiConfig.getApiValue());
 		Assert.assertEquals("underlying config should be 'DEBUG'", EDhApiRendererMode.DEBUG_TRIANGLE, coreConfig.get());
-		
-		
+
+
 		// set API value
 		apiConfig.setValue(true);
 		Assert.assertTrue("API Value should be 'true'", apiConfig.getApiValue());
-		Assert.assertEquals("underlying config should be 'DEFAULT'", EDhApiRendererMode.DEFAULT, coreConfig.get());  
-		
+		Assert.assertEquals("underlying config should be 'DEFAULT'", EDhApiRendererMode.DEFAULT, coreConfig.get());
+
 		// set API value again
 		apiConfig.setValue(false);
 		Assert.assertFalse("API Value should be 'false'", apiConfig.getApiValue());
 		Assert.assertEquals("underlying config should be disabled", EDhApiRendererMode.DISABLED, coreConfig.get());
-		
+
 		// clear API value
 		apiConfig.clearValue();
 		Assert.assertNull("API Value should be null", apiConfig.getApiValue());
 		Assert.assertEquals("underlying config should be 'DEBUG'", EDhApiRendererMode.DEBUG_TRIANGLE, coreConfig.get());
-		
-		
+
+
 	}
-	
+
 }

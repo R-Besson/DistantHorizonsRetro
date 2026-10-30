@@ -43,43 +43,43 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
  */
 public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 {
-	public static final DhLogger LOGGER = new DhLoggerBuilder().build(); 
-	
-	
+	public static final DhLogger LOGGER = new DhLoggerBuilder().build();
+
+
 	public static final GlTestTriangleRenderer INSTANCE = new GlTestTriangleRenderer();
-	
+
 	// Render a square with uv color
 	private static final float[] VERTICES =
-	{
-		// PosX,Y,    ColorR,G,B,A
-		-0.5f, -0.5f,   1.0f, 0.0f, 0.0f, 1.0f,
-		0.5f, -0.5f,   0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f,  0.5f,   0.0f, 0.0f, 1.0f, 1.0f,
-	};
-	
-	
-	
+		{
+			// PosX,Y,    ColorR,G,B,A
+			-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+			0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+			0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+		};
+
+
+
 	GlShaderProgram basicShader;
 	GLVertexBuffer vbo;
 	GlAbstractVertexAttribute va;
 	boolean init = false;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
+
 	private GlTestTriangleRenderer() { }
-	
+
 	public void init()
 	{
 		if (this.init)
 		{
 			return;
 		}
-		
+
 		LOGGER.info("init");
 		this.init = true;
 		this.va = GlAbstractVertexAttribute.create();
@@ -93,10 +93,10 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 			"assets/distanthorizons/shaders/test/gl/vert.vert",
 			"assets/distanthorizons/shaders/test/gl/frag.frag",
 			new String[]{"vPosition", "color"});
-		
+
 		this.createBuffer();
 	}
-	
+
 	private void createBuffer()
 	{
 		ByteBuffer buffer = ByteBuffer.allocateDirect(VERTICES.length * Float.BYTES);
@@ -104,39 +104,39 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 		buffer.order(ByteOrder.nativeOrder());
 		buffer.asFloatBuffer().put(VERTICES);
 		buffer.rewind();
-		
+
 		this.vbo = new GLVertexBuffer(false);
 		this.vbo.bind();
 		this.vbo.uploadBuffer(buffer, 3, EDhApiGpuUploadMethod.DATA, VERTICES.length * Float.BYTES);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//========//
 	// render //
 	//========//
 	//region
-	
+
 	@Override
 	public void render(RenderParams renderParams)
 	{
 		this.init();
-		
+
 		this.basicShader.bind();
 		this.va.bind();
-		
+
 		this.vbo.bind();
 		this.va.bindBufferToAllBindingPoints(this.vbo.getId());
-		
+
 		LWJGL.glDrawArrays(GL11.GL_TRIANGLES, 0, 3);
-		
+
 		GlDhApplyShader.INSTANCE.render(renderParams);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

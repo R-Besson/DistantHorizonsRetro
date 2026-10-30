@@ -30,29 +30,29 @@ package com.seibel.distanthorizons.api.enums.config;
  * Determines how the multiplayer folders should be named.
  *
  * @author James Seibel
- * @since API 2.0.0
  * @version 2024-4-6
+ * @since API 2.0.0
  */
 public enum EDhApiServerFolderNameMode
 {
 	/** Only use the server name */
 	NAME_ONLY,
-	
+
 	/** Only use the server IP */
 	IP_ONLY,
-	
+
 	/**
 	 * {SERVER_NAME} IP {IP} <br>
 	 * Example: Minecraft Server IP 192.168.1.40
 	 */
 	NAME_IP,
-	
+
 	/**
 	 * {SERVER_NAME} IP {IP}:{PORT} <br>
 	 * Example: Minecraft Server IP 192.168.1.40:25565
 	 */
 	NAME_IP_PORT,
-	
+
 	/**
 	 * {SERVER_NAME} IP {IP} <br>
 	 * Example: Minecraft Server IP 192.168.1.40:25565 GameVersion 1.16.5 <Br> <br>
@@ -62,5 +62,5 @@ public enum EDhApiServerFolderNameMode
 	 * This is just here to provide backwards compatibility.
 	 */
 	NAME_IP_PORT_MC_VERSION;
-	
+
 }

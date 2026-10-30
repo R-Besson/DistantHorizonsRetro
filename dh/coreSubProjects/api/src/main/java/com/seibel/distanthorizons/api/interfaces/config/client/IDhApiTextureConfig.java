@@ -27,7 +27,7 @@ import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
  *
  * Not to be confused with {@link IDhApiNoiseTextureConfig}
  * which handles simulated textures.
- * 
+ *
  * @author James Seibel
  * @version 2026-09-12
  * @since API 7.1.0
@@ -38,22 +38,22 @@ public interface IDhApiTextureConfig extends IDhApiConfigGroup
 	IDhApiConfigValue<Boolean> texturesEnabled();
 	/** defines what LOD detail level textures will be rendered on */
 	IDhApiConfigValue<Integer> maxTexturedLodDetailLevel();
-	
-	/** 
+
+	/**
 	 * defines a CSV list of block resource locations that won't use textures in DH rendering.  <Br><Br>
 	 *
 	 * Example: "minecraft:grass_block,nylium" <Br><Br>
-	 * 
-	 * Changes require a restart. 
+	 *
+	 * Changes require a restart.
 	 */
 	IDhApiConfigValue<String> blocksDontRenderTextureCsv();
-	/** 
+	/**
 	 * defines a CSV list of block resource locations
 	 * that will use their bottom texture for the sides instead of the actual side. <Br><Br>
-	 * 
+	 *
 	 * This is helpful for things like grass blocks where the side texture would
 	 * repeat, which looks bad. <br><br>
-	 * 
+	 *
 	 * Changes require a restart.
 	 */
 	IDhApiConfigValue<String> blocksDontUseSideTextureCsv();
@@ -63,9 +63,9 @@ public interface IDhApiTextureConfig extends IDhApiConfigGroup
 	 *
 	 * This is helpful for things like grass blocks where the side texture would
 	 * repeat, which looks bad. <br><br>
-	 * 
+	 *
 	 * Example: "minecraft:grass_block,nylium" <br><br>
-	 * 
+	 *
 	 * Changes require a restart.
 	 */
 	IDhApiConfigValue<String> blockTagsDontUseSideTextureCsv();
@@ -75,10 +75,10 @@ public interface IDhApiTextureConfig extends IDhApiConfigGroup
 	 *
 	 * Example: "grass_blocks,nylium" <br><br>
 	 *
-	 * Example: "minecraft:beacon" 
+	 * Example: "minecraft:beacon"
 	 */
 	IDhApiConfigValue<String> blocksAlwaysRasterizeTextureCsv();
-	
-	
-	
+
+
+
 }

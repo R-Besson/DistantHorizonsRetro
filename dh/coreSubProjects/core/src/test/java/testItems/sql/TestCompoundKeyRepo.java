@@ -31,16 +31,16 @@ import java.sql.SQLException;
 
 public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompoundKeyDto>
 {
-	
+
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public TestCompoundKeyRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, TestCompoundKeyDto.class);
-		
+
 		// note: this should only ever be done with the test repo.
 		// All long term tables should be created using a SQL Script.
-		String createTableSql = 
-				"CREATE TABLE IF NOT EXISTS "+this.getTableName()+"(\n" +
+		String createTableSql =
+			"CREATE TABLE IF NOT EXISTS " + this.getTableName() + "(\n" +
 				"XPos INT NOT NULL\n" +
 				",ZPos INT NOT NULL\n" +
 				"\n" +
@@ -54,22 +54,22 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 			// intentionally empty: executing the query creates the table
 		}
 	}
-	
-	
+
+
 	@Override
 	public String getTableName() { return "TestCompound"; }
 	@Override
 	protected String CreateParameterizedWhereString() { return "XPos = ? AND ZPos = ?"; }
-	
+
 	@Override
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, DhChunkPos pos) throws SQLException
 	{
 		statement.setInt(index++, pos.getX());
 		statement.setInt(index, pos.getZ());
-    }
-	
-	
-	
+	}
+
+
+
 	@Override
 	@Nullable
 	public TestCompoundKeyDto convertResultSetToDto(ResultSet result) throws ClassCastException, SQLException
@@ -77,30 +77,29 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 		int xPos = result.getInt("XPos");
 		int zPos = result.getInt("ZPos");
 		String value = result.getString("Value");
-		
+
 		return new TestCompoundKeyDto(new DhChunkPos(xPos, zPos), value);
 	}
-	
+
 	@Override
 	public PreparedStatement createUpsertStatement(TestCompoundKeyDto dto) throws SQLException
 	{
-		String sql = 
-			"INSERT INTO "+this.getTableName()+" \n" +
+		String sql =
+			"INSERT INTO " + this.getTableName() + " \n" +
 				"(XPos, ZPos, Value) \n" +
-			"VALUES(?,?,?) \n" +
-			"ON CONFLICT(XPos, ZPos) DO UPDATE SET" +
-			"   Value = excluded.Value"
-			;
+				"VALUES(?,?,?) \n" +
+				"ON CONFLICT(XPos, ZPos) DO UPDATE SET" +
+				"   Value = excluded.Value";
 		PreparedStatement statement = this.createPreparedStatement(sql);
-		
+
 		int i = 1; // post-increment for the win!
 		statement.setObject(i++, dto.id.getX());
 		statement.setObject(i++, dto.id.getZ());
 		statement.setObject(i, dto.value);
-		
+
 		return statement;
 	}
-	
-	
-	
+
+
+
 }

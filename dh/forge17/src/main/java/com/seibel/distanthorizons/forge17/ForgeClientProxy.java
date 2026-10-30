@@ -57,27 +57,27 @@ import org.lwjgl.input.Keyboard;
 public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClientProxy implements AbstractModInitializer.IEventProxy
 {
 
-    private static final IMinecraftClientWrapper MC = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-    private static final DhLogger LOGGER = new DhLoggerBuilder().build();
+	private static final IMinecraftClientWrapper MC = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
+	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
 	// unbound by default, modpacks like GTNH already use most keys
 	private static final String KEY_CATEGORY = "distanthorizons.key.category";
 	private static final KeyBinding TOGGLE_RENDERING_KEY = new KeyBinding("distanthorizons.key.toggleRendering", Keyboard.KEY_NONE, KEY_CATEGORY);
 	private static final KeyBinding OPEN_CONFIG_KEY = new KeyBinding("distanthorizons.key.openConfig", Keyboard.KEY_NONE, KEY_CATEGORY);
 
-	
+
 	//=======//
 	// setup //
 	//=======//
 	//region
-	
-    @Override
-    public void registerEvents()
-    {
-        MinecraftForge.EVENT_BUS.register(this);
-        FMLCommonHandler.instance()
-            .bus()
-            .register(this);
+
+	@Override
+	public void registerEvents()
+	{
+		MinecraftForge.EVENT_BUS.register(this);
+		FMLCommonHandler.instance()
+			.bus()
+			.register(this);
 
 		ClientRegistry.registerKeyBinding(TOGGLE_RENDERING_KEY);
 		ClientRegistry.registerKeyBinding(OPEN_CONFIG_KEY);
@@ -92,52 +92,52 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 			}
 		});
 
-        ForgePluginPacketSender.setPacketHandler((player, message) -> 
-        {
-            ClientApi.INSTANCE.pluginMessageReceived(message);
-            ServerApi.INSTANCE.pluginMessageReceived(player, message);
-        });
-    }
-	
+		ForgePluginPacketSender.setPacketHandler((player, message) ->
+		{
+			ClientApi.INSTANCE.pluginMessageReceived(message);
+			ServerApi.INSTANCE.pluginMessageReceived(player, message);
+		});
+	}
+
 	//endregion
 
 
 
-    //==============//
-    // chunk events //
-    //==============//
+	//==============//
+	// chunk events //
+	//==============//
 	//region
 
-    @SubscribeEvent
-    public void clickBlockEvent(PlayerInteractEvent event)
-    {
-        // RIGHT_CLICK_AIR has no block position (x/z are always 0)
-        if (MC.clientConnectedToDedicatedServer()
-	        && event.action != PlayerInteractEvent.Action.RIGHT_CLICK_AIR
-	        && isPlayedWorld(event.world))
+	@SubscribeEvent
+	public void clickBlockEvent(PlayerInteractEvent event)
+	{
+		// RIGHT_CLICK_AIR has no block position (x/z are always 0)
+		if (MC.clientConnectedToDedicatedServer()
+			&& event.action != PlayerInteractEvent.Action.RIGHT_CLICK_AIR
+			&& isPlayedWorld(event.world))
 		{
-            ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(event.world);
-            if (SharedApi.isChunkAtBlockPosAlreadyUpdating(wrappedLevel, event.x, event.z)) 
+			ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(event.world);
+			if (SharedApi.isChunkAtBlockPosAlreadyUpdating(wrappedLevel, event.x, event.z))
 			{
-                return;
-            }
-			
-            Minecraft.getMinecraft()
-	            // add to render thread executor
-                .addScheduledTask(() -> 
-                {
-	                World level = event.world;
-                    Chunk chunk = level.getChunkFromBlockCoords(event.x, event.z);
+				return;
+			}
+
+			Minecraft.getMinecraft()
+				// add to render thread executor
+				.addScheduledTask(() ->
+				{
+					World level = event.world;
+					Chunk chunk = level.getChunkFromBlockCoords(event.x, event.z);
 					if (!ChunkWrapper.canSaveChunk(chunk))
 					{
 						return;
 					}
-                    ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
-                    SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
-                });
-        }
-    }
-	
+					ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
+					SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
+				});
+		}
+	}
+
 	/**
 	 * Called after the server changed blocks in a loaded chunk (see MixinNetHandlerPlayClient). <br>
 	 * The click event above fires before a block finishes breaking and misses other players' changes,
@@ -171,20 +171,20 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 		{
 			return;
 		}
-		
+
 		World level = chunk.worldObj;
 		if (!isPlayedWorld(level))
 		{
 			return;
 		}
-		
+
 		if (!ChunkWrapper.canSaveChunk(chunk))
 		{
 			LOGGER.info(
 				"Skipping client chunk update for not-ready chunk [" + chunk.xPosition + "," + chunk.zPosition + "].");
 			return;
 		}
-		
+
 		ILevelWrapper wrappedLevel = ProxyUtil.getLevelWrapper(level);
 		ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
 		SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
@@ -198,22 +198,22 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 	{ return level != null && level.isRemote && level == Minecraft.getMinecraft().theWorld; }
 
 	//endregion
-	
-	
-	
-    //==============//
-    // key bindings //
-    //==============//
+
+
+
+	//==============//
+	// key bindings //
+	//==============//
 	//region
 
-    @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event)
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.thePlayer == null || mc.currentScreen != null)
+	@SubscribeEvent
+	public void onKeyInput(InputEvent.KeyInputEvent event)
+	{
+		Minecraft mc = Minecraft.getMinecraft();
+		if (mc.thePlayer == null || mc.currentScreen != null)
 		{
-            return;
-        }
+			return;
+		}
 
 		// isPressed() consumes one press each call, so a held key only triggers once
 		while (TOGGLE_RENDERING_KEY.isPressed())
@@ -235,65 +235,71 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 		{
 			switch (Keyboard.getEventKey())
 			{
-				case Keyboard.KEY_F6: ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F6); break;
-				case Keyboard.KEY_F7: ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F7); break;
-				case Keyboard.KEY_F8: ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F8); break;
+				case Keyboard.KEY_F6:
+					ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F6);
+					break;
+				case Keyboard.KEY_F7:
+					ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F7);
+					break;
+				case Keyboard.KEY_F8:
+					ClientApi.INSTANCE.keyPressedEvent(KeyCodesUtil.F8);
+					break;
 			}
 		}
-    }
-	
+	}
+
 	//endregion
-	
-	
-	
-    //===========//
-    // rendering //
-    //===========//
+
+
+
+	//===========//
+	// rendering //
+	//===========//
 	//region
 
-    @SubscribeEvent
-    public void afterLevelRenderEvent(TickEvent.RenderTickEvent event)
-    {
-	    if (event.type.equals(TickEvent.RenderTickEvent.Type.RENDER))
-	    {
-		    boolean framebufferMixinWasEnabled = MixinFlags.framebufferMixinEnabled;
-		    MixinFlags.framebufferMixinEnabled = true;
-            try 
-            {
-                if (!framebufferMixinWasEnabled) 
-				{
-                    // The splash screen may have created MC's main framebuffer before our redirect was enabled.
-                    // Rebuild it once after the first real render tick so the depth attachment becomes a texture.
-                    Framebuffer framebuffer = Minecraft.getMinecraft()
-                        .getFramebuffer();
-                    if (framebuffer != null) 
-					{
-                        framebuffer.createBindFramebuffer(framebuffer.framebufferWidth, framebuffer.framebufferHeight);
-                    }
-                }
-            } 
-			catch (Throwable e) 
+	@SubscribeEvent
+	public void afterLevelRenderEvent(TickEvent.RenderTickEvent event)
+	{
+		if (event.type.equals(TickEvent.RenderTickEvent.Type.RENDER))
+		{
+			boolean framebufferMixinWasEnabled = MixinFlags.framebufferMixinEnabled;
+			MixinFlags.framebufferMixinEnabled = true;
+			try
 			{
-                LOGGER.error("Unexpected error in afterLevelRenderEvent: [" + e.getMessage() + "].", e);
-            }
-        }
-    }
+				if (!framebufferMixinWasEnabled)
+				{
+					// The splash screen may have created MC's main framebuffer before our redirect was enabled.
+					// Rebuild it once after the first real render tick so the depth attachment becomes a texture.
+					Framebuffer framebuffer = Minecraft.getMinecraft()
+						.getFramebuffer();
+					if (framebuffer != null)
+					{
+						framebuffer.createBindFramebuffer(framebuffer.framebufferWidth, framebuffer.framebufferHeight);
+					}
+				}
+			}
+			catch (Throwable e)
+			{
+				LOGGER.error("Unexpected error in afterLevelRenderEvent: [" + e.getMessage() + "].", e);
+			}
+		}
+	}
 
-    @SubscribeEvent
-    public void onRenderOverlay(RenderGameOverlayEvent.Text event) 
-    {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (event.isCanceled()
-	        || !mc.gameSettings.showDebugInfo)
-        {
+	@SubscribeEvent
+	public void onRenderOverlay(RenderGameOverlayEvent.Text event)
+	{
+		Minecraft mc = Minecraft.getMinecraft();
+		if (event.isCanceled()
+			|| !mc.gameSettings.showDebugInfo)
+		{
 			return;
-        }
+		}
 
-        F3Screen.addStringToDisplay(event.right);
-    }
-	
+		F3Screen.addStringToDisplay(event.right);
+	}
+
 	//endregion
-	
-	
-	
+
+
+
 }

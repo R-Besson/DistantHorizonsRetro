@@ -34,9 +34,9 @@ public class DhApiVec3f implements IDhApiCopyable
 	public float x;
 	public float y;
 	public float z;
-	
-	
-	
+
+
+
 	/** creates a Vec3 at (0,0,0) */
 	public DhApiVec3f()
 	{
@@ -44,14 +44,14 @@ public class DhApiVec3f implements IDhApiCopyable
 		this.y = 0;
 		this.z = 0;
 	}
-	
+
 	public DhApiVec3f(float x, float y, float z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -80,7 +80,7 @@ public class DhApiVec3f implements IDhApiCopyable
 			return false;
 		}
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -88,11 +88,11 @@ public class DhApiVec3f implements IDhApiCopyable
 		i = 31 * i + Float.floatToIntBits(this.y);
 		return 31 * i + Float.floatToIntBits(this.z);
 	}
-	
+
 	@Override
 	public String toString() { return "[" + this.x + ", " + this.y + ", " + this.z + "]"; }
-	
-	@Override 
+
+	@Override
 	public DhApiVec3f copy() { return new DhApiVec3f(this.x, this.y, this.z); }
-	
+
 }

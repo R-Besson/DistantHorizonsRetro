@@ -36,11 +36,11 @@ public class DefaultConverter<T> implements IConverter<T, T>
 	{
 		return apiObject;
 	}
-	
+
 	@Override
 	public T convertToApiType(T coreObject)
 	{
 		return coreObject;
 	}
-	
+
 }

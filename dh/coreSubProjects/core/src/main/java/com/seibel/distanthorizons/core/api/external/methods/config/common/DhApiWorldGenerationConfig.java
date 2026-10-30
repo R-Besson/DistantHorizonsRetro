@@ -38,11 +38,11 @@ import com.seibel.distanthorizons.core.config.api.converters.ApiGeneratorModeToB
 public class DhApiWorldGenerationConfig implements IDhApiWorldGenerationConfig
 {
 	public static DhApiWorldGenerationConfig INSTANCE = new DhApiWorldGenerationConfig();
-	
+
 	private DhApiWorldGenerationConfig() { }
-	
-	
-	
+
+
+
 	@Deprecated
 	@Override
 	public IDhApiConfigValue<Boolean> enableDistantWorldGeneration()
@@ -50,11 +50,11 @@ public class DhApiWorldGenerationConfig implements IDhApiWorldGenerationConfig
 	@Override
 	public IDhApiConfigValue<EDhApiGeneratorPlan> GeneratorPlan()
 	{ return new DhApiConfigValue<>(Config.Common.WorldGenerator.generatorPlan); }
-	
-	
+
+
 	@Override
 	public IDhApiConfigValue<EDhApiDistantGeneratorMode> chunkGeneratorMode()
 	{ return new DhApiConfigValue<>(Config.Common.WorldGenerator.chunkGeneratorMode); }
-	
-	
+
+
 }

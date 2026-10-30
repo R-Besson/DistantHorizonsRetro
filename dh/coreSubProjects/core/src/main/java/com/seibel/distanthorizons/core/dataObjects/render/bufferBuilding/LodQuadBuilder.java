@@ -53,7 +53,7 @@ public class LodQuadBuilder implements AutoCloseable
 	public static final int BYTES_PER_QUAD = BYTES_PER_VERTEX * 4;
 
 	public static final int[][][] DIRECTION_VERTEX_IBO_QUAD = new int[][][]
-	//region
+		//region
 		{
 			// X,Z //
 			{ // UP
@@ -115,7 +115,7 @@ public class LodQuadBuilder implements AutoCloseable
 	 * min corner to max corner diagonal, west/east the two sides of the other one.
 	 */
 	@SuppressWarnings("unchecked")
-	private final ArrayList<BufferQuad>[] crossQuads = (ArrayList<BufferQuad>[]) new ArrayList[] { new ArrayList<BufferQuad>() };
+	private final ArrayList<BufferQuad>[] crossQuads = (ArrayList<BufferQuad>[]) new ArrayList[]{new ArrayList<BufferQuad>()};
 
 	/** normal index of the min corner to max corner diagonal plane, after the 6 cube faces */
 	public static final byte CROSS_PLANE_A_NORMAL_INDEX = 6;
@@ -262,9 +262,9 @@ public class LodQuadBuilder implements AutoCloseable
 		quad.seeThrough = this.seeThroughForNewQuads;
 		if (!quadList.isEmpty()
 			&& (
-				quadList.get(quadList.size() - 1).tryMerge(quad, BufferMergeDirectionEnum.EastWest)
+			quadList.get(quadList.size() - 1).tryMerge(quad, BufferMergeDirectionEnum.EastWest)
 				|| quadList.get(quadList.size() - 1).tryMerge(quad, BufferMergeDirectionEnum.NorthSouthOrUpDown))
-			)
+		)
 		{
 			this.premergeCount++;
 			// the merged quad isn't used, otherwise the cache runs dry and every quad is a new allocation
@@ -332,8 +332,8 @@ public class LodQuadBuilder implements AutoCloseable
 	{
 		boolean isTransparent = (this.doTransparency && ColorUtil.getAlpha(color) < 255);
 		ArrayList<BufferQuad> quadList = isTransparent
-				? this.transparentQuads[EDhDirection.UP.faceIndex]
-				: this.opaqueQuads[EDhDirection.UP.faceIndex];
+			? this.transparentQuads[EDhDirection.UP.faceIndex]
+			: this.opaqueQuads[EDhDirection.UP.faceIndex];
 
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(minX, maxY, minZ, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.UP);
@@ -364,8 +364,8 @@ public class LodQuadBuilder implements AutoCloseable
 		byte skylight, byte blocklight)
 	{
 		ArrayList<BufferQuad> quadArray = (this.doTransparency && ColorUtil.getAlpha(color) < 255)
-				? this.transparentQuads[EDhDirection.DOWN.faceIndex]
-				: this.opaqueQuads[EDhDirection.DOWN.faceIndex];
+			? this.transparentQuads[EDhDirection.DOWN.faceIndex]
+			: this.opaqueQuads[EDhDirection.DOWN.faceIndex];
 
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(x, y, z, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.DOWN);
@@ -727,14 +727,14 @@ public class LodQuadBuilder implements AutoCloseable
 			}
 
 			this.putVertex(bb, (short) (quad.x + dx), (short) (quad.y + dy), (short) (quad.z + dz),
-					quad.hasError ? ColorUtil.RED : color,
-					quad.hasError ? 0 : normalIndex,
-					quad.hasError ? 0 : quad.irisBlockMaterialId,
-					quad.hasError ? 15 : (this.noSkyLight ? 0 : skyLight),
-					quad.hasError ? 15 : blockLight,
-					quad.hasError ? 0 : quad.textureTileId,
-					quad.hasError ? RenderDataPointUtil.SHAPE_NONE : quad.shape,
-					mx, my, mz);
+				quad.hasError ? ColorUtil.RED : color,
+				quad.hasError ? 0 : normalIndex,
+				quad.hasError ? 0 : quad.irisBlockMaterialId,
+				quad.hasError ? 15 : (this.noSkyLight ? 0 : skyLight),
+				quad.hasError ? 15 : blockLight,
+				quad.hasError ? 0 : quad.textureTileId,
+				quad.hasError ? RenderDataPointUtil.SHAPE_NONE : quad.shape,
+				mx, my, mz);
 		}
 	}
 	/**
@@ -802,9 +802,18 @@ public class LodQuadBuilder implements AutoCloseable
 			// 0b01 = positive offset
 			// 0b11 = negative offset
 			// format is: 0b00zzyyxx
-			if (mx != 0) { mircoOffset |= (byte) (mx > 0 ? 0b01 : 0b11); }
-			if (my != 0) { mircoOffset |= (byte) (my > 0 ? 0b0100 : 0b1100); }
-			if (mz != 0) { mircoOffset |= (byte) (mz > 0 ? 0b010000 : 0b110000); }
+			if (mx != 0)
+			{
+				mircoOffset |= (byte) (mx > 0 ? 0b01 : 0b11);
+			}
+			if (my != 0)
+			{
+				mircoOffset |= (byte) (my > 0 ? 0b0100 : 0b1100);
+			}
+			if (mz != 0)
+			{
+				mircoOffset |= (byte) (mz > 0 ? 0b010000 : 0b110000);
+			}
 			meta |= (short) (mircoOffset << 8);
 
 			// the shape uses the 2 unused bits above the micro offset (0bss00_0000_0000_0000),

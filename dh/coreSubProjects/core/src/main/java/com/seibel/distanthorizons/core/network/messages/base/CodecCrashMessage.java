@@ -26,22 +26,22 @@ import io.netty.buffer.ByteBuf;
 public class CodecCrashMessage extends AbstractNetworkMessage
 {
 	public ECrashPhase crashPhase;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	public CodecCrashMessage() { }
 	public CodecCrashMessage(ECrashPhase crashPhase) { this.crashPhase = crashPhase; }
-	
-	
-	
+
+
+
 	//===============//
 	// serialization //
 	//===============//
-	
+
 	@Override
 	public void encode(ByteBuf out)
 	{
@@ -53,26 +53,26 @@ public class CodecCrashMessage extends AbstractNetworkMessage
 
 	@Override
 	public void decode(ByteBuf in) { throw new RuntimeException("decode force crash"); }
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
-	
+
 	@Override
 	public MoreObjects.ToStringHelper toStringHelper()
 	{
 		return super.toStringHelper()
-				.add("crashPhase", this.crashPhase);
+			.add("crashPhase", this.crashPhase);
 	}
-	
-	
-	
+
+
+
 	//================//
 	// helper classes //
 	//================//
-	
+
 	/**
 	 * ENCODE, <br>
 	 * DECODE, <br>
@@ -82,5 +82,5 @@ public class CodecCrashMessage extends AbstractNetworkMessage
 		ENCODE,
 		DECODE
 	}
-	
+
 }

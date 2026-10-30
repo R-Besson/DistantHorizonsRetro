@@ -32,16 +32,16 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
 public abstract class AbstractDhApiCancelableOneTimeTestEvent implements IDhApiCancelableEvent<Boolean>, IDhApiOneTimeEvent<Boolean>
 {
 	public abstract void onTestEvent(DhApiCancelableEventParam<Boolean> input);
-	
+
 	/** just used for testing */
 	public abstract Boolean getTestValue();
-	
-	
-	
+
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<Boolean> input)
 	{
@@ -51,5 +51,5 @@ public abstract class AbstractDhApiCancelableOneTimeTestEvent implements IDhApiC
 			input.cancelEvent();
 		}
 	}
-	
+
 }

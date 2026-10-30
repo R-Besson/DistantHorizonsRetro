@@ -31,7 +31,7 @@ import com.seibel.distanthorizons.api.interfaces.util.IDhApiCopyable;
  * m02, m12, m22, m32,  <br>
  * m03, m13, m23, m33   <br>
  * </code>
- * 
+ *
  * @author James Seibel
  * @version 2026-05-22
  */
@@ -41,54 +41,54 @@ public class DhApiMat4f implements IDhApiCopyable
 	public float m01;
 	public float m02;
 	public float m03;
-	
+
 	public float m10;
 	public float m11;
 	public float m12;
 	public float m13;
-	
+
 	public float m20;
 	public float m21;
 	public float m22;
 	public float m23;
-	
+
 	public float m30;
 	public float m31;
 	public float m32;
 	public float m33;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
 	//region
-	
+
 	public DhApiMat4f() { /* all values are 0 */ }
-	
+
 	public DhApiMat4f(DhApiMat4f sourceMatrix)
 	{
 		this.m00 = sourceMatrix.m00;
 		this.m01 = sourceMatrix.m01;
 		this.m02 = sourceMatrix.m02;
 		this.m03 = sourceMatrix.m03;
-		
+
 		this.m10 = sourceMatrix.m10;
 		this.m11 = sourceMatrix.m11;
 		this.m12 = sourceMatrix.m12;
 		this.m13 = sourceMatrix.m13;
-		
+
 		this.m20 = sourceMatrix.m20;
 		this.m21 = sourceMatrix.m21;
 		this.m22 = sourceMatrix.m22;
 		this.m23 = sourceMatrix.m23;
-		
+
 		this.m30 = sourceMatrix.m30;
 		this.m31 = sourceMatrix.m31;
 		this.m32 = sourceMatrix.m32;
 		this.m33 = sourceMatrix.m33;
 	}
-	
+
 	/** Expects the values of the input array to be in row major order (AKA rows then columns) */
 	public DhApiMat4f(float[] values)
 	{
@@ -96,32 +96,32 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m01 = values[1];
 		this.m02 = values[2];
 		this.m03 = values[3];
-		
+
 		this.m10 = values[4];
 		this.m11 = values[5];
 		this.m12 = values[6];
 		this.m13 = values[7];
-		
+
 		this.m20 = values[8];
 		this.m21 = values[9];
 		this.m22 = values[10];
 		this.m23 = values[11];
-		
+
 		this.m30 = values[12];
 		this.m31 = values[13];
 		this.m32 = values[14];
 		this.m33 = values[15];
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// methods //
 	//=========//
 	//region
-	
+
 	/** Returns the values of this matrix in row major order (AKA rows then columns) */
 	public float[] getValuesAsArray()
 	{
@@ -129,9 +129,10 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.putValuesInArray(array);
 		return array;
 	}
-	
-	/** 
-	 * Returns the values of this matrix in row major order (AKA rows then columns) 
+
+	/**
+	 * Returns the values of this matrix in row major order (AKA rows then columns)
+	 *
 	 * @since API 7.0.0
 	 */
 	public void putValuesInArray(float[] array)
@@ -140,24 +141,24 @@ public class DhApiMat4f implements IDhApiCopyable
 		array[1] = this.m01;
 		array[2] = this.m02;
 		array[3] = this.m03;
-		
+
 		array[4] = this.m10;
 		array[5] = this.m11;
 		array[6] = this.m12;
 		array[7] = this.m13;
-		
+
 		array[8] = this.m20;
 		array[9] = this.m21;
 		array[10] = this.m22;
 		array[11] = this.m23;
-		
+
 		array[12] = this.m30;
 		array[13] = this.m31;
 		array[14] = this.m32;
 		array[15] = this.m33;
 	}
-	
-	
+
+
 	/** @since API 7.0.0 */
 	public void set(DhApiMat4f mat)
 	{
@@ -165,23 +166,23 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m01 = mat.m01;
 		this.m02 = mat.m02;
 		this.m03 = mat.m03;
-		
+
 		this.m10 = mat.m10;
 		this.m11 = mat.m11;
 		this.m12 = mat.m12;
 		this.m13 = mat.m13;
-		
+
 		this.m20 = mat.m20;
 		this.m21 = mat.m21;
 		this.m22 = mat.m22;
 		this.m23 = mat.m23;
-		
+
 		this.m30 = mat.m30;
 		this.m31 = mat.m31;
 		this.m32 = mat.m32;
 		this.m33 = mat.m33;
 	}
-	
+
 	public void setIdentity()
 	{
 		this.m00 = 1.0F;
@@ -201,7 +202,7 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m32 = 0.0F;
 		this.m33 = 1.0F;
 	}
-	
+
 	/** adjudicate and determinate */
 	public float adjudicateAndDet()
 	{
@@ -251,7 +252,7 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m33 = f27;
 		return f * f11 - f1 * f10 + f2 * f9 + f3 * f8 - f4 * f7 + f5 * f6;
 	}
-	
+
 	public void transpose()
 	{
 		float f = this.m10;
@@ -273,13 +274,13 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m32 = this.m23;
 		this.m23 = f;
 	}
-	
+
 	public boolean canInvert()
 	{
 		float det = this.adjudicateAndDet();
 		return (Math.abs(det) > 1.0E-6F);
 	}
-	
+
 	public void invert()
 	{
 		float det = this.adjudicateAndDet();
@@ -288,7 +289,7 @@ public class DhApiMat4f implements IDhApiCopyable
 			this.multiply(det);
 		}
 	}
-	
+
 	public void multiply(DhApiMat4f multMatrix)
 	{
 		float f = this.m00 * multMatrix.m00 + this.m01 * multMatrix.m10 + this.m02 * multMatrix.m20 + this.m03 * multMatrix.m30;
@@ -324,7 +325,7 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m32 = f14;
 		this.m33 = f15;
 	}
-	
+
 	public void multiply(float scalar)
 	{
 		this.m00 *= scalar;
@@ -344,16 +345,16 @@ public class DhApiMat4f implements IDhApiCopyable
 		this.m32 *= scalar;
 		this.m33 *= scalar;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -365,28 +366,28 @@ public class DhApiMat4f implements IDhApiCopyable
 		{
 			DhApiMat4f otherMatrix = (DhApiMat4f) obj;
 			return Float.compare(otherMatrix.m00, this.m00) == 0
-					&& Float.compare(otherMatrix.m01, this.m01) == 0
-					&& Float.compare(otherMatrix.m02, this.m02) == 0
-					&& Float.compare(otherMatrix.m03, this.m03) == 0
-					&& Float.compare(otherMatrix.m10, this.m10) == 0
-					&& Float.compare(otherMatrix.m11, this.m11) == 0
-					&& Float.compare(otherMatrix.m12, this.m12) == 0
-					&& Float.compare(otherMatrix.m13, this.m13) == 0
-					&& Float.compare(otherMatrix.m20, this.m20) == 0
-					&& Float.compare(otherMatrix.m21, this.m21) == 0
-					&& Float.compare(otherMatrix.m22, this.m22) == 0
-					&& Float.compare(otherMatrix.m23, this.m23) == 0
-					&& Float.compare(otherMatrix.m30, this.m30) == 0
-					&& Float.compare(otherMatrix.m31, this.m31) == 0
-					&& Float.compare(otherMatrix.m32, this.m32) == 0
-					&& Float.compare(otherMatrix.m33, this.m33) == 0;
+				&& Float.compare(otherMatrix.m01, this.m01) == 0
+				&& Float.compare(otherMatrix.m02, this.m02) == 0
+				&& Float.compare(otherMatrix.m03, this.m03) == 0
+				&& Float.compare(otherMatrix.m10, this.m10) == 0
+				&& Float.compare(otherMatrix.m11, this.m11) == 0
+				&& Float.compare(otherMatrix.m12, this.m12) == 0
+				&& Float.compare(otherMatrix.m13, this.m13) == 0
+				&& Float.compare(otherMatrix.m20, this.m20) == 0
+				&& Float.compare(otherMatrix.m21, this.m21) == 0
+				&& Float.compare(otherMatrix.m22, this.m22) == 0
+				&& Float.compare(otherMatrix.m23, this.m23) == 0
+				&& Float.compare(otherMatrix.m30, this.m30) == 0
+				&& Float.compare(otherMatrix.m31, this.m31) == 0
+				&& Float.compare(otherMatrix.m32, this.m32) == 0
+				&& Float.compare(otherMatrix.m33, this.m33) == 0;
 		}
 		else
 		{
 			return false;
 		}
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -407,22 +408,22 @@ public class DhApiMat4f implements IDhApiCopyable
 		i = 31 * i + (this.m32 != 0.0F ? Float.floatToIntBits(this.m32) : 0);
 		return 31 * i + (this.m33 != 0.0F ? Float.floatToIntBits(this.m33) : 0);
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		return "Matrix4f:\n" +
-				this.m00 + " " + this.m01 + " " + this.m02 + " " + this.m03 + "\n" +
-				this.m10 + " " + this.m11 + " " + this.m12 + " " + this.m13 + "\n" +
-				this.m20 + " " + this.m21 + " " + this.m22 + " " + this.m23 + "\n" +
-				this.m30 + " " + this.m31 + " " + this.m32 + " " + this.m33 + "\n";
+			this.m00 + " " + this.m01 + " " + this.m02 + " " + this.m03 + "\n" +
+			this.m10 + " " + this.m11 + " " + this.m12 + " " + this.m13 + "\n" +
+			this.m20 + " " + this.m21 + " " + this.m22 + " " + this.m23 + "\n" +
+			this.m30 + " " + this.m31 + " " + this.m32 + " " + this.m33 + "\n";
 	}
-	
+
 	@Override
 	public DhApiMat4f copy() { return new DhApiMat4f(this); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

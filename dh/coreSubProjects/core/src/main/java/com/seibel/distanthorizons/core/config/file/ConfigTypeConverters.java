@@ -37,7 +37,7 @@ import java.util.Map;
 public class ConfigTypeConverters
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
-	
+
 	// Once you've made a converter add it to here where the first value is the type you want to convert and the 2nd value is the converter
 	public static final Map<Class<?>, ConverterBase> convertObjects = new HashMap<Class<?>, ConverterBase>()
 	{{
@@ -46,10 +46,10 @@ public class ConfigTypeConverters
 		this.put(Float.class, new FloatConverter());
 		this.put(Double.class, new DoubleConverter());
 		this.put(Byte.class, new ByteConverter());
-		
+
 		this.put(Map.class, new MapConverter());
 	}};
-	
+
 	public static Class<?> isClassConvertable(Class<?> clazz)
 	{
 		for (int i = 0; i < convertObjects.size(); i++)
@@ -60,27 +60,28 @@ public class ConfigTypeConverters
 		}
 		return null;
 	}
-	
+
 	public static Object attemptToConvertToString(Class<?> clazz, Object value)
 	{
 		Class<?> convertablClass = isClassConvertable(clazz);
-		if (convertablClass != null) {
+		if (convertablClass != null)
+		{
 			return convertToString(convertablClass, value);
 		}
 		return value;
 	}
-	
+
 	public static Object attemptToConvertFromString(Class<?> outputClass, Object value)
 	{
 		boolean valueNeedsConverting = (value == null || value.getClass().equals(String.class));
 		Class<?> convertablClass = isClassConvertable(outputClass);
-		if (valueNeedsConverting && convertablClass != null) 
+		if (valueNeedsConverting && convertablClass != null)
 		{
 			return convertFromString(convertablClass, (String) value);
 		}
 		return value;
 	}
-	
+
 	public static String convertToString(Class<?> clazz, Object value)
 	{
 		try
@@ -105,8 +106,8 @@ public class ConfigTypeConverters
 			return null;
 		}
 	}
-	
-	
+
+
 	/**
 	 * The converter should extend this
 	 */
@@ -114,48 +115,50 @@ public class ConfigTypeConverters
 	{
 		public abstract String convertToString(Object value);
 		public abstract Object convertFromString(String value);
-		
+
 	}
-	
-	
-	
+
+
+
 	// Some number types are a bit wack with the config parser
 	// So we just store them as strings
 	public static class ShortConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return ((Short) item).toString(); }
 		@Override public Short convertFromString(String s) { return Short.valueOf(s); }
-		
+
 	}
-	
+
 	public static class LongConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return ((Long) item).toString(); }
 		@Override public Long convertFromString(String s) { return Long.valueOf(s); }
-		
+
 	}
-	
+
 	public static class FloatConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return item.toString(); }
 		@Override public Float convertFromString(String s) { return Float.valueOf(s); }
+
 	}
-	
+
 	public static class DoubleConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return item.toString(); }
 		@Override public Double convertFromString(String s) { return Double.valueOf(s); }
+
 	}
-	
+
 	public static class ByteConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return ((Byte) item).toString(); }
 		@Override public Byte convertFromString(String s) { return Byte.valueOf(s); }
-		
+
 	}
-	
-	
-	
+
+
+
 	@SuppressWarnings("unchecked")
 	public static class MapConverter extends ConverterBase
 	{
@@ -164,17 +167,17 @@ public class ConfigTypeConverters
 		{
 			Map<String, Object> mapObject = (Map<String, Object>) item;
 			Config jsonObject = Config.inMemory();
-			
+
 			Object[] keyArray = mapObject.keySet().toArray();
-			
+
 			for (int i = 0; i < mapObject.size(); i++)
 			{
 				jsonObject.add(keyArray[i].toString(), mapObject.get(keyArray[i]));
 			}
-			
+
 			return JsonFormat.minimalInstance().createWriter().writeToString(jsonObject);
 		}
-		
+
 		@Override
 		public Map<String, Object> convertFromString(String str)
 		{
@@ -185,12 +188,12 @@ public class ConfigTypeConverters
 			}
 			catch (Exception e)
 			{
-				LOGGER.error("Unable to convert config string value ["+str+"] to a Map, error: ["+e.getMessage()+"].", e);
+				LOGGER.error("Unable to convert config string value [" + str + "] to a Map, error: [" + e.getMessage() + "].", e);
 			}
-			
+
 			return jsonObject.valueMap();
 		}
-		
+
 	}
-	
+
 }

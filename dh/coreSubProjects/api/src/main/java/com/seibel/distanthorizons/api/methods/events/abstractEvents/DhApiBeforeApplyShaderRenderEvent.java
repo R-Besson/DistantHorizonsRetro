@@ -28,7 +28,7 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
  * The apply shader is a shader that copies over everything DH has rendered
  * for this pass into MC's framebuffers so it can be rendered to the screen.
  * Canceling this event prevents the apply shader from running.
- * 
+ *
  * @author James Seibel
  * @version 2024-1-31
  * @since API 2.0.0
@@ -37,13 +37,13 @@ public abstract class DhApiBeforeApplyShaderRenderEvent implements IDhApiCancela
 {
 	/** Fired before the apply shader is run. */
 	public abstract void beforeRender(DhApiCancelableEventParam<DhApiRenderParam> event);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<DhApiRenderParam> event) { this.beforeRender(event); }
-	
+
 }

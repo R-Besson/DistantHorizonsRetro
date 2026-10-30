@@ -31,9 +31,9 @@ import java.util.function.Consumer;
 public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 {
 	private final Queue<Integer> iteratorQueue = new ArrayDeque<>();
-	
-	
-	
+
+
+
 	public QuadNodeChildIndexIterator(QuadNode<T> parentNode, boolean returnNullChildPos)
 	{
 		// only get the children if this section isn't at the bottom of the tree
@@ -50,12 +50,12 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 			}
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public boolean hasNext() { return !this.iteratorQueue.isEmpty(); }
-	
+
 	@Override
 	public Integer next()
 	{
@@ -64,15 +64,15 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 			throw new NoSuchElementException();
 		}
 
-        return this.iteratorQueue.poll();
+		return this.iteratorQueue.poll();
 	}
-	
-	
+
+
 	/** Unimplemented */
 	@Override
 	public void remove() { throw new UnsupportedOperationException("remove"); }
-	
+
 	@Override
 	public void forEachRemaining(Consumer<? super Integer> action) { Iterator.super.forEachRemaining(action); }
-	
+
 }

@@ -18,8 +18,8 @@ public interface IChiselCommonAccessor extends IModAccessor
 	/**
 	 * @param world has to return the neighbors' blocks and metas
 	 * @return the icons MC draws this face with, either one for the whole face
-	 *         or four quarters (bottom left, bottom right, top right, top left).
-	 *         Null if they couldn't be found.
+	 * or four quarters (bottom left, bottom right, top right, top left).
+	 * Null if they couldn't be found.
 	 */
 	@Nullable
 	IIcon[] getFaceIcons(IBlockAccess world, Block block, int x, int y, int z, int side);

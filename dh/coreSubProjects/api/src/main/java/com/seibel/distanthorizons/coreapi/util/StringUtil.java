@@ -29,8 +29,8 @@ import java.util.Arrays;
 public class StringUtil
 {
 	private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
-	
-	
+
+
 	/**
 	 * Returns the n-th index of the given string. <br> <br>
 	 *
@@ -45,14 +45,14 @@ public class StringUtil
 		}
 		return pos;
 	}
-	
-	/** @see StringUtil#join(String, Iterable)  */
+
+	/** @see StringUtil#join(String, Iterable) */
 	public static <T> String join(String delimiter, T[] list) { return join(delimiter, Arrays.asList(list)); }
 	/** Combines each item in the given list together separated by the given delimiter. */
 	public static <T> String join(String delimiter, Iterable<T> list)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		
+
 		boolean firstItem = true;
 		for (T item : list)
 		{
@@ -60,14 +60,14 @@ public class StringUtil
 			{
 				stringBuilder.append(delimiter);
 			}
-			
+
 			stringBuilder.append(item);
 			firstItem = false;
 		}
-		
+
 		return stringBuilder.toString();
 	}
-	
+
 	/**
 	 * Converts the given byte array into a hex string representation. <br>
 	 * source: https://stackoverflow.com/a/9855338
@@ -83,7 +83,7 @@ public class StringUtil
 		}
 		return new String(hexChars);
 	}
-	
+
 	/**
 	 * Returns a shortened version of the given string that is no longer than maxLength. <br>
 	 * If null returns the empty string.
@@ -99,7 +99,7 @@ public class StringUtil
 			return str.substring(0, Math.min(str.length(), maxLength));
 		}
 	}
-	
+
 	/**
 	 * Source:
 	 * https://stackoverflow.com/questions/3758606/how-can-i-convert-byte-size-into-a-human-readable-format-in-java#3758880
@@ -118,7 +118,7 @@ public class StringUtil
 		}
 		return String.format("%.1f %cB", bytes / 1000.0, ci.current());
 	}
-	
-	
-	
+
+
+
 }

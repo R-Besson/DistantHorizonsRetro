@@ -30,13 +30,13 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 	public byte dataDetailLevel;
 
 	public final byte[] dataArray;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
+
 	public FullDataSourceV1DTO(long pos, byte dataDetailLevel, byte[] dataArray)
 	{
 		// the checksum, world gen step, data type and format version
@@ -46,18 +46,18 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 
 		this.dataArray = dataArray;
 	}
-	
-	
-	
+
+
+
 	//===========//
 	// overrides //
 	//===========//
-	
+
 	@Override
 	public Long getKey() { return this.pos; }
-	
-	@Override 
+
+	@Override
 	public void close()
 	{ /* no closing needed */ }
-	
+
 }

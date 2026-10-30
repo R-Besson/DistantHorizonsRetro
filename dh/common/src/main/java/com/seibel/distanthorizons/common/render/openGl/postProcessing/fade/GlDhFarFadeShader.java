@@ -39,37 +39,37 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class GlDhFarFadeShader extends GlAbstractShaderRenderer
 {
 	public static GlDhFarFadeShader INSTANCE = new GlDhFarFadeShader();
-	
+
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-	
-	
+
+
 	public int frameBuffer = -1;
-	
+
 	private DhApiMat4f inverseDhMvmProjMatrix;
-	
-	
+
+
 	// Uniforms
-	
+
 	/** Inverted Model View Projection matrix */
 	public int uDhInvMvmProj = -1;
-	
+
 	public int uDhDepthTexture = -1;
 	public int uMcColorTexture = -1;
 	public int uDhColorTexture = -1;
-	
+
 	public int uStartFadeBlockDistance = -1;
 	public int uEndFadeBlockDistance = -1;
-	
+
 	public int uDepthIsZeroToPositiveOne = -1;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
-	
-	public GlDhFarFadeShader() {  }
+
+	public GlDhFarFadeShader() { }
 
 	@Override
 	public void onInit()
@@ -79,62 +79,62 @@ public class GlDhFarFadeShader extends GlAbstractShaderRenderer
 			"assets/distanthorizons/shaders/fade/gl/dh_fade.frag",
 			"vPosition"
 		);
-		
+
 		// all uniforms should be tryGet...
 		// because disabling fade can cause the GLSL to optimize out most (if not all) uniforms
-		
+
 		// near fade
 		this.uDhInvMvmProj = this.shader.tryGetUniformLocation("uDhInvMvmProj");
-		
+
 		this.uDhDepthTexture = this.shader.tryGetUniformLocation("uDhDepthTexture");
 		this.uMcColorTexture = this.shader.tryGetUniformLocation("uMcColorTexture");
 		this.uDhColorTexture = this.shader.tryGetUniformLocation("uDhColorTexture");
-		
+
 		this.uStartFadeBlockDistance = this.shader.tryGetUniformLocation("uStartFadeBlockDistance");
 		this.uEndFadeBlockDistance = this.shader.tryGetUniformLocation("uEndFadeBlockDistance");
-		
+
 		this.uDepthIsZeroToPositiveOne = this.shader.tryGetUniformLocation("uDepthIsZeroToPositiveOne");
 	}
-	
-	
-	
+
+
+
 	//=============//
 	// render prep //
 	//=============//
-	
+
 	@Override
 	protected void onApplyUniforms(RenderParams renderParams)
 	{
 		this.shader.setUniform(this.uDhInvMvmProj, this.inverseDhMvmProjMatrix);
-		
-		
+
+
 		float dhFarClipDistance = RenderUtil.getFarClipPlaneDistanceInBlocks();
 		float fadeStartDistance = dhFarClipDistance * 0.5f;
 		float fadeEndDistance = dhFarClipDistance * 0.9f;
-		
+
 		this.shader.setUniform(this.uStartFadeBlockDistance, fadeStartDistance);
 		this.shader.setUniform(this.uEndFadeBlockDistance, fadeEndDistance);
-		
+
 		this.shader.setUniform(this.uDepthIsZeroToPositiveOne, (RENDER_DEF.getDepthRange() == EDhApiDepthRange.ZERO_TO_POS_ONE) ? 1 : 0);
-		
+
 	}
-	
+
 	public void setProjectionMatrix(RenderParams renderParams)
 	{
 		this.inverseDhMvmProjMatrix = renderParams.dhInverseMvmProjectionMatrix;
 	}
-	
-	
+
+
 	//========//
 	// render //
 	//========//
-	
+
 	@Override
 	protected void onRender()
 	{
 		int depthTextureId = GlDhMetaRenderer.INSTANCE.getActiveDepthTextureId();
 		int colorTextureId = GlDhMetaRenderer.INSTANCE.getActiveColorTextureId();
-		
+
 		if (depthTextureId == -1
 			|| colorTextureId == -1)
 		{
@@ -142,14 +142,14 @@ public class GlDhFarFadeShader extends GlAbstractShaderRenderer
 			// we don't need to/can't render fading
 			return;
 		}
-		
-		
-		
+
+
+
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.frameBuffer);
 		GLMC.disableScissorTest();
 		GLMC.disableDepthTest();
 		GLMC.disableBlend();
-		
+
 		// If we don't restore the textures some mods can break
 		int prevActiveTexture = LWJGL.glGetInteger(GL13.GL_ACTIVE_TEXTURE);
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
@@ -158,22 +158,22 @@ public class GlDhFarFadeShader extends GlAbstractShaderRenderer
 		int prevTexture1 = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
 		GLMC.glActiveTexture(GL13.GL_TEXTURE2);
 		int prevTexture2 = LWJGL.glGetInteger(GL11.GL_TEXTURE_BINDING_2D);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(depthTextureId);
 		LWJGL.glUniform1i(this.uDhDepthTexture, 0);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
 		GLMC.glBindTexture(MC_RENDER.getGlColorTextureId());
 		LWJGL.glUniform1i(this.uMcColorTexture, 1);
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE2);
 		GLMC.glBindTexture(colorTextureId);
 		LWJGL.glUniform1i(this.uDhColorTexture, 2);
-		
-		
+
+
 		GlScreenQuad.INSTANCE.render();
-		
+
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(prevTexture0);
 		GLMC.glActiveTexture(GL13.GL_TEXTURE1);
@@ -182,5 +182,5 @@ public class GlDhFarFadeShader extends GlAbstractShaderRenderer
 		GLMC.glBindTexture(prevTexture2);
 		GLMC.glActiveTexture(prevActiveTexture);
 	}
-	
+
 }

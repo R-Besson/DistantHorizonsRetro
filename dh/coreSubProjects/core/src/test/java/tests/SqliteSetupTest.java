@@ -23,7 +23,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Validates Sqlite is setup correctly.
@@ -31,14 +35,14 @@ import java.sql.*;
 public class SqliteSetupTest
 {
 	public static String DATABASE_TYPE = "jdbc:sqlite";
-	
-	
+
+
 	@Test
 	public void testSqliteFile()
 	{
 		String databaseLocation = "sample.sqlite";
 		testSqliteDatabase(DATABASE_TYPE, databaseLocation);
-		
+
 		File dbFile = new File(databaseLocation);
 		Assert.assertTrue("Unable to delete test database.", dbFile.delete());
 	}
@@ -48,7 +52,7 @@ public class SqliteSetupTest
 	//================//
 	// helper methods //
 	//================//
-	
+
 	private static void testSqliteDatabase(String databaseType, String databaseLocation)
 	{
 		try (Connection connection = DriverManager.getConnection(databaseType + ":" + databaseLocation))
@@ -58,33 +62,33 @@ public class SqliteSetupTest
 				// create a database connection
 				Statement statement = connection.createStatement();
 				statement.setQueryTimeout(30);  // set timeout to 30 sec.
-				
-				
+
+
 				// create the database
 				statement.executeUpdate("drop table if exists person");
 				statement.executeUpdate("create table person (id integer, name string)");
-				
+
 				// insert test values
 				statement.executeUpdate("insert into person values(1, 'leo')");
 				statement.executeUpdate("insert into person values(2, 'yui')");
-				
+
 				// get the values
 				ResultSet rs = statement.executeQuery("select * from person");
-				
-				
+
+
 				// read the result set
 				Assert.assertTrue(rs.next());
 				int id = rs.getInt("id");
 				Assert.assertEquals(1, id);
 				String name = rs.getString("name");
 				Assert.assertEquals("leo", name);
-				
+
 				Assert.assertTrue(rs.next());
 				id = rs.getInt("id");
 				Assert.assertEquals(2, id);
 				name = rs.getString("name");
 				Assert.assertEquals("yui", name);
-				
+
 				// all results have been read
 				Assert.assertFalse(rs.next());
 			}
@@ -101,5 +105,5 @@ public class SqliteSetupTest
 			Assert.fail("Unable to close the connection: " + e.getMessage());
 		}
 	}
-	
+
 }

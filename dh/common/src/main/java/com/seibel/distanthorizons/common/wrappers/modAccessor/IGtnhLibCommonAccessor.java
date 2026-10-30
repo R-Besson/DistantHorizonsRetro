@@ -24,4 +24,5 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccesso
 public interface IGtnhLibCommonAccessor extends IModAccessor
 {
 	void renderTextAboveHotbar(String text);
+
 }

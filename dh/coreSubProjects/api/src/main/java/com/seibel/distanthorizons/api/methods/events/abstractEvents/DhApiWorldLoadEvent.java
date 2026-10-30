@@ -28,37 +28,37 @@ import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhAp
  * Called after Distant Horizons finishes loading a new world. <br>
  * Note: this may be fired before Minecraft has loaded in the player.
  *
- * @see IDhApiWorldProxy
- * 
  * @author James Seibel
  * @version 2024-12-7
+ * @see IDhApiWorldProxy
  * @since API 4.0.0
  */
 public abstract class DhApiWorldLoadEvent implements IDhApiEvent<DhApiWorldLoadEvent.EventParam>
 {
 	/** Fired after Distant Horizons loads a new world. */
 	public abstract void onWorldLoad(DhApiEventParam<EventParam> input);
-	
-	
+
+
 	//=========================//
 	// internal DH API methods //
 	//=========================//
-	
+
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.onWorldLoad(input); }
-	
-	
+
+
 	//==================//
 	// parameter object //
 	//==================//
-	
+
 	public static class EventParam implements IDhApiEventParam
 	{
 		public EventParam() { }
-		
-		
+
+
 		@Override
 		public EventParam copy() { return new EventParam(); }
+
 	}
-	
+
 }

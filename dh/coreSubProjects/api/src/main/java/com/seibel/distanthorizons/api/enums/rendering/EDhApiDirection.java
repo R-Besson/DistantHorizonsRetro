@@ -7,10 +7,10 @@ package com.seibel.distanthorizons.api.enums.rendering;
  * SOUTH, <br>
  * WEST, <br>
  * EAST, <br>
- * 
+ *
  * @author James Seibel
- * @since API 7.1.0
  * @version 2026-09-03
+ * @since API 7.1.0
  */
 public enum EDhApiDirection
 {
@@ -26,18 +26,18 @@ public enum EDhApiDirection
 	WEST(-1, 0, 0),
 	/** positive X */
 	EAST(1, 0, 0);
-	
-	
-	
+
+
+
 	public final int x;
 	public final int y;
 	public final int z;
-	
+
 	EDhApiDirection(int x, int y, int z)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 }

@@ -30,13 +30,13 @@ import com.seibel.distanthorizons.coreapi.interfaces.config.IConverter;
  */
 public class InvertedBoolConverter implements IConverter<Boolean, Boolean>
 {
-	
-	@Override 
+
+	@Override
 	public Boolean convertToCoreType(Boolean core)
 	{ return !core; }
-	
-	@Override 
+
+	@Override
 	public Boolean convertToApiType(Boolean api)
 	{ return !api; }
-	
+
 }

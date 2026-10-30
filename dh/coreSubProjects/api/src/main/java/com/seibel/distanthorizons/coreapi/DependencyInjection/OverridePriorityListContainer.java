@@ -34,35 +34,35 @@ public class OverridePriorityListContainer implements IBindable
 {
 	/** Sorted highest priority to lowest */
 	private final ArrayList<OverridePriorityPair> overridePairList = new ArrayList<>();
-	
-	
+
+
 	/** Doesn't do any validation */
 	public void addOverride(IDhApiOverrideable override)
 	{
 		OverridePriorityPair priorityPair = new OverridePriorityPair(override, override.getPriority());
 		this.overridePairList.add(priorityPair);
-		
+
 		this.sortList();
 	}
-	
+
 	/** @return true if the override was removed from the list, false otherwise. */
 	public boolean removeOverride(IDhApiOverrideable override)
 	{
 		boolean overrideRemoved = this.overridePairList.removeIf((pair) -> pair.override.equals(override));
 		return overrideRemoved;
 	}
-	
+
 	public boolean clear()
 	{
 		boolean objectsRemoved = (this.overridePairList.size() > 0);
 		this.overridePairList.clear();
 		return objectsRemoved;
 	}
-	
-	
-	
+
+
+
 	// getters //
-	
+
 	public IDhApiOverrideable getOverrideWithLowestPriority()
 	{
 		if (this.overridePairList.size() == 0)
@@ -108,29 +108,29 @@ public class OverridePriorityListContainer implements IBindable
 				return pair.override;
 			}
 		}
-		
+
 		return null;
 	}
-	
-	
+
+
 	// utils //
-	
+
 	/** sort the list so the highest priority item is first in the list */
 	private void sortList() { this.overridePairList.sort((x, y) -> Integer.compare(y.priority, x.priority)); }
-	
-	
-	
+
+
+
 	private class OverridePriorityPair
 	{
 		public final IDhApiOverrideable override;
 		public int priority;
-		
+
 		public OverridePriorityPair(IDhApiOverrideable newOverride, int newPriority)
 		{
 			this.override = newOverride;
 			this.priority = newPriority;
 		}
-		
+
 	}
-	
+
 }
