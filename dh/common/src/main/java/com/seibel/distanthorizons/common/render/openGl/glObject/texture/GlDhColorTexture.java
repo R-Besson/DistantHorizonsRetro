@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.common.render.openGl.glObject.texture;
 
-import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -10,9 +9,6 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 public class GlDhColorTexture
 {
-	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-
-
 	private final EGlDhInternalTextureFormat internalFormat;
 	private final EGlDhPixelFormat format;
 	private final EGlDhPixelType type;
@@ -84,14 +80,6 @@ public class GlDhColorTexture
 	{
 		this.throwIfInvalid();
 		return this.id;
-	}
-
-	public void destroy()
-	{
-		this.throwIfInvalid();
-		this.isValid = false;
-
-		GLMC.glDeleteTextures(this.id);
 	}
 
 	/** @throws IllegalStateException if the texture isn't valid */

@@ -37,7 +37,7 @@ public interface ISaveStructure extends AutoCloseable
 	File getPre23SaveFolder(ILevelWrapper levelWrapper);
 
 	/** Removes any cached data for the given {@link ILevelWrapper}, called when the level unloads. */
+	@SuppressWarnings("unused")
 	default void removeLevel(ILevelWrapper levelWrapper) { }
-
 }
 

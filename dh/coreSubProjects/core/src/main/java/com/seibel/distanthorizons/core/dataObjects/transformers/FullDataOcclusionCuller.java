@@ -132,11 +132,11 @@ public class FullDataOcclusionCuller
 	 * @return if centerPoint is covered, returns the index of the segment which finishes covering it.
 	 * the start of the covering may be a smaller index. in this case, the returned index may be used
 	 * as the adjacentIndex provided to this method on the next iteration which yields a new centerPoint.
-	 *
+	 * <p>
 	 * if centerPoint is NOT covered, returns the bitwise negation of the index of the
 	 * segment which did not cover it. this guarantees that the returned value is negative.
 	 * the caller should check for negative return values and manually un-negate them to proceed with the loop.
-	 *
+	 * <p>
 	 * in other words, this function returns the index of the next adjacent data
 	 * point to use in the loop, AND a boolean indicating whether or not the
 	 * centerPoint is covered;	both are packed into the same int, and returned.

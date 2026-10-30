@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.common.render.openGl.glObject.texture;
 
-import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -8,9 +7,6 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 public class GlDhDepthTexture
 {
-	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
-
-
 	private int id;
 	public GlDhDepthTexture(int width, int height, EGlDhDepthBufferFormat format)
 	{
@@ -46,13 +42,4 @@ public class GlDhDepthTexture
 
 		return this.id;
 	}
-
-	public void destroy()
-	{
-		GLMC.glDeleteTextures(this.getTextureId());
-		this.id = -1;
-	}
-
-
-
 }

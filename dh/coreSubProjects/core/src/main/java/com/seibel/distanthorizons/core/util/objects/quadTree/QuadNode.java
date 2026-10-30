@@ -127,6 +127,7 @@ public class QuadNode<T>
 	}
 
 	/** @return the number of children that have non-null values */
+	@SuppressWarnings("unused")
 	public int getNonNullChildCount()
 	{
 		int count = 0;
