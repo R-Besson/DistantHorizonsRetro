@@ -27,4 +27,7 @@ public interface IServerLevelWrapper extends ILevelWrapper
 
 	String getKeyedLevelDimensionName();
 
+	/** the name of the folder the world is saved in, IE "New World" or "world" on a dedicated server */
+	String getWorldFolderName();
+
 }

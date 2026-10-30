@@ -26,6 +26,7 @@ import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeR
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeRenderSetupEvent;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeTextureClearEvent;
 import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.config.DimensionCsv;
 import com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.LodBufferContainer;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
@@ -202,7 +203,8 @@ public class LodRenderer
 			}
 			else
 			{
-				renderFog = Config.Client.Advanced.Graphics.Fog.enableDhFog.get();
+				renderFog = Config.Client.Advanced.Graphics.Fog.enableDhFog.get()
+					&& !DimensionCsv.DH_FOG_DISABLED.contains(renderParams.clientLevelWrapper);
 				// allow enabling fog when: underwater fog, blind, etc.
 				// otherwise LODs won't appear correctly
 				renderFog |= renderParams.vanillaFogEnabled;

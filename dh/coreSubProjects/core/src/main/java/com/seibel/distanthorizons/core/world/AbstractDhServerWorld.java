@@ -75,6 +75,15 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 	@Override
 	public void removePlayer(IServerPlayerWrapper serverPlayer)
 	{
+		ServerPlayerState playerState = this.serverPlayerStateManager.getConnectedPlayer(serverPlayer);
+		if (playerState != null)
+		{
+			for (TDhServerLevel level : this.dhLevelByLevelWrapper.values())
+			{
+				level.unregisterNetworkHandlers(playerState);
+			}
+		}
+
 		// each level reads its players from the player state manager (see AbstractDhServerLevel#getPlayersInLevel)
 		this.serverPlayerStateManager.unregisterLeftPlayer(serverPlayer);
 

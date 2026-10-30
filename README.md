@@ -73,6 +73,22 @@ minecraft:wool:14=A12722
 minecraft:tallgrass=00000000
 ```
 
+## Backups
+
+LODs are stored in `DistantHorizons.sqlite` files next to each dimension's data, which can grow to several GB.
+They're a cache and can be deleted at any time, so they don't need to be backed up:
+
+- Store them outside the world: set `databaseFolderOverride` in `config/DistantHorizons.toml`, IE to `DistantHorizonsData`.
+  Each world and dimension gets its own folder in there. Existing LODs aren't moved.
+- Or exclude them from your backups. With ServerUtilities, add these to the backup exclusion list
+  (servers keep the world in `world/`, singleplayer in `saves/<world name>/`):
+  ```
+  **/DistantHorizons.sqlite
+  **/DistantHorizons.sqlite-wal
+  **/DistantHorizons.sqlite-shm
+  ```
+  The `-wal` and `-shm` files are SQLite's write-ahead log, they exist while the world is open.
+
 ## Using it in GTNH packs
 
 This is NOT an official GTNH mod and isn't supported by the GTNH team, report issues here.

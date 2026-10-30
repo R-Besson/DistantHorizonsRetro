@@ -1,6 +1,7 @@
 package com.seibel.distanthorizons.core.level;
 
 import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.config.DimensionCsv;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.file.fullDatafile.V2.FullDataSourceProviderV2;
 import com.seibel.distanthorizons.core.file.structure.ISaveStructure;
@@ -34,6 +35,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 public abstract class AbstractDhServerLevel extends AbstractDhLevel implements IDhServerLevel
 {
@@ -51,6 +54,8 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	private int worldGenCenteringPlayerIndex = 0;
 
 	private final FullDataSourceRequestHandler requestHandler;
+
+	private final ConcurrentHashMap<ServerPlayerState, List<Runnable>> unregisterActionsByPlayer = new ConcurrentHashMap<>();
 
 
 
@@ -102,6 +107,8 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	public boolean shouldDoWorldGen()
 	{
 		return Config.Common.WorldGenerator.generatorPlan.get().generationEnabled
+			// a negative radius turns generation off for this dimension
+			&& DimensionCsv.getGenerationMaxChunkRadius(this.getServerLevelWrapper()) >= 0
 			// without players generation would center on 0,0 for nobody,
 			// IE GTNH dimensions that are only kept loaded by chunk loaders
 			&& !this.getPlayersInLevel().isEmpty();
@@ -146,9 +153,16 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	// network handling //
 	//==================//
 
+	/** does nothing if the player's handlers are already registered for this level */
 	public void registerNetworkHandlers(ServerPlayerState serverPlayerState)
 	{
-		serverPlayerState.networkSession.registerHandler(FullDataSourceRequestMessage.class, (message) ->
+		List<Runnable> unregisterActions = new ArrayList<>();
+		if (this.unregisterActionsByPlayer.putIfAbsent(serverPlayerState, unregisterActions) != null)
+		{
+			return;
+		}
+
+		Consumer<FullDataSourceRequestMessage> fullDataSourceRequestHandler = (message) ->
 		{
 			if (!this.validatePlayerInCurrentLevel(message))
 			{
@@ -171,7 +185,7 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 				boolean posInRange = WorldGenUtil.isPosInWorldGenRange(
 					message.sectionPos,
 					Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
-					Config.Common.WorldGenerator.generationMaxChunkRadius.get()
+					DimensionCsv.getGenerationMaxChunkRadius(this.getServerLevelWrapper())
 				);
 				if (!posInRange)
 				{
@@ -196,11 +210,35 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 				}
 				this.requestHandler.queueLodSyncForRequestMessage(serverPlayerState, message, rateLimiterSet);
 			}
-		});
+		};
+		serverPlayerState.networkSession.registerHandler(FullDataSourceRequestMessage.class, fullDataSourceRequestHandler);
+		unregisterActions.add(() -> serverPlayerState.networkSession.unregisterHandler(FullDataSourceRequestMessage.class, fullDataSourceRequestHandler));
 
 
-		serverPlayerState.networkSession.registerHandler(CancelMessage.class, msg ->
-			this.requestHandler.cancelRequest(msg.futureId));
+		Consumer<CancelMessage> cancelMessageHandler = msg -> this.requestHandler.cancelRequest(msg.futureId);
+		serverPlayerState.networkSession.registerHandler(CancelMessage.class, cancelMessageHandler);
+		unregisterActions.add(() -> serverPlayerState.networkSession.unregisterHandler(CancelMessage.class, cancelMessageHandler));
+	}
+
+	/**
+	 * Called when the player leaves or this level closes,
+	 * otherwise the player's session would keep this level alive (and answering requests) after it unloaded.
+	 */
+	public void unregisterNetworkHandlers(ServerPlayerState serverPlayerState)
+	{
+		List<Runnable> unregisterActions = this.unregisterActionsByPlayer.remove(serverPlayerState);
+		if (unregisterActions == null)
+		{
+			return;
+		}
+
+		for (Runnable unregisterAction : unregisterActions)
+		{
+			unregisterAction.run();
+		}
+
+		this.requestHandler.cancelRequestsForPlayer(serverPlayerState);
+		serverPlayerState.removeRateLimiterSet(this);
 	}
 
 
@@ -277,7 +315,7 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 					int distanceFromPlayer = DhSectionPos.getChebyshevSignedBlockDistance(data.getPos(), new DhBlockPos2D((int) playerPosition.x, (int) playerPosition.z)) / 16;
 					if (distanceFromPlayer <= serverPlayerState.sessionConfig.getMaxUpdateDistanceRadius())
 					{
-						serverPlayerState.fullDataPayloadSender.sendInChunks(payload, () ->
+						serverPlayerState.fullDataPayloadSender.sendRealTimeUpdate(payload, () ->
 							serverPlayerState.networkSession.sendMessage(new FullDataPartialUpdateMessage(this.serverLevelWrapper, payload)));
 					}
 				}
@@ -325,6 +363,11 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	@Override
 	public void close()
 	{
+		for (ServerPlayerState serverPlayerState : this.unregisterActionsByPlayer.keySet())
+		{
+			this.unregisterNetworkHandlers(serverPlayerState);
+		}
+
 		super.close();
 		this.serverside.close();
 		this.requestHandler.close();

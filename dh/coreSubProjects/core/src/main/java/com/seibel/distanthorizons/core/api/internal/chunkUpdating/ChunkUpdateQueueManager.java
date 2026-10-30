@@ -15,6 +15,7 @@ import com.seibel.distanthorizons.core.logging.f3.F3Screen;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
+import com.seibel.distanthorizons.core.util.threading.PriorityTaskPicker;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 import com.seibel.distanthorizons.core.world.EWorldEnvironment;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
@@ -26,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -48,6 +48,9 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	 * used to prevent updates from infinitely pilling up if the user flies around extremely fast
 	 */
 	public static final int MAX_UPDATING_CHUNK_COUNT_PER_THREAD_AND_PLAYER = 1_000;
+
+	/** how many LOD build tasks can wait in the LOD builder's queue per thread */
+	public static final int MAX_QUEUED_LOD_BUILD_TASKS_PER_THREAD = 64;
 
 	/** how many milliseconds must pass before an overloaded message can be sent in chat or the log */
 	public static final int MIN_MS_BETWEEN_OVERLOADED_LOG_MESSAGE = 30_000;
@@ -391,10 +394,14 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 			return;
 		}
 
-		AbstractExecutorService executor = ThreadPoolUtil.getChunkToLodBuilderExecutor();
+		PriorityTaskPicker.Executor executor = ThreadPoolUtil.getChunkToLodBuilderExecutor();
 		// checked up front since execute() throws when the pool is shut down,
-		// and creating that exception every loop iteration is expensive
-		this.lodBuilderExecutorUnavailable = (executor == null || executor.isShutdown());
+		// and creating that exception every loop iteration is expensive.
+		// The executor's own queue is unbounded and each task holds a live chunk,
+		// so once it's full chunks wait in the size-limited update queue instead.
+		this.lodBuilderExecutorUnavailable = (executor == null
+			|| executor.isShutdown()
+			|| executor.getQueueSize() >= executor.getPoolSize() * MAX_QUEUED_LOD_BUILD_TASKS_PER_THREAD);
 		if (this.lodBuilderExecutorUnavailable)
 		{
 			this.updateQueue.addItem(updateData.chunkWrapper.getChunkPos(), updateData);

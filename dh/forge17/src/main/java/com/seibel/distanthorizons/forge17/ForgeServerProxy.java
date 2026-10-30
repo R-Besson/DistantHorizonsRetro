@@ -17,6 +17,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -27,10 +28,18 @@ import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 {
 	private final boolean isDedicated;
+
+	private static final int MAX_PENDING_CLICK_TASKS = 2_048;
+	private static final Set<Long> PENDING_CLICK_TASK_KEYS = ConcurrentHashMap.newKeySet();
+	private static final AtomicInteger PENDING_CLICK_TASK_COUNT = new AtomicInteger(0);
 
 
 
@@ -211,16 +220,60 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 			return;
 		}
 
+		// these are deferrable tasks, while the server lags only one runs per tick,
+		// so without a limit fake players (IE automation) clicking every tick would grow the queue forever
+		if (PENDING_CLICK_TASK_COUNT.get() >= MAX_PENDING_CLICK_TASKS)
+		{
+			return;
+		}
+
+		// only the values are captured, the event holds the player, world and item
+		final World world = event.world;
+		final int blockX = event.x;
+		final int blockZ = event.z;
+
+		// one pending update per chunk is enough, it reads the chunk when it runs
+		final long chunkKey = (((long) System.identityHashCode(world)) << 32) ^ ChunkCoordIntPair.chunkXZ2Int(blockX >> 4, blockZ >> 4);
+		if (!PENDING_CLICK_TASK_KEYS.add(chunkKey))
+		{
+			return;
+		}
+
+		PENDING_CLICK_TASK_COUNT.incrementAndGet();
+		AtomicBoolean taskStarted = new AtomicBoolean(false);
 		ServerThreadTaskHandler.INSTANCE.queueTask(() ->
 		{
-			Chunk chunk = event.world.getChunkFromBlockCoords(event.x, event.z);
-			if (!ChunkWrapper.canSaveChunk(chunk))
+			taskStarted.set(true);
+			PENDING_CLICK_TASK_KEYS.remove(chunkKey);
+			try
 			{
+				// the task may run ticks later, don't load the chunk again if it unloaded in the meantime
+				if (!world.getChunkProvider().chunkExists(blockX >> 4, blockZ >> 4))
+				{
+					return null;
+				}
+
+				Chunk chunk = world.getChunkFromBlockCoords(blockX, blockZ);
+				if (!ChunkWrapper.canSaveChunk(chunk))
+				{
+					return null;
+				}
+				ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
+				SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
 				return null;
 			}
-			ChunkWrapper chunkWrapper = new ChunkWrapper(chunk, wrappedLevel);
-			SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, wrappedLevel, true);
-			return null;
+			finally
+			{
+				PENDING_CLICK_TASK_COUNT.decrementAndGet();
+			}
+		}).whenComplete((result, throwable) ->
+		{
+			// the task was dropped (IE the server shut down) before it could clean up after itself
+			if (throwable != null && !taskStarted.get())
+			{
+				PENDING_CLICK_TASK_KEYS.remove(chunkKey);
+				PENDING_CLICK_TASK_COUNT.decrementAndGet();
+			}
 		});
 	}
 

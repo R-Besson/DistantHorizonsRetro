@@ -145,14 +145,15 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 
 		return dimensionName;
 	}
-	private String getWorldFolderName()
+	@Override
+	public String getWorldFolderName()
 	{
 		try
 		{
-			// We use the overworld since it's the only dimension that is stored in the server root folder
-
+			// We use the overworld since it's the only dimension that is stored in the server root folder.
+			// On 1.7.10 this is the world folder itself (modern MC returns "<world>/." so the parent was needed there)
 			return net.minecraft.server.MinecraftServer.getServer().worldServers[0]
-				.getSaveHandler().getWorldDirectory().getParentFile().getName();
+				.getSaveHandler().getWorldDirectory().getName();
 		}
 		catch (Exception e)
 		{

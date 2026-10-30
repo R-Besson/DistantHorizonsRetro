@@ -118,6 +118,7 @@ public class ServerPlayerStateManager implements AutoCloseable
 		{
 			this.unregisterLeftPlayer(playerWrapper);
 		}
+		this.messageQueueByPlayerWrapper.clear();
 	}
 
 

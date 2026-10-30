@@ -324,40 +324,47 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		IDhApiFramebuffer framebufferOverride = OverrideInjector.INSTANCE.get(IDhApiFramebuffer.class);
 
 
-		GlDhDepthTexture oldDepthTexture = this.depthTexture;
-		this.depthTexture = new GlDhDepthTexture(this.textureWidth, this.textureHeight, EGlDhDepthBufferFormat.DEPTH32F);
+		// On a resize the existing textures are resized in place instead of replaced,
+		// Angelica's shaders cache DH's texture IDs, with new IDs they kept sampling the old texture
+		// after a fullscreen toggle, which left the LODs as a frozen "shadow" following the camera.
+		if (this.depthTexture != null)
+		{
+			this.depthTexture.resize(this.textureWidth, this.textureHeight, EGlDhDepthBufferFormat.DEPTH32F);
+		}
+		else
+		{
+			this.depthTexture = new GlDhDepthTexture(this.textureWidth, this.textureHeight, EGlDhDepthBufferFormat.DEPTH32F);
+		}
 		this.framebuffer.addDepthAttachment(this.depthTexture.getTextureId(), EGlDhDepthBufferFormat.DEPTH32F.isCombinedStencil());
 		if (framebufferOverride != null)
 		{
 			framebufferOverride.addDepthAttachment(this.depthTexture.getTextureId(), EGlDhDepthBufferFormat.DEPTH32F.isCombinedStencil());
 		}
-		// The old texture needs to be deleted after the new one is created to ensure
-		// GL creates a new depth texture ID.
-		// This is necessary to fix an Iris bug where it caches on the texture ID,
-		// but GL may return the same texture ID, preventing the new texture from being bound properly.
-		if (oldDepthTexture != null)
-		{
-			oldDepthTexture.destroy();
-		}
 
 
 		if (this.colorTexture != null)
 		{
-			this.colorTexture.destroy();
+			this.colorTexture.resize(this.textureWidth, this.textureHeight);
 		}
-
-		this.colorTexture = GlDhColorTexture.builder()
-			.setDimensions(this.textureWidth, this.textureHeight)
-			.setInternalFormat(EGlDhInternalTextureFormat.RGBA8)
-			.setPixelType(EGlDhPixelType.UNSIGNED_BYTE)
-			.setPixelFormat(EGlDhPixelFormat.RGBA)
-			.build();
+		else
+		{
+			this.colorTexture = GlDhColorTexture.builder()
+				.setDimensions(this.textureWidth, this.textureHeight)
+				.setInternalFormat(EGlDhInternalTextureFormat.RGBA8)
+				.setPixelType(EGlDhPixelType.UNSIGNED_BYTE)
+				.setPixelFormat(EGlDhPixelFormat.RGBA)
+				.build();
+		}
 
 		this.framebuffer.addColorAttachment(0, this.colorTexture.getTextureId());
 		if (framebufferOverride != null)
 		{
 			framebufferOverride.addColorAttachment(0, this.colorTexture.getTextureId());
 		}
+
+		// resizing leaves the texture bound, a stale binding would leak into MC's
+		// (or the shader pack's) chunk rendering and make nearby chunks look transparent
+		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
 
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiAfterColorDepthTextureCreatedEvent.class, textureCreatedParam);

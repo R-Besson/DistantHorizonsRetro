@@ -21,6 +21,7 @@ package com.seibel.distanthorizons.core.render.QuadTree;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiMaxHorizontalResolution;
 import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.config.DimensionCsv;
 import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
@@ -912,7 +913,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 		return WorldGenUtil.isPosInWorldGenRange(
 			pos,
 			Config.Common.WorldGenerator.generationCenterChunkX.get(), Config.Common.WorldGenerator.generationCenterChunkZ.get(),
-			Config.Common.WorldGenerator.generationMaxChunkRadius.get())
+			DimensionCsv.getGenerationMaxChunkRadius(this.level.getLevelWrapper()))
 			&& this.fullDataSourceProvider.canRetrievePos(pos, playerPos);
 	}
 

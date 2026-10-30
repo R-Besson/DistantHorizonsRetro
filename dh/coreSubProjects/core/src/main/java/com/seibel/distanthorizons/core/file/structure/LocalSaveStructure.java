@@ -20,9 +20,12 @@
 package com.seibel.distanthorizons.core.file.structure;
 
 import com.seibel.distanthorizons.api.interfaces.override.levelHandling.IDhApiSaveStructure;
+import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.world.EWorldEnvironment;
+import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSharedWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.OverrideInjector;
@@ -37,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalSaveStructure implements ISaveStructure
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
+	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 
 	private final ConcurrentHashMap<ILevelWrapper, File> levelWrapperToFileMap = new ConcurrentHashMap<>();
 
@@ -58,6 +62,20 @@ public class LocalSaveStructure implements ISaveStructure
 			IServerLevelWrapper serverLevelWrapper = (IServerLevelWrapper) levelWrapper;
 			File saveFolder = serverLevelWrapper.getMcSaveFolder();
 
+			// a folder outside the world keeps the (often very large) LOD databases out of world backups
+			String folderOverride = Config.Common.LodBuilding.databaseFolderOverride.get();
+			if (folderOverride != null && !folderOverride.trim().isEmpty())
+			{
+				File overrideRoot = new File(folderOverride.trim());
+				if (!overrideRoot.isAbsolute())
+				{
+					overrideRoot = new File(MC_SHARED.getInstallationDirectory(), folderOverride.trim());
+				}
+
+				saveFolder = new File(new File(overrideRoot, cleanFolderName(serverLevelWrapper.getWorldFolderName())), cleanFolderName(levelWrapper.getDhIdentifier()));
+				LOGGER.info("Using the configured database folder [" + saveFolder.getPath() + "] for [" + levelWrapper.getDhIdentifier() + "].");
+			}
+
 
 			// Allow API users to override the save folder
 			IDhApiSaveStructure saveStructureOverride = OverrideInjector.INSTANCE.get(IDhApiSaveStructure.class);
@@ -77,6 +95,12 @@ public class LocalSaveStructure implements ISaveStructure
 
 	@Override
 	public File getPre23SaveFolder(ILevelWrapper levelWrapper) { return this.getSaveFolder(levelWrapper); }
+
+	@Override
+	public void removeLevel(ILevelWrapper levelWrapper) { this.levelWrapperToFileMap.remove(levelWrapper); }
+
+	/** dimension identifiers can contain characters (IE ':') that aren't allowed in folder names on every OS */
+	private static String cleanFolderName(String name) { return name.replaceAll("[^A-Za-z0-9._ -]", "_"); }
 
 
 	//==================//

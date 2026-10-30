@@ -113,6 +113,9 @@ public class ClientOnlySaveStructure implements ISaveStructure
 	}
 
 	@Override
+	public void removeLevel(ILevelWrapper levelWrapper) { this.levelWrapperToFileMap.remove(levelWrapper); }
+
+	@Override
 	public File getPre23SaveFolder(ILevelWrapper levelWrapper)
 	{
 		// Allow API users to override the save folder

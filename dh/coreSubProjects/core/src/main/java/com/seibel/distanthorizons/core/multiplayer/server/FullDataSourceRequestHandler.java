@@ -17,6 +17,7 @@ import com.seibel.distanthorizons.core.sql.dto.BeaconBeamDTO;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.AbstractExecutorService;
@@ -237,6 +238,27 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 		if (removedRequest != null)
 		{
 			removedRequest.rateLimiterSet.generationRequestRateLimiter.release();
+		}
+	}
+
+	public void cancelRequestsForPlayer(ServerPlayerState playerState)
+	{
+		List<Long> futureIds = new ArrayList<>();
+		for (Map.Entry<Long, DataSourceRequestGroup> entry : this.requestGroupsByFutureId.entrySet())
+		{
+			// groups are shared between players requesting the same section,
+			// so only the requests belonging to this player are cancelled
+			DataSourceRequestGroup.RequestData requestData = entry.getValue().requestMessages.get(entry.getKey());
+			if (requestData != null
+				&& requestData.serverPlayerState == playerState)
+			{
+				futureIds.add(entry.getKey());
+			}
+		}
+
+		for (Long futureId : futureIds)
+		{
+			this.cancelRequest(futureId);
 		}
 	}
 

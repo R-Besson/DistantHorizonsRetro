@@ -12,15 +12,19 @@ import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 public class WorldGenUtil
 {
 
-	/** will always return true if a generation max radius isn't set */
+	/** will always return true if the max radius is 0 (no limit), and false if it's negative (generation off) */
 	public static boolean isPosInWorldGenRange(
 		long requestedPos,
 		int centerChunkX, int centerChunkZ,
 		int maxChunkRadius)
 	{
-		if (Config.Common.WorldGenerator.generationMaxChunkRadius.get() <= 0)
+		if (maxChunkRadius == 0)
 		{
 			return true;
+		}
+		else if (maxChunkRadius < 0)
+		{
+			return false;
 		}
 
 

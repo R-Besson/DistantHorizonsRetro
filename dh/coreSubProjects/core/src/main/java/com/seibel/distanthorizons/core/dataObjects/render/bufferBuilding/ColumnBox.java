@@ -22,6 +22,7 @@ package com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiTransparency;
 import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.config.DimensionCsv;
 import com.seibel.distanthorizons.core.dataObjects.render.ColumnRenderSource;
 import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
 import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry;
@@ -124,7 +125,8 @@ public class ColumnBox
 		// defaulting to a value far below what we can normally render means we
 		// don't need to have an additional "is cave culling enabled" check
 		int caveCullingMaxY = Integer.MIN_VALUE;
-		if (Config.Client.Advanced.Graphics.Culling.enableCaveCulling.get())
+		if (Config.Client.Advanced.Graphics.Culling.enableCaveCulling.get()
+			&& !DimensionCsv.CAVE_CULLING_DISABLED.contains(clientLevelWrapper))
 		{
 			caveCullingMaxY = Config.Client.Advanced.Graphics.Culling.caveCullingHeight.get() - clientLevelWrapper.getMinHeight();
 		}

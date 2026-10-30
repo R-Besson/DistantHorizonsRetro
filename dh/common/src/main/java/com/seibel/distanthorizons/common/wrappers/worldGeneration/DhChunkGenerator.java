@@ -223,6 +223,8 @@ public final class DhChunkGenerator implements IChunkGenerator
 			event.future.cancel(true);
 			genEventIter.remove();
 		}
+
+		this.internalServerGenerator.close();
 	}
 
 	//endregion

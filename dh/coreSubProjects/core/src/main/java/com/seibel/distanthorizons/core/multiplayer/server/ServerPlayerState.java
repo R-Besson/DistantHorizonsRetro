@@ -47,6 +47,8 @@ public class ServerPlayerState implements Closeable
 
 	private final ConcurrentHashMap<AbstractDhServerLevel, RateLimiterSet> rateLimiterSets = new ConcurrentHashMap<>();
 	public RateLimiterSet getRateLimiterSet(AbstractDhServerLevel level) { return this.rateLimiterSets.computeIfAbsent(level, levelKey -> new RateLimiterSet()); }
+	/** called when the level unloads, otherwise this player would keep the closed level alive */
+	public void removeRateLimiterSet(AbstractDhServerLevel level) { this.rateLimiterSets.remove(level); }
 
 
 	//==============//

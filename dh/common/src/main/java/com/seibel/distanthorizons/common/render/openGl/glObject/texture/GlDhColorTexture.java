@@ -67,6 +67,13 @@ public class GlDhColorTexture
 		LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
 	}
 
+	/** keeps the texture ID, leaves the texture bound */
+	public void resize(int width, int height)
+	{
+		this.throwIfInvalid();
+		this.resizeTexture(this.id, width, height);
+	}
+
 	private void resizeTexture(int texture, int width, int height)
 	{
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, texture);

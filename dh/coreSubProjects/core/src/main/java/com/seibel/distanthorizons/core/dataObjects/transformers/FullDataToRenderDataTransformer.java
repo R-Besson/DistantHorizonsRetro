@@ -24,6 +24,7 @@ import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiTransparency;
 import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.config.DimensionCsv;
 import com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dataObjects.render.ColumnRenderSource;
@@ -403,6 +404,7 @@ public class FullDataToRenderDataTransformer
 		int caveCullingMaxY = Config.Client.Advanced.Graphics.Culling.caveCullingHeight.get() - levelWrapper.getMinHeight();
 		boolean caveCullingEnabled =
 			Config.Client.Advanced.Graphics.Culling.enableCaveCulling.get()
+				&& !DimensionCsv.CAVE_CULLING_DISABLED.contains(levelWrapper)
 				&& (
 				// dimensions with a ceiling will be all caves so we don't want cave culling
 				!levelWrapper.hasCeiling()

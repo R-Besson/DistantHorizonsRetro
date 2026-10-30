@@ -480,6 +480,18 @@ public class Config
 							+ "")
 						.build();
 
+					public static ConfigEntry<String> dhFogDisabledDimensionCsv = new ConfigEntry.Builder<String>()
+						.set("")
+						.setAppearance(EConfigEntryAppearance.ONLY_IN_FILE)
+						.comment(""
+							+ "A comma separated list of dimensions where DH doesn't draw fog on LODs, \n"
+							+ "fog from the game or other mods (IE underwater, pollution) still applies. \n"
+							+ "Open the F3 screen and copy the dimension name:ID, or use just the ID. \n"
+							+ "\n"
+							+ "Example: \"the_end:1,7\" \n"
+							+ "")
+						.build();
+
 					public static ConfigEntry<EDhApiFogColorMode> colorMode = new ConfigEntry.Builder<EDhApiFogColorMode>()
 						.set(EDhApiFogColorMode.USE_WORLD_FOG_COLOR)
 						.comment(""
@@ -838,6 +850,19 @@ public class Config
 							+ " overhangs or walls for floating objects. \n"
 							+ " Tweaking the caveCullingHeight, can resolve some \n"
 							+ " of those issues. \n"
+							+ "")
+						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
+						.build();
+
+					public static ConfigEntry<String> caveCullingDisabledDimensionCsv = new ConfigEntry.Builder<String>()
+						.set("")
+						.setAppearance(EConfigEntryAppearance.ONLY_IN_FILE)
+						.comment(""
+							+ "A comma separated list of dimensions where caves are never culled, \n"
+							+ "IE personal dimensions with a raised ground level, where cave culling makes walls. \n"
+							+ "Open the F3 screen and copy the dimension name:ID, or use just the ID. \n"
+							+ "\n"
+							+ "Example: \"nether:-1,180\" \n"
 							+ "")
 						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
 						.build();
@@ -1635,6 +1660,19 @@ public class Config
 					"")
 				.build();
 
+			public static ConfigEntry<String> dimensionGenerationRadiusCsv = new ConfigEntry.Builder<String>()
+				.set("")
+				.setAppearance(EConfigEntryAppearance.ONLY_IN_FILE)
+				.comment("" +
+					"Overrides generationMaxChunkRadius for specific dimensions, as a comma separated list of dimension=radius. \n" +
+					"Open the F3 screen and copy the dimension name:ID, or use just the ID. \n" +
+					"A radius of 0 removes the limit, a negative radius turns world generation off in that dimension \n" +
+					"(LODs are still made from chunks players load). \n" +
+					"\n" +
+					"Example: \"nether:-1=64,7=32,180=-1\" \n" +
+					"")
+				.build();
+
 
 		}
 
@@ -1711,6 +1749,24 @@ public class Config
 					+ "Very Fast\n"
 					+ "At max throughput: ~16k saves per sec, ~6% disk usage \n"
 					+ "\n"
+					+ "")
+				.build();
+
+			public static ConfigEntry<String> databaseFolderOverride = new ConfigEntry.Builder<String>()
+				.set("")
+				.setAppearance(EConfigEntryAppearance.ONLY_IN_FILE)
+				.comment(""
+					+ "Requires a world reload to apply. \n"
+					+ "\n"
+					+ "Stores the LOD databases of singleplayer worlds and servers in this folder \n"
+					+ "instead of inside the world's own folder, IE to keep them out of world backups. \n"
+					+ "Each world and dimension gets its own sub folder: [folder]/[world folder name]/[dimension]. \n"
+					+ "Relative paths start in the game (or server) folder. \n"
+					+ "Leave empty to store them in the world's folder. \n"
+					+ "\n"
+					+ "Existing LODs aren't moved, move the DistantHorizons.sqlite files by hand to keep them. \n"
+					+ "\n"
+					+ "Example: \"DistantHorizonsData\" \n"
 					+ "")
 				.build();
 

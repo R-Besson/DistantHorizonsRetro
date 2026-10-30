@@ -22,9 +22,11 @@ package com.seibel.distanthorizons.core.world;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiLevelLoadEvent;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiLevelUnloadEvent;
 import com.seibel.distanthorizons.core.api.internal.ClientApi;
+import com.seibel.distanthorizons.core.api.internal.chunkUpdating.WorldChunkUpdateManager;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
 import com.seibel.distanthorizons.core.generation.PregenManager;
 import com.seibel.distanthorizons.core.level.DhServerLevel;
+import com.seibel.distanthorizons.core.multiplayer.server.ServerPlayerState;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
@@ -62,14 +64,16 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 			return null;
 		}
 
-		return this.dhLevelByLevelWrapper.computeIfAbsent(wrapper,
+		final boolean[] levelCreated = { false };
+		DhServerLevel level = this.dhLevelByLevelWrapper.computeIfAbsent(wrapper,
 			(serverLevelWrapper) ->
 			{
 				try
 				{
-					DhServerLevel level = new DhServerLevel(this.saveStructure, (IServerLevelWrapper) serverLevelWrapper, this.getServerPlayerStateManager());
+					DhServerLevel newLevel = new DhServerLevel(this.saveStructure, (IServerLevelWrapper) serverLevelWrapper, this.getServerPlayerStateManager());
 					ApiEventInjector.INSTANCE.fireAllEvents(DhApiLevelLoadEvent.class, new DhApiLevelLoadEvent.EventParam(wrapper));
-					return level;
+					levelCreated[0] = true;
+					return newLevel;
 				}
 				catch (Exception e)
 				{
@@ -86,6 +90,18 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 					return null;
 				}
 			});
+
+		// players that joined before this level loaded (IE a dimension loaded by a chunk loader or portal)
+		// otherwise never get their requests for it answered
+		if (level != null && levelCreated[0])
+		{
+			for (ServerPlayerState playerState : this.getServerPlayerStateManager().getConnectedPlayers())
+			{
+				level.registerNetworkHandlers(playerState);
+			}
+		}
+
+		return level;
 	}
 
 	@Override
@@ -100,6 +116,8 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 		{
 			wrapper.onUnload();
 			this.dhLevelByLevelWrapper.remove(wrapper).close();
+			WorldChunkUpdateManager.INSTANCE.removeLevel(wrapper);
+			this.saveStructure.removeLevel(wrapper);
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiLevelUnloadEvent.class, new DhApiLevelUnloadEvent.EventParam(wrapper));
 			return true;
 		}
