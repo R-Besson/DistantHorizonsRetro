@@ -234,6 +234,12 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	{
 		this.requestHandler.onWorldGenTaskComplete(pos);
 	}
+
+	@Override
+	public void onWorldGenTaskFailed(long pos)
+	{
+		this.requestHandler.onWorldGenTaskFailed(pos);
+	}
 	
 	
 	

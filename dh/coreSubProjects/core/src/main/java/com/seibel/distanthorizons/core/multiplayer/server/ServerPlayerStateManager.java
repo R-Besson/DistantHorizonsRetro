@@ -33,6 +33,9 @@ public class ServerPlayerStateManager implements AutoCloseable
 	
 	public void unregisterLeftPlayer(IServerPlayerWrapper serverPlayer)
 	{
+		// the queue holds the player wrapper (and through it the player), a rejoining player gets a new wrapper
+		this.messageQueueByPlayerWrapper.remove(serverPlayer);
+
 		ServerPlayerState playerState = this.connectedPlayerStateByPlayerWrapper.remove(serverPlayer);
 		if (playerState != null)
 		{

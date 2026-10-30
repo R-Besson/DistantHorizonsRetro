@@ -139,6 +139,15 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 				{
 					LOGGER.error("Uncaught Gen Task Exception at [" + DhSectionPos.toString(genPos) + "], error: [" + exception.getMessage() + "].", exception);
 				}
+
+				// synchronized for the same reason as the success listeners below
+				synchronized (this.onWorldGenTaskCompleteListeners)
+				{
+					for (IOnWorldGenCompleteListener listener : this.onWorldGenTaskCompleteListeners)
+					{
+						listener.onWorldGenTaskFailed(genPos);
+					}
+				}
 				return;
 			}
 			
@@ -544,7 +553,10 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 		
 		/** Fired whenever a section has completed generating */
 		void onWorldGenTaskComplete(long pos);
-		
+
+		/** Fired when generating a section threw, so anything waiting on it can give up */
+		default void onWorldGenTaskFailed(long pos) { }
+
 	}
 	 
 	//endregion helper classes

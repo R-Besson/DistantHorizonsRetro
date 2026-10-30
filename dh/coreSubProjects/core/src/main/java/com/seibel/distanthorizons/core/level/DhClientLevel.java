@@ -52,6 +52,8 @@ import javax.annotation.CheckForNull;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -120,16 +122,13 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		boolean pre23FolderIsSaveFolder = pre23Folder.getAbsoluteFile().toPath().normalize()
 			.equals(saveFolder.getAbsoluteFile().toPath().normalize());
 
-		saveFolder.mkdirs();
-
 		if (!pre23FolderIsSaveFolder && pre23Folder.exists())
 		{
-			if (!pre23Folder.renameTo(saveFolder))
-			{
-				throw new RuntimeException("Could not move old save data folder: [" + pre23Folder.getAbsolutePath() + "] to [" + saveFolder.getAbsolutePath() + "].");
-			}
+			movePre23SaveFolder(pre23Folder, saveFolder);
 		}
-		
+
+		saveFolder.mkdirs();
+
 		if (!saveFolder.exists())
 		{
 			throw new IOException("unable to create save folder at ["+saveFolder.getPath()+"]. If you're on Windows you may need to enable long file paths.");
@@ -165,6 +164,34 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		
 		this.clientside.startRenderer();
 		LOGGER.info("Started DHLevel for " + this.levelWrapper + " with saves at " + this.saveStructure);
+	}
+	/** a failed move only warns, the level still loads using the new folder */
+	private static void movePre23SaveFolder(File pre23Folder, File saveFolder)
+	{
+		String[] existingFiles = saveFolder.list();
+		if (existingFiles != null && existingFiles.length != 0)
+		{
+			LOGGER.warn("Both the old save data folder [" + pre23Folder.getAbsolutePath() + "] and the new one [" + saveFolder.getAbsolutePath() + "] exist, the new one will be used. The old folder can be deleted.");
+			return;
+		}
+
+		try
+		{
+			File parentFolder = saveFolder.getParentFile();
+			if (parentFolder != null)
+			{
+				parentFolder.mkdirs();
+			}
+
+			// File.renameTo() can't replace anything on Windows,
+			// REPLACE_EXISTING only replaces an empty folder
+			Files.move(pre23Folder.toPath(), saveFolder.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			LOGGER.info("Moved old save data folder [" + pre23Folder.getAbsolutePath() + "] to [" + saveFolder.getAbsolutePath() + "].");
+		}
+		catch (IOException | RuntimeException e)
+		{
+			LOGGER.warn("Could not move old save data folder [" + pre23Folder.getAbsolutePath() + "] to [" + saveFolder.getAbsolutePath() + "], the new folder will be used. Error: [" + e.getMessage() + "].", e);
+		}
 	}
 	private void registerNetworkHandlers()
 	{

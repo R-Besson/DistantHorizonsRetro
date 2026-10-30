@@ -29,8 +29,11 @@ public class FullDataPayloadSender implements AutoCloseable
 	private final ConcurrentLinkedQueue<PendingTransfer> transferQueue = new ConcurrentLinkedQueue<>();
 	
 	private final SharedBandwidthLimit sharedBandwidthLimit;
-	
-	
+
+	/** stops a tick that's already running from re-registering this sender after it was closed */
+	private volatile boolean closed = false;
+
+
 	public FullDataPayloadSender(NetworkSession session, IntSupplier maxKBpsSupplier, SharedBandwidthLimit sharedBandwidthLimit)
 	{
 		this.session = session;
@@ -42,7 +45,9 @@ public class FullDataPayloadSender implements AutoCloseable
 	@Override
 	public void close()
 	{
+		this.closed = true;
 		this.tickTimerTask.cancel();
+		this.sharedBandwidthLimit.setSenderActive(this, false);
 	}
 	
 	
@@ -53,6 +58,15 @@ public class FullDataPayloadSender implements AutoCloseable
 	
 	private void tick()
 	{
+		// only senders with something to send split the global bandwidth,
+		// otherwise idle and logged out players would keep a share
+		boolean active = !this.closed && !this.transferQueue.isEmpty();
+		this.sharedBandwidthLimit.setSenderActive(this, active);
+		if (!active)
+		{
+			return;
+		}
+
 		int bandwidthShare = this.sharedBandwidthLimit.getBandwidthShare();
 		int maxPlayerRate = Math.min(this.maxKBpsSupplier.getAsInt(), bandwidthShare);
 		
@@ -60,9 +74,7 @@ public class FullDataPayloadSender implements AutoCloseable
 		int bytesToSend = maxPlayerRate > 0
 				? (maxPlayerRate * 1000) / TICK_RATE + 1
 				: Integer.MAX_VALUE;
-		
-		this.sharedBandwidthLimit.setSenderActive(this, bytesToSend > 0);
-		
+
 		while (bytesToSend > 0)
 		{
 			PendingTransfer pendingTransfer = this.transferQueue.peek();

@@ -289,6 +289,27 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 			this.tryFulfillDataSourceRequestGroup(requestGroup, pos);
 		}
 	}
+
+	/**
+	 * Without this the group would wait forever and each waiting player's generation permit would never be released,
+	 * after enough failures a player wouldn't get any more LODs from this level.
+	 */
+	public void onWorldGenTaskFailed(long pos)
+	{
+		DataSourceRequestGroup requestGroup = this.requestGroupsByPos.remove(pos);
+		if (requestGroup == null
+			|| !requestGroup.tryClose())
+		{
+			return;
+		}
+
+		for (DataSourceRequestGroup.RequestData requestData : requestGroup.requestMessages.values())
+		{
+			this.requestGroupsByFutureId.remove(requestData.futureId());
+			requestData.rateLimiterSet.generationRequestRateLimiter.release();
+			requestData.message.sendResponse(new RequestRejectedException("World generation failed for this section."));
+		}
+	}
 	
 	
 	

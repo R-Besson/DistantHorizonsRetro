@@ -32,6 +32,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccess
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.AbstractDhRenderApiDefinition;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.util.MathUtil;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This holds miscellaneous helper code
@@ -244,11 +245,12 @@ public class RenderUtil
 		
 		
 		// the player's FOV setting doesn't affect vanilla's render distance,
-		// which can cause issues for certain zoom mods.
-		// So the FOV setting should not affect DH's near clip plane;
-		// therefore, the FOV is left at a fixed value of 70 (MC's default)
-		double fov = 70;
-		
+		// so zoom mods (which lower the FOV) shouldn't push the near clip plane out,
+		// therefore the FOV never goes below 70 (MC's default).
+		// A wider FOV (IE Quake Pro or sprinting) shows closer terrain at the screen edges
+		// and needs the near clip plane pulled in, otherwise LODs there are cut off.
+		double fov = Math.max(70, getVerticalFovInDegrees(ClientApi.RENDER_STATE.mcProjectionMatrix));
+
 		double aspectRatio = (double) MC_RENDER.getTargetFramebufferViewportWidth() / MC_RENDER.getTargetFramebufferViewportHeight();
 		
 		// source: https://stackoverflow.com/questions/8101119/how-do-i-methodically-choose-the-near-clip-plane-distance-for-a-perspective-proj/8101234#8101234
@@ -256,7 +258,21 @@ public class RenderUtil
 				/ Math.sqrt(1d + MathUtil.pow2(Math.tan(fov / 180d * Math.PI / 2d))
 				* (MathUtil.pow2(aspectRatio) + 1d)));
 	}
-	
+	/**
+	 * m11 is 1/tan(fovY/2) and on the diagonal, so this works whether or not the matrix is transposed. <br>
+	 * Returns 0 if the matrix hasn't been set yet.
+	 */
+	private static double getVerticalFovInDegrees(@Nullable DhApiMat4f projectionMatrix)
+	{
+		if (projectionMatrix == null
+			|| !(projectionMatrix.m11 > 0)) // also catches NaN
+		{
+			return 0;
+		}
+
+		return Math.toDegrees(2d * Math.atan(1d / projectionMatrix.m11));
+	}
+
 	/**
 	 * LODs are dithered in from this distance to 1.5x it (see frag.frag),
 	 * then the vanilla fade turns MC's terrain into the LODs from 1.5x to 1.9x it (see vanilla_fade.frag). <br>
