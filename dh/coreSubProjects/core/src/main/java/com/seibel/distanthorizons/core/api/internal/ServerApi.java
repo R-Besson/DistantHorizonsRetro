@@ -64,11 +64,10 @@ public class ServerApi
 	{
 		LOGGER.debug("Server World " + SharedApi.getAbstractDhWorld() + " unloading");
 		
-		// shutdown the world if it isn't already
-		AbstractDhWorld dhWorld = SharedApi.getAbstractDhWorld();
-		if (dhWorld != null)
+		// shutdown the world if it isn't already,
+		// setDhWorld closes the old world so it shouldn't be closed here as well
+		if (SharedApi.getAbstractDhWorld() != null)
 		{
-			dhWorld.close();
 			SharedApi.setDhWorld(null);
 		}
 	}

@@ -55,7 +55,7 @@ public class DhLightingEngine
 	
 	private static final AbstractDebugWireframeRenderer DEBUG_RENDERER = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
 	
-	/** 
+	/**
 	 * Minor garbage collection optimization. <br>
 	 * Since these objects are always mutated anyway, using a {@link ThreadLocal} will allow us to
 	 * only create as many of these {@link DhBlockPos} as necessary.
@@ -69,16 +69,16 @@ public class DhLightingEngine
 	private static final boolean RENDER_SKY_LIGHT_WIREFRAME = false;
 	
 	/**
-	 * Used for dataSource lighting. <br> 
-	 * Packed as alternating x and z offsets. 
+	 * Used for dataSource lighting. <br>
+	 * Packed as alternating x and z offsets.
 	 */
 	private static final byte[] ADJACENT_DIRECTION_OFFSETS = new byte[]
-			{
-					-1, 0,
-					+1, 0,
-					0, -1,
-					0, +1
-			};
+		{
+			-1, 0,
+			+1, 0,
+			0, -1,
+			0, +1
+		};
 	
 	
 	
@@ -95,12 +95,13 @@ public class DhLightingEngine
 	//================//
 	
 	/**
-	 * Only populates block lights. 
-	 * @see DhLightingEngine#lightChunk(IChunkWrapper, ArrayList, int, boolean, boolean) 
+	 * Only populates block lights.
+	 *
+	 * @see DhLightingEngine#lightChunk(IChunkWrapper, ArrayList, int, boolean, boolean)
 	 */
 	public void bakeChunkBlockLighting(
-			@NotNull IChunkWrapper centerChunk, @NotNull ArrayList<IChunkWrapper> nearbyChunkList,
-			int maxSkyLight)
+		@NotNull IChunkWrapper centerChunk, @NotNull ArrayList<IChunkWrapper> nearbyChunkList,
+		int maxSkyLight)
 	{ this.lightChunk(centerChunk, nearbyChunkList, maxSkyLight, true, false); }
 	
 	
@@ -114,15 +115,12 @@ public class DhLightingEngine
 	 * @param maxSkyLight should be a value between 0 and 15
 	 */
 	private void lightChunk(
-			@NotNull IChunkWrapper centerChunk, @NotNull ArrayList<IChunkWrapper> nearbyChunkList, 
-			int maxSkyLight, boolean updateBlockLight, boolean updateSkyLight)
+		@NotNull IChunkWrapper centerChunk, @NotNull ArrayList<IChunkWrapper> nearbyChunkList,
+		int maxSkyLight, boolean updateBlockLight, boolean updateSkyLight)
 	{
 		DhChunkPos centerChunkPos = centerChunk.getChunkPos();
 		AdjacentChunkHolder adjacentChunkHolder = new AdjacentChunkHolder(centerChunk);
 		
-		// how many positions we've walked over, can be used for profiling/debugging
-		int posIterations = 0;
-			
 		// try-finally to handle the stableArray resources
 		StableLightPosStack blockLightWorldPosQueue = null;
 		StableLightPosStack skyLightWorldPosQueue = null;
@@ -130,8 +128,6 @@ public class DhLightingEngine
 		{
 			blockLightWorldPosQueue = StableLightPosStack.borrowStableLightPosArray();
 			skyLightWorldPosQueue = StableLightPosStack.borrowStableLightPosArray();
-			
-			
 			
 			// generate the list of chunk pos we need,
 			// currently a 3x3 grid
@@ -151,7 +147,7 @@ public class DhLightingEngine
 			for (int chunkIndex = 0; chunkIndex < nearbyChunkList.size(); chunkIndex++) // using iterators in high traffic areas can cause GC issues due to allocating a bunch of iterators, use an indexed for-loop instead
 			{
 				IChunkWrapper neighborChunk = nearbyChunkList.get(chunkIndex);
-				if (neighborChunk != null 
+				if (neighborChunk != null
 					&& requestedAdjacentPositions.contains(neighborChunk.getChunkPos()))
 				{
 					// remove the newly found position
@@ -193,7 +189,7 @@ public class DhLightingEngine
 					
 					// get and set the adjacent chunk's initial skylights,
 					// if the dimension has skylights
-					if (updateSkyLight 
+					if (updateSkyLight
 						&& maxSkyLight > 0)
 					{
 						@SuppressWarnings("unused")
@@ -268,7 +264,7 @@ public class DhLightingEngine
 		}
 		catch (Exception e)
 		{
-			LOGGER.error("Unexpected lighting issue for center chunk: "+centerChunkPos, e);
+			LOGGER.error("Unexpected lighting issue for center chunk: " + centerChunkPos, e);
 		}
 		finally
 		{
@@ -286,9 +282,9 @@ public class DhLightingEngine
 	
 	/** Applies each {@link LightPos} from the queue to the given set of {@link IChunkWrapper}'s. */
 	private int propagateChunkLightPosList(
-			StableLightPosStack lightPosQueue, AdjacentChunkHolder adjacentChunkHolder,
-			IGetLightFunc getLightFunc, ISetLightFunc setLightFunc,
-			boolean propagatingBlockLights)
+		StableLightPosStack lightPosQueue, AdjacentChunkHolder adjacentChunkHolder,
+		IGetLightFunc getLightFunc, ISetLightFunc setLightFunc,
+		boolean propagatingBlockLights)
 	{
 		// these objects are saved so they can be mutated throughout the method,
 		// this reduces the number of allocations necessary, reducing GC pressure
@@ -393,19 +389,19 @@ public class DhLightingEngine
 		{
 			if (!lightPosQueue.isLightLevelEmpty(currentLightLevel))
 			{
-				LodUtil.assertNotReach("Non empty light pos queue for light level ["+currentLightLevel+"] after light engine running");
+				LodUtil.assertNotReach("Non empty light pos queue for light level [" + currentLightLevel + "] after light engine running");
 			}
 		}
 		
 		
 		
 		// can be enabled if troubleshooting lighting issues
-		if (RENDER_BLOCK_LIGHT_WIREFRAME 
+		if (RENDER_BLOCK_LIGHT_WIREFRAME
 			&& propagatingBlockLights)
 		{
 			RenderDhLightValuesAsWireframe(adjacentChunkHolder, true);
 		}
-		else if (RENDER_SKY_LIGHT_WIREFRAME 
+		else if (RENDER_SKY_LIGHT_WIREFRAME
 			&& !propagatingBlockLights)
 		{
 			RenderDhLightValuesAsWireframe(adjacentChunkHolder, false);
@@ -577,12 +573,12 @@ public class DhLightingEngine
 	
 	/** @author BuilderB0y */
 	public void recursivelyLightAdjacentDataPoints(
-			FullDataSourceV2 chunk,
-			BitSet airIDs,
-			int relativeX,
-			int relativeZ,
-			long dataPoint
-		)
+		FullDataSourceV2 chunk,
+		BitSet airIDs,
+		int relativeX,
+		int relativeZ,
+		long dataPoint
+	)
 	{
 		int lightLevel = FullDataPointUtil.getSkyLight(dataPoint);
 		// early exit condition:
@@ -690,7 +686,7 @@ public class DhLightingEngine
 				{
 					for (int y = minY; y < maxY; y++)
 					{
-						int lightValue = renderBlockLights? chunk.getDhBlockLight(x, y, z) : chunk.getDhSkyLight(x, y, z);
+						int lightValue = renderBlockLights ? chunk.getDhBlockLight(x, y, z) : chunk.getDhSkyLight(x, y, z);
 						if (lightValue != LodUtil.MIN_MC_LIGHT)
 						{
 							// hotter colors for more intense light
@@ -741,10 +737,18 @@ public class DhLightingEngine
 	//================//
 	
 	@FunctionalInterface
-	interface IGetLightFunc { int getLight(IChunkWrapper chunk, DhBlockPos pos); }
+	interface IGetLightFunc
+	{
+		int getLight(IChunkWrapper chunk, DhBlockPos pos);
+		
+	}
 	
 	@FunctionalInterface
-	interface ISetLightFunc { void setLight(IChunkWrapper chunk, DhBlockPos pos, int lightValue); }
+	interface ISetLightFunc
+	{
+		void setLight(IChunkWrapper chunk, DhBlockPos pos, int lightValue);
+		
+	}
 	
 	private static class LightPos extends DhBlockPosMutable
 	{
@@ -758,12 +762,12 @@ public class DhLightingEngine
 		
 		
 		@Override
-		public String toString() { return this.lightValue+" - ["+ this.x +", "+ this.y +", "+ this.z +"]"; }
+		public String toString() { return this.lightValue + " - [" + this.x + ", " + this.y + ", " + this.z + "]"; }
 		
 		
 	}
 	
-	/** 
+	/**
 	 * Holds all potential {@link LightPos} objects a lighting task may need.
 	 * This is done so existing {@link LightPos} objects can be repurposed instead of destroyed,
 	 * reducing garbage collector load.
@@ -776,7 +780,7 @@ public class DhLightingEngine
 		
 		/** the index of the last item in the array, -1 if empty */
 		private final int[] indexByLightLevel = new int[LodUtil.MAX_MC_LIGHT + 1];
-
+		
 		/** x, y, z */
 		public static final int INTS_PER_LIGHT_POS = 3;
 		
@@ -876,8 +880,8 @@ public class DhLightingEngine
 		}
 		
 		@Override
-		public String toString() 
-		{ 
+		public String toString()
+		{
 			StringBuilder builder = new StringBuilder();
 			
 			for (int i = 0; i < this.indexByLightLevel.length; i++)

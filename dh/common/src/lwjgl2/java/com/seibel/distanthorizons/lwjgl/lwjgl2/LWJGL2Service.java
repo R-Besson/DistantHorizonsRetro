@@ -397,6 +397,8 @@ public class LWJGL2Service implements ILWJGLService
 		// In LWJGL2, we use the normal method which should be null-terminated aware.
 		ByteBuffer sourceBuffer = MemoryUtilities.memUTF8(source, true);
 		GL20.glShaderSource(shader, sourceBuffer);
+		// GL copies the source during the call
+		MemoryUtilities.memFree(sourceBuffer);
 	}
 	
 	@Override

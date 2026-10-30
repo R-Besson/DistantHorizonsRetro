@@ -226,12 +226,11 @@ public class ClientApi
 	/** Synchronized to prevent a rare issue where multiple disconnect events are triggered on top of each other. */
 	public synchronized void onClientOnlyDisconnected()
 	{
-		AbstractDhWorld world = SharedApi.getAbstractDhWorld();
-		if (world != null)
+		if (SharedApi.getAbstractDhWorld() != null)
 		{
 			LOGGER.info("Client on ClientOnly mode disconnecting.");
-			
-			world.close();
+
+			// also closes the world
 			SharedApi.setDhWorld(null);
 		}
 		
