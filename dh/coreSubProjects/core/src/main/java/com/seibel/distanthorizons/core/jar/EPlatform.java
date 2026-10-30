@@ -20,7 +20,7 @@
 package com.seibel.distanthorizons.core.jar;
 
 /**
- * A simple OS getting util based off LWJGL's EPlatform at {@link org.lwjgl.system.Platform}. <br>
+ * A simple OS getting util based off LWJGL's EPlatform. <br>
  * This version includes some extra utils that we need and removes stuff which we don't.
  *
  * @author coolGi
@@ -47,7 +47,7 @@ public enum EPlatform
 			current = LINUX;
 		}
 		else if (osName.contains("mac") || osName.contains("darwin"))
-		{ // For MacOS it should either output "Mac OS X" or "Darwin" depending on the version of MacOS
+		{ // For macOS it should either output "Mac OS X" or "Darwin" depending on the version of macOS
 			current = MACOS;
 		}
 		else if (osName.startsWith("bsd") || osName.startsWith("freebsd"))
@@ -55,12 +55,12 @@ public enum EPlatform
 			current = BSD;
 		}
 		else if (osName.startsWith("unix"))
-		{ // In case you are running some very niece OS which didnt change their OS name from Unix
+		{ // In case you are running some very niece OS which didn't change their OS name from Unix
 			current = UNIX;
 		}
 		else
 		{
-			// We only test on Windows, Linux and MacOS
+			// We only test on Windows, Linux and macOS
 			// If you use a different os (eg, BSD, Unix) then it may or may not work
 			// Otherwise, good luck
 			throw new LinkageError("Unknown platform: " + osName);

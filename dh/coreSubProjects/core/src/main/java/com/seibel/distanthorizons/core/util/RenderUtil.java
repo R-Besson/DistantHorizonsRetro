@@ -47,8 +47,6 @@ public class RenderUtil
 	/** 
 	 * all speeds are measured in blocks per second 
 	 * 
-	 * @see LodUtil#WALKING_SPEED_IN_BLOCKS_PER_SEC
-	 * @see LodUtil#SPRINTING_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC
 	 */

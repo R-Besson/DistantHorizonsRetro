@@ -19,9 +19,9 @@
 
 package com.seibel.distanthorizons.core.network.messages.fullData;
 
-import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.multiplayer.fullData.FullDataPayload;
 import com.seibel.distanthorizons.core.network.messages.AbstractNetworkMessage;
+import com.seibel.distanthorizons.core.util.MoreObjects;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 

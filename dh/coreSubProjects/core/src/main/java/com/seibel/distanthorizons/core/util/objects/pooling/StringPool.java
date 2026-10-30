@@ -7,9 +7,9 @@ import java.util.concurrent.locks.StampedLock;
 
 /**
  * A thread-safe string pool backed by a trie.
- * 
- * @link https://en.wikipedia.org/wiki/Trie
- * @link https://claude.ai/share/eb7fddbe-03a0-4562-88a0-a089b7a52006
+ *
+ * @link h<a href = " ttps: / / en.wikipedia.org / wiki / Trie
+	">...</a> * @link <a href="https://claude.ai/share/eb7fddbe-03a0-4562-88a0-a089b7a52006">...</a>
  */
 public class StringPool
 {

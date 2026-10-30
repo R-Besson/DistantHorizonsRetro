@@ -13,7 +13,6 @@ public class FullDataOcclusionCuller
 	 * (IE completely surrounded by other opaque blocks)
 	 * are removed from the data column.
 	 * 
-	 * @param dataSource
 	 * @param relX relative X position in the datasource
 	 * @param relZ relative Z position in the datasource
 	 */
@@ -168,8 +167,7 @@ public class FullDataOcclusionCuller
 			{
 				// the adjacent point is below the center point,
 				// check the next one
-				continue;
-			}
+            }
 			else if (isTranslucent(source, adjacentPoint))
 			{
 				// this point is adjacent to a transparent LOD and should be shown

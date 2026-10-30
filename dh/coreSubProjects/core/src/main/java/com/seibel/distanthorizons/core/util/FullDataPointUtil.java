@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Contract;
  * MY: Min Y Height (unsigned, relative to the minimum level height) <br>
  * HI: Height (how tall this data point is in blocks) <br>
  * BL: Block light <br>
- * SL: Sky light <br><br>
+ * SL: Skylight <br><br>
  *
  * =======Bit layout=======	<br>
  * SL SL SL SL  BL BL BL BL <-- Top bits <br>

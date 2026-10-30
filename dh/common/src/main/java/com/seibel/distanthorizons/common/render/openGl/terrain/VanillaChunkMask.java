@@ -159,9 +159,8 @@ public class VanillaChunkMask
 				this.renderedByChunk[((offsetZ + newRadius) * width) + (offsetX + newRadius)] = (byte) (rendered ? 1 : 0);
 			}
 		}
-		
-		/** horizontal distance from the camera to the nearest chunk MC can't draw (unloaded or past the render distance) */
-		float vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
+
+        float vanillaTerrainEndDistance = (float) Math.sqrt(nearestUnloadedDistanceSquared);
 		RenderUtil.setVanillaTerrainEndDistanceInBlocks(vanillaTerrainEndDistance);
 
 		this.upload(width);
@@ -211,8 +210,7 @@ public class VanillaChunkMask
 		return angelicaAccessor.isChunkBuilt(chunkX, chunkZ, surfaceSectionRange[0], surfaceSectionRange[1]);
 	}
 	/** @return the lowest and highest section Y holding the chunk's top blocks, null if the chunk has no blocks */
-	@Nullable
-	private static int[] getSurfaceSectionRange(Chunk chunk)
+	private static int @Nullable [] getSurfaceSectionRange(Chunk chunk)
 	{
 		int lowestTopY = Integer.MAX_VALUE;
 		int highestTopY = Integer.MIN_VALUE;

@@ -33,8 +33,6 @@ import org.lwjgl.opengl.GL30;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-import java.nio.ByteBuffer;
-
 /**
  * Handles fading MC and DH together via {@link GlDhFarFadeShader} and {@link GlDhFarFadeApplyShader}. <br><br>
  * 
@@ -98,7 +96,7 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 		this.fadeTexture = LWJGL.glGenTextures();
 		{
 			GLMC.glBindTexture(this.fadeTexture);
-			LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA16, width, height, 0, GL11.GL_RGBA, GL12.GL_UNSIGNED_SHORT_4_4_4_4, (ByteBuffer) null);
+			LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA16, width, height, 0, GL11.GL_RGBA, GL12.GL_UNSIGNED_SHORT_4_4_4_4, null);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			

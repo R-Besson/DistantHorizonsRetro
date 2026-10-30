@@ -21,15 +21,21 @@ package com.seibel.distanthorizons.core.util.objects.dataStreams;
 
 import com.github.luben.zstd.Zstd;
 import com.seibel.distanthorizons.api.enums.config.EDhApiDataCompressionMode;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FrameOutputStream;
 import net.jpountz.xxhash.XXHashFactory;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import org.tukaani.xz.*;
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.ResettableArrayCache;
+import org.tukaani.xz.XZ;
+import org.tukaani.xz.XZOutputStream;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * See {@link DhDataInputStream} for more information about these custom streams.

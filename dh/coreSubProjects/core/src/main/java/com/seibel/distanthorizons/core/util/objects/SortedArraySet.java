@@ -19,7 +19,9 @@
 
 package com.seibel.distanthorizons.core.util.objects;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 
 public class SortedArraySet<E>
 {

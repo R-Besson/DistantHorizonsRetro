@@ -71,14 +71,14 @@ public class EventInjectorTest
 		Assert.assertEquals("Bound list doesn't contain the correct number of items.", 2, afterRenderEventList.size());
 		// object one
 		Assert.assertNotNull("Event not bound.", afterRenderEventList.get(0));
-		Assert.assertEquals("First event object setup incorrectly.", null, afterRenderEventList.get(0).getTestValue());
+		Assert.assertNull("First event object setup incorrectly.", afterRenderEventList.get(0).getTestValue());
 		// object two
 		Assert.assertNotNull("Event not bound.", afterRenderEventList.get(1));
-		Assert.assertEquals("First event object setup incorrectly.", null, afterRenderEventList.get(1).getTestValue());
+		Assert.assertNull("First event object setup incorrectly.", afterRenderEventList.get(1).getTestValue());
 		
 		
 		// event firing
-		Assert.assertEquals("fireAllEvents canceled returned canceled incorrectly.", false, TEST_EVENT_HANDLER.fireAllEvents(AbstractDhApiTestEvent.class, true));
+		Assert.assertFalse("fireAllEvents canceled returned canceled incorrectly.", TEST_EVENT_HANDLER.fireAllEvents(AbstractDhApiTestEvent.class, true));
 		// object one
 		Assert.assertEquals("Event not fired for first object.", true, afterRenderEventList.get(0).getTestValue());
 		// object two
@@ -97,7 +97,7 @@ public class EventInjectorTest
 		
 		
 		// check unbound event firing
-		Assert.assertEquals("fireAllEvents canceled returned canceled incorrectly.", false, TEST_EVENT_HANDLER.fireAllEvents(AbstractDhApiTestEvent.class, false));
+		Assert.assertFalse("fireAllEvents canceled returned canceled incorrectly.", TEST_EVENT_HANDLER.fireAllEvents(AbstractDhApiTestEvent.class, false));
 		// remaining event
 		Assert.assertEquals("Event not fired for remaining object.", false, ((DhTestEventHandlerAlt) afterRenderEventList.get(0)).eventFiredValue);
 		// unbound event
@@ -105,8 +105,8 @@ public class EventInjectorTest
 		
 		
 		// prevent event handlers from being bound to the wrong event interface
-		Assert.assertThrows("Event bound to a non-implementing interface.", IllegalArgumentException.class, () -> { TEST_EVENT_HANDLER.bind(AbstractDhApiCancelableOneTimeTestEvent.class, new DhTestEventHandler()); });
-		Assert.assertThrows("Event bound to a non-implementing interface.", IllegalArgumentException.class, () -> { TEST_EVENT_HANDLER.bind(AbstractDhApiTestEvent.class, new DhCancelableOneTimeTestEventHandler()); });
+		Assert.assertThrows("Event bound to a non-implementing interface.", IllegalArgumentException.class, () -> TEST_EVENT_HANDLER.bind(AbstractDhApiCancelableOneTimeTestEvent.class, new DhTestEventHandler()));
+		Assert.assertThrows("Event bound to a non-implementing interface.", IllegalArgumentException.class, () -> TEST_EVENT_HANDLER.bind(AbstractDhApiTestEvent.class, new DhCancelableOneTimeTestEventHandler()));
 		
 	}
 	
@@ -191,11 +191,11 @@ public class EventInjectorTest
 		Assert.assertEquals("Bound list doesn't contain the correct number of items.", 1, eventList.size());
 		// object one
 		Assert.assertNotNull("Event not bound.", eventList.get(0));
-		Assert.assertEquals("First event object setup incorrectly.", null, eventList.get(0).getTestValue());
+		Assert.assertNull("First event object setup incorrectly.", eventList.get(0).getTestValue());
 		
 		
 		// event firing
-		Assert.assertEquals("fireAllEvents canceled returned canceled incorrectly.", false, TEST_EVENT_HANDLER.fireAllEvents(AbstractDhApiRemoveAfterFireTestEvent.class, true));
+		Assert.assertFalse("fireAllEvents canceled returned canceled incorrectly.", TEST_EVENT_HANDLER.fireAllEvents(AbstractDhApiRemoveAfterFireTestEvent.class, true));
 		// object one
 		Assert.assertEquals("Event not fired for first object.", true, event.getTestValue());
 		

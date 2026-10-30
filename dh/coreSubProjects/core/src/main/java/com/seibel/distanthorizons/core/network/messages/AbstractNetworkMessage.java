@@ -1,8 +1,8 @@
 package com.seibel.distanthorizons.core.network.messages;
 
-import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.network.INetworkObject;
 import com.seibel.distanthorizons.core.network.session.NetworkSession;
+import com.seibel.distanthorizons.core.util.MoreObjects;
 
 /** Any new implementing classes should be registered in {@link MessageRegistry} */
 public abstract class AbstractNetworkMessage implements INetworkObject

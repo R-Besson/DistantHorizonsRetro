@@ -1,9 +1,8 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import net.coderbot.iris.Iris;
 import net.irisshaders.iris.api.v0.IrisApi;
-
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 
 public class IrisAccessor implements IIrisAccessor 
 {

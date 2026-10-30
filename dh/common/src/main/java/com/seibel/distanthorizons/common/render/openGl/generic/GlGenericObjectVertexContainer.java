@@ -7,10 +7,10 @@ import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IDhGenericObjectVertexBufferContainer;
 import org.lwjgl.opengl.GL15;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import java.awt.*;
 import java.util.List;
+
+import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * For use by {@link RenderableBoxGroup} 

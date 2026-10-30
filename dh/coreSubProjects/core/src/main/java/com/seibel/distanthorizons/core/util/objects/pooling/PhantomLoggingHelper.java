@@ -61,7 +61,7 @@ public class PhantomLoggingHelper
 			
 			stringBuilder.append(count).append(". ").append(stack).append("\n");
 		}
-		logger.warn(prefix+" Stacks: ["+ allocationStackTraceCountPairList.size()+"]\n" + stringBuilder);
+		logger.warn(prefix + " Stacks: [" + allocationStackTraceCountPairList.size() + "]\n" + stringBuilder);
 	}
 	
 	
@@ -84,7 +84,7 @@ public class PhantomLoggingHelper
 		/** if enabled the number of GC'ed buffers will be logged */
 		private static final boolean LOG_PHANTOM_RECOVERY = true;
 		/**
-		 * If enabled the GC'ed buffers allocation/upload stacks will be logged. 
+		 * If enabled the GC'ed buffers allocation/upload stacks will be logged.
 		 * Note: due to how the buffers are often run on the render thread,
 		 * these stacks will likely only be of limited use.
 		 * For more robust debugging it would likely be best to somehow track
@@ -100,7 +100,7 @@ public class PhantomLoggingHelper
 		private static final ThreadPoolExecutor CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("BasicPhantom Cleanup");
 		
 		
-		private final PhantomReference<? extends BasicPhantomReference> phantomReference; 
+		private final PhantomReference<? extends BasicPhantomReference> phantomReference;
 		
 		
 		
@@ -109,7 +109,10 @@ public class PhantomLoggingHelper
 		//==============//
 		//region
 		
-		static { CLEANUP_THREAD.execute(BasicPhantomReference::runPhantomReferenceCleanupLoop); }
+		static
+		{
+			CLEANUP_THREAD.execute(BasicPhantomReference::runPhantomReferenceCleanupLoop);
+		}
 		
 		public BasicPhantomReference(Class<?> parentClass)
 		{
@@ -126,7 +129,7 @@ public class PhantomLoggingHelper
 		//================//
 		//region
 		
-		@Override 
+		@Override
 		public void close()
 		{
 			this.phantomReference.clear();
@@ -145,12 +148,10 @@ public class PhantomLoggingHelper
 		private static void runPhantomReferenceCleanupLoop()
 		{
 			// these arrays are stored here so they don't have to be re-allocated each loop
-			ArrayList<Pair<String, AtomicInteger>> allocationStackTraceCountPairList = new ArrayList<>();
 			ArrayList<Pair<String, AtomicInteger>> parentClassNameCountPairList = new ArrayList<>();
 			
 			while (true)
 			{
-				allocationStackTraceCountPairList.clear();
 				parentClassNameCountPairList.clear();
 				
 				try
@@ -159,7 +160,9 @@ public class PhantomLoggingHelper
 					{
 						Thread.sleep(PHANTOM_REF_CHECK_TIME_IN_MS);
 					}
-					catch (InterruptedException ignore) { }
+					catch (InterruptedException ignore)
+					{
+					}
 					
 					int collectedCount = 0;
 					
@@ -167,7 +170,7 @@ public class PhantomLoggingHelper
 					while (phantomRef != null)
 					{
 						// destroy the buffer if it hasn't been cleared yet
-						Class<?> parentClass = PHANTOM_TO_PARENT_CLASS.remove((PhantomReference<? extends BasicPhantomReference>)phantomRef); // cast to make IntelliJ happy
+						Class<?> parentClass = PHANTOM_TO_PARENT_CLASS.remove((PhantomReference<? extends BasicPhantomReference>) phantomRef); // cast to make IntelliJ happy
 						{
 							String parentClassName = "NULL";
 							if (parentClass != null)
@@ -177,7 +180,7 @@ public class PhantomLoggingHelper
 							
 							PhantomLoggingHelper.putAndIncrementTrackingString(parentClassName, parentClassNameCountPairList);
 						}
-
+						
 						collectedCount++;
 						phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 					}
@@ -189,7 +192,7 @@ public class PhantomLoggingHelper
 						// we only want to log when something has been returned
 						if (collectedCount != 0)
 						{
-							LOGGER.warn("Phantoms collected: ["+ F3Screen.NUMBER_FORMAT.format(collectedCount)+"].");
+							LOGGER.warn("Phantoms collected: [" + F3Screen.NUMBER_FORMAT.format(collectedCount) + "].");
 							
 							PhantomLoggingHelper.LogAllocationStackTracePairCounts(LOGGER, "Parent class", parentClassNameCountPairList);
 						}

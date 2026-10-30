@@ -46,8 +46,7 @@ public interface ICubicChunksCommonAccessor extends IModAccessor
 	 * @return the lowest and highest cube Y holding the column's top blocks,
 	 *         null if the column has no blocks within DH's height range
 	 */
-	@Nullable
-	int[] getSurfaceCubeRange(Chunk column);
+	int @Nullable [] getSurfaceCubeRange(Chunk column);
 
 	/**
 	 * Has to be called on the server thread.

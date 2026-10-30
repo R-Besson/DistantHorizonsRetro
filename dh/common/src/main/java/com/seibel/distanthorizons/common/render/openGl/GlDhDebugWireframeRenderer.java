@@ -32,10 +32,10 @@ import com.seibel.distanthorizons.core.util.math.DhMat4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles rendering the wireframe particles 

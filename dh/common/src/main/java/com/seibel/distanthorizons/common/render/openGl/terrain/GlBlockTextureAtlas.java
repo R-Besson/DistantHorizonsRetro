@@ -87,8 +87,8 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 			GL11.GL_RGBA8,
 			width, height, 
 			0,
-			GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, 
-			(ByteBuffer) null
+			GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE,
+                null
 		);
 		
 		// nearest filtering keeps the blocky look and prevents

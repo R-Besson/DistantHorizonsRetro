@@ -78,7 +78,7 @@ public class DataSourceUpdateSpeedTest
 							height, // height
 							lastMaxY, // relative min Y
 							LodUtil.MIN_MC_LIGHT, // block light 
-							LodUtil.MIN_MC_LIGHT // sky light
+							LodUtil.MIN_MC_LIGHT // skylight
 					);
 					fullDataArray[arrayIndex].add(datapoint);
 					
@@ -131,7 +131,7 @@ public class DataSourceUpdateSpeedTest
 							height, // height
 							lastMaxY, // relative min Y
 							LodUtil.MAX_MC_LIGHT, // block light 
-							LodUtil.MAX_MC_LIGHT // sky light
+							LodUtil.MAX_MC_LIGHT // skylight
 					);
 					fullDataArray[arrayIndex].add(datapoint);
 					
@@ -164,6 +164,7 @@ public class DataSourceUpdateSpeedTest
 		// so we can profile the DTO creation process and
 		// see if there are any object leaks and how the GC
 		// handles it
+		//noinspection ConstantValue
 		if (true)
 		{
 			System.out.println("Starting long update test for time testing...");

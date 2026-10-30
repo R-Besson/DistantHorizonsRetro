@@ -210,7 +210,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	protected abstract String CreateParameterizedWhereString();
 	
 	protected void setPreparedStatementWhereClause(PreparedStatement statement, TKey key) throws SQLException { this.setPreparedStatementWhereClause(statement, 1, key); }
-	protected abstract int setPreparedStatementWhereClause(PreparedStatement statement, int parameterIndex, TKey key) throws SQLException;
+	protected abstract void setPreparedStatementWhereClause(PreparedStatement statement, int parameterIndex, TKey key) throws SQLException;
 	
 	/**
 	 * upsert = update/insert <br>
@@ -247,7 +247,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			// a closed repo is expected during shutdown, so it isn't logged
 			if (!(e instanceof SQLException
-				&& DbConnectionClosedException.isClosedException((SQLException)e)))
+				&& DbConnectionClosedException.isClosedException(e)))
 			{
 				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with primary key ["+primaryKey+"]. Error: ["+e.getMessage()+"].", e);
 			}
@@ -256,9 +256,10 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 	
 	
-	@SuppressWarnings({"try", "unused"})
+	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void save(TDTO dto)
 	{
+		//noinspection EmptyTryBlock
 		try(PreparedStatement statement = this.createUpsertStatement(dto);
 			ResultSet resultSet = this.query(statement))
 		{
@@ -277,13 +278,12 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	
 	
 	public void delete(TDTO dto) { this.deleteWithKey(dto.getKey()); }
-	@SuppressWarnings({"try", "unused"})
+	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void deleteWithKey(TKey key)
 	{
 		try (PreparedStatement statement = this.createDeleteStatementByKey(key);
-			ResultSet resultSet =this.query(statement))
+			ResultSet resultSet = this.query(statement))
 		{
-			
 		}
 		catch (SQLException e)
 		{
@@ -292,14 +292,13 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 	
 	/** With great power comes great responsibility... */
-	@SuppressWarnings({"try", "unused"})
+	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void deleteAll()
 	{
 		String sql = "DELETE FROM " + this.getTableName();
 		try (PreparedStatement statement = this.createPreparedStatement(sql);
 			ResultSet resultSet =this.query(statement))
 		{
-			
 		}
 		catch (SQLException e)
 		{
@@ -344,15 +343,8 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	@Nullable
 	public Map<String, Object> queryDictionaryFirst(String sql) 
 	{
-		try
-		{
-			List<Map<String, Object>> objectList = this.queryDictionary(sql);
-			return !objectList.isEmpty() ? objectList.get(0) : null;
-		}
-		catch (DbConnectionClosedException e)
-		{
-			return null;
-		}
+		List<Map<String, Object>> objectList = this.queryDictionary(sql);
+		return !objectList.isEmpty() ? objectList.get(0) : null;
 	}
 	/**
 	 * This can only run 1 command at a time. <br><br>
@@ -361,7 +353,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	 * should be used if the query will be run often.
 	 * This reduces GC pressure due to the {@link String} and {@link Map} allocation cost.
 	 */
-	private List<Map<String, Object>> queryDictionary(String sql) throws RuntimeException, DbConnectionClosedException
+	private List<Map<String, Object>> queryDictionary(String sql) throws RuntimeException
 	{
 		Connection connection = this.getConnection();
 		if (connection == null)
@@ -637,7 +629,7 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 						AtomicInteger countRef = unclosedObjectCountsByString.get(objString);
 						if (countRef != null)
 						{
-							stringBuilder.append("[" + countRef.get() + "] - [" + objString + "] \n");
+							stringBuilder.append("[").append(countRef.get()).append("] - [").append(objString).append("] \n");
 						}
 					}
 					

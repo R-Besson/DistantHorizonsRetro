@@ -1,32 +1,32 @@
 package com.seibel.distanthorizons.common.wrappers.gui.classicConfig;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-
 import com.seibel.distanthorizons.api.enums.config.DisallowSelectingViaConfigGui;
-import com.seibel.distanthorizons.common.wrappers.gui.*;
+import com.seibel.distanthorizons.common.wrappers.gui.DhScreen;
+import com.seibel.distanthorizons.common.wrappers.gui.DhScreenUtil;
+import com.seibel.distanthorizons.common.wrappers.gui.GuiHelper;
+import com.seibel.distanthorizons.common.wrappers.gui.OnPressed;
 import com.seibel.distanthorizons.common.wrappers.gui.config.ConfigGuiInfo;
 import com.seibel.distanthorizons.core.config.ConfigHandler;
 import com.seibel.distanthorizons.core.config.types.*;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigValidity;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.AnnotationUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.config.ILangWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.EnumChatFormatting;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.*;
 
@@ -152,7 +152,7 @@ class DhConfigScreen extends DhScreen
 			}
 		}
 
-		ClassicConfigGUI.CONFIG_CORE_INTERFACE.onScreenChangeListenerList.forEach((listener) -> listener.run());
+		ClassicConfigGUI.CONFIG_CORE_INTERFACE.onScreenChangeListenerList.forEach(Runnable::run);
 	}
 	private void addMenuItem(AbstractConfigBase<?> configEntry)
 	{
@@ -291,7 +291,7 @@ class DhConfigScreen extends DhScreen
 	private static void setupBooleanMenuOption(ConfigEntry<Boolean> booleanConfigEntry)
 	{
 		// For boolean
-		Function<Object, String> func = value -> (((Boolean) value ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + Translatable("distanthorizons.general."+(((Boolean) value).toString())));
+		Function<Object, String> func = value -> (((Boolean) value ? EnumChatFormatting.GREEN : EnumChatFormatting.RED) + Translatable("distanthorizons.general."+ value));
 
 		final ConfigGuiInfo configGuiInfo = ((ConfigGuiInfo) booleanConfigEntry.guiValue);
 
@@ -344,7 +344,7 @@ class DhConfigScreen extends DhScreen
 					{
 						enumValue = enumList.get(index);
 						
-						// does enum have ignore attribute?
+						// does enum have ignored attribute?
 						boolean selectable = !AnnotationUtil.doesEnumHaveAnnotation(enumValue, DisallowSelectingViaConfigGui.class);
 						if (selectable)
 						{
@@ -393,7 +393,7 @@ class DhConfigScreen extends DhScreen
 				}, getEnumTranslatableFunc);
 	}
 
-	private boolean tryCreateInputField(AbstractConfigBase<?> configBase)
+	@SuppressWarnings("rawtypes") private boolean tryCreateInputField(AbstractConfigBase<?> configBase)
 	{
 		final ConfigGuiInfo configGuiInfo = ((ConfigGuiInfo) configBase.guiValue);
 
@@ -492,8 +492,7 @@ class DhConfigScreen extends DhScreen
 					resetButton,
 					null,
 					textComponent);
-
-				return true;
+				
 			}
 			else
 			{
@@ -508,10 +507,10 @@ class DhConfigScreen extends DhScreen
 				this.textFieldProcessors.put(widget, processor);
 
 				this.configListWidget.addButton(this, configEntry, widget, resetButton, null, textComponent);
-
-				return true;
+				
 			}
-
+			return true;
+			
 			//endregion
 		}
 
@@ -814,7 +813,7 @@ class DhConfigScreen extends DhScreen
 	{
 		ConfigHandler.INSTANCE.configFileHandler.saveToFile();
 		// Handled by button to avoid recursive loop
-		ClassicConfigGUI.CONFIG_CORE_INTERFACE.onScreenChangeListenerList.forEach((listener) -> listener.run());
+		ClassicConfigGUI.CONFIG_CORE_INTERFACE.onScreenChangeListenerList.forEach(Runnable::run);
 	}
 
 	//endregion

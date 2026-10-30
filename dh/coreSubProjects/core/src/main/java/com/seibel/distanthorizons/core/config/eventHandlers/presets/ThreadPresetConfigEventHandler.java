@@ -20,9 +20,9 @@
 package com.seibel.distanthorizons.core.config.eventHandlers.presets;
 
 import com.seibel.distanthorizons.api.enums.config.quickOptions.EDhApiThreadPreset;
-import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.ConfigPresetOptions;
+import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
 import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
 import com.seibel.distanthorizons.coreapi.util.MathUtil;
 
@@ -73,7 +73,7 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 		for (ConfigPresetOptions<EDhApiThreadPreset, ?> config : this.configList)
 		{
 			// ignore try-using, the listeners should only ever be added once and should never be removed
-			new ConfigChangeListener<>(config.configEntry, (val) -> { this.onConfigValueChanged(); });
+			new ConfigChangeListener<>(config.configEntry, (val) -> this.onConfigValueChanged());
 		}
 	}
 	

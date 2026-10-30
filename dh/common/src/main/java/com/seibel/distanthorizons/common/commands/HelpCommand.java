@@ -1,8 +1,8 @@
 package com.seibel.distanthorizons.common.commands;
 
-import static com.seibel.distanthorizons.core.network.messages.MessageRegistry.DEBUG_CODEC_CRASH_MESSAGE;
-
 import net.minecraft.command.ICommandSender;
+
+import static com.seibel.distanthorizons.core.network.messages.MessageRegistry.DEBUG_CODEC_CRASH_MESSAGE;
 
 
 public class HelpCommand extends AbstractDhCommand

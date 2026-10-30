@@ -26,13 +26,13 @@ import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.generation.tasks.DataSourceRetrievalTask;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.sql.DbConnectionClosedException;
 import com.seibel.distanthorizons.core.sql.dto.FullDataSourceV2DTO;
 import com.seibel.distanthorizons.core.util.BoolUtil;
 import com.seibel.distanthorizons.core.util.ListUtil;
 import com.seibel.distanthorizons.core.util.objects.dataStreams.DhDataInputStream;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.jetbrains.annotations.Nullable;
@@ -41,8 +41,6 @@ import java.io.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.IntSupplier;
 
 public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2DTO>
@@ -168,15 +166,14 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	protected String CreateParameterizedWhereString() { return "DetailLevel = ? AND PosX = ? AND PosZ = ?"; }
 	
 	@Override
-	protected int setPreparedStatementWhereClause(PreparedStatement statement, int index, Long pos) throws SQLException
+	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, Long pos) throws SQLException
 	{
 		int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL;
 		
 		statement.setInt(index++, detailLevel);
 		statement.setInt(index++, DhSectionPos.getX(pos));
-		statement.setInt(index++, DhSectionPos.getZ(pos));
-		
-		return index;
+		statement.setInt(index, DhSectionPos.getZ(pos));
+
 	}
 	
 	
@@ -384,7 +381,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		statement.setBoolean(i++, BoolUtil.falseIfNull(dto.regenerate));
 		
 		statement.setLong(i++, System.currentTimeMillis()); // last modified unix time
-		statement.setLong(i++, System.currentTimeMillis()); // created unix time (only used if this is a fresh insert)
+		statement.setLong(i, System.currentTimeMillis()); // created unix time (only used if this is a fresh insert)
 		
 		return statement;
 	}
@@ -457,7 +454,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			int i = 1;
 			statement.setInt(i++, DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 			statement.setInt(i++, DhSectionPos.getX(pos));
-			statement.setInt(i++, DhSectionPos.getZ(pos));
+			statement.setInt(i, DhSectionPos.getZ(pos));
 			
 			
 			try(ResultSet resultSet = this.query(statement))
@@ -484,7 +481,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		{
 			// a closed repo is expected during shutdown, so it isn't logged
 			if (!(e instanceof SQLException
-					&& DbConnectionClosedException.isClosedException((SQLException)e)))
+					&& DbConnectionClosedException.isClosedException(e)))
 			{
 				LOGGER.warn("Unexpected issue deserializing DTO ["+this.dtoClass.getSimpleName()+"] with pos ["+DhSectionPos.toString(pos)+"] and direction ["+direction+"]. Error: ["+e.getMessage()+"].", e);
 			}
@@ -501,7 +498,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	//=========//
 	//region
 	
-	/** should be be very similar to {@link FullDataSourceV2Repo#setApplyToChildrenSql} */
+	/** should be very similar to {@link FullDataSourceV2Repo#setApplyToChildrenSql} */
 	private final String setApplyToParentSql = 
 			"UPDATE "+this.getTableName()+" \n" +
 			"SET ApplyToParent = ? \n" +
@@ -509,7 +506,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	public void setApplyToParent(long pos, boolean applyToParent)
 	{ this.setApplyToFlag(pos, applyToParent, this.setApplyToParentSql); }
 	
-	/** should be be very similar to {@link FullDataSourceV2Repo#setApplyToParentSql} */
+	/** should be very similar to {@link FullDataSourceV2Repo#setApplyToParentSql} */
 	private final String setApplyToChildrenSql =
 			"UPDATE "+this.getTableName()+" \n" +
 			"SET ApplyToChildren = ? \n" +
@@ -517,7 +514,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	public void setApplyToChild(long pos, boolean applyToChild)
 	{ this.setApplyToFlag(pos, applyToChild, this.setApplyToChildrenSql); }
 	
-	/** should be be very similar to {@link FullDataSourceV2Repo#setApplyToParentSql} */
+	/** should be very similar to {@link FullDataSourceV2Repo#setApplyToParentSql} */
 	private final String setRegenerateToChildrenSql =
 			"UPDATE "+this.getTableName()+" \n" +
 			"SET Regenerate = ? \n" +
@@ -525,7 +522,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	public void setRegenerate(long pos, boolean regenerate)
 	{ this.setApplyToFlag(pos, regenerate, this.setRegenerateToChildrenSql); }
 	
-	@SuppressWarnings({"try", "unused"})
+	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	private void setApplyToFlag(long pos, boolean applyFlag, String sql)
 	{
 		try (PreparedStatement statement = this.createPreparedStatement(sql))
@@ -542,11 +539,10 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
-			statement.setInt(i++, DhSectionPos.getZ(pos));
+			statement.setInt(i, DhSectionPos.getZ(pos));
 			
 			try (ResultSet resultSet = this.query(statement))
 			{
-				
 			}
 		}
 		catch (SQLException e)
@@ -557,7 +553,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	
 	
 	
-	/** should be be very similar to {@link FullDataSourceV2Repo#getChildPositionsToUpdateSql} */
+	/** should be very similar to {@link FullDataSourceV2Repo#getChildPositionsToUpdateSql} */
 	private final String getParentPositionsToUpdateSql =
 			"SELECT DetailLevel, PosX, PosZ, " +
 			"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
@@ -571,7 +567,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	public LongArrayList getParentPositionsToUpdate(int targetBlockPosX, int targetBlockPosZ, int returnCount)
 	{ return this.getPositionsToUpdate(targetBlockPosX, targetBlockPosZ, returnCount, this.getParentPositionsToUpdateSql); }
 	
-	/** should be be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
+	/** should be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
 	private final String getChildPositionsToUpdateSql =
 			"SELECT DetailLevel, PosX, PosZ, " +
 			"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
@@ -598,7 +594,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			statement.setInt(i++, targetBlockPosX);
 			statement.setInt(i++, targetBlockPosZ);
 			
-			statement.setInt(i++, returnCount);
+			statement.setInt(i, returnCount);
 			
 			try (ResultSet result = this.query(statement))
 			{
@@ -623,7 +619,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 	
 	
-	/** should be be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
+	/** should be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
 	private final String getRegenPositionsToUpdateSql =
 		"SELECT DetailLevel, PosX, PosZ, " +
 		"   abs((PosX << (6 + DetailLevel)) - ?) + abs((PosZ << (6 + DetailLevel)) - ?) AS Distance " +
@@ -657,7 +653,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				statement.setInt(i++, maxBlockDistanceFromTarget);
 			}
 			
-			statement.setInt(i++, returnCount);
+			statement.setInt(i, returnCount);
 			
 			try (ResultSet result = this.query(statement))
 			{
@@ -686,7 +682,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			"select ColumnGenerationStep, CompressionMode, MinY " +
 			"from "+this.getTableName()+" " +
 			"WHERE DetailLevel = ? AND PosX = ? AND PosZ = ?";
-	/** @return null if nothing exists for this position */
+	/** */
 	public void getColumnGenerationStepForPos(long pos, ByteArrayList outputByteArray)
 	{
 		if (this.lookupCache != null
@@ -711,7 +707,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			int i = 1;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
-			statement.setInt(i++, DhSectionPos.getZ(pos));
+			statement.setInt(i, DhSectionPos.getZ(pos));
 			
 			
 			try (ResultSet result = this.query(statement))
@@ -810,11 +806,11 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			
 			if (maxBlockDistanceFromTarget < 0)
 			{
-				statement.setLong(i++, Long.MAX_VALUE); // get everything
+				statement.setLong(i, Long.MAX_VALUE); // get everything
 			}
 			else
 			{
-				statement.setInt(i++, maxBlockDistanceFromTarget);
+				statement.setInt(i, maxBlockDistanceFromTarget);
 			}
 			
 			try (ResultSet result = this.query(statement))
@@ -870,7 +866,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			int i = 1;
 			preparedStatement.setInt(i++, DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 			preparedStatement.setInt(i++, DhSectionPos.getX(pos));
-			preparedStatement.setInt(i++, DhSectionPos.getZ(pos));
+			preparedStatement.setInt(i, DhSectionPos.getZ(pos));
 			
 			try (ResultSet result = this.query(preparedStatement))
 			{
@@ -962,7 +958,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			int i = 1;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
-			statement.setInt(i++, DhSectionPos.getZ(pos));
+			statement.setInt(i, DhSectionPos.getZ(pos));
 			
 			
 			try (ResultSet result = this.query(statement))

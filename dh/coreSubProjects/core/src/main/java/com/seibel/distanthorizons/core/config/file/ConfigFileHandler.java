@@ -21,13 +21,13 @@ package com.seibel.distanthorizons.core.config.file;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.seibel.distanthorizons.core.config.ConfigHandler;
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
+import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -142,7 +142,7 @@ public class ConfigFileHandler
 				CommentedFileConfig tmpNightConfig = CommentedFileConfig.builder(this.configPath.toFile()).build();
 				tmpNightConfig.load();
 				// Attempt to get the version number
-				currentCfgVersion = (Integer) tmpNightConfig.get("_version");
+				currentCfgVersion = tmpNightConfig.get("_version");
 				tmpNightConfig.close();
 			}
 			catch (Exception e)
@@ -249,7 +249,7 @@ public class ConfigFileHandler
 	}
 	
 	/** Loads an entry */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public <T> void loadEntry(ConfigEntry<T> entry, CommentedFileConfig nightConfig)
 	{
 		if (!entry.getAppearance().showInFile)
@@ -309,7 +309,7 @@ public class ConfigFileHandler
 		
 		
 		
-		String comment = entry.getComment().replaceAll("\n", "\n ").trim();
+		String comment = entry.getComment().replace("\n", "\n ").trim();
 		// the new line makes it easier to read and separate configs
 		// the space makes sure the first word of a comment isn't directly in line with the "#" 
 		comment = "\n " + comment;

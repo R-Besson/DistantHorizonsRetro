@@ -30,7 +30,9 @@ import com.seibel.distanthorizons.core.config.ConfigPresetOptions;
 import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
 import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class RenderQualityPresetConfigEventHandler extends AbstractPresetConfigEventHandler<EDhApiQualityPreset>
@@ -154,7 +156,7 @@ public class RenderQualityPresetConfigEventHandler extends AbstractPresetConfigE
 		for (ConfigPresetOptions<EDhApiQualityPreset, ?> config : this.configList)
 		{
 			// ignore try-using, the listener should only ever be added once and should never be removed
-			new ConfigChangeListener<>(config.configEntry, (val) -> { this.onConfigValueChanged(); });
+			new ConfigChangeListener<>(config.configEntry, (val) -> this.onConfigValueChanged());
 		}
 	}
 	

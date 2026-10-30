@@ -2,11 +2,11 @@ package com.seibel.distanthorizons.common.wrappers.minecraft;
 
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSharedWrapper;
-import java.util.Arrays;
+import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.server.MinecraftServer;
-import cpw.mods.fml.common.FMLCommonHandler;
+import java.util.Arrays;
 
 public abstract class AbstractMinecraftSharedWrapper implements IMinecraftSharedWrapper
 {

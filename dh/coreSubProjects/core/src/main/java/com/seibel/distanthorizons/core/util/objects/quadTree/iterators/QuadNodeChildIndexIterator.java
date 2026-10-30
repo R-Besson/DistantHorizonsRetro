@@ -22,7 +22,10 @@ package com.seibel.distanthorizons.core.util.objects.quadTree.iterators;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.objects.quadTree.QuadNode;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Queue;
 import java.util.function.Consumer;
 
 public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>

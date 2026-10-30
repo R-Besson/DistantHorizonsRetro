@@ -11,18 +11,11 @@
 
 package com.seibel.distanthorizons.core.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-
 import com.google.common.annotations.GwtCompatible;
-import com.google.common.base.Optional;
+
+import java.util.Arrays;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helper functions that operate on any {@code Object}, and are not already provided in {@link
@@ -44,7 +37,7 @@ public final class MoreObjects {
 	 *
 	 * <p>
 	 * This is helpful for implementing {@link Object#toString()}. Specification by example:
-	 *
+	 * <p>
 	 * {@snippet :
 	 * // Returns "ClassName{}"
 	 * MoreObjects.toStringHelper(this)

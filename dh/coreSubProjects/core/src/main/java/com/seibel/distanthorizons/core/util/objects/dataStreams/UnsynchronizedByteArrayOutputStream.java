@@ -1,6 +1,7 @@
 package com.seibel.distanthorizons.core.util.objects.dataStreams;
 
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class UnsynchronizedByteArrayOutputStream extends ByteArrayOutputStream
 	}
 
 	@Override
-	public void write(byte[] b, int off, int len)
+	public void write(byte @NotNull [] b, int off, int len)
 	{
 		if (off < 0 || len < 0 || len > b.length - off)
 		{

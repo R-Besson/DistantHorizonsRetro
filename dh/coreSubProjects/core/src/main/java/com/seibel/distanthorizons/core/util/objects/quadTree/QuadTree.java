@@ -19,18 +19,19 @@
 
 package com.seibel.distanthorizons.core.util.objects.quadTree;
 
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.render.QuadTree.LodQuadTree;
 import com.seibel.distanthorizons.core.util.LodUtil;
+import com.seibel.distanthorizons.core.util.gridList.MovableGridRingList;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
 import com.seibel.distanthorizons.coreapi.util.MathUtil;
-import com.seibel.distanthorizons.core.util.gridList.MovableGridRingList;
 import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 
@@ -397,9 +398,7 @@ public class QuadTree<T>
 		
 		// mutate out of bound child nodes
 		this.topRingList.forEach((rootNode) ->
-		{
-			this.mutateOutOfBoundChildNodes(rootNode, mutateOutOfBoundConsumer);
-		});
+                this.mutateOutOfBoundChildNodes(rootNode, mutateOutOfBoundConsumer));
 	}
 	/** 
 	 * we don't want to actually remove nodes or node data 

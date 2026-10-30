@@ -15,9 +15,9 @@ import com.seibel.distanthorizons.core.network.event.internal.IncompatibleMessag
 import com.seibel.distanthorizons.core.network.messages.base.LevelInitMessage;
 import com.seibel.distanthorizons.core.network.messages.base.RequestLevelInitMessage;
 import com.seibel.distanthorizons.core.network.messages.base.SessionConfigMessage;
+import com.seibel.distanthorizons.core.network.messages.fullData.FullDataPartialUpdateMessage;
 import com.seibel.distanthorizons.core.network.messages.fullData.FullDataSourceResponseMessage;
 import com.seibel.distanthorizons.core.network.messages.fullData.FullDataSplitMessage;
-import com.seibel.distanthorizons.core.network.messages.fullData.FullDataPartialUpdateMessage;
 import com.seibel.distanthorizons.core.network.session.NetworkSession;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
@@ -131,9 +131,7 @@ public class ClientNetworkState implements Closeable
 		});
 		
 		this.networkSession.registerHandler(CloseInternalEvent.class, message ->
-		{
-			this.configReceived = false;
-		});
+                this.configReceived = false);
 		
 		this.networkSession.registerHandler(FullDataPartialUpdateMessage.class, msg ->
 		{

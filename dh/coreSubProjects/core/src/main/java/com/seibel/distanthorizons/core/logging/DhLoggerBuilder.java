@@ -22,7 +22,6 @@ package com.seibel.distanthorizons.core.logging;
 import com.seibel.distanthorizons.api.enums.config.EDhApiLoggerLevel;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
 /**

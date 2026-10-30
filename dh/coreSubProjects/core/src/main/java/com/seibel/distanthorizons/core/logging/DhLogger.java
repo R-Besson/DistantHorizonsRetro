@@ -55,8 +55,6 @@ public class DhLogger implements IConfigListener
 	/**
 	 * This logger uses the base 4J logger so we don't have to worry about
 	 * setup order and can track errors when setting up DH loggers.
-	 * <br>
-	 * Yo dog, I heard you liked loggers, so I put a logger in your logger.
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
 	
@@ -90,7 +88,7 @@ public class DhLogger implements IConfigListener
 	// static setup //
 	//==============//
 	
-	static { TICKER_THREAD.execute(() -> runTickerLoop()); }
+	static { TICKER_THREAD.execute(DhLogger::runTickerLoop); }
 	
 	/** 
 	 * needs to be run at a later date since loggers
@@ -322,7 +320,7 @@ public class DhLogger implements IConfigListener
 			prefix += MinecraftTextFormat.WHITE;
 		}
 		
-		prefix += MinecraftTextFormat.BOLD + "" + MinecraftTextFormat.WHITE;
+		prefix += MinecraftTextFormat.BOLD + MinecraftTextFormat.WHITE;
 		prefix += logLevel.name();
 		prefix += MinecraftTextFormat.CLEAR_FORMATTING + " ";
 		

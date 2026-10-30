@@ -19,10 +19,10 @@
 
 package com.seibel.distanthorizons.core.network.messages.fullData;
 
-import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.multiplayer.fullData.FullDataPayload;
 import com.seibel.distanthorizons.core.network.INetworkObject;
 import com.seibel.distanthorizons.core.network.messages.AbstractTrackableMessage;
+import com.seibel.distanthorizons.core.util.MoreObjects;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.Nullable;
 

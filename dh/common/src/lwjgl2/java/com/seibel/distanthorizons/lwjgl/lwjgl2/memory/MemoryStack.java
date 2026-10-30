@@ -3,40 +3,14 @@
  */
 package com.seibel.distanthorizons.lwjgl.lwjgl2.memory;
 
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.encodeASCIIUnsafe;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.encodeUTF16Unsafe;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.encodeUTF8Unsafe;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memAddress;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memLengthASCII;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memLengthUTF16;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memLengthUTF8;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPointerBuffer;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutAddress;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutByte;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutDouble;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutFloat;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutInt;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutLong;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memPutShort;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.memSet;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.wrapBufferByte;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.wrapBufferDouble;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.wrapBufferFloat;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.wrapBufferInt;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.wrapBufferLong;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.wrapBufferShort;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
-import java.util.Arrays;
-
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
+
+import java.nio.*;
+import java.util.Arrays;
+
+import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.*;
 
 /**
  * An off-heap memory stack.

@@ -22,10 +22,9 @@ package tests;
 import com.seibel.distanthorizons.api.interfaces.override.worldGenerator.IDhApiWorldGenerator;
 import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.DependencyInjector;
-import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.OverrideInjector;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.WorldGeneratorInjector;
-
+import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 import org.junit.Assert;
 import org.junit.Test;
 import testItems.overrideInjection.interfaces.IOverrideTest;
@@ -104,11 +103,11 @@ public class DependencyInjectorTest
 		// basic dependencies
 		ISingletonTestOne testInterOne = TEST_SINGLETON_HANDLER.get(ISingletonTestOne.class);
 		Assert.assertNotNull(ISingletonTestOne.class.getSimpleName() + " not bound.", testInterOne);
-		Assert.assertEquals(ISingletonTestOne.class.getSimpleName() + " incorrect value.", testInterOne.getValue(), ConcreteSingletonTestBoth.VALUE);
+		Assert.assertEquals(ISingletonTestOne.class.getSimpleName() + " incorrect value.", ConcreteSingletonTestBoth.VALUE, testInterOne.getValue());
 		
 		ISingletonTestTwo testInterTwo = TEST_SINGLETON_HANDLER.get(ISingletonTestTwo.class);
 		Assert.assertNotNull(ISingletonTestTwo.class.getSimpleName() + " not bound.", testInterTwo);
-		Assert.assertEquals(ISingletonTestTwo.class.getSimpleName() + " incorrect value.", testInterTwo.getValue(), ConcreteSingletonTestBoth.VALUE);
+		Assert.assertEquals(ISingletonTestTwo.class.getSimpleName() + " incorrect value.", ConcreteSingletonTestBoth.VALUE, testInterTwo.getValue());
 		
 	}
 	
@@ -157,7 +156,7 @@ public class DependencyInjectorTest
 		Assert.assertNull("Non-core override should not be bound yet.", TEST_INJECTOR.get(IOverrideTest.class, OverrideTestPrimary.PRIORITY));
 		// standard get
 		override = TEST_INJECTOR.get(IOverrideTest.class);
-		Assert.assertEquals("Override returned incorrect override type.", override.getPriority(), OverrideInjector.CORE_PRIORITY);
+		Assert.assertEquals("Override returned incorrect override type.", OverrideInjector.CORE_PRIORITY, override.getPriority());
 		Assert.assertEquals("Incorrect override object returned.", override.getValue(), OverrideTestCore.VALUE);
 		
 		
@@ -213,8 +212,8 @@ public class DependencyInjectorTest
 		// validate the core generator was bound
 		generator = TEST_INJECTOR.get(boundLevel);
 		Assert.assertNotNull("Level generator not bound.", generator);
-		Assert.assertEquals("Incorrect level generator bound.", generator.getPriority(), WorldGeneratorTestCore.PRIORITY);
-		Assert.assertEquals("Incorrect level generator bound.", generator.getSmallestDataDetailLevel(), WorldGeneratorTestCore.SMALLEST_DETAIL_LEVEL);
+		Assert.assertEquals("Incorrect level generator bound.", WorldGeneratorTestCore.PRIORITY, generator.getPriority());
+		Assert.assertEquals("Incorrect level generator bound.", WorldGeneratorTestCore.SMALLEST_DETAIL_LEVEL, generator.getSmallestDataDetailLevel());
 		
 		// unbound level should still return null
 		Assert.assertNull("Nothing should have been bound to this level.", TEST_INJECTOR.get(unboundLevel));
@@ -235,7 +234,7 @@ public class DependencyInjectorTest
 		generator = TEST_INJECTOR.get(boundLevel);
 		Assert.assertNotNull("Level generator not bound.", generator);
 		Assert.assertEquals("Incorrect level generator bound.", generator.getPriority(), WorldGeneratorTestSecondary.PRIORITY);
-		Assert.assertEquals("Incorrect level generator bound.", generator.getSmallestDataDetailLevel(), WorldGeneratorTestSecondary.SMALLEST_DETAIL_LEVEL);
+		Assert.assertEquals("Incorrect level generator bound.", WorldGeneratorTestSecondary.SMALLEST_DETAIL_LEVEL, generator.getSmallestDataDetailLevel());
 		
 		// the unbound level should still return null
 		Assert.assertNull("Nothing should have been bound to this level.", TEST_INJECTOR.get(unboundLevel));
@@ -256,7 +255,7 @@ public class DependencyInjectorTest
 		generator = TEST_INJECTOR.get(boundLevel);
 		Assert.assertNotNull("Level generator not bound.", generator);
 		Assert.assertEquals("Incorrect level generator bound.", generator.getPriority(), WorldGeneratorTestPrimary.PRIORITY);
-		Assert.assertEquals("Incorrect level generator bound.", generator.getSmallestDataDetailLevel(), WorldGeneratorTestPrimary.SMALLEST_DETAIL_LEVEL);
+		Assert.assertEquals("Incorrect level generator bound.", WorldGeneratorTestPrimary.SMALLEST_DETAIL_LEVEL, generator.getSmallestDataDetailLevel());
 		
 		// the unbound level should still return null
 		Assert.assertNull("Nothing should have been bound to this level.", TEST_INJECTOR.get(unboundLevel));

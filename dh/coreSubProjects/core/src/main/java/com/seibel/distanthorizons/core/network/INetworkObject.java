@@ -24,10 +24,13 @@ import org.jetbrains.annotations.Contract;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 /** The base for any object that can be sent over the network. */
 public interface INetworkObject

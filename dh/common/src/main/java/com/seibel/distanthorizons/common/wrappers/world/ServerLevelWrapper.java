@@ -19,34 +19,30 @@
 
 package com.seibel.distanthorizons.common.wrappers.world;
 
+import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiLevelType;
+import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
+import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
+import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
+import com.seibel.distanthorizons.api.objects.DhApiResult;
+import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
+import com.seibel.distanthorizons.core.api.internal.SharedApi;
+import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.level.IDhLevel;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.network.messages.base.LevelInitMessage;
+import com.seibel.distanthorizons.core.world.EWorldEnvironment;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
+import net.minecraft.world.WorldServer;
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
-
-import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiLevelType;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
-import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
-import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
-import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
-import com.seibel.distanthorizons.api.objects.DhApiResult;
-import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
-import com.seibel.distanthorizons.core.api.internal.SharedApi;
-import com.seibel.distanthorizons.core.config.Config;
-import com.seibel.distanthorizons.core.level.IDhLevel;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.network.messages.base.LevelInitMessage;
-import com.seibel.distanthorizons.core.world.EWorldEnvironment;
-
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
-import net.minecraft.world.WorldServer;
-
-import net.minecraft.world.World;
-
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import org.jetbrains.annotations.Nullable;
 
 public class ServerLevelWrapper implements IServerLevelWrapper
 {
@@ -128,7 +124,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 			{
 				String cleanWorldFolderName = this.getWorldFolderName()
 						.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
-						.replaceAll(" ", "_");
+						.replace(" ", "_");
 
 				levelKeyPrefix += (!levelKeyPrefix.isEmpty() ? "_" : "") + cleanWorldFolderName
 						+ "_" + this.getHashedSeedEncoded();
@@ -171,7 +167,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	{
 		// Casting to World is necessary to fix a reobfuscation issue.
 		// otherwise it sometimes fails to obfuscate `provider` properly.
-		return DimensionTypeWrapper.getDimensionTypeWrapper(((World) this.level).provider.dimensionId);
+		return DimensionTypeWrapper.getDimensionTypeWrapper(this.level.provider.dimensionId);
 	}
 
 	@Override
@@ -179,7 +175,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	{
 		// Casting to World is necessary to fix a reobfuscation issue.
 		// otherwise it sometimes fails to obfuscate `provider` properly.
-		return LegacyDimensionInfo.fullName(((World) this.level).provider.dimensionId);
+		return LegacyDimensionInfo.fullName(this.level.provider.dimensionId);
 	}
 
 	@Override
@@ -199,7 +195,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	{
 		// Casting to World is necessary to fix a reobfuscation issue.
 		// otherwise it sometimes fails to obfuscate `provider` properly.
-		return CeilingDetection.hasCeiling(((World) this.level).provider);
+		return CeilingDetection.hasCeiling(this.level.provider);
 	}
 
 	@Override
@@ -207,7 +203,7 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	{
 		// Casting to World is necessary to fix a reobfuscation issue.
 		// otherwise it sometimes fails to obfuscate `provider` properly.
-		return !((World) this.level).provider
+		return !this.level.provider
 			// hasNoSky is true when the dimension lacks skylight
 			.hasNoSky;
 	}

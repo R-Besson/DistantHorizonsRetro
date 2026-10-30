@@ -22,11 +22,11 @@ package com.seibel.distanthorizons.core.config;
 import com.seibel.distanthorizons.core.config.file.ConfigFileHandler;
 import com.seibel.distanthorizons.core.config.types.*;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.config.ILangWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSharedWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
@@ -219,13 +219,13 @@ public class ConfigHandler
 	 * @param onlyShowMissing If false then this will remake the entire config lang
 	 * @param checkEnums Checks if all the lang for the enum's exist
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public String generateLang(boolean onlyShowMissing, boolean checkEnums)
 	{
 		ILangWrapper langWrapper = SingletonInjector.INSTANCE.get(ILangWrapper.class);
 		List<Class<? extends Enum<?>>> enumList = new ArrayList<>();
 		
-		String generatedLang = "";
+		StringBuilder generatedLang = new StringBuilder();
 		
 		String starter = "  \"";
 		String separator = "\":\n    \"";
@@ -272,11 +272,7 @@ public class ConfigHandler
 			}
 			
 			
-			generatedLang += starter
-					+ entryPrefix
-					+ separator
-					+ langWrapper.getLang(entryPrefix)
-					+ ending
+			generatedLang.append(starter).append(entryPrefix).append(separator).append(langWrapper.getLang(entryPrefix)).append(ending)
 			;
 			
 			// only add tooltips for entries that are also missing
@@ -285,13 +281,9 @@ public class ConfigHandler
 			if (!langWrapper.langExists(entryPrefix + ".@tooltip") 
 				|| !onlyShowMissing)
 			{
-				generatedLang += starter
-						+ entryPrefix + ".@tooltip"
-						+ separator
-						+ langWrapper.getLang(entryPrefix + ".@tooltip")
-						.replaceAll("\n", "\\\\n")
-						.replaceAll("\"", "\\\\\"")
-						+ ending
+				generatedLang.append(starter).append(entryPrefix).append(".@tooltip").append(separator).append(langWrapper.getLang(entryPrefix + ".@tooltip")
+					.replaceAll("\n", "\\\\n")
+					.replaceAll("\"", "\\\\\"")).append(ending)
 				;
 			}
 		}
@@ -300,7 +292,7 @@ public class ConfigHandler
 		// enums
 		if (!enumList.isEmpty())
 		{
-			generatedLang += "\n"; // Separate the main lang with the enum's
+			generatedLang.append("\n"); // Separate the main lang with the enum's
 			
 			for (Class<? extends Enum> anEnum : enumList)
 			{
@@ -311,18 +303,14 @@ public class ConfigHandler
 					if (!langWrapper.langExists(enumPrefix) 
 						|| !onlyShowMissing)
 					{
-						generatedLang += starter
-								+ enumPrefix
-								+ separator
-								+ langWrapper.getLang(enumPrefix)
-								+ ending
+						generatedLang.append(starter).append(enumPrefix).append(separator).append(langWrapper.getLang(enumPrefix)).append(ending)
 						;
 					}
 				}
 			}
 		}
 		
-		return generatedLang;
+		return generatedLang.toString();
 	}
 	
 	

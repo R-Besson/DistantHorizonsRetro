@@ -1,9 +1,8 @@
 package com.seibel.distanthorizons.forge17;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 import com.gtnewhorizon.gtnhmixins.builders.MixinBuilder;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Handles setting up mixins

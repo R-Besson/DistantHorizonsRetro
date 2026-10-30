@@ -19,19 +19,18 @@
 
 package com.seibel.distanthorizons.common.wrappers.block;
 
+import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
+import net.minecraft.world.biome.BiomeGenBase;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
-
-import net.minecraft.world.biome.BiomeGenBase;
 
 
 
@@ -194,7 +193,7 @@ public class BiomeWrapper implements IBiomeWrapper
 			}
 			return EMPTY_WRAPPER;
 		}
-		else if (resourceLocationString.trim().isEmpty() || resourceLocationString.equals(""))
+		else if (resourceLocationString.trim().isEmpty() || resourceLocationString.isEmpty())
 		{
 			LOGGER.warn("Null biome string deserialized.");
 			return EMPTY_WRAPPER;

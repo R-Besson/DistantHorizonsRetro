@@ -20,33 +20,26 @@
 package com.seibel.distanthorizons.common.wrappers.block;
 
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockColorOverrideEvent;
+import com.seibel.distanthorizons.common.backports.FakeBlockState;
+import com.seibel.distanthorizons.common.backports.FakeWorld;
+import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
-import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockBush;
-import net.minecraft.block.BlockFlower;
-import net.minecraft.block.BlockGrass;
-import net.minecraft.block.BlockLeavesBase;
-import net.minecraft.block.BlockPane;
-import net.minecraft.block.BlockRotatedPillar;
+import com.seibel.distanthorizons.coreapi.util.ColorUtil;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.util.ForgeDirection;
-import com.seibel.distanthorizons.common.backports.IBlockState;
-import com.seibel.distanthorizons.common.backports.FakeBlockState;
-import com.seibel.distanthorizons.common.backports.FakeWorld;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -385,7 +378,7 @@ public class ClientBlockStateColorCache
 					}
 					count += scale;
 					//apparently alpha is linear
-					alpha += a * scale;
+					alpha += (long) a * scale;
 					//gamma correction is complicated
 					red += srgbToLinearTable[r] * a * scale;
 					green += srgbToLinearTable[g] * a * scale;

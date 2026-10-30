@@ -19,18 +19,20 @@
 package com.seibel.distanthorizons.core.jar;
 
 
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.sql.dto.FullDataSourceV2DTO;
 import com.seibel.distanthorizons.core.sql.repo.FullDataSourceV2Repo;
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import org.apache.logging.log4j.LogManager;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.apache.logging.log4j.core.LoggerContext;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Only partially implemented.
@@ -220,7 +222,6 @@ public class JarMain
 		if (dto == null)
 		{
 			LOGGER.error("Unable to find any data at the position ["+DhSectionPos.toString(pos)+"].");
-			return;
 		}
 		
 		// TODO finishing this needs a way to create datasources (specifically data mappings) without a MC level object to deserialize with,

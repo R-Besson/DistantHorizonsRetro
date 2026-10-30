@@ -43,7 +43,7 @@ public class CameraZoom
 	/**
 	 * The tangent of half the zoom cone's horizontal angle. <br>
 	 * The cone is slightly wider than the zoomed camera's FOV so LODs
-	 * just off screen can start loading before the camera pans over them.
+	 * just off-screen can start loading before the camera pans over them.
 	 */
 	public double coneTanHalfAngle;
 	

@@ -19,16 +19,16 @@
 package com.seibel.distanthorizons.common.wrappers.chunk;
 
 import com.seibel.distanthorizons.api.DhApi;
+import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.misc.MutableBlockPosWrapper;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
-import net.minecraft.init.Blocks;
-import org.jetbrains.annotations.Nullable;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.ChunkLightStorage;
@@ -37,17 +37,18 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IMutableBlockPosWr
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.biome.WorldChunkManager;
 import net.minecraft.world.chunk.Chunk;
-import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import org.jetbrains.annotations.Nullable;
 
-import com.seibel.distanthorizons.core.logging.DhLogger;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -57,7 +58,7 @@ public class ChunkWrapper implements IChunkWrapper
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
 	/** can be used for interactions with the underlying chunk where creating new BlockPos objects could cause issues for the garbage collector. */
-	private static final ThreadLocal<MutableBlockPosWrapper> MUTABLE_BLOCK_POS_WRAPPER_REF = ThreadLocal.withInitial(() -> new MutableBlockPosWrapper());
+	private static final ThreadLocal<MutableBlockPosWrapper> MUTABLE_BLOCK_POS_WRAPPER_REF = ThreadLocal.withInitial(MutableBlockPosWrapper::new);
 
 	public static final Set<String> LOGGED_BLOCK_GET_ERRORS = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -172,7 +173,7 @@ public class ChunkWrapper implements IChunkWrapper
 	{
 		World world = chunk.worldObj;
 		// Mods like LOTR override the provider's biome lookup, those must go through the world.
-		// Otherwise the biome is read from this chunk, the world's lookup would end up there too
+		// Otherwise, the biome is read from this chunk, the world's lookup would end up there too
 		// but first checks the server's chunk map, which isn't thread safe and wrappers are created off thread.
 		boolean useWorldLookup = providerOverridesBiomeLookup(world.provider);
 		WorldChunkManager chunkManager = world.getWorldChunkManager();
@@ -416,7 +417,8 @@ public class ChunkWrapper implements IChunkWrapper
 		}
 		catch (Exception e)
 		{
-			if (LOGGED_BLOCK_GET_ERRORS.add(e.getMessage()))
+			// the message can be null (common for NPEs on Java 8), which ConcurrentHashMap doesn't accept
+			if (LOGGED_BLOCK_GET_ERRORS.add(e.getClass().getName() + ": " + e.getMessage()))
 			{
 				LOGGER.warn("Failed to get block from chunk ["+this.chunkPos+"] at relative block pos ["+relX+","+relY+","+relZ+"], air will be used instead. This error message will only be logged once. error: ["+e.getMessage()+"].", e);
 			}
@@ -438,7 +440,8 @@ public class ChunkWrapper implements IChunkWrapper
 		}
 		catch (Exception e)
 		{
-			if (LOGGED_BLOCK_GET_ERRORS.add(e.getMessage()))
+			// the message can be null (common for NPEs on Java 8), which ConcurrentHashMap doesn't accept
+			if (LOGGED_BLOCK_GET_ERRORS.add(e.getClass().getName() + ": " + e.getMessage()))
 			{
 				LOGGER.warn("Failed to get block from chunk ["+this.chunkPos+"] at relative block pos ["+relX+","+relY+","+relZ+"], air will be used instead. This error message will only be logged once. error: ["+e.getMessage()+"].", e);
 			}

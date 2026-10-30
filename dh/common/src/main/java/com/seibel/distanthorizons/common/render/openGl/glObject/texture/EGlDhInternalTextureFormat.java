@@ -1,12 +1,11 @@
 package com.seibel.distanthorizons.common.render.openGl.glObject.texture;
 
-import com.seibel.distanthorizons.common.render.openGl.glObject.enums.EGlVersion;
 import org.lwjgl.opengl.GL11;
 
 public enum EGlDhInternalTextureFormat
 {
 	// 8-bit normalized
-	RGBA8(GL11.GL_RGBA8, EGlVersion.GL_11, EGlDhPixelFormat.RGBA);
+	RGBA8(GL11.GL_RGBA8, EGlDhPixelFormat.RGBA);
 
 
 
@@ -15,10 +14,9 @@ public enum EGlDhInternalTextureFormat
 
 
 
-	EGlDhInternalTextureFormat(int glFormat, EGlVersion minimumGlVersion, EGlDhPixelFormat expectedPixelFormat)
+	EGlDhInternalTextureFormat(int glFormat, EGlDhPixelFormat expectedPixelFormat)
 	{
 		this.glFormat = glFormat;
-		/** kept to document which GL version each format needs */
 		this.expectedPixelFormat = expectedPixelFormat;
 	}
 

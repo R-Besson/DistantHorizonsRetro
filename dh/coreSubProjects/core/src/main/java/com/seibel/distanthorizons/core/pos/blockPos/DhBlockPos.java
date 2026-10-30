@@ -72,27 +72,12 @@ public class DhBlockPos implements INetworkObject
 	// offset //
 	//========//
 
-	/** if not null, mutates "mutablePos" so it matches the current pos after being offset. Otherwise creates a new {@link DhBlockPos}. */
-	public void mutateOffset(EDhDirection direction, @NotNull DhBlockPosMutable mutablePos) { this.mutateOrCreateOffset(direction.normal.x, direction.normal.y, direction.normal.z, mutablePos); }
-
-	protected DhBlockPos mutateOrCreateOffset(int x, int y, int z, @Nullable DhBlockPosMutable mutablePos) 
+	/** mutates "mutablePos" so it matches the current pos after being offset */
+	public void mutateOffset(EDhDirection direction, @NotNull DhBlockPosMutable mutablePos)
 	{
-		int newX = this.x + x;
-		int newY = this.y + y;
-		int newZ = this.z + z;
-		
-		if (mutablePos != null)
-		{
-			mutablePos.x = newX;
-			mutablePos.y = newY;
-			mutablePos.z = newZ;
-			
-			return mutablePos;
-		}
-		else
-		{
-			return new DhBlockPos(newX, newY, newZ);
-		}
+		mutablePos.x = this.x + direction.normal.x;
+		mutablePos.y = this.y + direction.normal.y;
+		mutablePos.z = this.z + direction.normal.z;
 	}
 	
 	

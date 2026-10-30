@@ -3,33 +3,21 @@
  */
 package com.seibel.distanthorizons.lwjgl.lwjgl2.memory;
 
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer.BITS32;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer.BITS64;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer.CLONG_SIZE;
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer.POINTER_SHIFT;
-import static java.lang.Character.isHighSurrogate;
-import static java.lang.Character.toCodePoint;
-import static java.lang.Math.min;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.PointerBuffer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.Buffer;
-import java.nio.BufferOverflowException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.CharBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
+import java.nio.*;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.util.Objects;
 import java.util.function.LongPredicate;
 
-import org.jetbrains.annotations.Nullable;
-import org.lwjgl.PointerBuffer;
+import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.Pointer.*;
+import static java.lang.Character.isHighSurrogate;
+import static java.lang.Character.toCodePoint;
+import static java.lang.Math.min;
 
 /**
  * This class provides functionality for managing native memory.

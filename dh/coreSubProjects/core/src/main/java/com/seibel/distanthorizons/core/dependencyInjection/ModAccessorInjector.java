@@ -19,11 +19,11 @@
 
 package com.seibel.distanthorizons.core.dependencyInjection;
 
-import com.seibel.distanthorizons.coreapi.DependencyInjection.DependencyInjector;
-import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccessor;
-import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.coreapi.DependencyInjection.DependencyInjector;
+import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 
 /**
  * This class takes care of dependency injection for mod accessors. (for mod compatibility
@@ -51,7 +51,7 @@ public class ModAccessorInjector extends DependencyInjector<IModAccessor>
 	
 	/**
 	 * Go to {@link DependencyInjector#bind(Class, IBindable)} DependencyHandler.bind()}
-	 * for this method's javadocs.
+	 * for this method's Javadocs.
 	 */
 	@Override
 	public void bind(Class<? extends IModAccessor> interfaceClass, IModAccessor modAccessor)

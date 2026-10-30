@@ -19,15 +19,16 @@
 
 package com.seibel.distanthorizons.common.render.openGl.glObject.vertexAttribute;
 
+import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import org.lwjgl.opengl.GL15;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.seibel.distanthorizons.core.config.Config;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import org.lwjgl.opengl.GL15;
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 
@@ -147,7 +148,7 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 			}
 		});
 		
-		this.pointers = this.pointersBuilder.toArray(new GlVertexPointer[this.pointersBuilder.size()]);
+		this.pointers = this.pointersBuilder.toArray(new GlVertexPointer[0]);
 		this.pointersOffset = new int[this.pointers.length];
 		this.pointersBuilder = null; // Release the builder
 		this.bindingPointsToIndexBuilder = null; // Release the builder

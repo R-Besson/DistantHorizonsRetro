@@ -31,13 +31,13 @@ import com.seibel.distanthorizons.core.enums.EDhDirection;
 import com.seibel.distanthorizons.core.file.fullDatafile.V2.FullDataSourceProviderV2;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.AbstractPhantomArrayList;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.sql.dto.util.FullDataMinMaxPosUtil;
 import com.seibel.distanthorizons.core.util.*;
 import com.seibel.distanthorizons.core.util.objects.DataCorruptedException;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.AbstractPhantomArrayList;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
@@ -832,8 +832,7 @@ public class FullDataSourceV2
 						// Sample point is above this datapoint, move to next (lower) one
 						currentIndices[i]--;
 					}
-					else if (sampleY >= inputMinY 
-							&& sampleY < inputMaxY)
+					else if (sampleY >= inputMinY)
 					{
 						// Sample point is within this datapoint
 						mergeIds[i] = FullDataPointUtil.getId(datapoint);
@@ -855,7 +854,7 @@ public class FullDataSourceV2
 			int id = determineMostCommonValueInColumnSlice(mergeIds, inputDataSource.mapping);
 			
 			// Only average light from sub-columns that match the winning ID.
-			// Otherwise light from an outvoted block (ie: surface water) can bleed
+			// Otherwise, light from an outvoted block (ie: surface water) can bleed
 			// into the merged datapoint (ie: sand under the water),
 			// causing incorrect bright spots.
 			byte blockLight = (byte) determineAverageValueInColumnSliceWithId(mergeBlockLights, mergeIds, id);
@@ -897,7 +896,7 @@ public class FullDataSourceV2
 			else
 			{
 				// this datapoint is the same as the last one, 
-				// just extend it's height
+				// just extend its height
 				accumulatedHeight += sliceHeight;
 			}
 		}

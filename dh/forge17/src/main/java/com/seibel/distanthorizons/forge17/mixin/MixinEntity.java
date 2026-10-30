@@ -35,6 +35,7 @@ public class MixinEntity
 	public double posZ;
 
 	@Inject(method = "isInRangeToRender3d", at = @At("HEAD"), cancellable = true)
+	@SuppressWarnings("ConstantValue") // IntelliJ doesn't know this mixin's "this" is an Entity
 	private void distanthorizons$matchVanillaTerrainDistance(double cameraX, double cameraY, double cameraZ, CallbackInfoReturnable<Boolean> cir)
 	{
 		if (!Config.Client.quickEnableRendering.get())
@@ -70,6 +71,7 @@ public class MixinEntity
 	}
 
 	/** measured like the shader pack does, see IAngelicaAccessor#getShaderPackVanillaTerrainDistance */
+	@SuppressWarnings("ConstantValue") // IntelliJ doesn't know this mixin's "this" is an Entity
 	private boolean isPastShaderPackVanillaTerrain(Entity camera)
 	{
 		IAngelicaAccessor angelicaAccessor = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);

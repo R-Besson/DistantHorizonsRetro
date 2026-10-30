@@ -37,7 +37,7 @@ public class DhTestEventHandlerAlt extends AbstractDhApiTestEvent
 	
 	
 	
-	// test (non standard) methods //
+	// test (non-standard) methods //
 	@Override
 	public Boolean getTestValue() { return this.eventFiredValue; }
 	

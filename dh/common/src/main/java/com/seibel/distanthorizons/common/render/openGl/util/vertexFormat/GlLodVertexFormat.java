@@ -19,9 +19,9 @@
 
 package com.seibel.distanthorizons.common.render.openGl.util.vertexFormat;
 
-import java.util.stream.Collectors;
-
 import com.google.common.collect.ImmutableList;
+
+import java.util.stream.Collectors;
 
 
 /**

@@ -20,8 +20,8 @@
 package tests;
 
 import com.seibel.distanthorizons.core.enums.EDhDirection;
-import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
+import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import org.junit.Assert;
@@ -422,8 +422,8 @@ public class DhSectionPosTest
 		assertSectionPosEqual(DhSectionPos.encode((byte) 0, -1, 0), DhSectionPos.getAdjacentPos(pos, EDhDirection.WEST));
 		
 		// getting the adjacent position in the up and down position don't make sense
-		Assert.assertThrows(IllegalArgumentException.class, () -> { DhSectionPos.getAdjacentPos(pos, EDhDirection.UP); });
-		Assert.assertThrows(IllegalArgumentException.class, () -> { DhSectionPos.getAdjacentPos(pos, EDhDirection.DOWN); });
+		Assert.assertThrows(IllegalArgumentException.class, () -> DhSectionPos.getAdjacentPos(pos, EDhDirection.UP));
+		Assert.assertThrows(IllegalArgumentException.class, () -> DhSectionPos.getAdjacentPos(pos, EDhDirection.DOWN));
 	}
 	
 	@Test

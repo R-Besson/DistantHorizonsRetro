@@ -21,24 +21,24 @@ package com.seibel.distanthorizons.common.wrappers.block;
 
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockStateWrapperCreatedEvent;
+import com.seibel.distanthorizons.common.backports.FakeBlockState;
+import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
-import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
-
+import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
+import com.seibel.distanthorizons.coreapi.util.ColorUtil;
+import cpw.mods.fml.common.registry.GameData;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.block.*;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemDye;
-import cpw.mods.fml.common.registry.GameData;
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import net.minecraftforge.fluids.IFluidBlock;
-import com.seibel.distanthorizons.common.backports.FakeBlockState;
-import com.seibel.distanthorizons.core.logging.DhLogger;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.io.IOException;
@@ -46,8 +46,6 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-
-import org.jetbrains.annotations.Nullable;
 
 
 
@@ -277,7 +275,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		// is liquid //
 		{
 			if (this.isAir()
-				|| this.blockState == null) // == null isn't necessary since its handled in isAir() but is here to prevent intellij from complaining
+				|| this.blockState == null) // == null isn't necessary since it's handled in isAir() but is here to prevent intellij from complaining
 			{
 				this.isLiquid = false;
 			}
@@ -441,7 +439,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		// is solid //
 		{
 			if (this.isAir()
-				|| this.blockState == null) // "== null" isn't necessary since its handled in isAir() but is here to prevent IntelliJ from complaining
+				|| this.blockState == null) // "== null" isn't necessary since it's handled in isAir() but is here to prevent IntelliJ from complaining
 			{
 				this.isSolid = false;
 			}
@@ -849,7 +847,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 
 		ObjectOpenHashSet<String> baseIgnoredBlockResourceSet = new ObjectOpenHashSet<>();
 		waterSubsurfaceReplacementBlocks = getAllBlockWrappers(Config.Client.Advanced.Graphics.Culling.waterSubSurfaceBlockReplacementCsv, baseIgnoredBlockResourceSet);
-		// air will be present if any invalid resource locations are present
+		// air will be present if any invalid resource locations are present,
 		// but we don't want to replace air with water, that'll cause monoliths
 		waterSubsurfaceReplacementBlocks.remove(AIR);
 
@@ -1164,7 +1162,7 @@ public class BlockStateWrapper implements IBlockStateWrapper
 		final String finalResourceStateString = resourceStateString;
 
 		if (finalResourceStateString.equals(AIR_STRING)
-			|| finalResourceStateString.equals("")) // the empty string shouldn't normally happen, but just in case
+			|| finalResourceStateString.isEmpty()) // the empty string shouldn't normally happen, but just in case
 		{
 			return AIR;
 		}

@@ -1,15 +1,13 @@
 package com.seibel.distanthorizons.forge17.mixin;
 
+import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinTextureAtlasSprite;
 
 @Mixin(TextureMap.class)
 public class MixinTextureMap

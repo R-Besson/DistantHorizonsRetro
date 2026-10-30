@@ -1,14 +1,14 @@
 package com.seibel.distanthorizons.core.util.objects.dataStreams;
 
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.tukaani.xz.ArrayCache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.IntUnaryOperator;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntUnaryOperator;
 
 /** 
  * LZMA requires a custom object to cache its backend arrays. 

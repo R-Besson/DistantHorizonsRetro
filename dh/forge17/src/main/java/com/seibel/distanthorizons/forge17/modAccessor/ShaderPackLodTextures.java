@@ -1,11 +1,11 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
+import com.gtnewhorizons.angelica.glsm.GLStateManager;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
-import com.gtnewhorizons.angelica.glsm.GLStateManager;
 import com.seibel.distanthorizons.forge17.RenderHelper;
 import net.coderbot.iris.pipeline.transform.PatchShaderType;
 import org.joml.Matrix4f;
@@ -56,8 +56,7 @@ public class ShaderPackLodTextures
 	 * The LOD shape (fence and wall posts, bottom slabs), the same inset as DH's own vertex shader (see terrain/gl/vert.vert).
 	 * It's stored in the 2 bits above the micro offset (see LodQuadBuilder), which Angelica ignores.
 	 */
-	private static final String SHAPE_OFFSET_FUNCTION = ""
-		+ "vec3 dhr_shapeOffset() {\n"
+	private static final String SHAPE_OFFSET_FUNCTION = "vec3 dhr_shapeOffset() {\n"
 		+ "    uint shape = (vPosition.a >> 14u) & 3u;\n"
 		+ "    if (shape == 0u) return vec3(0.0);\n"
 		+ "    uint mirco = (vPosition.a >> 8u) & 0x3Fu;\n"
@@ -103,8 +102,7 @@ public class ShaderPackLodTextures
 	private static final String ENABLED_UNIFORM = "dhr_TexturedLods";
 	private static final int ILLUMINATED_MATERIAL_ID = EDhApiBlockMaterial.ILLUMINATED.index;
 
-	private static final String VERTEX_CODE = ""
-		+ "out vec3 dhr_BlockPos;\n"
+	private static final String VERTEX_CODE = "out vec3 dhr_BlockPos;\n"
 		+ "flat out uint dhr_NormalIndex;\n"
 		+ "flat out uint dhr_TileId;\n"
 		+ "flat out uint dhr_MaterialId;\n"
@@ -119,8 +117,7 @@ public class ShaderPackLodTextures
 		+ "}\n";
 
 	/** the same 4x4 ordered dither as DH's own LOD shader */
-	private static final String BAYER_FUNCTION = ""
-		+ "float dhr_bayer4x4(vec2 pos) {\n"
+	private static final String BAYER_FUNCTION = "float dhr_bayer4x4(vec2 pos) {\n"
 		+ "    int x = int(mod(pos.x, 4.0));\n"
 		+ "    int y = int(mod(pos.y, 4.0));\n"
 		+ "    float bayer[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);\n"
@@ -139,8 +136,7 @@ public class ShaderPackLodTextures
 	private static final String VANILLA_WATER_DITHER = "fog = exp(-3.0 * fog); if (fog <= dhr_bayer4x4(gl_FragCoord.xy) + 0.001) discard;";
 
 	/** placed before the pack's main so its code can use them */
-	private static final String FRAGMENT_DECLARATIONS = ""
-		+ "uniform sampler2D " + ATLAS_UNIFORM + ";\n"
+	private static final String FRAGMENT_DECLARATIONS = "uniform sampler2D " + ATLAS_UNIFORM + ";\n"
 		+ "uniform int " + ENABLED_UNIFORM + ";\n"
 		+ "in vec3 dhr_BlockPos;\n"
 		+ "flat in uint dhr_NormalIndex;\n"
@@ -162,8 +158,7 @@ public class ShaderPackLodTextures
 	 * Angelica swaps gbufferProjection for DH's projection in LOD programs (so ScreenToView reads LOD depths),
 	 * MC's own projection is uploaded separately to read the vanilla depth (see bindUniforms).
 	 */
-	private static final String VANILLA_SHOWN_FUNCTION = ""
-		+ "uniform mat4 " + MC_PROJECTION_INVERSE_UNIFORM + ";\n"
+	private static final String VANILLA_SHOWN_FUNCTION = "uniform mat4 " + MC_PROJECTION_INVERSE_UNIFORM + ";\n"
 		+ "bool dhr_vanillaTerrainShown(vec2 coord) {\n"
 		+ "    float dhr_depth = texture(depthtex0, coord).r;\n"
 		+ "    if (dhr_depth >= 1.0) return false;\n"
@@ -175,8 +170,7 @@ public class ShaderPackLodTextures
 		+ "}\n";
 
 	/** OUTPUT is replaced with the pack's color output */
-	private static final String FRAGMENT_CODE = ""
-		+ "vec2 dhr_blockFaceUvAt(vec3 pos) {\n"
+	private static final String FRAGMENT_CODE = "vec2 dhr_blockFaceUvAt(vec3 pos) {\n"
 		// 6 and 7 are the diagonal planes of crossed plants, see-through leaves add 8 (see LodQuadBuilder)
 		+ "    uint face = (dhr_NormalIndex >= 8u) ? (dhr_NormalIndex - 8u) : dhr_NormalIndex;\n"
 		+ "    if (face >= 6u) return vec2(pos.x, 1.0 - pos.y);\n"

@@ -22,8 +22,8 @@ package com.seibel.distanthorizons.core.config.file;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.io.ParsingMode;
 import com.electronwill.nightconfig.json.JsonFormat;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -137,13 +137,13 @@ public class ConfigTypeConverters
 	
 	public static class FloatConverter extends ConverterBase
 	{
-		@Override public String convertToString(Object item) { return ((Float) item).toString(); }
+		@Override public String convertToString(Object item) { return item.toString(); }
 		@Override public Float convertFromString(String s) { return Float.valueOf(s); }
 	}
 	
 	public static class DoubleConverter extends ConverterBase
 	{
-		@Override public String convertToString(Object item) { return ((Double) item).toString(); }
+		@Override public String convertToString(Object item) { return item.toString(); }
 		@Override public Double convertFromString(String s) { return Double.valueOf(s); }
 	}
 	

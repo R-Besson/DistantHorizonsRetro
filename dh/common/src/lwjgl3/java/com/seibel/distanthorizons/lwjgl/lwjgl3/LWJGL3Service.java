@@ -1,23 +1,25 @@
 package com.seibel.distanthorizons.lwjgl.lwjgl3;
 
+import com.seibel.distanthorizons.lwjgl.AbstractMemoryStack;
+import com.seibel.distanthorizons.lwjgl.EGLExtension;
+import com.seibel.distanthorizons.lwjgl.EGLFeature;
+import com.seibel.distanthorizons.lwjgl.ILWJGLService;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.APIUtil;
 import org.lwjgl.system.FunctionProvider;
 import org.lwjgl.system.JNI;
 import org.lwjgl.system.MemoryUtil;
-import com.seibel.distanthorizons.lwjgl.EGLExtension;
-import com.seibel.distanthorizons.lwjgl.EGLFeature;
-import com.seibel.distanthorizons.lwjgl.ILWJGLService;
-import com.seibel.distanthorizons.lwjgl.AbstractMemoryStack;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 /**
  * LWJGL3 implementation of {@link ILWJGLService}.
  */
 // TODO why is this a record?
-public class LWJGL3Service implements ILWJGLService
+@SuppressWarnings("ALL") public class LWJGL3Service implements ILWJGLService
 {
 	private static final Thread RENDER_THREAD = Thread.currentThread();
 

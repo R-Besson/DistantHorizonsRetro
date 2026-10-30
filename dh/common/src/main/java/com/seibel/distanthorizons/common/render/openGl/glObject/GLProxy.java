@@ -83,10 +83,10 @@ public class GLProxy
 	private static GLProxy instance = null;
 	
 	
-	public boolean bufferStorageSupported = false; // ~OpenGL 4.4
-	public boolean vertexAttributeBufferBindingSupported = false; // ~OpenGL 4.3
-	public boolean instancedArraysSupported = false;
-	public boolean vertexAttribDivisorSupported = false; // OpenGL 3.3 or newer
+	public boolean bufferStorageSupported; // ~OpenGL 4.4
+	public boolean vertexAttributeBufferBindingSupported; // ~OpenGL 4.3
+	public boolean instancedArraysSupported;
+	public boolean vertexAttribDivisorSupported; // OpenGL 3.3 or newer
 	
 	private final EDhApiGpuUploadMethod preferredUploadMethod;
 	

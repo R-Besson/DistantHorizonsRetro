@@ -1,36 +1,32 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
-import java.awt.Color;
-
+import com.gtnewhorizons.angelica.config.AngelicaConfig;
+import com.gtnewhorizons.angelica.glsm.GLStateManager;
+import com.gtnewhorizons.angelica.rendering.celeritas.CeleritasWorldRenderer;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.RenderUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.forge17.modAccessor.exceptions.AngelicaVersionGuiException;
-import cpw.mods.fml.common.versioning.VersionParser;
-import cpw.mods.fml.common.versioning.VersionRange;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import net.coderbot.iris.compat.dh.DHCompat;
-import net.coderbot.iris.rendertarget.IRenderTargetExt;
-import net.irisshaders.iris.api.v0.IrisApi;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL20;
-
-import java.lang.reflect.Method;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.shader.Framebuffer;
-
-import java.nio.FloatBuffer;
-
-import com.gtnewhorizons.angelica.config.AngelicaConfig;
-import com.gtnewhorizons.angelica.rendering.celeritas.CeleritasWorldRenderer;
-import org.embeddedt.embeddium.impl.render.chunk.RenderSectionManager;
-import com.gtnewhorizons.angelica.glsm.GLStateManager;
-
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
+import cpw.mods.fml.common.versioning.VersionParser;
+import cpw.mods.fml.common.versioning.VersionRange;
+import net.coderbot.iris.compat.dh.DHCompat;
+import net.coderbot.iris.rendertarget.IRenderTargetExt;
+import net.irisshaders.iris.api.v0.IrisApi;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.shader.Framebuffer;
+import org.embeddedt.embeddium.impl.render.chunk.RenderSectionManager;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL20;
+
+import java.awt.*;
+import java.lang.reflect.Method;
+import java.nio.FloatBuffer;
 
 public class AngelicaAccessor implements IAngelicaAccessor
 {

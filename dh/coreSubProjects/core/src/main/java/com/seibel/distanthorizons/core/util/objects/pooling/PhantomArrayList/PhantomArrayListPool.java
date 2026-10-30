@@ -105,7 +105,7 @@ public class PhantomArrayListPool
 	public final PhantomArrayListPoolStatTracker<ShortArrayList> shortPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Short.BYTES,     () -> new ShortArrayList(0));
 	public final PhantomArrayListPoolStatTracker<LongArrayList> longPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Long.BYTES,      () -> new LongArrayList(0));
 	public final PhantomArrayListPoolStatTracker<CharArrayList> charPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Character.BYTES, () -> new CharArrayList(0));
-	public final PhantomArrayListPoolStatTracker<ByteBufferCheckoutWrapper> byteBufferPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Byte.BYTES, () -> new ByteBufferCheckoutWrapper());
+	public final PhantomArrayListPoolStatTracker<ByteBufferCheckoutWrapper> byteBufferPoolStatTracker = new PhantomArrayListPoolStatTracker<>(Byte.BYTES, ByteBufferCheckoutWrapper::new);
 	
 	public final PhantomArrayListPoolStatTracker<?>[] poolStatTrackers = new PhantomArrayListPoolStatTracker[]
 	{
@@ -135,7 +135,7 @@ public class PhantomArrayListPool
 	//==============//
 	
 	// shared setup used by all pools
-	static { RECYCLER_THREAD.execute(() -> runPhantomReferenceCleanupLoop()); }
+	static { RECYCLER_THREAD.execute(PhantomArrayListPool::runPhantomReferenceCleanupLoop); }
 	
 	
 	public PhantomArrayListPool(String name) { this(name, false); }
@@ -355,7 +355,7 @@ public class PhantomArrayListPool
 		try
 		{
 			parentRef.clear();
-			// will be null if the this parent has already been returned
+			// will be null if the parent has already been returned
 			PhantomArrayListCheckout checkout = this.phantomRefToCheckout.remove(parentRef);
 			this.returnCheckout(checkout);
 		}

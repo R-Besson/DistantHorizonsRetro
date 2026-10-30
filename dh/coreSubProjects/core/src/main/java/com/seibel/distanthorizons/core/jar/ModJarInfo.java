@@ -22,8 +22,8 @@ package com.seibel.distanthorizons.core.jar;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.io.ParsingMode;
 import com.electronwill.nightconfig.json.JsonFormat;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 
 /**
  * Get info on the git for the mod <br>
@@ -44,7 +44,7 @@ public final class ModJarInfo
 		
 		try
 		{
-			// Warning: Atm, this file is in the common subproject as the processResources task in gradle doesn't work for core
+			// Warning: Atm, this file is in the common subproject as the processResources task in Gradle doesn't work for core
 			String jsonString = JarUtils.convertInputStreamToString(JarUtils.accessFile(FILE_NAME));
 			
 			Config jsonObject = Config.inMemory();

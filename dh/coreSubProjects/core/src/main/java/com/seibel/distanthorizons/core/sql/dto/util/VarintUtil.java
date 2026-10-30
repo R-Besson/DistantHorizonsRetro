@@ -9,10 +9,10 @@ public class VarintUtil
 {
 	
 	/**
-	 * zigzagEncode maps 0=>0, -1=>1, 1=>2, -2=>3, 3=>4, etc.
-	 * this helps encode small magnitude signed numbers as small varints.
-	 * https://lemire.me/blog/2022/11/25/making-all-your-integers-positive-with-zigzag-encoding/
-	 */
+     * zigzagEncode maps 0=>0, -1=>1, 1=>2, -2=>3, 3=>4, etc.
+     * this helps encode small magnitude signed numbers as small varints.
+     * <a href="https://lemire.me/blog/2022/11/25/making-all-your-integers-positive-with-zigzag-encoding/">...</a>
+     */
 	public static int zigzagEncode(int n)
 	{
 		// if n is (byte)-1, this results in:

@@ -1,12 +1,8 @@
 package com.seibel.distanthorizons.forge17.mixin;
 
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.List;
-
+import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,7 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinTextureAtlasSprite;
+import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.List;
 
 @Mixin(TextureAtlasSprite.class)
 public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
@@ -98,7 +96,7 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 	 * The missing sprite is skipped, it's what the atlas returns for unknown names
 	 * and those are told apart by not having sprite data.
 	 */
-	@Unique
+	@SuppressWarnings("ConstantValue") @Unique
 	private void distanthorizons$captureCustomLoadedFrames()
 	{
 		if (this.distanthorizons$spriteFrames == null

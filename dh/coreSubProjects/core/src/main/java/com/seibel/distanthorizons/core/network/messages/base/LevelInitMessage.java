@@ -1,7 +1,7 @@
 package com.seibel.distanthorizons.core.network.messages.base;
 
-import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.network.messages.AbstractNetworkMessage;
+import com.seibel.distanthorizons.core.util.MoreObjects;
 import io.netty.buffer.ByteBuf;
 
 public class LevelInitMessage extends AbstractNetworkMessage

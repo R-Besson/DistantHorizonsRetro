@@ -15,29 +15,16 @@
 
 package com.seibel.distanthorizons.forge17;
 
-import java.util.List;
-import java.util.function.Consumer;
-
-import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.IChiselCommonAccessor;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
-import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.*;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modLoader.IForgeMain;
-import com.seibel.distanthorizons.forge17.modAccessor.*;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeChunkManager;
-
 import com.seibel.distanthorizons.common.AbstractModInitializer;
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
+import com.seibel.distanthorizons.common.wrappers.block.IBiomeHandler;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.*;
 import com.seibel.distanthorizons.core.api.internal.ServerApi;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IPluginPacketSender;
-
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.*;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modLoader.IForgeMain;
+import com.seibel.distanthorizons.forge17.modAccessor.*;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -45,9 +32,15 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeChunkManager;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
- * Initialize and setup the Mod. <br>
+ * Initialize and set up the Mod. <br>
  * If you are looking for the real start of the mod
  * check out the ClientProxy.
  */

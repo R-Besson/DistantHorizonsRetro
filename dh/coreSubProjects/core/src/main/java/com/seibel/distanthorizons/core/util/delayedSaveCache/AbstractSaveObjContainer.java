@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class AbstractSaveObjContainer<T>
 {
-	/** the last unix millisecond time this data source was written to */
+	/** the last Unix millisecond time this data source was written to */
 	public long lastWrittenDateTimeMs;
 	
 	

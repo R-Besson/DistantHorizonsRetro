@@ -32,13 +32,13 @@ import java.sql.SQLException;
 public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompoundKeyDto>
 {
 	
-	@SuppressWarnings({"try", "unused"})
+	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public TestCompoundKeyRepo(String databaseType, File databaseFile) throws SQLException, IOException
 	{
 		super(databaseType, databaseFile, TestCompoundKeyDto.class);
 		
 		// note: this should only ever be done with the test repo.
-		// All long term tables should be created using a sql Script.
+		// All long term tables should be created using a SQL Script.
 		String createTableSql = 
 				"CREATE TABLE IF NOT EXISTS "+this.getTableName()+"(\n" +
 				"XPos INT NOT NULL\n" +
@@ -62,12 +62,11 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 	protected String CreateParameterizedWhereString() { return "XPos = ? AND ZPos = ?"; }
 	
 	@Override
-	protected int setPreparedStatementWhereClause(PreparedStatement statement, int index, DhChunkPos pos) throws SQLException
+	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, DhChunkPos pos) throws SQLException
 	{
 		statement.setInt(index++, pos.getX());
-		statement.setInt(index++, pos.getZ());
-		return index;
-	}
+		statement.setInt(index, pos.getZ());
+    }
 	
 	
 	
@@ -97,8 +96,7 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 		int i = 1; // post-increment for the win!
 		statement.setObject(i++, dto.id.getX());
 		statement.setObject(i++, dto.id.getZ());
-		
-		statement.setObject(i++, dto.value);
+		statement.setObject(i, dto.value);
 		
 		return statement;
 	}

@@ -38,8 +38,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import java.lang.ref.PhantomReference;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -50,6 +48,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.StampedLock;
+
+import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 public class GLBuffer implements AutoCloseable
 {
@@ -119,7 +119,7 @@ public class GLBuffer implements AutoCloseable
 	//==============//
 	//region
 	
-	static { CLEANUP_THREAD.execute(() -> runPhantomReferenceCleanupLoop()); }
+	static { CLEANUP_THREAD.execute(GLBuffer::runPhantomReferenceCleanupLoop); }
 	
 	public GLBuffer(boolean isBufferStorage) { this.destroyOldAndCreate(isBufferStorage); }
 	
@@ -215,7 +215,7 @@ public class GLBuffer implements AutoCloseable
 			this.id = 0;
 			this.size = 0;
 			
-			RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer destroyAsync", () -> { destroyBufferIdNow(idToDelete, "destroyAsync"); });
+			RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer destroyAsync", () -> destroyBufferIdNow(idToDelete, "destroyAsync"));
 		}
 		finally
 		{
@@ -358,7 +358,7 @@ public class GLBuffer implements AutoCloseable
 			// glBufferData call:
 			//   1) allocate-only with the size overload (no memcpy)
 			//   2) fill the buffer through chunked glBufferSubData calls
-			LWJGL.glBufferData(target, (long) bbSize, bufferDataHint);
+			LWJGL.glBufferData(target, bbSize, bufferDataHint);
 			subDataUploadInChunks(target, 0, bb, MAC_UPLOAD_CHUNK_BYTES);
 		}
 		else
@@ -385,7 +385,7 @@ public class GLBuffer implements AutoCloseable
 			}
 			
 			// allocate-only — no memcpy, safe on macOS regardless of size
-			LWJGL.glBufferData(target, (long) newSize, bufferDataHint);
+			LWJGL.glBufferData(target, newSize, bufferDataHint);
 			this.size = newSize;
 		}
 		
@@ -489,7 +489,7 @@ public class GLBuffer implements AutoCloseable
 				int chunk = Math.min(chunkBytes, total - uploaded);
 				bb.position(origPos + uploaded);
 				bb.limit(origPos + uploaded + chunk);
-				LWJGL.glBufferSubData(target, (long) (baseOffset + uploaded), bb);
+				LWJGL.glBufferSubData(target, baseOffset + uploaded, bb);
 				uploaded += chunk;
 				// Force the driver to drain its command queue between chunks
 				// so the OpenGL -> Metal bridge processes (and frees) each
@@ -578,7 +578,7 @@ public class GLBuffer implements AutoCloseable
 					{
 						BUFFER_ID_TO_PHANTOM.remove(idRef);
 						final int id = idRef;
-						RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer phantom destroy", () -> { destroyBufferIdNow(id, "runPhantomReferenceCleanupLoop"); });
+						RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("GLBuffer phantom destroy", () -> destroyBufferIdNow(id, "runPhantomReferenceCleanupLoop"));
 							
 						if (LOG_PHANTOM_ALLOCATION_STACKS) // stack trace shouldn't be null, but just in case
 						{

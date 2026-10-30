@@ -19,12 +19,12 @@
 
 package com.seibel.distanthorizons.core.network.messages.requests;
 
-import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.network.exceptions.RateLimitedException;
 import com.seibel.distanthorizons.core.network.exceptions.RequestOutOfRangeException;
 import com.seibel.distanthorizons.core.network.exceptions.RequestRejectedException;
 import com.seibel.distanthorizons.core.network.exceptions.SectionRequiresSplittingException;
 import com.seibel.distanthorizons.core.network.messages.AbstractTrackableMessage;
+import com.seibel.distanthorizons.core.util.MoreObjects;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;

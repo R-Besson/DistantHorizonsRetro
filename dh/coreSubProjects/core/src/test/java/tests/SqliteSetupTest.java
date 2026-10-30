@@ -51,63 +51,54 @@ public class SqliteSetupTest
 	
 	private static void testSqliteDatabase(String databaseType, String databaseLocation)
 	{
-		Connection connection = null;
-		try
-		{
-			// create a database connection
-			connection = DriverManager.getConnection(databaseType+":"+databaseLocation);
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);  // set timeout to 30 sec.
-			
-			
-			// create the database
-			statement.executeUpdate("drop table if exists person");
-			statement.executeUpdate("create table person (id integer, name string)");
-			
-			// insert test values
-			statement.executeUpdate("insert into person values(1, 'leo')");
-			statement.executeUpdate("insert into person values(2, 'yui')");
-			
-			// get the values
-			ResultSet rs = statement.executeQuery("select * from person");
-			
-			
-			// read the result set
-			Assert.assertTrue(rs.next());
-			int id = rs.getInt("id");
-			Assert.assertEquals(1, id);
-			String name = rs.getString("name");
-			Assert.assertEquals("leo", name);
-			
-			Assert.assertTrue(rs.next());
-			id = rs.getInt("id");
-			Assert.assertEquals(2, id);
-			name = rs.getString("name");
-			Assert.assertEquals("yui", name);
-			
-			// all results have been read
-			Assert.assertFalse(rs.next());
-		}
-		catch(SQLException e)
-		{
-			// if the error message is "out of memory",
-			// it probably means no database file is found
-			Assert.fail("Unexpected error: " + e.getMessage());
-		}
-		finally
+		try (Connection connection = DriverManager.getConnection(databaseType + ":" + databaseLocation))
 		{
 			try
 			{
-				if(connection != null)
-				{
-					connection.close();
-				}
+				// create a database connection
+				Statement statement = connection.createStatement();
+				statement.setQueryTimeout(30);  // set timeout to 30 sec.
+				
+				
+				// create the database
+				statement.executeUpdate("drop table if exists person");
+				statement.executeUpdate("create table person (id integer, name string)");
+				
+				// insert test values
+				statement.executeUpdate("insert into person values(1, 'leo')");
+				statement.executeUpdate("insert into person values(2, 'yui')");
+				
+				// get the values
+				ResultSet rs = statement.executeQuery("select * from person");
+				
+				
+				// read the result set
+				Assert.assertTrue(rs.next());
+				int id = rs.getInt("id");
+				Assert.assertEquals(1, id);
+				String name = rs.getString("name");
+				Assert.assertEquals("leo", name);
+				
+				Assert.assertTrue(rs.next());
+				id = rs.getInt("id");
+				Assert.assertEquals(2, id);
+				name = rs.getString("name");
+				Assert.assertEquals("yui", name);
+				
+				// all results have been read
+				Assert.assertFalse(rs.next());
 			}
-			catch(SQLException e)
+			catch (SQLException e)
 			{
-				// connection close failed.
-				Assert.fail("Unable to close the connection: " + e.getMessage());
+				// if the error message is "out of memory",
+				// it probably means no database file is found
+				Assert.fail("Unexpected error: " + e.getMessage());
 			}
+		}
+		catch (SQLException e)
+		{
+			// connection close failed.
+			Assert.fail("Unable to close the connection: " + e.getMessage());
 		}
 	}
 	

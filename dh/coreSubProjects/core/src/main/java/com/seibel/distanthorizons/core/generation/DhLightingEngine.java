@@ -22,26 +22,26 @@ package com.seibel.distanthorizons.core.generation;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPosMutable;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPosMutable;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.util.FullDataPointUtil;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IMutableBlockPosWrapper;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import com.seibel.distanthorizons.core.logging.DhLogger;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.*;
+import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
-
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This logic was roughly based on
@@ -60,12 +60,12 @@ public class DhLightingEngine
 	 * Since these objects are always mutated anyway, using a {@link ThreadLocal} will allow us to
 	 * only create as many of these {@link DhBlockPos} as necessary.
 	 */
-	private static final ThreadLocal<DhBlockPosMutable> PRIMARY_BLOCK_POS_REF = ThreadLocal.withInitial(() -> new DhBlockPosMutable());
-	private static final ThreadLocal<DhBlockPosMutable> SECONDARY_BLOCK_POS_REF = ThreadLocal.withInitial(() -> new DhBlockPosMutable());
+	private static final ThreadLocal<DhBlockPosMutable> PRIMARY_BLOCK_POS_REF = ThreadLocal.withInitial(DhBlockPosMutable::new);
+	private static final ThreadLocal<DhBlockPosMutable> SECONDARY_BLOCK_POS_REF = ThreadLocal.withInitial(DhBlockPosMutable::new);
 	
 	/** if enabled will render each block light value when the chunk lighting engine is run */
 	private static final boolean RENDER_BLOCK_LIGHT_WIREFRAME = false;
-	/** if enabled will render each sky light value when the chunk lighting engine is run */
+	/** if enabled will render each skylight value when the chunk lighting engine is run */
 	private static final boolean RENDER_SKY_LIGHT_WIREFRAME = false;
 	
 	/**
@@ -112,10 +112,8 @@ public class DhLightingEngine
 	 * @param centerChunk the chunk we want to apply lighting to
 	 * @param nearbyChunkList should also contain centerChunk
 	 * @param maxSkyLight should be a value between 0 and 15
-	 * 
-	 * @return the number of light positions iterated over, can be used for profiling.
 	 */
-	private int lightChunk(
+	private void lightChunk(
 			@NotNull IChunkWrapper centerChunk, @NotNull ArrayList<IChunkWrapper> nearbyChunkList, 
 			int maxSkyLight, boolean updateBlockLight, boolean updateSkyLight)
 	{
@@ -222,11 +220,11 @@ public class DhLightingEngine
 									}
 									
 									
-									// add sky light to the queue
+									// add skylight to the queue
 									DhBlockPos skyLightPos = new DhBlockPos(neighborChunk.getMinBlockX() + relX, y, neighborChunk.getMinBlockZ() + relZ);
 									skyLightWorldPosQueue.push(skyLightPos.getX(), skyLightPos.getY(), skyLightPos.getZ(), maxSkyLight);
 									
-									// set the chunk's sky light
+									// set the chunk's skylight
 									skyLightPos.mutateToChunkRelativePos(relLightBlockPos);
 									neighborChunk.setDhSkyLight(relLightBlockPos.getX(), relLightBlockPos.getY(), relLightBlockPos.getZ(), maxSkyLight);
 								}
@@ -251,18 +249,18 @@ public class DhLightingEngine
 				// done to prevent a rare issue where the light values are incorrectly set to -1
 				centerChunk.clearDhBlockLighting();
 				
-				posIterations += this.propagateChunkLightPosList(blockLightWorldPosQueue, adjacentChunkHolder,
+				this.propagateChunkLightPosList(blockLightWorldPosQueue, adjacentChunkHolder,
 					(neighbourChunk, relBlockPos) -> neighbourChunk.getDhBlockLight(relBlockPos.getX(), relBlockPos.getY(), relBlockPos.getZ()),
 					(neighbourChunk, relBlockPos, newLightValue) -> neighbourChunk.setDhBlockLight(relBlockPos.getX(), relBlockPos.getY(), relBlockPos.getZ(), newLightValue),
 					true);
 			}
 			
-			// sky light
+			// skylight
 			if (updateSkyLight)
 			{
 				centerChunk.clearDhSkyLighting();
 				
-				posIterations += this.propagateChunkLightPosList(skyLightWorldPosQueue, adjacentChunkHolder,
+				this.propagateChunkLightPosList(skyLightWorldPosQueue, adjacentChunkHolder,
 					(neighbourChunk, relBlockPos) -> neighbourChunk.getDhSkyLight(relBlockPos.getX(), relBlockPos.getY(), relBlockPos.getZ()),
 					(neighbourChunk, relBlockPos, newLightValue) -> neighbourChunk.setDhSkyLight(relBlockPos.getX(), relBlockPos.getY(), relBlockPos.getZ(), newLightValue),
 					false);
@@ -284,7 +282,6 @@ public class DhLightingEngine
 			centerChunk.setIsDhBlockLightCorrect(true);
 		}
 		
-		return posIterations;
 	}
 	
 	/** Applies each {@link LightPos} from the queue to the given set of {@link IChunkWrapper}'s. */
@@ -534,7 +531,7 @@ public class DhLightingEngine
 					long dataPoint = list.getLong(index);
 					if (index == 0)
 					{
-						// top data point, assume "above" has the max sky light.
+						// top data point, assume "above" has the max skylight.
 						dataPoint = FullDataPointUtil.setSkyLight(dataPoint, maxSkyLight);
 						list.set(index, dataPoint);
 					}
@@ -629,7 +626,6 @@ public class DhLightingEngine
 							// then there is no overlap between this one and the adjacent one,
 							// and therefore light cannot propagate here.
 							// try to propagate to the next data point down from the adjacent one.
-							continue;
 						}
 						else if (adjacentMaxY <= minY)
 						{
@@ -641,7 +637,6 @@ public class DhLightingEngine
 						else if (!airIDs.get(FullDataPointUtil.getId(adjacentDataPoint)))
 						{
 							// assume for now that we cannot propagate into non-transparent data points.
-							continue;
 						}
 						else
 						{
@@ -792,7 +787,7 @@ public class DhLightingEngine
 		{
 			for (int i = 0; i < this.lightPositionsByLightLevel.length; i++)
 			{
-				// When tested with a normal 1.20 world James saw a maximum of 36,709 block and 2,355 sky lights,
+				// When tested with a normal 1.20 world James saw a maximum of 36,709 block and 2,355 skylights,
 				// so 40,000 should be a good starting point that can contain most lighting tasks.
 				this.lightPositionsByLightLevel[i] = new IntArrayList(40_000 * INTS_PER_LIGHT_POS);
 				this.indexByLightLevel[i] = -1;

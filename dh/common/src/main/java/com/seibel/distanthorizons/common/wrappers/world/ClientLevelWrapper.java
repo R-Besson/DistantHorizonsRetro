@@ -7,6 +7,7 @@ import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
 import com.seibel.distanthorizons.api.objects.DhApiResult;
 import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
+import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
@@ -17,7 +18,10 @@ import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
-import com.seibel.distanthorizons.core.level.*;
+import com.seibel.distanthorizons.core.level.IDhLevel;
+import com.seibel.distanthorizons.core.level.IKeyedClientLevelManager;
+import com.seibel.distanthorizons.core.level.IServerKeyedClientLevel;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPosMutable;
@@ -28,15 +32,11 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IDimensionTypeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
-
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import net.minecraft.client.Minecraft;
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.WorldServer;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -118,6 +118,7 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		CLIENT_CLEANUP_TIMER.scheduleAtFixedRate(CLIENT_CLEANUP_TASK, 0, 1000 / 20);
 	}
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	public static void tickCleanup()
 	{
 		WorldClient clientLevel = MINECRAFT.theWorld;
@@ -126,8 +127,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		{
 			return;
 		}
-
-
 
 		long currentTime = System.currentTimeMillis();
 
@@ -552,27 +551,25 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		EDhApiLodShading lodShading = Config.Client.Advanced.Graphics.Quality.lodShading.get();
 		switch (lodShading)
 		{
-			default:
+			case DISABLED:
+				return 1.0F;
 			case AUTO:
-				// the level doesn't have a getShade method, fall through to ENABLED
 			case ENABLED:
+			default:
 				switch (lodDirection)
 				{
-					case DOWN:
-						return 0.5F;
-					default:
-					case UP:
-						return 1.0F;
 					case NORTH:
 					case SOUTH:
 						return 0.8F;
 					case WEST:
 					case EAST:
 						return 0.6F;
+					case DOWN:
+						return 0.5F;
+					case UP:
+					default:
+						return 1.0F;
 				}
-
-			case DISABLED:
-				return 1.0F;
 		}
 	}
 

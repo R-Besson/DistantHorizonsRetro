@@ -6,13 +6,13 @@ import com.seibel.distanthorizons.core.level.AbstractDhServerLevel;
 import com.seibel.distanthorizons.core.multiplayer.config.SessionConfig;
 import com.seibel.distanthorizons.core.multiplayer.fullData.FullDataPayloadSender;
 import com.seibel.distanthorizons.core.multiplayer.fullData.SharedBandwidthLimit;
+import com.seibel.distanthorizons.core.network.event.internal.CloseInternalEvent;
 import com.seibel.distanthorizons.core.network.event.internal.IncompatibleMessageInternalEvent;
+import com.seibel.distanthorizons.core.network.exceptions.RateLimitedException;
 import com.seibel.distanthorizons.core.network.messages.base.CloseReasonMessage;
 import com.seibel.distanthorizons.core.network.messages.base.LevelInitMessage;
 import com.seibel.distanthorizons.core.network.messages.base.RequestLevelInitMessage;
 import com.seibel.distanthorizons.core.network.messages.base.SessionConfigMessage;
-import com.seibel.distanthorizons.core.network.event.internal.CloseInternalEvent;
-import com.seibel.distanthorizons.core.network.exceptions.RateLimitedException;
 import com.seibel.distanthorizons.core.network.messages.fullData.FullDataSourceRequestMessage;
 import com.seibel.distanthorizons.core.network.session.NetworkSession;
 import com.seibel.distanthorizons.core.util.ratelimiting.SupplierBasedRateAndConcurrencyLimiter;
@@ -33,7 +33,7 @@ public class ServerPlayerState implements Closeable
 	private final String serverKeyWithoutId = Config.Server.serverKey.get();
 	private final String serverKey = (this.serverKeyWithoutId.isEmpty() ? "" : Config.Server.serverId.get() + "_" + this.serverKeyWithoutId.trim())
 			.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
-			.replaceAll(" ", "_");
+			.replace(" ", "_");
 	
 	
 	public final NetworkSession networkSession;
@@ -133,16 +133,12 @@ public class ServerPlayerState implements Closeable
 	{
 		public final SupplierBasedRateAndConcurrencyLimiter<FullDataSourceRequestMessage> generationRequestRateLimiter = new SupplierBasedRateAndConcurrencyLimiter<>(
 				() -> Config.Server.generationRequestRateLimit.get(),
-				msg -> {
-					msg.sendResponse(new RateLimitedException("Full data request rate limit: " + ServerPlayerState.this.sessionConfig.getGenerationRequestRateLimit()));
-				}
+				msg -> msg.sendResponse(new RateLimitedException("Full data request rate limit: " + ServerPlayerState.this.sessionConfig.getGenerationRequestRateLimit()))
 		);
 		
 		public final SupplierBasedRateAndConcurrencyLimiter<FullDataSourceRequestMessage> syncOnLoginRateLimiter = new SupplierBasedRateAndConcurrencyLimiter<>(
 				() -> Config.Server.syncOnLoadRateLimit.get(),
-				msg -> {
-					msg.sendResponse(new RateLimitedException("Sync on login rate limit: " + ServerPlayerState.this.sessionConfig.getSyncOnLoginRateLimit()));
-				}
+				msg -> msg.sendResponse(new RateLimitedException("Sync on login rate limit: " + ServerPlayerState.this.sessionConfig.getSyncOnLoginRateLimit()))
 		);
 		
 	}

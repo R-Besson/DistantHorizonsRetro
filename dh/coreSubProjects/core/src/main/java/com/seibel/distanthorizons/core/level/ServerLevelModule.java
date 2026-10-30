@@ -23,10 +23,10 @@ import com.seibel.distanthorizons.api.interfaces.override.worldGenerator.IDhApiW
 import com.seibel.distanthorizons.core.file.fullDatafile.GeneratedFullDataSourceProvider;
 import com.seibel.distanthorizons.core.file.structure.ISaveStructure;
 import com.seibel.distanthorizons.core.generation.DhWorldGenerator;
-import com.seibel.distanthorizons.core.generation.queues.IFullDataSourceRetrievalQueue;
-import com.seibel.distanthorizons.core.generation.queues.WorldGenerationQueue;
 import com.seibel.distanthorizons.core.generation.queues.AbstractLodRequestState;
+import com.seibel.distanthorizons.core.generation.queues.IFullDataSourceRetrievalQueue;
 import com.seibel.distanthorizons.core.generation.queues.LodRequestModule;
+import com.seibel.distanthorizons.core.generation.queues.WorldGenerationQueue;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.WorldGeneratorInjector;
 
 import java.io.IOException;

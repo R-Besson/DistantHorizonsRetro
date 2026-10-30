@@ -55,7 +55,7 @@ public class ServerThreadTaskHandler
 	private volatile long tickStartNano = TICK_START_NOT_SET;
 	
 	/** 
-	 * How long {@link #runTasks()} took for each of the last {@link #DH_TICK_HISTORY_LENGTH} ticks. <br>
+	 * How long {@link #runTasks()} took for each of the last n ticks. <br>
 	 * This work runs after Minecraft records its tick time, so it has to be tracked separately
 	 * to know how much of each tick is actually used.
 	 */

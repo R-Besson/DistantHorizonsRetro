@@ -56,7 +56,7 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		
 		
 		// particle cleanup		
-		BoxParticle head = null;
+		BoxParticle head;
 		while ((head = this.particles.poll()) != null && head.isDead())
 		{ /* remove dead particles */ }
 		if (head != null)

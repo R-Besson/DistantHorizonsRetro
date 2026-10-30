@@ -19,21 +19,17 @@
 
 package com.seibel.distanthorizons.common.render.openGl.glObject.shader;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * This object holds a OpenGL reference to a shader
@@ -116,8 +112,8 @@ public class GlShader
 			InputStream in;
 			if (absoluteFilePath)
 			{
-				// Throws FileNotFoundException
-				in = new FileInputStream(path); // Note: this should use OS path seperator
+				// Throws NoSuchFileException
+				in = Files.newInputStream(Paths.get(path)); // Note: this should use OS path seperator
 			}
 			else
 			{
@@ -127,13 +123,15 @@ public class GlShader
 					throw new FileNotFoundException("Shader file not found in resource: " + path);
 				}
 			}
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			
-			// read in the file
-			String line;
-			while ((line = reader.readLine()) != null)
+
+			// read in the file, closing the reader also closes the stream
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(in)))
 			{
-				stringBuilder.append(line).append("\n");
+				String line;
+				while ((line = reader.readLine()) != null)
+				{
+					stringBuilder.append(line).append("\n");
+				}
 			}
 		}
 		catch (IOException e)

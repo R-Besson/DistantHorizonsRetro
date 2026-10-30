@@ -25,7 +25,8 @@ import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3d;
 import com.seibel.distanthorizons.api.objects.render.DhApiRenderableBox;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles creating {@link DhApiRenderableBox}.

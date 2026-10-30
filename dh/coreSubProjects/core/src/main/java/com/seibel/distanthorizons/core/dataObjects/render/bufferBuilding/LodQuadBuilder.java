@@ -19,9 +19,6 @@
 
 package com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding;
 
-import java.nio.ByteBuffer;
-import java.util.*;
-
 import com.seibel.distanthorizons.api.enums.config.EDhApiGrassSideRendering;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiDebugRendering;
@@ -31,9 +28,13 @@ import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.ByteBufferCheckoutWrapper;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
-import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
+import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Used to create the quads before they are converted to render-able buffers. <br><br>
@@ -140,7 +141,7 @@ public class LodQuadBuilder implements AutoCloseable
 
 	/**
 	 * Smaller lists are quicker to sort with their list index packed into the sort keys' low 16 bits,
-	 * which are always 0 (see {@link BufferQuad#computeSortKey}). <br>
+	 * which are always 0 (see {@code BufferQuad.computeSortKey}). <br>
 	 * Must be at most 2^16 so the index fits.
 	 */
 	private static final int RADIX_SORT_MIN_QUAD_COUNT = 2048;
@@ -208,7 +209,7 @@ public class LodQuadBuilder implements AutoCloseable
 		this.doTransparency = doTransparency;
 		
 		this.clientLevelWrapper = clientLevelWrapper;
-		// faces next to open air default to full sky light, which lights up caves in dimensions without a sky
+		// faces next to open air default to full skylight, which lights up caves in dimensions without a sky
 		this.noSkyLight = (clientLevelWrapper != null && !clientLevelWrapper.hasSkyLight());
 
 		this.debugRenderingMode = Config.Client.Advanced.Debugging.debugRenderingColors.get();
@@ -929,6 +930,7 @@ public class LodQuadBuilder implements AutoCloseable
 		{
 			// manual add and loop to reduce GC pressure due to addAll() doing unnecessary
 			// array copies
+			//noinspection ForLoopReplaceableByForEach,UseBulkOperation
 			for (int j = 0; j < quadsToReturn[i].size(); j++)
 			{
 				quadCache.add(quadsToReturn[i].get(j));

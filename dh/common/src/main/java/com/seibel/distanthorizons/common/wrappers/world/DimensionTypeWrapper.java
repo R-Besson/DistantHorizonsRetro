@@ -19,11 +19,11 @@
 
 package com.seibel.distanthorizons.common.wrappers.world;
 
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IDimensionTypeWrapper;
+
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.Objects;
-
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.IDimensionTypeWrapper;
 
 /**
  * 1.7.10 has no DimensionType class, dimensions are identified by WorldProvider.dimensionId.

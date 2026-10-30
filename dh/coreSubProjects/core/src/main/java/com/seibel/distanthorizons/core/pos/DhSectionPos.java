@@ -40,7 +40,7 @@ import java.util.function.LongConsumer;
  * A section defines what unit the quad tree works in, because of that we don't want that unit to be too big or too small. <br>
  * <strong>Too small</strong>, and we'll have 1,000s of sections running around, all needing individual files and render buffers.<br>
  * <strong>Too big</strong>, and the LOD dropoff will be very noticeable.<br>
- * With those thoughts in mind we decided on a smallest section size of 64 data points square (IE 4x4 chunks).
+ * With those thoughts in mind we decided on the smallest section size of 64 data points square (IE 4x4 chunks).
  *
  * @author Leetom
  */

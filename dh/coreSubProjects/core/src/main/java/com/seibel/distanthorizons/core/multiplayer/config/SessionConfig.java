@@ -1,11 +1,11 @@
 package com.seibel.distanthorizons.core.multiplayer.config;
 
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiGeneratorPlan;
-import com.seibel.distanthorizons.core.util.MoreObjects;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 import com.seibel.distanthorizons.core.network.INetworkObject;
+import com.seibel.distanthorizons.core.util.MoreObjects;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
@@ -223,7 +223,7 @@ public class SessionConfig implements INetworkObject
 			
 			if (includeAllValues || !Objects.equals(thisValue, thatValue))
 			{
-				stringBuilder.append(key+":["+thatValue+"], ");
+				stringBuilder.append(key).append(":[").append(thatValue).append("], ");
 			}
 		}
 		
@@ -273,18 +273,11 @@ public class SessionConfig implements INetworkObject
 		
 		public AnyChangeListener(Runnable runnable)
 		{
-			try
+			int size = CONFIG_ENTRIES.size();
+			this.changeListeners = new ArrayList<>(size);
+			for (Entry entry : CONFIG_ENTRIES.values())
 			{
-				int size = CONFIG_ENTRIES.size();
-				this.changeListeners = new ArrayList<>(size);
-				for (Entry entry : CONFIG_ENTRIES.values())
-				{
-					this.changeListeners.add(entry.changeListenerFactory.apply(runnable));
-				}
-			}
-			catch (Throwable e)
-			{
-				throw e;
+				this.changeListeners.add(entry.changeListenerFactory.apply(runnable));
 			}
 		}
 		

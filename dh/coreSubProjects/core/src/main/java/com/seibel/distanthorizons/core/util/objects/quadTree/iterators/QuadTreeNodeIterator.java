@@ -35,7 +35,7 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 	
 	private final Queue<QuadNode<T>> validNodesForDetailLevel = new ArrayDeque<>();
 	private final Queue<QuadNode<T>> iteratorNodeQueue = new ArrayDeque<>();
-	private byte iteratorDetailLevel = 0;
+	private byte iteratorDetailLevel;
 	
 	private final boolean onlyReturnLeafValues;
 	@Nullable

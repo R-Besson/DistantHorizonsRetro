@@ -100,7 +100,7 @@ public class DataSourceRepoTests
 							1, // height
 							colIndex, // relative min Y
 							(byte)(colIndex % LodUtil.MAX_MC_LIGHT), // block light 
-							(byte)((colIndex + 2) % LodUtil.MAX_MC_LIGHT) // sky light
+							(byte)((colIndex + 2) % LodUtil.MAX_MC_LIGHT) // skylight
 					);
 					fullDataArray[arrayIndex].add(datapoint);
 				}
@@ -182,7 +182,7 @@ public class DataSourceRepoTests
 				assertArraysAreEqual(originalDataSource.columnGenerationSteps, savedDataSource.columnGenerationSteps);
 				assertArraysAreEqual(originalDataSource.columnWorldCompressionMode,
 						savedDataSource.columnWorldCompressionMode);
-				Assert.assertTrue(originalDataSource.dataPoints.length == savedDataSource.dataPoints.length);
+				Assert.assertEquals(originalDataSource.dataPoints.length, savedDataSource.dataPoints.length);
 				
 				for (int i = 0; i < FullDataSourceV2.WIDTH * FullDataSourceV2.WIDTH; i++)
 				{
@@ -276,6 +276,7 @@ public class DataSourceRepoTests
 			// so we can profile the DTO creation process and
 			// see if there are any object leaks and how the GC
 			// handles it
+			//noinspection ConstantValue
 			if (false)
 			{
 				System.out.println("Initial save/get success, starting long update test for GC validation...");
@@ -293,7 +294,7 @@ public class DataSourceRepoTests
 					{
 						// create a new DTO so each thread can have their own to work with,
 						// otherwise they'll get stuck on locks for interacting with the same row
-						FullDataSourceV2DTO threadDto = null;
+						FullDataSourceV2DTO threadDto;
 						try
 						{
 							threadDto = FullDataSourceV2DTO.CreateFromDataSource(originalDataSource, EDhApiDataCompressionMode.LZMA2);

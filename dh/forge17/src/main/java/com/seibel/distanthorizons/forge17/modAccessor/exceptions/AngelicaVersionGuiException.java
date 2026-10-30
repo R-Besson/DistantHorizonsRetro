@@ -1,11 +1,10 @@
 package com.seibel.distanthorizons.forge17.modAccessor.exceptions;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiErrorScreen;
-
 import cpw.mods.fml.client.CustomModLoadingErrorDisplayException;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiErrorScreen;
 
 @SideOnly(Side.CLIENT)
 public class AngelicaVersionGuiException extends CustomModLoadingErrorDisplayException 
@@ -47,7 +46,7 @@ public class AngelicaVersionGuiException extends CustomModLoadingErrorDisplayExc
 
         errorScreen.drawCenteredString(
             fontRenderer,
-            "Forge Mod Loader has found a problem with your minecraft installation",
+            "Forge Mod Loader has found a problem with your Minecraft installation",
             centerX,
             y,
             0xFFFFFF); // white

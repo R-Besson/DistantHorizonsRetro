@@ -4,17 +4,17 @@ import com.seibel.distanthorizons.api.enums.config.EDhApiDataCompressionMode;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV1;
 import com.seibel.distanthorizons.core.file.structure.ISaveStructure;
 import com.seibel.distanthorizons.core.level.IDhLevel;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.sql.dto.FullDataSourceV1DTO;
 import com.seibel.distanthorizons.core.sql.repo.AbstractDhRepo;
 import com.seibel.distanthorizons.core.sql.repo.FullDataSourceV1Repo;
 import com.seibel.distanthorizons.core.util.objects.DataCorruptedException;
 import com.seibel.distanthorizons.core.util.objects.dataStreams.DhDataInputStream;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 	{
 		FullDataSourceV1 dataSource = FullDataSourceV1.createEmpty(dto.pos);
 		try (PhantomArrayListCheckout checkout = ARRAY_LIST_POOL.checkoutByteArrays(1);
-			// LZ4 was used by DH before 2.1.0 and as such must be used until the data format is changed to record the compressor)
+			// LZ4 was used by DH before 2.1.0 and as such must be used until the data format is changed to record the compressor
 			DhDataInputStream inputStream = DhDataInputStream.create(dto.dataArray, EDhApiDataCompressionMode.LZ4, checkout))
 		{
 			dataSource.populateFromStream(dto, inputStream, this.level);
@@ -137,7 +137,7 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 		return dataSourceList;
 	}
 	
-	public void markMigrationFailed(long pos) { ((FullDataSourceV1Repo) this.repo).markMigrationFailed(pos); }
+	public void markMigrationFailed(long pos) { this.repo.markMigrationFailed(pos); }
 	
 	
 	

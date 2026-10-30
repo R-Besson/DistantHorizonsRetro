@@ -19,16 +19,13 @@
 
 package com.seibel.distanthorizons.core.wrapperInterfaces.minecraft;
 
-import java.awt.Color;
-
 import com.seibel.distanthorizons.api.enums.config.EDhApiDepthDirection;
-import com.seibel.distanthorizons.core.wrapperInterfaces.misc.ILightMapWrapper;
-import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.util.math.DhVec3f;
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.seibel.distanthorizons.core.wrapperInterfaces.misc.ILightMapWrapper;
+import com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection.IBindable;
+
+import java.awt.*;
 
 /**
  * Contains everything related to
@@ -59,7 +56,6 @@ public interface IMinecraftRenderWrapper extends IBindable
 
 	Color getFogColor();
 	
-	/** Unless you really need to know if the player is blind, use {@link IMinecraftRenderWrapper#isFogStateSpecial()} instead */
 	boolean isFogStateSpecial();
 	
 	Color getSkyColor();

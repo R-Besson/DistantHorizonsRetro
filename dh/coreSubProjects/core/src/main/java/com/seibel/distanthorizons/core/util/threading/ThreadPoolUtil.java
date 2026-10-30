@@ -28,7 +28,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSha
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Holds each thread pool the system uses.
@@ -169,8 +169,6 @@ public class ThreadPoolUtil
 	 * 
 	 * all speeds are measured in blocks per second 
 	 * 
-	 * @see LodUtil#WALKING_SPEED_IN_BLOCKS_PER_SEC
-	 * @see LodUtil#SPRINTING_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC
 	 * @see LodUtil#MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC
 	 */

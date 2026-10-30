@@ -3,12 +3,12 @@
  */
 package com.seibel.distanthorizons.lwjgl.lwjgl2.memory;
 
-import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.NULL;
-
 import com.seibel.distanthorizons.core.jar.EPlatform;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.Sys;
+
+import static com.seibel.distanthorizons.lwjgl.lwjgl2.memory.MemoryUtilities.NULL;
 
 /**
  * Pointer interface.

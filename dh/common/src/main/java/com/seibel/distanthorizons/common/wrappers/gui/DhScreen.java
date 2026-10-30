@@ -4,9 +4,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.StatCollector;
 
-
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 public class DhScreen extends GuiScreen
 {

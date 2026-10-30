@@ -18,6 +18,7 @@ public class ChunkPosGenStream
 	public static Stream<ChunkPos> getStream(int genMinX, int genMinZ, int width, int extraRadius)
 	{ return StreamSupport.stream(new InclusiveChunkPosIterator(genMinX, genMinZ, width, extraRadius), false); }
 	
+	@SuppressWarnings("FieldCanBeLocal")
 	private static class InclusiveChunkPosIterator extends Spliterators.AbstractSpliterator<ChunkPos>
 	{
 		private final int minX;

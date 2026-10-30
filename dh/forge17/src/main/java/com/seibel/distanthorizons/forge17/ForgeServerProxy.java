@@ -1,7 +1,21 @@
 package com.seibel.distanthorizons.forge17;
 
+import com.seibel.distanthorizons.common.AbstractModInitializer;
 import com.seibel.distanthorizons.common.commonMixins.MixinChunkMapCommon;
+import com.seibel.distanthorizons.common.util.ProxyUtil;
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
+import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
+import com.seibel.distanthorizons.common.wrappers.misc.ServerPlayerWrapper;
+import com.seibel.distanthorizons.common.wrappers.world.ServerLevelWrapper;
+import com.seibel.distanthorizons.core.api.internal.ServerApi;
+import com.seibel.distanthorizons.core.api.internal.SharedApi;
+import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IServerPlayerWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -13,22 +27,6 @@ import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.HashMap;
-
-import com.seibel.distanthorizons.common.AbstractModInitializer;
-import com.seibel.distanthorizons.common.util.ProxyUtil;
-import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
-import com.seibel.distanthorizons.common.wrappers.misc.ServerPlayerWrapper;
-import com.seibel.distanthorizons.common.wrappers.world.ServerLevelWrapper;
-import com.seibel.distanthorizons.core.api.internal.ServerApi;
-import com.seibel.distanthorizons.core.api.internal.SharedApi;
-import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IServerPlayerWrapper;
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.PlayerEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 
 public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 {
@@ -124,7 +122,7 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 			BlockChangeLodUpdater blockChangeLodUpdater = this.blockChangeLodUpdaterByWorld.remove((WorldServer) GetEventLevel(event));
 			if (blockChangeLodUpdater != null)
 			{
-				((WorldServer) GetEventLevel(event)).removeWorldAccess(blockChangeLodUpdater);
+				GetEventLevel(event).removeWorldAccess(blockChangeLodUpdater);
 			}
 
 			// the levels are looked up by their wrapper instance (it has no equals()),

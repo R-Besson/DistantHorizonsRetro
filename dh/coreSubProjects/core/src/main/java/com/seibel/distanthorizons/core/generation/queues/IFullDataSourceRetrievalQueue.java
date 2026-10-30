@@ -20,8 +20,8 @@
 package com.seibel.distanthorizons.core.generation.queues;
 
 import com.seibel.distanthorizons.core.generation.tasks.DataSourceRetrievalResult;
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.render.QuadTree.LodQuadTree;
 import com.seibel.distanthorizons.core.util.objects.RollingAverage;
 
@@ -100,7 +100,7 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	void setCanRegenerate(boolean retrievingLowDetailLods);
 	
 	/** 
-	 * Generally the retrieval queue should be fairly small, so its faster to iterate over the existing list
+	 * Generally the retrieval queue should be fairly small, so it's faster to iterate over the existing list
 	 * and check if each one is valid vs dumbly attempting to remove every position that just went out of range.
 	 */
 	void removeRetrievalRequestIf(DhSectionPos.IPrimitiveLongConsumer removeIf);

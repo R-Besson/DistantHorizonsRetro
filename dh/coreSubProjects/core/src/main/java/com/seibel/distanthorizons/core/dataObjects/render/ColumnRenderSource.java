@@ -20,14 +20,14 @@
 package com.seibel.distanthorizons.core.dataObjects.render;
 
 import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
+import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
 import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry;
+import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.RenderDataPointReducingList;
+import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.AbstractPhantomArrayList;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
-import com.seibel.distanthorizons.core.pos.DhSectionPos;
-import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
-import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
-import com.seibel.distanthorizons.core.config.Config;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
@@ -69,7 +69,7 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	 * LODs that aren't right up against the minimum world height.
 	 * <br><br>
 	 * This is necessary so sky/block lighting is correct.
-	 * Otherwise those air LODs will be optimized away by
+	 * Otherwise, those air LODs will be optimized away by
 	 * the {@link RenderDataPointReducingList}.
 	 */
 	public final LongArrayList voidRenderDataContainer;
@@ -308,7 +308,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	public String toString()
 	{
 		String LINE_DELIMITER = "\n";
-		String DATA_DELIMITER = " ";
 		String SUBDATA_DELIMITER = ",";
 		StringBuilder stringBuilder = new StringBuilder();
 		
@@ -327,13 +326,7 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 					if (y != this.maxVerticalSliceCount - 1)
 						stringBuilder.append(SUBDATA_DELIMITER);
 				}
-				
-				if (x != size - 1)
-					stringBuilder.append(DATA_DELIMITER);
 			}
-			
-			if (z != size - 1)
-				stringBuilder.append(LINE_DELIMITER);
 		}
 		return stringBuilder.toString();
 	}

@@ -22,9 +22,11 @@ package com.seibel.distanthorizons.common.render.openGl.generic;
 import com.seibel.distanthorizons.api.enums.config.EDhApiGpuUploadMethod;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.interfaces.override.rendering.IDhApiGenericObjectShaderProgram;
-import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
-import com.seibel.distanthorizons.api.methods.events.abstractEvents.*;
+import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup;
+import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeGenericObjectRenderEvent;
+import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeGenericRenderCleanupEvent;
+import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeGenericRenderSetupEvent;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiRenderParam;
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3d;
 import com.seibel.distanthorizons.api.objects.render.DhApiRenderableBox;
@@ -42,8 +44,8 @@ import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.render.renderer.GenericRenderObjectFactory;
 import com.seibel.distanthorizons.core.render.renderer.RenderableBoxGroup;
 import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrapper;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
+import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhGenericRenderer;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.OverrideInjector;
@@ -53,13 +55,14 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
 
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
  * Handles rendering generic groups of {@link DhApiRenderableBox}.
@@ -177,7 +180,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	
 	public GlGenericObjectRenderer() { }
 	
-	public void init()
+	@SuppressWarnings("ConstantValue") public void init()
 	{
 		if (this.init)
 		{
@@ -345,7 +348,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 				blockPos.y = 140f;
 
 				Color newColor = (massRelativePosBoxGroup.get(0).color == Color.RED) ? Color.RED.darker() : Color.RED;
-				massRelativePosBoxGroup.forEach((box) -> { box.color = newColor; });
+				massRelativePosBoxGroup.forEach((box) -> box.color = newColor);
 				massRelativePosBoxGroup.triggerBoxChange();
 			}
 
@@ -633,7 +636,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		}
 	}
 	/** 
-	 * Clean way to handle both {@link LWJGL#glVertexAttribDivisor} and {@link ARBInstancedArrays#glVertexAttribDivisorARB}
+	 * Clean way to handle both  and {@link ARBInstancedArrays#glVertexAttribDivisorARB}
 	 * based on which one is supported.
 	 */
 	private void vertexAttribDivisor(int index, int divisor)

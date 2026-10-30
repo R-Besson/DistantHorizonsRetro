@@ -19,24 +19,24 @@
 
 package com.seibel.distanthorizons.core;
 
+import com.seibel.distanthorizons.api.DhApi;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderObjectFactory;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeRenderEvent;
+import com.seibel.distanthorizons.core.api.external.methods.config.DhApiConfig;
+import com.seibel.distanthorizons.core.api.external.methods.data.DhApiTerrainDataRepo;
 import com.seibel.distanthorizons.core.api.internal.ClientApi;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.eventHandlers.IgnoredDimensionCsvHandler;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
 import com.seibel.distanthorizons.core.jar.EPlatform;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.sql.DatabaseUpdater;
-import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
-import com.seibel.distanthorizons.core.world.DhApiWorldProxy;
-import com.seibel.distanthorizons.core.api.external.methods.config.DhApiConfig;
-import com.seibel.distanthorizons.core.api.external.methods.data.DhApiTerrainDataRepo;
-import com.seibel.distanthorizons.api.DhApi;
-import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.render.DhApiRenderProxy;
+import com.seibel.distanthorizons.core.sql.DatabaseUpdater;
+import com.seibel.distanthorizons.core.world.DhApiWorldProxy;
+import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
+import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import org.sqlite.SQLiteJDBCLoader;
 
 import java.awt.*;
@@ -130,7 +130,7 @@ public class Initializer
 			
 			if (EPlatform.get() == EPlatform.MACOS)
 			{
-				// setting AWT headless to "true" on Mac causes a lock up
+				// setting AWT headless to "true" on Mac causes a lock-up
 				// due to a bug with Java.awt texture loading
 				setAwtHeadless = false;
 			}
@@ -230,16 +230,14 @@ public class Initializer
 				{
 					LOGGER.warn(
 						warningMessageHeader + "\n" +
-						warningMessageBody +
-						"");
+						warningMessageBody);
 				}
 				
 				if (Config.Common.Logging.Warning.showGarbageCollectorWarning.get())
 				{
 					ClientApi.INSTANCE.queueSlowChatMessage(
 						MinecraftTextFormat.ORANGE + warningMessageHeader + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-						warningMessageBody +
-						"");
+						warningMessageBody);
 				}
 			}
 		}
@@ -266,6 +264,7 @@ public class Initializer
 				if (arg.toLowerCase().contains("DisableExplicitGC".toLowerCase()))
 				{
 					explicitGcDisabled = true;
+					break;
 				}
 			}
 			LOGGER.info("Explicit Garbage Collection: ["+(explicitGcDisabled ? "Disabled" : "Enabled")+"]");
@@ -287,16 +286,14 @@ public class Initializer
 				{
 					LOGGER.warn(
 						warningMessageHeader + "\n" +
-						warningMessageBody +
-						"");
+						warningMessageBody);
 				}
 				
 				if (Config.Common.Logging.Warning.showExplicitGcDisabledWarning.get())
 				{
 					ClientApi.INSTANCE.queueSlowChatMessage(
 						MinecraftTextFormat.ORANGE + warningMessageHeader + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
-						warningMessageBody +
-						"");
+						warningMessageBody);
 				}
 			}
 		}

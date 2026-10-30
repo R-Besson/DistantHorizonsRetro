@@ -364,7 +364,7 @@ public class BlockTextureRegistry
 		short textureId;
 		if (!anyFaceTextured)
 		{
-			// blocks whose every face is flat (IE uniformly colored textures)
+			// blocks who's every face is flat (IE uniformly colored textures)
 			// share the reserved flat set
 			textureId = UNTEXTURED_ID;
 		}
@@ -504,7 +504,6 @@ public class BlockTextureRegistry
 					red   = encodeRatio(redRatio * ratioScale);
 					green = encodeRatio(greenRatio * ratioScale);
 					blue  = encodeRatio(blueRatio * ratioScale);
-					alpha = (byte)ColorUtil.getAlpha(argb);
 				}
 				else
 				{
@@ -514,8 +513,8 @@ public class BlockTextureRegistry
 					red   = (byte) ColorUtil.getRed(argb);
 					green = (byte) ColorUtil.getGreen(argb);
 					blue  = (byte) ColorUtil.getBlue(argb);
-					alpha = (byte) ColorUtil.getAlpha(argb);
 				}
+				alpha = (byte)ColorUtil.getAlpha(argb);
 				
 				int outIndex = TextureUtil.getPixelIndex(u,v) * 4;
 				uploadPixels[outIndex] = red;

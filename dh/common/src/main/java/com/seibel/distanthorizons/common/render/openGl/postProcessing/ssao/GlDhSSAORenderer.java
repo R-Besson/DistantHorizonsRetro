@@ -31,8 +31,6 @@ import org.lwjgl.opengl.GL30;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-import java.nio.ByteBuffer;
-
 /**
  * Handles adding SSAO via {@link GlDhSSAOShader} and {@link GlDhSSAOApplyShader}. <br><br>
  * 
@@ -92,7 +90,7 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 		this.ssaoTexture = GLMC.glGenTextures();
 		{
 			GLMC.glBindTexture(this.ssaoTexture);
-			LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_R16F, width, height, 0, GL11.GL_RED, GL30.GL_HALF_FLOAT, (ByteBuffer) null);
+			LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL30.GL_R16F, width, height, 0, GL11.GL_RED, GL30.GL_HALF_FLOAT, null);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			LWJGL.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			

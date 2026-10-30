@@ -1,7 +1,7 @@
 package com.seibel.distanthorizons.common.wrappers.misc;
 
-import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IMutableBlockPosWrapper;
 import com.seibel.distanthorizons.common.backports.BlockPos;
+import com.seibel.distanthorizons.core.wrapperInterfaces.misc.IMutableBlockPosWrapper;
 
 public class MutableBlockPosWrapper implements IMutableBlockPosWrapper
 {

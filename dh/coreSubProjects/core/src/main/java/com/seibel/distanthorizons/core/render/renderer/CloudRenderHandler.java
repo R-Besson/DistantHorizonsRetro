@@ -29,6 +29,7 @@ import com.seibel.distanthorizons.api.objects.render.DhApiRenderableBoxGroupShad
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.level.IDhClientLevel;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
@@ -37,7 +38,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRen
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhGenericRenderer;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -45,7 +45,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
 
 public class CloudRenderHandler
 {
@@ -548,11 +548,11 @@ public class CloudRenderHandler
 	//==================//
 	//region
 	
-	private static boolean[][] getCloudsFromTexture() throws FileNotFoundException, IOException
+	private static boolean[][] getCloudsFromTexture() throws IOException
 	{
 		final ClassLoader loader = CloudRenderHandler.class.getClassLoader();
 		
-		boolean[][] whitePixels = null;
+		boolean[][] whitePixels;
 		try(InputStream imageInputStream = loader.getResourceAsStream(CLOUD_RESOURCE_TEXTURE_PATH))
 		{
 			if (imageInputStream == null)
@@ -604,9 +604,9 @@ public class CloudRenderHandler
 		
 		
 		/** how far this cloud group has moved in the X direction based on time */
-		public float deltaOffsetX = 0;
+		public float deltaOffsetX;
 		/** how far this cloud group has moved in the Z direction based on time */
-		public float deltaOffsetZ = 0;
+		public float deltaOffsetZ;
 		
 		public long lastFrameTime = System.currentTimeMillis();
 		

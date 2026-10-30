@@ -6,8 +6,6 @@ import org.lwjgl.opengl.GL12;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-import java.nio.ByteBuffer;
-
 public class GlDhDepthTexture
 {
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
@@ -36,7 +34,7 @@ public class GlDhDepthTexture
 	{
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, this.getTextureId());
 		LWJGL.glTexImage2D(GL11.GL_TEXTURE_2D, 0, format.getGlInternalFormat(), width, height, 0,
-				format.getGlType(), format.getGlFormat(), (ByteBuffer) null);
+				format.getGlType(), format.getGlFormat(), null);
 	}
 	
 	public int getTextureId()

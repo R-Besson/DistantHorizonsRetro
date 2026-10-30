@@ -1,9 +1,9 @@
 package com.seibel.distanthorizons.core.util.delayedSaveCache;
 
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.KeyedLockContainer;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -56,7 +57,7 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 	
 	static
 	{
-		BACKGROUND_CLEAN_UP_THREAD.execute(() -> runCleanupLoop());
+		BACKGROUND_CLEAN_UP_THREAD.execute(AbstractDelayedSaveCache::runCleanupLoop);
 	}
 	
 	public AbstractDelayedSaveCache(int saveDelayInMs)

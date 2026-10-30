@@ -34,9 +34,6 @@ public class ConcreteSingletonTestBoth implements ISingletonTestOne, ISingletonT
 	public static final int VALUE = 3;
 	
 	@Override
-	public void finishDelayedSetup() { }
-	
-	@Override
 	public int getValue()
 	{
 		return VALUE;

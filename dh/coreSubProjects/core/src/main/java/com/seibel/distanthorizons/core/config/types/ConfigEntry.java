@@ -21,12 +21,12 @@ package com.seibel.distanthorizons.core.config.types;
 
 
 import com.seibel.distanthorizons.core.config.ConfigHandler;
-import com.seibel.distanthorizons.core.util.NumberUtil;
 import com.seibel.distanthorizons.core.config.file.ConfigFileHandler;
 import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
 import com.seibel.distanthorizons.core.config.listeners.IConfigListener;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigEntryAppearance;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigValidity;
+import com.seibel.distanthorizons.core.util.NumberUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.seibel.distanthorizons.common.wrappers.gui;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  * Should be used instead of showing dialogs directly

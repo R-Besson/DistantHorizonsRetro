@@ -19,18 +19,17 @@
 
 package com.seibel.distanthorizons.common.render.openGl.glObject.shader;
 
-import java.awt.Color;
-import java.nio.FloatBuffer;
-
 import com.seibel.distanthorizons.api.objects.math.DhApiMat4f;
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3i;
-import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
+import com.seibel.distanthorizons.core.util.math.DhVec3f;
 import com.seibel.distanthorizons.lwjgl.AbstractMemoryStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import com.seibel.distanthorizons.core.util.math.DhVec3f;
+import java.awt.*;
+import java.nio.FloatBuffer;
+
+import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 
 /**

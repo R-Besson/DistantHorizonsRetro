@@ -19,8 +19,8 @@
 
 package com.seibel.distanthorizons.core.sql.repo;
 
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.sql.DbConnectionClosedException;
 import com.seibel.distanthorizons.core.sql.dto.BeaconBeamDTO;
 import org.jetbrains.annotations.Nullable;
@@ -59,13 +59,12 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 	protected String CreateParameterizedWhereString() { return "BlockPosX = ? AND BlockPosY = ? AND BlockPosZ = ?"; }
 	
 	@Override
-	protected int setPreparedStatementWhereClause(PreparedStatement statement, int index, DhBlockPos pos) throws SQLException
+	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, DhBlockPos pos) throws SQLException
 	{
 		statement.setInt(index++, pos.getX());
 		statement.setInt(index++, pos.getY());
-		statement.setInt(index++, pos.getZ());
-		return index;
-	}
+		statement.setInt(index, pos.getZ());
+    }
 	
 	
 	
@@ -123,8 +122,8 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 		statement.setInt(i++, dto.color.getGreen());
 		statement.setInt(i++, dto.color.getBlue());
 		
-		statement.setLong(i++, System.currentTimeMillis()); // last modified unix time
-		statement.setLong(i++, System.currentTimeMillis()); // created unix time
+		statement.setLong(i++, System.currentTimeMillis()); // last modified Unix time
+		statement.setLong(i, System.currentTimeMillis()); // created Unix time
 		
 		return statement;
 	}
@@ -172,7 +171,7 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 			statement.setInt(i++, minBlockX);
 			statement.setInt(i++, maxBlockX);
 			statement.setInt(i++, minBlockZ);
-			statement.setInt(i++, maxBlockZ);
+			statement.setInt(i, maxBlockZ);
 			
 			
 			try (ResultSet result = this.query(statement))
@@ -187,7 +186,7 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 		{
 			// done to handle resultSet.get() methods which can throw closed exceptions
 			if (e instanceof SQLException
-				&& DbConnectionClosedException.isClosedException((SQLException)e))
+				&& DbConnectionClosedException.isClosedException(e))
 			{
 				return beamList;
 			}

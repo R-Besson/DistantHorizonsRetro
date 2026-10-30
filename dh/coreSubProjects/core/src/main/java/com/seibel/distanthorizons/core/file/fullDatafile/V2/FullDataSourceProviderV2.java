@@ -48,8 +48,13 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -74,7 +79,7 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 		= DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL
 		// We might be able to get away with 9,
 		// but James would like to keep a little safe buffer, just in case.
-		// At 10+ the LOD application process breaks down and
+		// At 10+ the LOD application process breaks down and,
 		// we start to get weird anomolies that look bad.
 		+ 8;
 	
@@ -414,7 +419,7 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	 */
 	public boolean tryMakeRoomForRetrieval(long pos, DhBlockPos2D centerPos) { return false; }
 
-	/** @see IFullDataSourceRetrievalQueue#canRetrievePos */
+	/** */
 	public boolean canRetrievePos(long pos, DhBlockPos2D centerPos) { return true; }
 	
 	/** Can be used to display how many total chunk retrieval requests should be available. */

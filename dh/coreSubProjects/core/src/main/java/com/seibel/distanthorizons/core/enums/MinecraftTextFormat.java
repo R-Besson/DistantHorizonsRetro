@@ -4,34 +4,34 @@ package com.seibel.distanthorizons.core.enums;
  * might be deprecated in the future? in that case we'll probably want a wrapper 
  * function to handle colors for new MC versions
  * <br><br>
- * source: https://minecraft.wiki/w/Formatting_codes <br>
+ * source: <a href="https://minecraft.wiki/w/Formatting_codes">...</a> <br>
  * The full code table is kept even though not every code is used.
  */
 @SuppressWarnings("unused")
 public class MinecraftTextFormat
 {
-	public static final String BLACK = "\u00A70";
-	public static final String DARK_BLUE = "\u00A71";
-	public static final String DARK_GREEN = "\u00A72";
-	public static final String DARK_AQUA = "\u00A73";
-	public static final String DARK_RED = "\u00A74";
-	public static final String DARK_PURPLE = "\u00A75";
-	public static final String ORANGE = "\u00A76";
-	public static final String GRAY = "\u00A77";
-	public static final String DARK_GRAY = "\u00A78";
-	public static final String BLUE = "\u00A79";
-	public static final String GREEN = "\u00A7a";
-	public static final String AQUA = "\u00A7b";
-	public static final String RED = "\u00A7c";
-	public static final String LIGHT_PURPLE = "\u00A7d";
-	public static final String YELLOW = "\u00A7e";
-	public static final String WHITE = "\u00A7f";
+	public static final String BLACK = "§0";
+	public static final String DARK_BLUE = "§1";
+	public static final String DARK_GREEN = "§2";
+	public static final String DARK_AQUA = "§3";
+	public static final String DARK_RED = "§4";
+	public static final String DARK_PURPLE = "§5";
+	public static final String ORANGE = "§6";
+	public static final String GRAY = "§7";
+	public static final String DARK_GRAY = "§8";
+	public static final String BLUE = "§9";
+	public static final String GREEN = "§a";
+	public static final String AQUA = "§b";
+	public static final String RED = "§c";
+	public static final String LIGHT_PURPLE = "§d";
+	public static final String YELLOW = "§e";
+	public static final String WHITE = "§f";
 	
-	public static final String OBFUSCATED = "\u00A7k";
-	public static final String BOLD = "\u00A7l";
-	public static final String STRIKETHROUGH = "\u00A7m";
-	public static final String UNDERLINE = "\u00A7n";
-	public static final String ITALIC = "\u00A7o";
-	public static final String CLEAR_FORMATTING = "\u00A7r";
+	public static final String OBFUSCATED = "§k";
+	public static final String BOLD = "§l";
+	public static final String STRIKETHROUGH = "§m";
+	public static final String UNDERLINE = "§n";
+	public static final String ITALIC = "§o";
+	public static final String CLEAR_FORMATTING = "§r";
 	
 }

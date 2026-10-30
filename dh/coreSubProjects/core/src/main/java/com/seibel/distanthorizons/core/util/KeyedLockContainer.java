@@ -7,8 +7,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * map to a finite number of locks.
  * Useful when loading/modifying positional LOD data and wanting to
  * prevent concurrent modifications. <br>
- * 
- * Based on the stack overflow post: https://stackoverflow.com/a/45909920
+ *
+ * Based on the stack overflow post: <a href="https://stackoverflow.com/a/45909920">...</a>
  */
 public class KeyedLockContainer<TKey>
 {

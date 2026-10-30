@@ -36,7 +36,7 @@ public class DhCancelableOneTimeTestEventHandler extends AbstractDhApiCancelable
 	public void onTestEvent(DhApiCancelableEventParam<Boolean> input) { this.eventFiredValue = input.value; }
 	
 	
-	// test (non standard) methods //
+	// test (non-standard) methods //
 	@Override
 	public Boolean getTestValue() { return this.eventFiredValue; }
 	

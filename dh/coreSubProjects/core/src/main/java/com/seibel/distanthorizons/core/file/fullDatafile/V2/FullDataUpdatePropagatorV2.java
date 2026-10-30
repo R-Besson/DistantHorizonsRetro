@@ -778,10 +778,10 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	public void debugRender(AbstractDebugWireframeRenderer renderer)
 	{
 		this.updatingPosSet
-				.forEach((pos) -> { renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f, 0.20f, Color.MAGENTA)); });
+				.forEach((pos) -> renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f, 0.20f, Color.MAGENTA)));
 		
 		this.generatingPosSet
-				.forEach((pos) -> { renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f, 0.20f, Color.CYAN)); });
+				.forEach((pos) -> renderer.renderBox(new AbstractDebugWireframeRenderer.Box(pos, -32f, 80f, 0.20f, Color.CYAN)));
 	}
 	
 	@Override

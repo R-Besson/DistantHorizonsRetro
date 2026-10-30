@@ -101,7 +101,7 @@ public class CompressionRoundTripTest
 					1, // height
 					y, // relative min Y
 					(byte) random.nextInt(LodUtil.MAX_MC_LIGHT), // block light
-					(byte) random.nextInt(LodUtil.MAX_MC_LIGHT))); // sky light
+					(byte) random.nextInt(LodUtil.MAX_MC_LIGHT))); // skylight
 			}
 			generationSteps[i] = (byte) (random.nextInt(4) + 1);
 			worldCompressionModes[i] = (byte) random.nextInt(3);

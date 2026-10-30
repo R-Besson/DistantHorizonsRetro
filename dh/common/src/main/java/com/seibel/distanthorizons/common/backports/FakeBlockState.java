@@ -1,13 +1,13 @@
 package com.seibel.distanthorizons.common.backports;
 
-import java.util.Objects;
-
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+
+import java.util.Objects;
 
 /**
  * Allows for smoother use of blocks in

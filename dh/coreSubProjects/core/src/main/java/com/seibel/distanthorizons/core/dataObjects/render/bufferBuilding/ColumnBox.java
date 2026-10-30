@@ -23,14 +23,14 @@ import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiTransparency;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dataObjects.render.ColumnRenderSource;
+import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
 import com.seibel.distanthorizons.core.dataObjects.render.textures.BlockTextureRegistry;
 import com.seibel.distanthorizons.core.enums.EDhDirection;
+import com.seibel.distanthorizons.core.util.LodUtil;
+import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
-import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.core.util.RenderDataPointUtil;
-import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -424,8 +424,8 @@ public class ColumnBox
 		// otherwise a light on top of this column (IE fire on a hill) would light its whole side
 		segments.add(YSegmentUtil.encode(yMin, yMax, LodUtil.MAX_MC_LIGHT, blockLight, false));
 		
-		// Process each adjacent datapoint and split segments as needed
-		// (index -1 is a special case for the void datapoint)
+		// Process each adjacent Datapoint and split segments as needed
+		// (index -1 is a special case for the void Datapoint)
 		for (int adjIndex = -1; adjIndex < adjCount; adjIndex++)
 		{
 			long adjPoint = (adjIndex != -1) 
@@ -474,8 +474,8 @@ public class ColumnBox
 				adjBelowPoint = adjColumnView.getVoid();
 			}
 			
-			// the datapoint below this may be empty due to how datapoint reducing
-			// is done. In that case use the void datapoint.
+			// the Datapoint below this may be empty due to how Datapoint reducing
+			// is done. In that case use the void Datapoint.
 			if (adjBelowPoint == RenderDataPointUtil.EMPTY_DATA)
 			{
 				adjBelowPoint = adjColumnView.getVoid();
@@ -570,7 +570,7 @@ public class ColumnBox
 			// Fill overhang area [adjMaxY, adjAboveMinY) with adjSkyLight
 			if (adjMaxY < adjAboveMinY)
 			{
-				// the topmost air keeps its max sky light (min is taken)
+				// the topmost air keeps its max sky ight (min is taken)
 				byte overhangSkyLight = (adjIndex == 0) ? LodUtil.MAX_MC_LIGHT : adjSkyLight;
 
 				// the stored block light is the light right above the adjacent point,
@@ -667,7 +667,7 @@ public class ColumnBox
 				newSegments.add(YSegmentUtil.encode(startY, rangeStart, skyLight, blockLight, covered));
 			}
 
-			// Overlapping part - take minimum sky light, the block light is replaced
+			// Overlapping part - take minimum skylight, the block light is replaced
 			short overlapStart = (short)Math.max(startY, rangeStart);
 			short overlapEnd = (short)Math.min(endY, rangeEnd);
 			byte minLight = (byte) Math.min(newLight, skyLight);
@@ -699,7 +699,7 @@ public class ColumnBox
 		
 		// Don't add transparent vertical faces
 		// unless the adjacent position is empty.
-		// Sky light can't be used for this, it's below max under overhangs and in dimensions without a sky.
+		// Skylight can't be used for this, it's below max under overhangs and in dimensions without a sky.
 		// This is done to prevent walls between water blocks in the ocean.
 		if (inputTransparent
 			&& covered)
@@ -866,7 +866,7 @@ public class ColumnBox
 		private static final int END_Y_OFFSET = START_Y_OFFSET + HEIGHT_WIDTH;
 		private static final int SKY_LIGHT_OFFSET = END_Y_OFFSET + HEIGHT_WIDTH;
 		private static final int BLOCK_LIGHT_OFFSET = SKY_LIGHT_OFFSET + SKY_LIGHT_WIDTH;
-		/** set when an adjacent datapoint covers the segment, overhangs only darken it */
+		/** set when an adjacent Datapoint covers the segment, overhangs only darken it */
 		private static final int COVERED_OFFSET = BLOCK_LIGHT_OFFSET + SKY_LIGHT_WIDTH;
 
 

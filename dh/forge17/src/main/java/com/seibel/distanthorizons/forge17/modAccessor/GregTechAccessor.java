@@ -1,19 +1,18 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
-import java.lang.reflect.Field;
-
 import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.util.IIcon;
-
 import gregtech.api.interfaces.IBlockWithTextures;
 import gregtech.api.interfaces.IIconContainer;
 import gregtech.api.interfaces.ITexture;
 import gregtech.common.render.GTRenderedTexture;
+import net.minecraft.block.Block;
+import net.minecraft.util.IIcon;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Field;
 
 public class GregTechAccessor implements IGregTechCommonAccessor
 {

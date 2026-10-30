@@ -20,11 +20,12 @@
 package com.seibel.distanthorizons.core.file.structure;
 
 import com.google.common.net.PercentEscaper;
-import com.seibel.distanthorizons.api.interfaces.override.levelHandling.IDhApiSaveStructure;
-import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
-import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.api.enums.config.EDhApiServerFolderNameMode;
+import com.seibel.distanthorizons.api.interfaces.override.levelHandling.IDhApiSaveStructure;
+import com.seibel.distanthorizons.core.config.Config;
+import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.level.IServerKeyedClientLevel;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.util.objects.ParsedIp;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
@@ -32,10 +33,8 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftSha
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.OverrideInjector;
 import com.seibel.distanthorizons.coreapi.util.StringUtil;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.io.File;
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -137,7 +136,7 @@ public class ClientOnlySaveStructure implements ISaveStructure
 		String path = MC_SHARED.getInstallationDirectory().getPath() + File.separatorChar
 				+ SERVER_DATA_FOLDER_NAME + File.separatorChar
 				+ folderName + File.separatorChar
-				+ dimensionName.replaceAll(":", "@@");
+				+ dimensionName.replace(":", "@@");
 		
 		return new File(path);
 	}
@@ -167,24 +166,26 @@ public class ClientOnlySaveStructure implements ISaveStructure
 		
 		// generate the folder name
 		String folderName;
+		
+		String s = (!serverPortCleaned.isEmpty() ? ("-" + serverPortCleaned) : "");
+		
 		switch (folderNameMode)
 		{
-			default:
-			case NAME_ONLY:
-				folderName = serverName;
-				break;
-			case IP_ONLY:
-				folderName = serverIpCleaned;
-				break;
-			
 			case NAME_IP:
 				folderName = serverName + ", IP " + serverIpCleaned;
 				break;
 			case NAME_IP_PORT:
-				folderName = serverName + ", IP " + serverIpCleaned + (!serverPortCleaned.isEmpty() ? ("-" + serverPortCleaned) : "");
+				folderName = serverName + ", IP " + serverIpCleaned + s;
 				break;
 			case NAME_IP_PORT_MC_VERSION:
-				folderName = serverName + ", IP " + serverIpCleaned + (!serverPortCleaned.isEmpty() ? ("-" + serverPortCleaned) : "") + ", GameVersion " + serverMcVersion;
+				folderName = serverName + ", IP " + serverIpCleaned + s + ", GameVersion " + serverMcVersion;
+				break;
+			case IP_ONLY:
+				folderName = serverIpCleaned;
+				break;
+			case NAME_ONLY:
+			default:
+				folderName = serverName;
 				break;
 		}
 		

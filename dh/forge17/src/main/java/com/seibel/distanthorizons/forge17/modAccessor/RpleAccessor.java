@@ -1,12 +1,11 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
-import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-
 import com.falsepattern.rple.api.client.RPLELightMapAPI;
 import com.falsepattern.rple.api.common.ServerColorHelper;
 import com.falsepattern.rple.api.common.block.RPLEBlock;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.IRpleCommonAccessor;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 
 /**
  * 

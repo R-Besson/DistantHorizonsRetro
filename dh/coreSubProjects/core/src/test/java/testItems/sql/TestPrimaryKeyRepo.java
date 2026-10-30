@@ -60,11 +60,10 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 	protected String CreateParameterizedWhereString() { return "Id = ?"; }
 	
 	@Override
-	protected int setPreparedStatementWhereClause(PreparedStatement statement, int index, Integer id) throws SQLException
+	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, Integer id) throws SQLException
 	{
-		statement.setInt(index++, id);
-		return index;
-	}
+		statement.setInt(index, id);
+    }
 	
 	
 	@Override
@@ -89,8 +88,7 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 			"ON CONFLICT(Id) DO UPDATE SET\n" +
 			"     Value = excluded.Value \n" +
 			"    ,LongValue = excluded.LongValue \n" +
-			"    ,ByteValue = excluded.ByteValue \n" +
-			"";
+			"    ,ByteValue = excluded.ByteValue \n";
 		PreparedStatement statement = this.createPreparedStatement(sql);
 		
 		int i = 1; // post-increment for the win!
@@ -98,7 +96,7 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 		
 		statement.setObject(i++, dto.value);
 		statement.setObject(i++, dto.longValue);
-		statement.setObject(i++, dto.byteValue);
+		statement.setObject(i, dto.byteValue);
 		
 		return statement;
 	}

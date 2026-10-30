@@ -152,8 +152,7 @@ public class DhClientWorld extends AbstractDhWorld implements IDhClientWorld
 			
 			ClientApi.INSTANCE.queueSlowChatMessage(
 				r + "Distant Horizons: Client level loading failed." + cf + "\n" +
-				"Unable to load level ["+y+clientLevelWrapper.getDhIdentifier()+cf+"], LODs may not appear. See log for more information. \n" +
-				"");
+				"Unable to load level ["+y+clientLevelWrapper.getDhIdentifier()+cf+"], LODs may not appear. See log for more information. \n");
 			
 			return null;
 		}

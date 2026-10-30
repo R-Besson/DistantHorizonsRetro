@@ -21,9 +21,9 @@ package com.seibel.distanthorizons.core.util;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.seibel.distanthorizons.core.dataObjects.render.columnViews.ColumnRenderView;
+import com.seibel.distanthorizons.core.util.LodUtil.AssertFailureException;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.AbstractPhantomArrayList;
 import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
-import com.seibel.distanthorizons.core.util.LodUtil.AssertFailureException;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortArrayList;
 import it.unimi.dsi.fastutil.shorts.ShortArrays;
@@ -280,15 +280,15 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * algorithm:
 	 * 	1: try to merge the smallest segment with the segment above or below it.
 	 * 		this will only succeed if the adjacent node has the same alpha as it.
-	 * 		1a: if there is only one adjacent node which matches this criteria,
+	 * 		1a: if there is only one adjacent node which matches these criteria,
 	 * 			we will merge with that node. <br><br>
 	 *
-	 * 		1b: if both adjacent nodes match this criteria,
+	 * 		1b: if both adjacent nodes match these criteria,
 	 * 			attempt to merge with the smaller one.
 	 * 			1b1: if both adjacent nodes are the same height,
 	 * 				merge with the higher one. <br><br>
 	 *
-	 * 		1c: if there are no adjacent nodes which match this criteria,
+	 * 		1c: if there are no adjacent nodes which match these criteria,
 	 * 			repeat step 1 with the next smallest segment instead.
 	 * 			continue trying bigger and bigger segments until we either:
 	 * 				* have a success, or
@@ -649,15 +649,15 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	/**
 	 * returns the largest node whose height is strictly less than the provided size,
 	 * or null if all contained nodes are greater than or equal to the provided size.
-	 *
+	 * <p>
 	 * special cases:
 	 * if the list is empty, then null is returned,
 	 * because the loop will not run and biggest will be null.
-	 *
+	 * <p>
 	 * if all nodes are less tall than size, then the largest node is returned,
 	 * because the loop will run for all nodes, but will not return any of them,
 	 * so the fallback path of returning the biggest node is used.
-	 *
+	 * <p>
 	 * if all nodes are at least as tall as size, then null is returned,
 	 * because the loop will immediately return the
 	 * smallest node's smaller neighbor, which is null.
@@ -787,7 +787,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			
 			int lowY = this.getMinY(lowest);
 			int higher = this.getHigher(lowest);
-			inner:
 			while (true)
 			{
 				if (higher == NULL)
@@ -825,7 +824,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 					if (ASSERTS) this.checkLinks();
 					
 					lowest = this.getLowest();
-					break inner;
+					break;
 				}
 				else
 				{

@@ -20,17 +20,18 @@
 package com.seibel.distanthorizons.core.api.external.methods.data;
 
 import com.seibel.distanthorizons.api.interfaces.data.IDhApiTerrainDataCache;
+import com.seibel.distanthorizons.api.interfaces.data.IDhApiTerrainDataRepo;
 import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
 import com.seibel.distanthorizons.api.objects.DhApiResult;
 import com.seibel.distanthorizons.api.objects.data.DhApiRaycastResult;
 import com.seibel.distanthorizons.api.objects.data.DhApiTerrainDataPoint;
-import com.seibel.distanthorizons.api.interfaces.data.IDhApiTerrainDataRepo;
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3i;
 import com.seibel.distanthorizons.core.api.internal.SharedApi;
 import com.seibel.distanthorizons.core.dataObjects.fullData.FullDataPointIdMap;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.level.IDhLevel;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.pos.DhChunkPos;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
@@ -39,17 +40,16 @@ import com.seibel.distanthorizons.core.util.DhApiTerrainDataPointUtil;
 import com.seibel.distanthorizons.core.util.FullDataPointUtil;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.RayCastUtil;
+import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.util.math.DhVec3f;
+import com.seibel.distanthorizons.core.util.math.DhVec3i;
 import com.seibel.distanthorizons.core.world.AbstractDhWorld;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
-import com.seibel.distanthorizons.core.util.math.DhVec3d;
-import com.seibel.distanthorizons.core.util.math.DhVec3i;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -245,14 +245,11 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 		// get the data source //
 		//=====================//
 		
-		FullDataSourceV2 dataSource = null;
+		FullDataSourceV2 dataSource;
 		try
 		{
 			// try using the cached data if possible
-			if (dataCache != null)
-			{
-				dataSource = dataCache.get(sectionPos);
-			}
+			dataSource = dataCache.get(sectionPos);
 			
 			if (dataSource == null)
 			{
@@ -264,10 +261,7 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 				}
 				
 				// save to the cache if present
-				if (dataCache != null)
-				{
-					dataCache.add(sectionPos, dataSource);
-				}
+				dataCache.add(sectionPos, dataSource);
 			}
 			
 			
@@ -338,14 +332,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 			// shouldn't normally happen, but just in case
 			LOGGER.error("Unexpected exception in getTerrainDataColumnArray. Error: [" + e.getMessage() + "]", e);
 			return DhApiResult.createFail("Unexpected exception: [" + e.getMessage() + "].");
-		}
-		finally
-		{
-			if (dataCache == null
-				&& dataSource != null)
-			{
-				dataSource.close();
-			}
 		}
 	}
 	
@@ -627,7 +613,7 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 							{
 								for (DhApiTerrainDataPoint point : rayCastColumn)
 								{
-									str.append(point.topYBlockPos + " block: " + point.blockStateWrapper.getSerialString() + " SL: " + point.skyLightLevel + " BL: " + point.blockLightLevel + "\n");
+									str.append(point.topYBlockPos).append(" block: ").append(point.blockStateWrapper.getSerialString()).append(" SL: ").append(point.skyLightLevel).append(" BL: ").append(point.blockLightLevel).append("\n");
 								}
 							}
 							LOGGER.info(str.toString());

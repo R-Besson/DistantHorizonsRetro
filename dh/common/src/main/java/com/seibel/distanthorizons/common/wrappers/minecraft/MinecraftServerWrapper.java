@@ -3,10 +3,9 @@ package com.seibel.distanthorizons.common.wrappers.minecraft;
 import com.seibel.distanthorizons.common.wrappers.world.ServerLevelWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
 import net.minecraft.server.dedicated.DedicatedServer;
-import org.jetbrains.annotations.Nullable;
-
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 

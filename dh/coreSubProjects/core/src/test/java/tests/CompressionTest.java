@@ -27,7 +27,7 @@ import com.seibel.distanthorizons.coreapi.util.StringUtil;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.junit.Assert;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * <strong>Note:</strong>
@@ -115,7 +115,7 @@ public class CompressionTest
 			File compressedDatabaseFile = new File(compressedDatabaseFilePath);
 			compressedDatabaseFile.mkdirs();
 			compressedDatabaseFile.delete();
-			Assert.assertTrue(!compressedDatabaseFile.exists());
+			Assert.assertFalse(compressedDatabaseFile.exists());
 			compressedRepo = new FullDataSourceV2Repo("jdbc:sqlite", compressedDatabaseFile);
 
 

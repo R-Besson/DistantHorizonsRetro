@@ -6,12 +6,7 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import org.jetbrains.annotations.Nullable;
-
-import team.chisel.ctmlib.CTM;
-import team.chisel.ctmlib.ICTMBlock;
-import team.chisel.ctmlib.ISubmapManager;
-import team.chisel.ctmlib.RenderBlocksCTM;
-import team.chisel.ctmlib.TextureSubmap;
+import team.chisel.ctmlib.*;
 
 /**
  * Picks the icons the same way Chisel's CTMRenderer and RenderBlocksCTM draw a block in the world.

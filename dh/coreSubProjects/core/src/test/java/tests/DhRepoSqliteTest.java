@@ -26,8 +26,8 @@ import com.seibel.distanthorizons.core.sql.repo.phantoms.AutoClosableTrackingWra
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import testItems.sql.TestCompoundKeyRepo;
 import testItems.sql.TestCompoundKeyDto;
+import testItems.sql.TestCompoundKeyRepo;
 import testItems.sql.TestPrimaryKeyRepo;
 import testItems.sql.TestSingleKeyDto;
 
@@ -63,10 +63,8 @@ public class DhRepoSqliteTest
 	@Test
 	public void testPrimaryKeyRepo()
 	{
-		TestPrimaryKeyRepo primaryKeyRepo = null;
-		try
+		try (TestPrimaryKeyRepo primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-			primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
 			
 			
 			
@@ -75,13 +73,13 @@ public class DhRepoSqliteTest
 			//==========================//
 			
 			// check that the schema table is created
-			try(PreparedStatement statement = primaryKeyRepo.createPreparedStatement(
-					"SELECT name FROM sqlite_master WHERE type='table' AND name='"+DatabaseUpdater.SCHEMA_TABLE_NAME+"';");
+			try (PreparedStatement statement = primaryKeyRepo.createPreparedStatement(
+				"SELECT name FROM sqlite_master WHERE type='table' AND name='" + DatabaseUpdater.SCHEMA_TABLE_NAME + "';");
 				ResultSet autoUpdateTablePresentResult = primaryKeyRepo.query(statement))
 			{
 				if (autoUpdateTablePresentResult == null
-						|| !autoUpdateTablePresentResult.next()
-						|| autoUpdateTablePresentResult.getString("name") == null)
+					|| !autoUpdateTablePresentResult.next()
+					|| autoUpdateTablePresentResult.getString("name") == null)
 				{
 					Assert.fail("Auto DB update table missing.");
 				}
@@ -138,22 +136,13 @@ public class DhRepoSqliteTest
 		{
 			Assert.fail(e.getMessage());
 		}
-		finally
-		{
-			if (primaryKeyRepo != null)
-			{
-				primaryKeyRepo.close();
-			}
-		}
 	}
 	
 	@Test
 	public void testCompoundKeyRepo()
 	{
-		TestCompoundKeyRepo compoundKeyRepo = null;
-		try
+		try (TestCompoundKeyRepo compoundKeyRepo = new TestCompoundKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-			compoundKeyRepo = new TestCompoundKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
 			
 			
 			
@@ -201,20 +190,13 @@ public class DhRepoSqliteTest
 		{
 			Assert.fail(e.getMessage());
 		}
-		finally
-		{
-			if (compoundKeyRepo != null)
-			{
-				compoundKeyRepo.close();
-			}
-		}
 	}
 	
 	/** 
 	 * leak detection is done to make sure {@link ResultSet} and {@link PreparedStatement}'s
 	 * are properly cleaned up.
 	 */
-	@Test
+	@SuppressWarnings("ConstantValue") @Test
 	public void testRepoLeakDetection()
 	{
 		if (!AutoClosableTrackingWrapper.TRACK_WRAPPERS)
@@ -223,10 +205,8 @@ public class DhRepoSqliteTest
 			return;
 		}
 		
-		TestPrimaryKeyRepo primaryKeyRepo = null;
-		try
+		try (TestPrimaryKeyRepo primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-			primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
 			
 			int insertCount = 10;
 			int readCount = 10;
@@ -289,7 +269,7 @@ public class DhRepoSqliteTest
 			
 			// don't run these tests in release, leaks aren't tracked and the test will fail
 			if (AutoClosableTrackingWrapper.TRACK_WRAPPERS)
-			{	
+			{
 				// nuke the DB so we can insert without worries
 				primaryKeyRepo.deleteAll();
 				
@@ -333,50 +313,31 @@ public class DhRepoSqliteTest
 		{
 			Assert.fail(e.getMessage());
 		}
-		finally
-		{
-			if (primaryKeyRepo != null)
-			{
-				primaryKeyRepo.close();
-			}
-		}
 	}
 	
 	
 	// can be uncommented to compare different update methods performance
 	//@Test
-	@SuppressWarnings("unused")
+	@Test @SuppressWarnings("unused")
 	public void testBulkUpdatePerformance()
 	{
-		TestPrimaryKeyRepo primaryKeyRepo = null;
-		try
+		try (TestPrimaryKeyRepo primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-			primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
-			final TestPrimaryKeyRepo finalRepoRef = primaryKeyRepo;
-			
-			
 			long startMs = System.currentTimeMillis();
 			
 			// run two threads that try to update
 			// the same DTO to test locks
-			CompletableFuture<Void> f1 = CompletableFuture.runAsync(() -> bulkSameDtoUpdate(finalRepoRef, 0, 2_000));
-			CompletableFuture<Void> f2 = CompletableFuture.runAsync(() -> bulkSameDtoUpdate(finalRepoRef, 2_000, 4_000));
+			CompletableFuture<Void> f1 = CompletableFuture.runAsync(() -> bulkSameDtoUpdate(primaryKeyRepo, 0, 2_000));
+			CompletableFuture<Void> f2 = CompletableFuture.runAsync(() -> bulkSameDtoUpdate(primaryKeyRepo, 2_000, 4_000));
 			
 			CompletableFuture.allOf(f1, f2).join();
 			
 			long endMs = System.currentTimeMillis();
-			System.out.println("Bulk update took ["+(endMs - startMs)+"] ms");
+			System.out.println("Bulk update took [" + (endMs - startMs) + "] ms");
 		}
 		catch (SQLException | IOException e)
 		{
 			Assert.fail(e.getMessage());
-		}
-		finally
-		{
-			if (primaryKeyRepo != null)
-			{
-				primaryKeyRepo.close();
-			}
 		}
 	}
 	private static void bulkSameDtoUpdate(TestPrimaryKeyRepo repo, int startIndex, int endIndex)

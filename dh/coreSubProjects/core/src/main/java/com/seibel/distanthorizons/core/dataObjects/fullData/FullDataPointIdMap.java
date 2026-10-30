@@ -21,25 +21,26 @@ package com.seibel.distanthorizons.core.dataObjects.fullData;
 
 import com.seibel.distanthorizons.core.dataObjects.BlockBiomeWrapperPair;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
-import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
-import com.seibel.distanthorizons.core.util.objects.pooling.StringPool;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.objects.DataCorruptedException;
 import com.seibel.distanthorizons.core.util.objects.dataStreams.DhDataInputStream;
 import com.seibel.distanthorizons.core.util.objects.dataStreams.DhDataOutputStream;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListCheckout;
+import com.seibel.distanthorizons.core.util.objects.pooling.PhantomArrayList.PhantomArrayListPool;
+import com.seibel.distanthorizons.core.util.objects.pooling.StringPool;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
 import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IBiomeWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 import it.unimi.dsi.fastutil.chars.CharArrayList;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -171,7 +172,7 @@ public class FullDataPointIdMap
 	 * Allows duplicate entries. <br><br>
 	 * 
 	 * Allowing duplicate entries should be done if a datasource is just being read in and 
-	 * a merge step isn't being done afterwards. If duplicates are removed it may cause 
+	 * a merge step isn't being done afterward. If duplicates are removed it may cause 
 	 * the ID's to get out of sync since everything will be shifted down after the removed
 	 * ID(s).
 	 */
@@ -408,18 +409,6 @@ public class FullDataPointIdMap
 	
 	@Override 
 	public String toString() { return DhSectionPos.toString(this.pos) + " size: " + this.blockBiomePairList.size(); }
-	
-	@Override
-	public boolean equals(Object other)
-	{
-        return other == this;
-/*        if (!(other instanceof FullDataPointIdMap)) return false;
-		FullDataPointIdMap otherMap = (FullDataPointIdMap) other;
-        if (entries.size() != otherMap.entries.size()) return false;
-        for (int i=0; i<entries.size(); i++) {
-            if (!entries.get(i).equals(otherMap.entries.get(i))) return false;
-        }*/
-    }
 	
 	/** Only includes the base data in this object, not the mapping */
 	@Override

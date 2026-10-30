@@ -259,17 +259,16 @@ public final class BufferQuad
 					thisParallelCompareStartPos = this.z;
 					
 					otherPerpendicularCompareStartPos = quad.x;
-					otherParallelCompareStartPos = quad.z;
-				}
+                }
 				else //if (mergeDirection == MergeDirection.NorthSouthOrUpDown)
 				{
 					thisPerpendicularCompareStartPos = this.y;
 					thisParallelCompareStartPos = this.z;
 					
 					otherPerpendicularCompareStartPos = quad.y;
-					otherParallelCompareStartPos = quad.z;
-				}
-				break;
+                }
+                otherParallelCompareStartPos = quad.z;
+                break;
 			
 			default: // shouldn't normally happen, just here to make the compiler happy
 				throw new IllegalArgumentException("Unsupported axis: ["+this.direction.axis+"]");

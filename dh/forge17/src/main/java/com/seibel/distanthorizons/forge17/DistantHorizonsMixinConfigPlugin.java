@@ -1,5 +1,6 @@
 package com.seibel.distanthorizons.forge17;
 
+import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.lib.tree.ClassNode;
@@ -9,8 +10,6 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.gtnewhorizon.gtnhmixins.builders.IMixins;
 
 public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 {

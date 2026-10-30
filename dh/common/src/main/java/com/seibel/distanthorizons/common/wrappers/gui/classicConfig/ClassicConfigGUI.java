@@ -1,28 +1,24 @@
 package com.seibel.distanthorizons.common.wrappers.gui.classicConfig;
 
+import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
+import com.seibel.distanthorizons.core.config.types.ConfigUIComment;
+import com.seibel.distanthorizons.core.config.types.enums.EConfigCommentTextPosition;
+import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.wrapperInterfaces.config.IConfigGui;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.seibel.distanthorizons.core.config.types.*;
-
-import com.seibel.distanthorizons.core.config.types.enums.EConfigCommentTextPosition;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
-import com.seibel.distanthorizons.core.wrapperInterfaces.config.IConfigGui;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
-import net.minecraft.world.World;
-import com.seibel.distanthorizons.core.logging.DhLogger;
-
-import org.jetbrains.annotations.NotNull;
-
-import net.minecraft.client.renderer.Tessellator;
-
-
-
-import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.*;
+import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.SetY;
 
 
 /*
@@ -34,7 +30,6 @@ import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.*;
  * @author James Seibel
  * @version 5-21-2022
  */
-@SuppressWarnings("unchecked")
 public class ClassicConfigGUI
 {
 	public static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder()
@@ -124,7 +119,7 @@ public class ClassicConfigGUI
 			super.drawContainerBackground(tessellator);
 		}
 
-		public void addButton(DhConfigScreen gui, AbstractConfigBase dhConfigType, Gui button, GuiButton resetButton, GuiButton indexButton, String text)
+		public void addButton(DhConfigScreen gui, AbstractConfigBase<?> dhConfigType, Gui button, GuiButton resetButton, GuiButton indexButton, String text)
 		{
 			this.children.add(new DhButtonEntry(gui, dhConfigType, button, text, resetButton, indexButton));
 		}

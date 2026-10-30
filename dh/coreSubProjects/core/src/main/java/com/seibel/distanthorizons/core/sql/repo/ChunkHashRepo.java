@@ -55,11 +55,10 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 	protected String CreateParameterizedWhereString() { return "ChunkPosX = ? AND ChunkPosZ = ?"; }
 	
 	@Override
-	protected int setPreparedStatementWhereClause(PreparedStatement statement, int index, DhChunkPos pos) throws SQLException
+	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, DhChunkPos pos) throws SQLException
 	{
 		statement.setInt(index++, pos.getX());
-		statement.setInt(index++, pos.getZ());
-		return index;
+		statement.setInt(index, pos.getZ());
 	}
 	
 	
@@ -110,8 +109,8 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 		
 		statement.setObject(i++, dto.chunkHash);
 		
-		statement.setObject(i++, System.currentTimeMillis()); // last modified unix time
-		statement.setObject(i++, System.currentTimeMillis()); // created unix time
+		statement.setObject(i++, System.currentTimeMillis()); // last modified Unix time
+		statement.setObject(i, System.currentTimeMillis()); // created Unix time
 		
 		return statement;
 	}

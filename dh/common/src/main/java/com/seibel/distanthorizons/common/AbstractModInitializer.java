@@ -8,6 +8,7 @@ import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiAfterDh
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeDhInitEvent;
 import com.seibel.distanthorizons.common.commands.CommandInitializer;
 import com.seibel.distanthorizons.common.wrappers.DependencySetup;
+import com.seibel.distanthorizons.common.wrappers.gui.NativeDialogUtil;
 import com.seibel.distanthorizons.common.wrappers.minecraft.AbstractMinecraftSharedWrapper;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftClientWrapper;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftServerWrapper;
@@ -18,10 +19,10 @@ import com.seibel.distanthorizons.core.config.eventHandlers.presets.ThreadPreset
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.jar.ModJarInfo;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.render.renderer.StubDebugWireframeRenderer;
-import com.seibel.distanthorizons.common.wrappers.gui.NativeDialogUtil;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IVersionConstants;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
@@ -30,15 +31,13 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccesso
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModChecker;
 import com.seibel.distanthorizons.coreapi.DependencyInjection.ApiEventInjector;
 import com.seibel.distanthorizons.coreapi.ModInfo;
+import net.minecraft.command.ServerCommandManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import net.minecraft.command.ServerCommandManager;
 
 /**
  * Base for the mod loader initializer
@@ -201,11 +200,6 @@ public abstract class AbstractModInitializer
 		LOGGER.info("Running Delayed setup...");
 		this.runDelayedSetup();
 		
-		if (ConfigHandler.INSTANCE == null)
-		{
-			throw new IllegalStateException("Config was not initialized. Make sure to call LodCommonMain.initConfig() before calling this method.");
-		}
-		
 		LOGGER.info("Delayed setup complete, firing DhApiAfterDhInitEvent event...");
 		
 		// should be fired after all delayed setup so singletons and config can be accessed
@@ -321,7 +315,7 @@ public abstract class AbstractModInitializer
 		// Disabled since it prevents the JVM from exiting
 		Config.Client.Advanced.Debugging.OpenGl.overrideVanillaGLLogger.setMcVersionOverrideValue(false);
 
-		// worldgen
+		// World generation
 		AbstractMinecraftSharedWrapper.supportsSurfaceGeneration = false;
 		EDhApiGeneratorPlan genPlan = Config.Common.WorldGenerator.generatorPlan.getTrueValue();
 		if (genPlan.surfaceGenEnabled)

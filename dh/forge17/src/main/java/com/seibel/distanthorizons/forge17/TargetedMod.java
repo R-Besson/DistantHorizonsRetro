@@ -1,9 +1,8 @@
 package com.seibel.distanthorizons.forge17;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.gtnewhorizon.gtnhmixins.builders.ITargetMod;
 import com.gtnewhorizon.gtnhmixins.builders.TargetModBuilder;
+import org.jetbrains.annotations.NotNull;
 
 public enum TargetedMod implements ITargetMod 
 {

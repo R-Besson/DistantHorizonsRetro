@@ -19,33 +19,27 @@
 
 package com.seibel.distanthorizons.common.wrappers.minecraft;
 
-import java.awt.Color;
-
 import com.seibel.distanthorizons.api.enums.config.EDhApiDepthDirection;
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
-
-import com.seibel.distanthorizons.common.wrappers.misc.LightMapWrapper;
-
-import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingApi;
-import com.seibel.distanthorizons.core.wrapperInterfaces.misc.ILightMapWrapper;
-
-import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
+import com.seibel.distanthorizons.common.backports.Camera;
+import com.seibel.distanthorizons.common.wrappers.misc.LightMapWrapper;
+import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.util.math.DhVec3f;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.misc.ILightMapWrapper;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IAngelicaAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
-
-import net.minecraft.client.shader.Framebuffer;
-import com.seibel.distanthorizons.common.backports.Camera;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.shader.Framebuffer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fluids.IFluidBlock;
-import net.minecraft.client.Minecraft;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
+
+import java.awt.*;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
@@ -110,18 +104,18 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	}
 
 	/**
-	 * percentage of time into the current client tick. <br><br>
-	 *
-	 * Can be converted to a millisecond frametime
-	 * (IE time between frames in milliseconds) using the formula: <br>
-	 * <code>
-	 * (partialTickTime/20*1000)
-	 * </code> <br>
-	 * IE 60 FPS = 16.6 MS <br>
-	 *
-	 * @link https://fpstoms.com/
-	 * @see com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState#partialTickTime
-	 */
+     * percentage of time into the current client tick. <br><br>
+     *
+     * Can be converted to a millisecond frametime
+     * (IE time between frames in milliseconds) using the formula: <br>
+     * <code>
+     * (partialTickTime/20*1000)
+     * </code> <br>
+     * IE 60 FPS = 16.6 MS <br>
+     *
+     * @link <a href="https://fpstoms.com/">...</a>
+     * @see com.seibel.distanthorizons.core.api.internal.rendering.DhRenderState#partialTickTime
+     */
 	public float getPartialTickTime()
 	{
 		return Minecraft.getMinecraft().timer.renderPartialTicks;

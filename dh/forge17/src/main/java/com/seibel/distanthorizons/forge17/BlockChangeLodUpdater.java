@@ -30,7 +30,7 @@ public class BlockChangeLodUpdater implements IWorldAccess
 	 * a chunk is only rebuilt this often
 	 */
 	private static final long MIN_CHUNK_UPDATE_INTERVAL_MS = 3_000;
-	/** spreads the work out when a lot of chunks change at once (IE an explosion) */
+	/** spreads the work-out when a lot of chunks change at once (IE an explosion) */
 	private static final int MAX_CHUNK_UPDATES_PER_TICK = 16;
 	private static final int MAX_TRACKED_UPDATE_TIMES = 4096;
 

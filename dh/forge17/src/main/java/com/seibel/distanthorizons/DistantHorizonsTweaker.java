@@ -1,13 +1,12 @@
 package com.seibel.distanthorizons;
 
+import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
-
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 /**
  * Coremod entry point. <br><br>

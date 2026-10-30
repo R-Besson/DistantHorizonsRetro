@@ -20,11 +20,11 @@
 package com.seibel.distanthorizons.core.config.api;
 
 import com.seibel.distanthorizons.api.interfaces.config.IDhApiConfigValue;
+import com.seibel.distanthorizons.core.config.api.converters.DefaultConverter;
 import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.interfaces.config.IConverter;
-import com.seibel.distanthorizons.core.config.api.converters.DefaultConverter;
 
 import java.util.Collections;
 import java.util.Set;

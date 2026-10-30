@@ -1,17 +1,16 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
-import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import org.jetbrains.annotations.Nullable;
-
 import com.cardinalstar.cubicchunks.api.IColumn;
 import com.cardinalstar.cubicchunks.api.IHeightMap;
 import com.cardinalstar.cubicchunks.world.ICubicWorld;
 import com.cardinalstar.cubicchunks.world.api.ICubeProviderServer;
 import com.cardinalstar.cubicchunks.world.cube.Cube;
 import com.cardinalstar.cubicchunks.world.cube.ICubeProvider;
+import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import org.jetbrains.annotations.Nullable;
 
 public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 {
@@ -50,7 +49,7 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 	public int getMaxHeight(World world)
 	{
 		int minHeight = this.getMinHeight(world);
-		long maxHeight = Math.min((long) ((ICubicWorld) world).getMaxHeight(), (long) minHeight + MAX_DH_HEIGHT_RANGE);
+		long maxHeight = Math.min(((ICubicWorld) world).getMaxHeight(), (long) minHeight + MAX_DH_HEIGHT_RANGE);
 		return Math.max((int) maxHeight, 256) & ~15;
 	}
 
@@ -106,8 +105,7 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 	public boolean isCubeLoaded(Chunk column, int cubeY) { return ((IColumn) column).getLoadedCube(cubeY) != null; }
 
 	@Override
-	@Nullable
-	public int[] getSurfaceCubeRange(Chunk column)
+	public int @Nullable [] getSurfaceCubeRange(Chunk column)
 	{
 		World world = column.worldObj;
 		int minHeight = this.getMinHeight(world);

@@ -1,9 +1,8 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
+import com.gtnewhorizon.gtnhlib.util.AboveHotbarHUD;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGtnhLibCommonAccessor;
 import com.seibel.distanthorizons.core.enums.MinecraftTextFormat;
-
-import com.gtnewhorizon.gtnhlib.util.AboveHotbarHUD;
 
 public class GtnhLibAccessor implements IGtnhLibCommonAccessor
 {

@@ -1,11 +1,9 @@
 package com.seibel.distanthorizons.forge17.mixin;
 
-import java.nio.ByteBuffer;
-
+import com.seibel.distanthorizons.forge17.MixinFlags;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.shader.Framebuffer;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
@@ -15,7 +13,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import com.seibel.distanthorizons.forge17.MixinFlags;
+import java.nio.ByteBuffer;
 
 @Mixin(Framebuffer.class)
 public class MixinFramebuffer 

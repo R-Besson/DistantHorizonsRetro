@@ -1,11 +1,10 @@
 
 package com.seibel.distanthorizons.forge17.modAccessor;
 
+import com.mitchej123.hodgepodge.SimulationDistanceHelper;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-
-import com.mitchej123.hodgepodge.SimulationDistanceHelper;
 
 public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 {

@@ -32,9 +32,9 @@ import com.seibel.distanthorizons.core.generation.tasks.ERetrievalResultState;
 import com.seibel.distanthorizons.core.level.IDhClientLevel;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
+import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
-import com.seibel.distanthorizons.core.pos.DhSectionPos;
 import com.seibel.distanthorizons.core.render.CameraZoom;
 import com.seibel.distanthorizons.core.render.RenderBufferHandler;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
@@ -134,12 +134,12 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 	
 	/** 
 	 * The smallest numerical detail level number that can be rendered. <Br>
-	 * Stored as an absolute detail level (ie lowest numerical value is 0)
+	 * Stored as an absolute detail level (ie the lowest numerical value is 0)
 	 */
 	private byte maxLeafRenderDetailLevel;
 	/** 
 	 * the largest numerical detail level number that can be rendered. <Br>
-	 * Stored as an absolute detail level (ie lowest numerical value is 0)
+	 * Stored as an absolute detail level (ie the lowest numerical value is 0)
 	 */
 	private byte minRootRenderDetailLevel;
 	
@@ -220,10 +220,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			
 			// manual add and loop to reduce GC pressure due to addAll() doing unnecessary
 			// array copies
-			for (int i = 0; i < this.enabledSections.size(); i++)
-			{
-				tempProcessNodeList.add(this.enabledSections.get(i));
-			}
+			tempProcessNodeList.addAll(this.enabledSections);
 		}
 		finally
 		{
@@ -961,10 +958,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 					
 					if (result.state == ERetrievalResultState.REQUIRES_SPLITTING)
 					{
-						DhSectionPos.forEachChild(missingPos, (long childPos) ->
-						{
-							this.tryQueuePosForRetrieval(childPos);
-						});
+						DhSectionPos.forEachChild(missingPos, this::tryQueuePosForRetrieval);
 					}
 				});
 			}
@@ -1020,7 +1014,7 @@ public class LodQuadTree extends QuadTree<LodRenderSection> implements IDebugRen
 			if (WorldGenUtil.regenAllowed(this.fullDataSourceProvider))
 			{
 				// only query the DB every few seconds
-				// to prevent constant DB reads (we only need this as an estimate
+				// to prevent constant DB reads (we only need this as an estimate,
 				// and it isn't likely to change very often/quickly)
 				long timeSinceLastQuery = System.currentTimeMillis() - this.lastRegenTaskCountQueryMs;
 				if (timeSinceLastQuery > 10_000L)

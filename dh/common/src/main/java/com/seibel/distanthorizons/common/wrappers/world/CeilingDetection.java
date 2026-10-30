@@ -11,8 +11,8 @@ import java.util.Set;
 /**
  * Whether a dimension has a ceiling, IE it's all caves and shouldn't be cave culled. <br>
  * 1.7.10 has no flag for this, {@link WorldProvider#isHellWorld} is only set by the Nether,
- * so dimensions without sky light are treated as having one. The End is the exception,
- * it has no sky light but is open above. The config lists override the detection.
+ * so dimensions without skylight are treated as having one. The End is the exception,
+ * it has no skylight but is open above. The config lists override the detection.
  */
 public class CeilingDetection
 {
@@ -44,7 +44,7 @@ public class CeilingDetection
 	//=========//
 	//region
 
-	/** re-parsed only when the config string changes */
+	/** reparsed only when the config string changes */
 	private static ParsedCsv getCeilingDimensions()
 	{
 		String csv = Config.Client.Advanced.Graphics.Culling.ceilingDimensionCsv.get();

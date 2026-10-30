@@ -19,13 +19,13 @@
 
 package tests;
 
-import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.pos.DhSectionPos;
-import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
+import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
 import com.seibel.distanthorizons.core.util.LodUtil;
-import com.seibel.distanthorizons.coreapi.util.MathUtil;
 import com.seibel.distanthorizons.core.util.objects.quadTree.QuadNode;
 import com.seibel.distanthorizons.core.util.objects.quadTree.QuadTree;
+import com.seibel.distanthorizons.coreapi.util.BitShiftUtil;
+import com.seibel.distanthorizons.coreapi.util.MathUtil;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -217,7 +217,7 @@ public class QuadTreeTest
 		testGet(tree, ne, 3);
 		testGet(tree, sw, 4);
 		testGet(tree, se, 5);
-		Assert.assertEquals("incorrect leaf node count", tree.leafNodeCount(), 4);
+		Assert.assertEquals("incorrect leaf node count", 4, tree.leafNodeCount());
 		
 		
 		// small move //

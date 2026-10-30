@@ -21,8 +21,8 @@ package com.seibel.distanthorizons.common.render.openGl.postProcessing.fade;
 
 import com.seibel.distanthorizons.common.render.openGl.glObject.shader.GlShaderProgram;
 import com.seibel.distanthorizons.common.render.openGl.postProcessing.GlScreenQuad;
-import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import com.seibel.distanthorizons.common.render.openGl.util.GlAbstractShaderRenderer;
+import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftGLWrapper;
 import com.seibel.distanthorizons.core.render.RenderParams;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;

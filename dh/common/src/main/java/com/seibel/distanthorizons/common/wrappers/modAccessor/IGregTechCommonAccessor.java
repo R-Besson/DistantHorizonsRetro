@@ -19,11 +19,10 @@
 
 package com.seibel.distanthorizons.common.wrappers.modAccessor;
 
-import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IGregTechAccessor;
-import org.jetbrains.annotations.Nullable;
-
 import com.seibel.distanthorizons.common.backports.IBlockState;
+import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IGregTechAccessor;
 import net.minecraft.util.IIcon;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The common Accessor allows for MC

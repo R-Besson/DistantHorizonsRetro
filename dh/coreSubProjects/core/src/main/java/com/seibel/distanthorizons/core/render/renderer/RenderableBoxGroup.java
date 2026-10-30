@@ -14,6 +14,7 @@ import com.seibel.distanthorizons.core.util.threading.PriorityTaskPicker;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.IWrapperFactory;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.IDhGenericObjectVertexBufferContainer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
@@ -303,23 +304,23 @@ public class RenderableBoxGroup
 	@Override 
 	public int size() { return this.boxList.size(); }
 	@Override 
-	public boolean removeIf(Predicate<? super DhApiRenderableBox> filter) { return this.boxList.removeIf(filter); }
+	public boolean removeIf(@NotNull Predicate<? super DhApiRenderableBox> filter) { return this.boxList.removeIf(filter); }
 	@Override 
 	public boolean remove(Object obj) { return this.boxList.remove(obj); }
 	@Override 
 	public DhApiRenderableBox remove(int index) { return this.boxList.remove(index); }
 	@Override 
-	public void replaceAll(UnaryOperator<DhApiRenderableBox> operator) { this.boxList.replaceAll(operator); }
+	public void replaceAll(@NotNull UnaryOperator<DhApiRenderableBox> operator) { this.boxList.replaceAll(operator); }
 	@Override 
 	public void sort(Comparator<? super DhApiRenderableBox> comparator) { this.boxList.sort(comparator); }
 	@Override 
 	public void forEach(Consumer<? super DhApiRenderableBox> action) { this.boxList.forEach(action); }
 	@Override 
-	public Spliterator<DhApiRenderableBox> spliterator() { return this.boxList.spliterator(); }
+	public @NotNull Spliterator<DhApiRenderableBox> spliterator() { return this.boxList.spliterator(); }
 	@Override 
-	public Stream<DhApiRenderableBox> stream() { return this.boxList.stream(); }
+	public @NotNull Stream<DhApiRenderableBox> stream() { return this.boxList.stream(); }
 	@Override 
-	public Stream<DhApiRenderableBox> parallelStream() { return this.boxList.parallelStream(); }
+	public @NotNull Stream<DhApiRenderableBox> parallelStream() { return this.boxList.parallelStream(); }
 	@Override 
 	public void clear() { this.boxList.clear(); }
 	

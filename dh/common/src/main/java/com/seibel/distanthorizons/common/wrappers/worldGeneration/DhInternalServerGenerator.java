@@ -1,6 +1,7 @@
 package com.seibel.distanthorizons.common.wrappers.worldGeneration;
 
 import com.seibel.distanthorizons.api.DhApi;
+import com.seibel.distanthorizons.common.backports.ChunkPos;
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
 import com.seibel.distanthorizons.common.wrappers.McObjectConverter;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
@@ -25,22 +26,21 @@ import com.seibel.distanthorizons.core.util.TimerUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modLoader.IForgeMain;
 import com.seibel.distanthorizons.coreapi.ModInfo;
-
-import org.jetbrains.annotations.Nullable;
-import com.seibel.distanthorizons.common.backports.ChunkPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.ForgeChunkManager;
+import org.jetbrains.annotations.Nullable;
 
-
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
-
-import java.lang.reflect.Field;
 
 public class DhInternalServerGenerator
 {
@@ -61,7 +61,7 @@ public class DhInternalServerGenerator
 	/**
 	 * Used to revert the ignore logic in {@link SharedApi} so
 	 * that a given chunk pos can be handled again.
-	 * A timer is used so we don't have to inject into MC's code and it works sell enough
+	 * A timer is used so we don't have to inject into MC's code, and it works sell enough
 	 * most of the time.
 	 * If a chunk does get through due the timeout not being long enough that isn't the end of the world.
 	 */
@@ -440,7 +440,7 @@ public class DhInternalServerGenerator
 	}
 	/**
 	 * mitigates out of memory issues in the vanilla chunk system. <br>
-	 * See: https://github.com/pop4959/Chunky/pull/383
+	 * See: <a href="https://github.com/pop4959/Chunky/pull/383">...</a>
 	 */
 	private CompletableFuture<Void> releaseChunkFromServerAsync(WorldServer level, ChunkPos chunkPos)
 	{

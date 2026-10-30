@@ -52,9 +52,7 @@ public class NetworkSession extends AbstractNetworkEventSource
 		this.serverPlayer = serverPlayer;
 		
 		this.registerHandler(CloseReasonMessage.class, msg ->
-		{
-			this.close(new SessionClosedException(msg.reason));
-		});
+			this.close(new SessionClosedException(msg.reason)));
 	}
 	
 	

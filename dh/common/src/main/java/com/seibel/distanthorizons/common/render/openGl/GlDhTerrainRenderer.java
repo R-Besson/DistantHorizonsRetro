@@ -4,7 +4,6 @@ import com.seibel.distanthorizons.common.render.openGl.terrain.GlDhTerrainShader
 import com.seibel.distanthorizons.core.dataObjects.render.bufferBuilding.LodBufferContainer;
 import com.seibel.distanthorizons.core.render.RenderParams;
 import com.seibel.distanthorizons.core.util.objects.SortedArraySet;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IProfilerWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.render.renderPass.IDhTerrainRenderer;
 
 public class GlDhTerrainRenderer implements IDhTerrainRenderer

@@ -22,8 +22,8 @@ package com.seibel.distanthorizons.core.config.types;
 import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigCommentTextPosition;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigEntryAppearance;
-import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.DhLogger;
+import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,9 +37,9 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	
 	
-	public String parentConfigPath = null;
+	public String parentConfigPath;
 	@Nullable
-	public EConfigCommentTextPosition textPosition = null;
+	public EConfigCommentTextPosition textPosition;
 	
 	
 	

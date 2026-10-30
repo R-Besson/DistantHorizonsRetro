@@ -73,7 +73,7 @@ public class FullDataLookupCache
 
 	public synchronized long writeCount(long pos) { return this.writeCountByStripe[stripe(pos)]; }
 
-	private static int stripe(long pos) { return (int) (Long.hashCode(pos * 0x9E3779B97F4A7C15L) & (WRITE_COUNT_STRIPES - 1)); }
+	private static int stripe(long pos) { return Long.hashCode(pos * 0x9E3779B97F4A7C15L) & (WRITE_COUNT_STRIPES - 1); }
 
 	//endregion
 
@@ -89,7 +89,7 @@ public class FullDataLookupCache
 	public void putGenerationSteps(long pos, ByteArrayList generationSteps, long writeCountBeforeQuery)
 	{ this.put(pos, true, generationSteps.toByteArray(), writeCountBeforeQuery); }
 
-	private synchronized void put(long pos, boolean exists, @Nullable byte[] generationSteps, long writeCountBeforeQuery)
+	private synchronized void put(long pos, boolean exists, byte @Nullable [] generationSteps, long writeCountBeforeQuery)
 	{
 		if (this.writeCountByStripe[stripe(pos)] != writeCountBeforeQuery)
 		{
@@ -165,10 +165,9 @@ public class FullDataLookupCache
 	{
 		final boolean exists;
 		/** null if only the existence is known */
-		@Nullable
-		final byte[] generationSteps;
+		final byte @Nullable [] generationSteps;
 
-		Entry(boolean exists, @Nullable byte[] generationSteps)
+		Entry(boolean exists, byte @Nullable [] generationSteps)
 		{
 			this.exists = exists;
 			this.generationSteps = generationSteps;

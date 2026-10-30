@@ -2,10 +2,10 @@ package com.seibel.distanthorizons.common.wrappers.gui;
 
 import com.seibel.distanthorizons.common.wrappers.gui.classicConfig.ClassicConfigGUI;
 import com.seibel.distanthorizons.core.config.ConfigHandler;
+import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import net.minecraft.client.gui.GuiScreen;
-import com.seibel.distanthorizons.core.logging.DhLogger;
 
 public class GetConfigScreen
 {

@@ -21,9 +21,11 @@ package com.seibel.distanthorizons.common.render.openGl.glObject.enums;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL14.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL32.*;
+import static org.lwjgl.opengl.GL14.GL_DECR_WRAP;
+import static org.lwjgl.opengl.GL14.GL_INCR_WRAP;
+import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 
 // Turns GL int enums back to readable strings
 public class GLEnums
@@ -252,7 +254,6 @@ public class GLEnums
 				return 2;
 			case GL_INT:
 			case GL_UNSIGNED_INT:
-				return 4;
 			case GL_FLOAT:
 				return 4;
 			case GL_DOUBLE:

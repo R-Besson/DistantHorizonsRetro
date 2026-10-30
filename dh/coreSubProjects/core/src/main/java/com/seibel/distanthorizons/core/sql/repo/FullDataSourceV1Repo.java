@@ -62,11 +62,10 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 	protected String CreateParameterizedWhereString() { return "DhSectionPos = ?"; }
 	
 	@Override
-	protected int setPreparedStatementWhereClause(PreparedStatement statement, int index, Long pos) throws SQLException
+	protected void setPreparedStatementWhereClause(PreparedStatement statement, int index, Long pos) throws SQLException
 	{
-		statement.setString(index++, serializeSectionPos(pos));
-		return index;
-	}
+		statement.setString(index, serializeSectionPos(pos));
+    }
 	
 	
 	
@@ -146,7 +145,7 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 			
 			
 			int i = 1;
-			statement.setInt(i++, returnCount);
+			statement.setInt(i, returnCount);
 			
 			try (ResultSet result = this.query(statement))
 			{
@@ -222,7 +221,7 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 			}
 			
 			int i = 1;
-			statement.setInt(i++, limit);
+			statement.setInt(i, limit);
 			
 			try (ResultSet result = this.query(statement))
 			{

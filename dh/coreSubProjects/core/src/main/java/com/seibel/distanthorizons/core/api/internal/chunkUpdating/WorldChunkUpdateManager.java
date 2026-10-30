@@ -112,9 +112,7 @@ public class WorldChunkUpdateManager
 		
 		this.updateQueueByLevelWrapper.forEach(
 			(ILevelWrapper levelWrapper, ChunkUpdateQueueManager updateManager) ->
-			{
-				queueCountRef.addAndGet(updateManager.getQueuedCount());
-			});
+                    queueCountRef.addAndGet(updateManager.getQueuedCount()));
 		
 		return queueCountRef.get();
 	}
