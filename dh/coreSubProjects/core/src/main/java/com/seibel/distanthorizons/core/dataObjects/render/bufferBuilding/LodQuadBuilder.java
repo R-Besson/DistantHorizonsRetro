@@ -45,13 +45,13 @@ public class LodQuadBuilder implements AutoCloseable
 {
 	/** ThreadLocal is the simplest way to allow each LOD loading thread to have their own builder */
 	private static final ThreadLocal<LodQuadBuilder> THREAD_LOCAL = ThreadLocal.withInitial(LodQuadBuilder::new);
-	
+
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("LodQuadBuilder");
-	
+
 	/** the number of bytes for a single vertex */
 	public static final int BYTES_PER_VERTEX = 16;
 	public static final int BYTES_PER_QUAD = BYTES_PER_VERTEX * 4;
-	
+
 	public static final int[][][] DIRECTION_VERTEX_IBO_QUAD = new int[][][]
 	//region
 		{
@@ -68,43 +68,43 @@ public class LodQuadBuilder implements AutoCloseable
 				{1, 1}, // 2
 				{1, 0}, // 3
 			},
-			
+
 			// X,Y //
 			{ // NORTH
 				{0, 0}, // 0
 				{0, 1}, // 1
 				{1, 1}, // 2
-				
+
 				{1, 0}, // 3
 			},
 			{ // SOUTH
 				{1, 0}, // 0
 				{1, 1}, // 1
 				{0, 1}, // 2
-				
+
 				{0, 0}, // 3
 			},
-			
+
 			// Z,Y //
 			{ // WEST
 				{0, 0}, // 0
 				{1, 0}, // 1
 				{1, 1}, // 2
-				
+
 				{0, 1}, // 3
 			},
 			{ // EAST
 				{0, 1}, // 0
 				{1, 1}, // 1
 				{1, 0}, // 2
-				
+
 				{0, 0}, // 3
 			},
 		};
 	//endregion
-	
-	
-	
+
+
+
 	@SuppressWarnings("unchecked")
 	private final ArrayList<BufferQuad>[] opaqueQuads = (ArrayList<BufferQuad>[]) new ArrayList[6];
 	@SuppressWarnings("unchecked")
@@ -121,10 +121,10 @@ public class LodQuadBuilder implements AutoCloseable
 	public static final byte CROSS_PLANE_A_NORMAL_INDEX = 6;
 	/** normal index of the other diagonal plane */
 	public static final byte CROSS_PLANE_B_NORMAL_INDEX = 7;
-	
-	/** 
+
+	/**
 	 * Caching the BufferQuad objects reduces overhead slightly. <br>
-	 * Caching is handled per builder (vs globally in {@link BufferQuad} itself) 
+	 * Caching is handled per builder (vs globally in {@link BufferQuad} itself)
 	 * to prevent concurrency overhead.
 	 */
 	private final ArrayList<BufferQuad> bufferQuadCacheList = new ArrayList<>();
@@ -151,14 +151,14 @@ public class LodQuadBuilder implements AutoCloseable
 	private boolean doTransparency;
 	private IClientLevelWrapper clientLevelWrapper;
 	private boolean noSkyLight;
-	
-	/** 
-	 * {@link RenderDataPointUtil#SHAPE_NONE} etc. applied to every quad added until it's changed, 
+
+	/**
+	 * {@link RenderDataPointUtil#SHAPE_NONE} etc. applied to every quad added until it's changed,
 	 * set by {@link ColumnBox} for each LOD box.
 	 */
 	public byte shapeForNewQuads = RenderDataPointUtil.SHAPE_NONE;
-	
-	/** 
+
+	/**
 	 * If true quads added are see-through leaf faces, which have their gaps cut out by the shaders,
 	 * marked by adding {@link #SEE_THROUGH_NORMAL_INDEX_OFFSET} to their normal index. Set by {@link ColumnBox}.
 	 */
@@ -179,17 +179,17 @@ public class LodQuadBuilder implements AutoCloseable
 
 	private EDhApiDebugRendering debugRenderingMode;
 	private EDhApiGrassSideRendering grassSideRenderingMode;
-	
+
 	private int premergeCount = 0;
-	
-	
-	
+
+
+
 	//=============//
 	// constructor //
 	//=============//
 	//region
-	
-	private LodQuadBuilder() 
+
+	private LodQuadBuilder()
 	{
 		for (int i = 0; i < 6; i++)
 		{
@@ -197,7 +197,7 @@ public class LodQuadBuilder implements AutoCloseable
 			this.transparentQuads[i] = new ArrayList<>();
 		}
 	}
-	
+
 	public static LodQuadBuilder getBuilder(boolean doTransparency, IClientLevelWrapper clientLevelWrapper)
 	{
 		LodQuadBuilder builder = THREAD_LOCAL.get();
@@ -207,28 +207,28 @@ public class LodQuadBuilder implements AutoCloseable
 	private void set(boolean doTransparency, IClientLevelWrapper clientLevelWrapper)
 	{
 		this.doTransparency = doTransparency;
-		
+
 		this.clientLevelWrapper = clientLevelWrapper;
 		// faces next to open air default to full skylight, which lights up caves in dimensions without a sky
 		this.noSkyLight = (clientLevelWrapper != null && !clientLevelWrapper.hasSkyLight());
 
 		this.debugRenderingMode = Config.Client.Advanced.Debugging.debugRenderingColors.get();
 		this.grassSideRenderingMode = Config.Client.Advanced.Graphics.Quality.grassSideRendering.get();
-		
+
 		this.premergeCount = 0;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===========//
 	// add quads //
 	//===========//
 	//region
-	
+
 	public void addQuadAdj(
-		EDhDirection dir, 
+		EDhDirection dir,
 		short x, short y, short z,
 		short width, short height,
 		int color, short faceTextureId,
@@ -253,9 +253,9 @@ public class LodQuadBuilder implements AutoCloseable
 		}
 		else
 		{
-			quadList = this.opaqueQuads[dir.faceIndex]; 
+			quadList = this.opaqueQuads[dir.faceIndex];
 		}
-		
+
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(x, y, z, width, height, color, faceTextureId, irisBlockMaterialId, skyLight, blockLight, dir);
 		quad.shape = this.shapeForNewQuads;
@@ -331,10 +331,10 @@ public class LodQuadBuilder implements AutoCloseable
 		int cornerLights)
 	{
 		boolean isTransparent = (this.doTransparency && ColorUtil.getAlpha(color) < 255);
-		ArrayList<BufferQuad> quadList = isTransparent 
-				? this.transparentQuads[EDhDirection.UP.faceIndex] 
+		ArrayList<BufferQuad> quadList = isTransparent
+				? this.transparentQuads[EDhDirection.UP.faceIndex]
 				: this.opaqueQuads[EDhDirection.UP.faceIndex];
-		
+
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(minX, maxY, minZ, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.UP);
 		quad.shape = this.shapeForNewQuads;
@@ -355,25 +355,25 @@ public class LodQuadBuilder implements AutoCloseable
 		}
 		quadList.add(quad);
 	}
-	
+
 	public void addQuadDown(
-		short x, short y, short z, 
-		short blockWidth, 
+		short x, short y, short z,
+		short blockWidth,
 		int color, short faceTextureId,
-		byte irisBlockMaterialId, 
+		byte irisBlockMaterialId,
 		byte skylight, byte blocklight)
 	{
 		ArrayList<BufferQuad> quadArray = (this.doTransparency && ColorUtil.getAlpha(color) < 255)
 				? this.transparentQuads[EDhDirection.DOWN.faceIndex]
 				: this.opaqueQuads[EDhDirection.DOWN.faceIndex];
-		
+
 		BufferQuad quad = this.getOrCreateBufferQuad();
 		quad.set(x, y, z, blockWidth, blockWidth, color, faceTextureId, irisBlockMaterialId, skylight, blocklight, EDhDirection.DOWN);
 		quad.shape = this.shapeForNewQuads;
 		quad.seeThrough = this.seeThroughForNewQuads;
 		quadArray.add(quad);
 	}
-	
+
 	/**
 	 * Adds two crossed diagonal planes, each drawn from both sides,
 	 * like MC draws tall grass and flowers.
@@ -404,7 +404,7 @@ public class LodQuadBuilder implements AutoCloseable
 	// data finalizing //
 	//=================//
 	//region
-	
+
 	/** Uses Greedy meshing to merge this builder's Quads. */
 	public void mergeQuads()
 	{
@@ -414,7 +414,7 @@ public class LodQuadBuilder implements AutoCloseable
 		{
 			return;
 		}
-		
+
 		for (int directionIndex = 0; directionIndex < 6; directionIndex++)
 		{
 			mergeCount += mergeQuadsInternal(this.opaqueQuads, directionIndex, BufferMergeDirectionEnum.EastWest);
@@ -422,10 +422,10 @@ public class LodQuadBuilder implements AutoCloseable
 			{
 				mergeCount += mergeQuadsInternal(this.transparentQuads, directionIndex, BufferMergeDirectionEnum.EastWest);
 			}
-			
-			
+
+
 			// only run the second merge if the face is the top or bottom
-			if (directionIndex == EDhDirection.UP.faceIndex 
+			if (directionIndex == EDhDirection.UP.faceIndex
 				|| directionIndex == EDhDirection.DOWN.faceIndex)
 			{
 				mergeCount += mergeQuadsInternal(this.opaqueQuads, directionIndex, BufferMergeDirectionEnum.NorthSouthOrUpDown);
@@ -436,7 +436,7 @@ public class LodQuadBuilder implements AutoCloseable
 			}
 		}
 	}
-	
+
 	/** Merges all of this builder's quads for the given directionIndex (up, down, left, etc.) in the given direction */
 	private long mergeQuadsInternal(ArrayList<BufferQuad>[] list, int directionIndex, BufferMergeDirectionEnum mergeDirection)
 	{
@@ -558,16 +558,16 @@ public class LodQuadBuilder implements AutoCloseable
 		}
 		return sortedQuads;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// buffer setup //
 	//==============//
 	//region
-	
+
 	public ArrayList<ByteBuffer> makeOpaqueVertexBuffers(PhantomArrayListCheckout checkout) { return this.makeVertexBuffers(checkout, this.opaqueQuads, true); }
 	public ArrayList<ByteBuffer> makeTransparentVertexBuffers(PhantomArrayListCheckout checkout) { return this.makeVertexBuffers(checkout, this.transparentQuads, false); }
 	private ArrayList<ByteBuffer> makeVertexBuffers(PhantomArrayListCheckout checkout, ArrayList<BufferQuad>[] quadList, boolean includeCrossQuads)
@@ -599,9 +599,9 @@ public class LodQuadBuilder implements AutoCloseable
 			// put all the quads in this direction into the buffer
 			for (int quadIndex = 0; quadIndex < quads.size(); quadIndex++)
 			{
-				// if this is the first iteration or the buffer is full, 
+				// if this is the first iteration or the buffer is full,
 				// create a new buffer
-				if (buffer == null 
+				if (buffer == null
 					|| buffer.remaining() < BYTES_PER_QUAD)
 				{
 					if ((byteBufferList.size() + 1) > checkout.getByteBufferWrapperCount())
@@ -614,10 +614,10 @@ public class LodQuadBuilder implements AutoCloseable
 					{
 						buffer = checkout.getByteBuffer(byteBufferList.size(), byteBufferSize);
 					}
-					
+
 					byteBufferList.add(buffer);
 				}
-				
+
 				if (directionIndex < 6)
 				{
 					this.putQuad(buffer, quads.get(quadIndex));
@@ -628,7 +628,7 @@ public class LodQuadBuilder implements AutoCloseable
 				}
 			}
 		}
-		
+
 		// rewind all the buffers so they can be read from
 		for (int i = 0; i < byteBufferList.size(); i++)
 		{
@@ -636,7 +636,7 @@ public class LodQuadBuilder implements AutoCloseable
 			buffer.limit(buffer.position());
 			buffer.rewind();
 		}
-		
+
 		return byteBufferList;
 	}
 	private void putQuad(ByteBuffer bb, BufferQuad quad)
@@ -679,10 +679,10 @@ public class LodQuadBuilder implements AutoCloseable
 				default:
 					throw new IllegalArgumentException("Invalid Axis enum: " + axis);
 			}
-			
-			
+
+
 			int color = quad.color;
-			
+
 			// use custom side color logic for grass blocks
 			if (quad.irisBlockMaterialId == EDhApiBlockMaterial.GRASS.index)
 			{
@@ -713,8 +713,8 @@ public class LodQuadBuilder implements AutoCloseable
 					}
 				}
 			}
-			
-			
+
+
 			byte skyLight = quad.skyLight;
 			byte blockLight = quad.blockLight;
 			if (quad.cornerLights != BufferQuad.UNIFORM_CORNER_LIGHTS)
@@ -778,24 +778,24 @@ public class LodQuadBuilder implements AutoCloseable
 
 	private void putVertex(
 		ByteBuffer bb,
-		short x, short y, short z, 
-		int color, 
-		byte normalIndex, byte irisBlockMaterialId, 
+		short x, short y, short z,
+		int color,
+		byte normalIndex, byte irisBlockMaterialId,
 		byte skylight, byte blocklight,
-		short textureTileId, 
+		short textureTileId,
 		byte shape,
 		int mx, int my, int mz)
 	{
 		bb.putShort(x);
 		bb.putShort(y);
 		bb.putShort(z);
-		
+
 		short meta = 0;
 		{
 			skylight %= 16;
 			blocklight %= 16;
 			meta |= (short) (skylight | (blocklight << 4));
-			
+
 			byte mircoOffset = 0;
 			// mirco offset which is a xyz 2bit value
 			// 0b00 = no offset
@@ -806,13 +806,13 @@ public class LodQuadBuilder implements AutoCloseable
 			if (my != 0) { mircoOffset |= (byte) (my > 0 ? 0b0100 : 0b1100); }
 			if (mz != 0) { mircoOffset |= (byte) (mz > 0 ? 0b010000 : 0b110000); }
 			meta |= (short) (mircoOffset << 8);
-			
+
 			// the shape uses the 2 unused bits above the micro offset (0bss00_0000_0000_0000),
 			// DH's vertex shader insets the vertex based on it, shader packs get the same inset from ShaderPackLodTextures
 			meta |= (short) ((shape & 0b11) << 14);
 		}
 		bb.putShort(meta);
-		
+
 		byte r = (byte) ColorUtil.getRed(color);
 		byte g = (byte) ColorUtil.getGreen(color);
 		byte b = (byte) ColorUtil.getBlue(color);
@@ -821,26 +821,26 @@ public class LodQuadBuilder implements AutoCloseable
 		bb.put(g);
 		bb.put(b);
 		bb.put(a);
-		
+
 		// Block ID and normal index are used by the Iris format
 		bb.put(irisBlockMaterialId);
 		bb.put(normalIndex);
-		
+
 		// These two bytes keep the vertex a multiple of 4
 		// and are treated as padding by Iris's mirror of this format,
 		// so the tile id is invisible to shader packs.
 		bb.putShort(textureTileId);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=========//
 	// getters //
 	//=========//
 	//region
-	
+
 	public int getCurrentOpaqueQuadsCount()
 	{
 		int i = 0;
@@ -858,18 +858,18 @@ public class LodQuadBuilder implements AutoCloseable
 		{
 			return 0;
 		}
-		
+
 		int i = 0;
 		for (ArrayList<BufferQuad> quadList : this.transparentQuads)
 		{
 			i += quadList.size();
 		}
-		
+
 		return i;
 	}
-	
+
 	private static int maxBufferByteSize = -1;
-	/** 
+	/**
 	 * The max number of bytes we allow for a single Vertex buffer.
 	 * If an LOD has more data than this it will be split
 	 * up into multiple buffers.
@@ -880,30 +880,30 @@ public class LodQuadBuilder implements AutoCloseable
 		{
 			return maxBufferByteSize;
 		}
-		
+
 		// 2 MB
 		// note: this is relatively small (10 MB was the previous max) to reduce stuttering
 		// during the upload process by having smaller upload steps
-		int maxVboByteSize = 2 * 1024 * 1024; 
-		
+		int maxVboByteSize = 2 * 1024 * 1024;
+
 		int maxQuadsPerBuffer = maxVboByteSize / BYTES_PER_QUAD;
 		// integer truncation to remove decimal component
 		int fullSizedBuffer = maxQuadsPerBuffer * BYTES_PER_QUAD;
-		
+
 		maxBufferByteSize = fullSizedBuffer;
-		
+
 		return fullSizedBuffer;
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//=====================//
 	// buffer quad pooling //
 	//=====================//
 	//region
-	
+
 	private BufferQuad getOrCreateBufferQuad()
 	{
 		// start from the back of the list so we don't have
@@ -914,52 +914,52 @@ public class LodQuadBuilder implements AutoCloseable
 			// cache empty, create a new object
 			return new BufferQuad();
 		}
-		
+
 		BufferQuad quad = bufferQuadCacheList.remove(index);
 		if (quad != null) // shouldn't happen, but just in case
 		{
 			return quad;
 		}
-		
+
 		return new BufferQuad();
 	}
-	
+
+	@SuppressWarnings({"UseBulkOperation", "ForLoopReplaceableByForEach"})
 	private static void returnQuadsToCache(ArrayList<BufferQuad> quadCache, ArrayList<BufferQuad>[] quadsToReturn)
 	{
 		for (int i = 0; i < quadsToReturn.length; i++)
 		{
 			// manual add and loop to reduce GC pressure due to addAll() doing unnecessary
 			// array copies
-			//noinspection ForLoopReplaceableByForEach,UseBulkOperation
 			for (int j = 0; j < quadsToReturn[i].size(); j++)
 			{
 				quadCache.add(quadsToReturn[i].get(j));
 			}
-			
+
 			quadsToReturn[i].clear();
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// base overrides //
 	//================//
 	//region
-	
+
 	// can be used/closed multiple times
-	@Override 
+	@Override
 	public void close()
 	{
 		returnQuadsToCache(this.bufferQuadCacheList, this.opaqueQuads);
 		returnQuadsToCache(this.bufferQuadCacheList, this.transparentQuads);
 		returnQuadsToCache(this.bufferQuadCacheList, this.crossQuads);
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }

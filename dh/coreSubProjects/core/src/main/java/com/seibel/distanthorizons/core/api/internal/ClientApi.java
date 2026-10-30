@@ -50,7 +50,6 @@ import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import com.seibel.distanthorizons.core.util.objects.Pair;
 import com.seibel.distanthorizons.core.util.objects.RollingAverage;
 import com.seibel.distanthorizons.core.util.threading.ThreadPoolUtil;
-import com.seibel.distanthorizons.core.world.AbstractDhWorld;
 import com.seibel.distanthorizons.core.world.DhClientWorld;
 import com.seibel.distanthorizons.core.world.IDhClientWorld;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
@@ -85,67 +84,67 @@ public class ClientApi
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final DhLogger RATE_LIMITED_LOGGER = new DhLoggerBuilder().maxCountPerSecond(1).build();
-	
+
 	public static final ClientApi INSTANCE = new ClientApi();
-	
+
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
-	
+
 	/** Delayed accessing is necessary since this object will be created before the mod accessors are bound. */
-	private static class DelayedAccessors 
+	private static class DelayedAccessors
 	{
 		public static final IIrisAccessor IRIS = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	}
-	
+
 	/** this includes the is dev build message and low allocated memory warning */
 	private static final int MS_BETWEEN_WARNING_MESSAGES = 3_000;
-	
-	/** 
-	 * This isn't the cleanest way of storing variables before passing them to the LOD renderer, 
+
+	/**
+	 * This isn't the cleanest way of storing variables before passing them to the LOD renderer,
 	 * but due to how mixins work and the inconsistency between MC versions,
 	 * having a static object that stores a single frame's data
 	 * is often the easiest solution. <br><br>
-	 * 
+	 *
 	 * Only downside is making sure each variable is populated before rendering.
 	 */
 	public static final DhRenderState RENDER_STATE = new DhRenderState();
-	/** 
+	/**
 	 * static variable so we don't have to re-create it each frame,
 	 * reducing GC pressure.
 	 */
 	private static final RenderParams RENDER_PARAMS = new RenderParams();
-	
+
 	/**
 	 * 50ms = 20 FPS
-	 * @link <a href="https://fpstoms.com/">...</a> 
+	 * @link <a href="https://fpstoms.com/">...</a>
 	 * @see ClientApi#cameraSpeedRollingAverage
 	 */
 	private static final long MIN_MS_BETWEEN_SPEED_CHECKS = 50;
-	
-	
+
+
 	private boolean isDevBuildMessagePrinted = false;
 	private boolean lowMemoryWarningPrinted = false;
 	private boolean highVanillaRenderDistanceWarningPrinted = false;
-	
+
 	private long lastSlowChatMessageSentMsTime = 0L;
-	
+
 	private final Queue<String> slowChatMessageQueue = new LinkedBlockingQueue<>();
 	private final Queue<String> fastChatMessageQueue = new LinkedBlockingQueue<>();
 	private final Queue<String> overlayMessageQueue = new LinkedBlockingQueue<>();
-	
+
 	public boolean rendererDisabledBecauseOfExceptions = false;
-	
+
 	/** Holds any chunks that were found before the client levels are loaded. */
 	public final Map<Pair<IClientLevelWrapper, DhChunkPos>, IChunkWrapper> waitingChunkByClientLevelAndPos = new ConcurrentHashMap<>();
-	
+
 	/** publicly available so {@link F3Screen} can display the error */
 	@Nullable
 	public String lastRenderParamValidationMessage = null;
-	
-	
-	/** 
+
+
+	/**
 	 * measured in blocks/second <br>
-	 * 
+	 *
 	 * The number of points tracked here is related
 	 * to the rate at which we check for speed.
 	 * So if the ms_between is changed the number of points
@@ -156,8 +155,8 @@ public class ClientApi
 	private DhVec3d lastCameraPosForSpeedCheck = new DhVec3d();
 	private long msSinceLastSpeedCheck = 0L;
 	public double getAvgCameraSpeed() { return cameraSpeedRollingAverage.getAverage(); }
-	
-	/** 
+
+	/**
 	 * keeping track of this is necessary to fix
 	 * out-of-date LODs from rendering when the shading
 	 * is changed by Iris, causing LODs to often
@@ -168,28 +167,28 @@ public class ClientApi
 	/** only used to compare against, never dereferenced */
 	private IClientLevelWrapper heightCheckLevelLastFrame = null;
 	private int levelMinHeightLastFrame = 0;
-	
-	
-	
+
+
+
 	//==============//
 	// constructors //
 	//==============//
-	
+
 	private ClientApi() { }
-	
-	
-	
+
+
+
 	//==============//
 	// world events //
 	//==============//
 	//region world events
-	
+
 	/**
 	 * May be fired slightly before or after the associated
 	 * level is loaded
 	 * depending on how the host mod loader functions. <br><br>
-	 * 
-	 * Synchronized shouldn't be necessary, but is present to match {@see onClientOnlyDisconnected} and prevent any unforeseen issues. 
+	 *
+	 * Synchronized shouldn't be necessary, but is present to match {@see onClientOnlyDisconnected} and prevent any unforeseen issues.
 	 */
 	public synchronized void onClientOnlyConnected()
 	{
@@ -205,7 +204,7 @@ public class ClientApi
 			else
 			{
 				LOGGER.info("Replay on ClientServer mode connecting.");
-				
+
 				if (Config.Common.Logging.Warning.showReplayWarningOnStartup.get())
 				{
 					MC_CLIENT.sendChatMessage(MinecraftTextFormat.ORANGE + "Distant Horizons: Replay detected." + MinecraftTextFormat.CLEAR_FORMATTING);
@@ -216,13 +215,13 @@ public class ClientApi
 					MC_CLIENT.sendChatMessage("");
 				}
 			}
-			
-			
+
+
 			DhClientWorld world = new DhClientWorld();
 			SharedApi.setDhWorld(world);
 		}
 	}
-	
+
 	/** Synchronized to prevent a rare issue where multiple disconnect events are triggered on top of each other. */
 	public synchronized void onClientOnlyDisconnected()
 	{
@@ -233,20 +232,20 @@ public class ClientApi
 			// also closes the world
 			SharedApi.setDhWorld(null);
 		}
-		
+
 		// remove any waiting items
 		this.waitingChunkByClientLevelAndPos.clear();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==============//
 	// level events //
 	//==============//
 	//region level events
-	
+
 	public void loadWaitingChunksForLevel(IClientLevelWrapper level)
 	{
 		HashSet<Pair<IClientLevelWrapper, DhChunkPos>> keysToRemove = new HashSet<>();
@@ -262,29 +261,29 @@ public class ClientApi
 				SharedApi.INSTANCE.applyChunkUpdate(
 					// the level reference is changed since it may not match the level
 					// we're attempting to load now
-					chunkWrapper.copyWithLevel(level), 
-					level, 
+					chunkWrapper.copyWithLevel(level),
+					level,
 					false);
 				keysToRemove.add(levelChunkPair);
 			}
 		}
 		LOGGER.info("Loaded [" + keysToRemove.size() + "] waiting chunk wrappers.");
-		
+
 		for (Pair<IClientLevelWrapper, DhChunkPos> keyToRemove : keysToRemove)
 		{
 			this.waitingChunkByClientLevelAndPos.remove(keyToRemove);
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//============//
 	// networking //
 	//============//
 	//region networking
-	
+
 	/**
 	 * Forwards a decoded message into the registered handlers.
 	 *
@@ -298,7 +297,7 @@ public class ClientApi
 			LOGGER.warn("warn");
 			return;
 		}
-		
+
 		try
 		{
 			executor.execute(() ->
@@ -310,7 +309,7 @@ public class ClientApi
 					{
 						return;
 					}
-					
+
 					DhClientWorld world = (DhClientWorld) clientWorld;
 					NetworkSession networkSession = world.pluginChannelApi.networkSession;
 					if (networkSession != null)
@@ -329,39 +328,39 @@ public class ClientApi
 			LOGGER.warn("Plugin message executor rejected");
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//===============//
 	// LOD rendering //
 	//===============//
 	//region lod rendering
-	
+
 	/** Should be called before {@link ClientApi#renderDeferredLodsForShaders} */
 	public void renderLods() { this.renderLodLayer(false); }
-	
-	/** 
+
+	/**
 	 * Only necessary when Shaders are in use.
-	 * Should be called after {@link ClientApi#renderLods} 
+	 * Should be called after {@link ClientApi#renderLods}
 	 */
 	public void renderDeferredLodsForShaders() { this.renderLodLayer(true); }
-	
+
 	@SuppressWarnings({"try", "unused"})
 	private void renderLodLayer(boolean renderingDeferredLayer)
 	{
 		IProfilerWrapper profiler = MC_CLIENT.getProfiler();
 		try (IProfilerWrapper.IProfileBlock profileBlock =profiler.push("DH-RenderLevel"))
 		{
-			
-			
-			
+
+
+
 			//=====================//
 			// render thread tasks //
 			//=====================//
 			//region
-			
+
 			// only run these tasks once per frame
 			if (!renderingDeferredLayer)
 			{
@@ -370,11 +369,11 @@ public class ClientApi
 					//===============//
 					// chat messages //
 					//===============//
-					
+
 					this.sendQueuedChatMessages();
-					
-					
-					
+
+
+
 					//====================//
 					// Render Thread jobs //
 					//====================//
@@ -391,40 +390,40 @@ public class ClientApi
 					}
 
 					//endregion
-					
-					
-					
+
+
+
 					//==============//
 					// camera speed //
 					//==============//
 					//region
-					
+
 					long nowMs = System.currentTimeMillis();
 					if (this.msSinceLastSpeedCheck + MIN_MS_BETWEEN_SPEED_CHECKS < nowMs)
 					{
 						// calc time since last check
 						double secSinceLastCheck = (nowMs - this.msSinceLastSpeedCheck) / 1_000.0;
 						this.msSinceLastSpeedCheck = nowMs;
-						
+
 						// get the distance traveled since last frame
 						DhVec3d camPos = MC_RENDER.getCameraExactPosition();
 						double distanceInBlocks = camPos.getDistance(this.lastCameraPosForSpeedCheck);
 						double speed = distanceInBlocks / secSinceLastCheck;
-						
+
 						// record new values for next check
 						this.cameraSpeedRollingAverage.add(speed);
 						this.lastCameraPosForSpeedCheck = camPos;
 					}
-					
+
 					//endregion
-					
-					
-					
+
+
+
 					//================================//
 					// Iris LOD data re-build trigger //
 					//================================//
 					//region
-					
+
 					if (DelayedAccessors.IRIS != null)
 					{
 						boolean shadersActive = DelayedAccessors.IRIS.isShaderPackInUse();
@@ -461,40 +460,40 @@ public class ClientApi
 					}
 
 					//endregion
-					
-					
-					
+
+
+
 					//=============//
 					// Camera Zoom //
 					//=============//
 					//region
-					
+
 					boolean updateCameraZoom = DelayedAccessors.IRIS == null
 						|| !DelayedAccessors.IRIS.isRenderingShadowPass();
 					// only update the zoom if we're rendering the player's camera
 					// if we update the zoom during the shadow pass it will cause flickering
 					// due to the conflicting zoom information.
-					
+
 					if (updateCameraZoom)
 					{
 						CameraZoom.INSTANCE.update(RENDER_STATE);
 					}
-					
+
 					//endregion
 
 				}
 			}
-			
+
 			//endregion
-			
-			
-			
-			
+
+
+
+
 			//=================//
 			// parameter setup //
 			//=================//
 			//region
-			
+
 			EDhApiRenderPass renderPass;
 			if (DhApiRenderProxy.INSTANCE.getDeferTransparentRendering())
 			{
@@ -511,28 +510,28 @@ public class ClientApi
 			{
 				renderPass = EDhApiRenderPass.OPAQUE_AND_TRANSPARENT;
 			}
-			
+
 			// A global render state variable is used since MC has split up their
 			// render prep and actual rendering into different threads/methods
 			// this is annoying since it's possible to start a render with only
 			// partially complete info, but there isn't a better option at the moment
 			RENDER_PARAMS.update(renderPass, RENDER_STATE);
-			
+
 			//endregion
-			
-			
-			
+
+
+
 			//============//
 			// validation //
 			//============//
 			//region
-			
+
 			String validationMessage = RENDER_PARAMS.getValidationErrorMessage();
 			if (validationMessage != null)
 			{
 				// store the error message so it can be seen on the F3 screen
 				this.lastRenderParamValidationMessage = validationMessage;
-				
+
 				// Allow the debug triangle to render regardless of validation
 				// since the triangle just renders directly to the screen
 				// and doesn't care about any params
@@ -545,7 +544,7 @@ public class ClientApi
 			{
 				this.lastRenderParamValidationMessage = null;
 			}
-			
+
 			if (this.rendererDisabledBecauseOfExceptions)
 			{
 				// re-enable rendering if the user toggles DH rendering
@@ -555,24 +554,24 @@ public class ClientApi
 					this.rendererDisabledBecauseOfExceptions = false;
 					Config.Client.quickEnableRendering.set(true);
 				}
-				
+
 				return;
 			}
-			
+
 			if (Config.Client.Advanced.Debugging.rendererMode.get() == EDhApiRendererMode.DISABLED)
 			{
 				return;
 			}
-			
+
 			//endregion
-			
-			
-			
+
+
+
 			//===========//
 			// rendering //
 			//===========//
 			//region
-			
+
 			try
 			{
 				// render pass //
@@ -581,13 +580,13 @@ public class ClientApi
 					if (!renderingDeferredLayer)
 					{
 						// normal/opaque
-						
+
 						boolean renderingCancelled = ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeRenderEvent.class, RENDER_PARAMS);
 						if (!renderingCancelled)
 						{
 							LodRenderer.INSTANCE.render(RENDER_PARAMS, profiler);
 						}
-						
+
 						if (!DhApi.Delayed.renderProxy.getDeferTransparentRendering())
 						{
 							ApiEventInjector.INSTANCE.fireAllEvents(DhApiAfterRenderEvent.class, null);
@@ -596,14 +595,14 @@ public class ClientApi
 					else
 					{
 						// deferred
-						
+
 						boolean renderingCancelled = ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeDeferredRenderEvent.class, RENDER_PARAMS);
 						if (!renderingCancelled)
 						{
 							LodRenderer.INSTANCE.renderDeferred(RENDER_PARAMS, profiler);
 						}
-						
-						
+
+
 						if (DhApi.Delayed.renderProxy.getDeferTransparentRendering())
 						{
 							ApiEventInjector.INSTANCE.fireAllEvents(DhApiAfterRenderEvent.class, null);
@@ -622,9 +621,9 @@ public class ClientApi
 							// meta renderer needed for render state/texture
 							// for setup on some APIs (IE openGL)
 							metaRenderer.runRenderPassSetup(RENDER_PARAMS);
-							
+
 							testRenderer.render(RENDER_PARAMS);
-							
+
 							metaRenderer.runRenderPassCleanup();
 						}
 						else
@@ -638,29 +637,29 @@ public class ClientApi
 			{
 				this.rendererDisabledBecauseOfExceptions = true;
 				LOGGER.error("Unexpected Renderer error in render pass [" + renderPass + "]. Error: " + e.getMessage(), e);
-				
+
 				MC_CLIENT.sendChatMessage(MinecraftTextFormat.DARK_RED + MinecraftTextFormat.BOLD + "ERROR: Distant Horizons renderer has encountered an exception!" + MinecraftTextFormat.CLEAR_FORMATTING);
 				MC_CLIENT.sendChatMessage(MinecraftTextFormat.DARK_RED + "Renderer disabled to try preventing GL state corruption." + MinecraftTextFormat.CLEAR_FORMATTING);
 				MC_CLIENT.sendChatMessage(MinecraftTextFormat.DARK_RED + "Toggle DH rendering via the config UI to re-activate DH rendering." + MinecraftTextFormat.CLEAR_FORMATTING);
 				MC_CLIENT.sendChatMessage(MinecraftTextFormat.DARK_RED + "Error: " + MinecraftTextFormat.CLEAR_FORMATTING + e);
 			}
-			
+
 			//endregion
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//================//
 	// fade rendering //
 	//================//
 	//region fade rendering
-	
-	/** 
+
+	/**
 	 * The first fade pass.
-	 * Called after MC finishes rendering the opaque passes. 
+	 * Called after MC finishes rendering the opaque passes.
 	 */
 	public void renderFadeOpaque()
 	{
@@ -669,7 +668,7 @@ public class ClientApi
 		{
 			return;
 		}
-		
+
 		// only fade when DH is rendering
 		if (Config.Client.Advanced.Debugging.rendererMode.get() == EDhApiRendererMode.DEFAULT
 			&&
@@ -685,10 +684,10 @@ public class ClientApi
 			fadeRenderer.render(RENDER_PARAMS);
 		}
 	}
-	/** 
+	/**
 	 * The second fade pass.
 	 * Called after MC finishes rendering both opaque
-	 * and transparent passes. 
+	 * and transparent passes.
 	 */
 	public void renderFadeTransparent()
 	{
@@ -697,7 +696,7 @@ public class ClientApi
 		{
 			return;
 		}
-		
+
 		// only fade when DH is rendering
 		if (Config.Client.Advanced.Debugging.rendererMode.get() == EDhApiRendererMode.DEFAULT)
 		{
@@ -716,23 +715,23 @@ public class ClientApi
 			}
 		}
 	}
-	
+
 	private static boolean shouldRenderFade()
 	{
 		// don't fade when Iris shaders are active, otherwise the rendering can get weird
 		return DelayedAccessors.IRIS == null
 			|| !DelayedAccessors.IRIS.isShaderPackInUse();
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//==========//
 	// keyboard //
 	//==========//
 	//region keyboard
-	
+
 	/** Trigger once on key press, with CLIENT PLAYER. */
 	public void keyPressedEvent(int glfwKey)
 	{
@@ -741,8 +740,8 @@ public class ClientApi
 			// keybindings are disabled
 			return;
 		}
-		
-		
+
+
 		if (glfwKey == KeyCodesUtil.F6)
 		{
 			Config.Client.Advanced.Debugging.rendererMode.set(EDhApiRendererMode.next(Config.Client.Advanced.Debugging.rendererMode.get()));
@@ -759,29 +758,29 @@ public class ClientApi
 			MC_CLIENT.sendChatMessage("F8: Set debug mode to " + Config.Client.Advanced.Debugging.debugRenderingColors.get());
 		}
 	}
-	
+
 	//endregion
-	
-	
-	
+
+
+
 	//======//
 	// chat //
 	//======//
 	//region chat
-	
+
 	private void sendQueuedChatMessages()
 	{
 		// this includes if the current build is a dev build
 		// and configuration warnings (IE Java memory amount and MC settings)
 		this.detectAndSendBootTimeWarnings();
-		
-		
+
+
 		// slow chat messages
 		{
 			// if for some reason we end up with a lot of messages in the queue (world gen)
 			// show everything to prevent the queue from growing infinitely
 			boolean chatQueueBackedUp = this.slowChatMessageQueue.size() > 25;
-			
+
 			// chat messages
 			while (!this.slowChatMessageQueue.isEmpty())
 			{
@@ -793,11 +792,11 @@ public class ClientApi
 				{
 					break;
 				}
-				
+
 				// last chat time is only tracked for slow messages
 				// to prevent ever sending any if a lot of fast messages are being sent
 				this.lastSlowChatMessageSentMsTime = System.currentTimeMillis();
-				
+
 				String message = this.slowChatMessageQueue.poll();
 				if (message == null)
 				{
@@ -807,7 +806,7 @@ public class ClientApi
 				MC_CLIENT.sendChatMessage(message);
 			}
 		}
-		
+
 		// fast chat messages
 		{
 			// chat messages
@@ -822,7 +821,7 @@ public class ClientApi
 				MC_CLIENT.sendChatMessage(message);
 			}
 		}
-		
+
 		// overlay messages
 		while (!this.overlayMessageQueue.isEmpty())
 		{
@@ -840,13 +839,13 @@ public class ClientApi
 	private void detectAndSendBootTimeWarnings()
 	{
 		// dev build
-		if (ModInfo.IS_DEV_BUILD 
-			&& !this.isDevBuildMessagePrinted 
+		if (ModInfo.IS_DEV_BUILD
+			&& !this.isDevBuildMessagePrinted
 			&& MC_CLIENT.playerExists())
 		{
 			this.isDevBuildMessagePrinted = true;
 			this.lastSlowChatMessageSentMsTime = System.currentTimeMillis();
-			
+
 			// remind the user that this is a development build
 			String message =
 					MinecraftTextFormat.DARK_GREEN + "Distant Horizons: nightly/unstable build, version: [" + ModInfo.VERSION+"]." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
@@ -854,25 +853,25 @@ public class ClientApi
 							"Here be dragons!\n";
 			MC_CLIENT.sendChatMessage(message);
 		}
-		
-		
+
+
 		// memory
 		if (this.chatMessageSentRecently()) return;
-		if (!this.lowMemoryWarningPrinted 
+		if (!this.lowMemoryWarningPrinted
 			&& Config.Common.Logging.Warning.showLowMemoryWarningOnStartup.get())
 		{
 			this.lowMemoryWarningPrinted = true;
 			this.lastSlowChatMessageSentMsTime = System.currentTimeMillis();
-			
+
 			// 4 GB
 			long minimumRecommendedMemoryInBytes = 4L * 1_000_000_000L;
-			
+
 			// Java returned 17,171,480,576 for 16 GB so it might be slightly off what you'd expect
 			long maxMemoryInBytes = Runtime.getRuntime().maxMemory();
 			if (maxMemoryInBytes < minimumRecommendedMemoryInBytes)
 			{
 				String message =
-						// orange text		
+						// orange text
 						MinecraftTextFormat.ORANGE + "Distant Horizons: Low memory detected." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
 						"Stuttering or low FPS may occur. \n" +
 						"Please increase Minecraft's available memory to 4 GB or more. \n" +
@@ -880,20 +879,20 @@ public class ClientApi
 				MC_CLIENT.sendChatMessage(message);
 			}
 		}
-		
-		
+
+
 		// high vanilla render distance
 		if (this.chatMessageSentRecently()) return;
-		if (!this.highVanillaRenderDistanceWarningPrinted 
+		if (!this.highVanillaRenderDistanceWarningPrinted
 			&& Config.Common.Logging.Warning.showHighVanillaRenderDistanceWarning.get())
 		{
 			this.highVanillaRenderDistanceWarningPrinted = true;
-			
-			// DH generally doesn't need a vanilla render distance above 12 
+
+			// DH generally doesn't need a vanilla render distance above 12
 			if (MC_RENDER.getRenderDistance() > 12)
 			{
 				this.lastSlowChatMessageSentMsTime = System.currentTimeMillis();
-				
+
 				String message =
 					MinecraftTextFormat.YELLOW + "Distant Horizons: High vanilla render distance detected." + MinecraftTextFormat.CLEAR_FORMATTING + "\n" +
 					"Using a high vanilla render distance uses a lot of CPU power \n" +
@@ -914,34 +913,34 @@ public class ClientApi
 			// no static message has ever been sent
 			return false;
 		}
-		
-		long timeSinceLastMessage = System.currentTimeMillis() - this.lastSlowChatMessageSentMsTime; 
+
+		long timeSinceLastMessage = System.currentTimeMillis() - this.lastSlowChatMessageSentMsTime;
 		return timeSinceLastMessage <= MS_BETWEEN_WARNING_MESSAGES;
 	}
-	
-	
-	/** 
+
+
+	/**
 	 * Queues the given message to appear in chat the next valid frame.
-	 * Useful for queueing up messages that may be triggered before the user has loaded into the world. 
+	 * Useful for queueing up messages that may be triggered before the user has loaded into the world.
 	 */
 	public void queueSlowChatMessage(String chatMessage) { this.slowChatMessageQueue.add(chatMessage); }
-	
-	/** 
+
+	/**
 	 * Similar to {@link ClientApi#queueSlowChatMessage(String)}
 	 * however any chat messages queued here will be shown immediately
 	 * instead of having a delay between messages. <br><br>
-	 * 
+	 *
 	 * This is good for logging or alerts.
 	 */
 	public void queueFastChatMessage(String chatMessage) { this.fastChatMessageQueue.add(chatMessage); }
-	
+
 	/**
 	 * Similar to {@link ClientApi#queueSlowChatMessage(String)} but appears above the toolbar.
 	 */
 	public void queueOverlayMessage(String message) { this.overlayMessageQueue.add(message); }
-	
+
 	//endregion
-	
-	
-	
+
+
+
 }
