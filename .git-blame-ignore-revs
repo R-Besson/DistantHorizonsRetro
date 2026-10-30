@@ -1,0 +1,5 @@
+# commits git blame skips, enable locally with:
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# reformat codebase
+aa7bcbc92d86be63e86a6d7dde6b7020689cb0cb
