@@ -19,6 +19,7 @@
 
 package com.seibel.distanthorizons.common.wrappers.world;
 
+import com.google.common.hash.Hashing;
 import com.seibel.distanthorizons.api.enums.worldGeneration.EDhApiLevelType;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBiomeWrapper;
 import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
@@ -173,10 +174,14 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 		return LegacyDimensionInfo.fullName(this.level.provider.dimensionId);
 	}
 
+	/**
+	 * The level key sent to clients is built from this, so it must not be the seed itself.
+	 * 1.7.10 has no hashed seed, this is the same hash modern MC sends (BiomeManager.obfuscateSeed)
+	 */
 	@Override
 	public long getHashedSeed()
 	{
-		return this.level.getSeed();
+		return Hashing.sha256().hashLong(this.level.getSeed()).asLong();
 	}
 
 	@Override

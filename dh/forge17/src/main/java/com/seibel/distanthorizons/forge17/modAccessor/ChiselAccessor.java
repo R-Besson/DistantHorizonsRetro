@@ -62,7 +62,8 @@ public class ChiselAccessor implements IChiselCommonAccessor
 			}
 
 			quarters[i] = (submap != null)
-				? submap.getSubIcon(index % submap.getWidth(), index / submap.getHeight())
+				// the index counts row by row
+				? submap.getSubIcon(index % submap.getWidth(), index / submap.getWidth())
 				: block.getIcon(side, meta);
 		}
 		return quarters;

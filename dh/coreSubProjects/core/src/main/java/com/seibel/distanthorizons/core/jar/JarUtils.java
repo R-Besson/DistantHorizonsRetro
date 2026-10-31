@@ -22,10 +22,7 @@ package com.seibel.distanthorizons.core.jar;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * Some general utils for the jar
@@ -39,16 +36,6 @@ public class JarUtils
 	// methods //
 	//=========//
 	//region
-
-	/**
-	 * Gets the URI of a resource
-	 *
-	 * @param resource Resource location
-	 * @return The URI of that file
-	 * @throws URISyntaxException If the file doesnt exist
-	 */
-	public static URI accessFileURI(String resource) throws URISyntaxException
-	{ return Objects.requireNonNull(JarUtils.class.getResource(resource)).toURI(); }
 
 	/**
 	 * Get a file within the mods resources

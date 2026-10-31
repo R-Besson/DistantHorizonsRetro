@@ -13,7 +13,7 @@ public class GlDhColorTexture
 	private final EGlDhPixelFormat format;
 	private final EGlDhPixelType type;
 
-	private boolean isValid;
+	private final boolean isValid;
 	/** AKA, the OpenGL name of this texture */
 	private final int id;
 

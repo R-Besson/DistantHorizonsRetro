@@ -7,7 +7,7 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 public class GlDhDepthTexture
 {
-	private int id;
+	private final int id;
 	public GlDhDepthTexture(int width, int height, EGlDhDepthBufferFormat format)
 	{
 		this.id = LWJGL.glGenTextures();

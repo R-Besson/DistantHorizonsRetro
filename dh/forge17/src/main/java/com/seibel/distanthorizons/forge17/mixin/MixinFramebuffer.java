@@ -4,6 +4,7 @@ import com.seibel.distanthorizons.forge17.MixinFlags;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import net.minecraft.client.shader.Framebuffer;
+import net.minecraftforge.client.MinecraftForgeClient;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
@@ -30,6 +31,12 @@ public class MixinFramebuffer
 	 */
 	@Unique
 	private boolean distanthorizons$depthIsTexture = false;
+	/**
+	 * Forge gives framebuffers a combined depth and stencil buffer when a mod reserved stencil bits,
+	 * the depth texture has to hold the stencil too then
+	 */
+	@Unique
+	private boolean distanthorizons$depthHasStencil = false;
 
 	//========================//
 	// depth texture handling //
@@ -49,18 +56,19 @@ public class MixinFramebuffer
 			return OpenGlHelper.func_153185_f(); // glGenRenderbuffers
 		}
 
+		this.distanthorizons$depthHasStencil = MinecraftForgeClient.getStencilBits() != 0;
 		int depthTextureId = TextureUtil.glGenTextures();
 
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, depthTextureId);
 		GL11.glTexImage2D(
 			GL11.GL_TEXTURE_2D,
 			0,
-			GL14.GL_DEPTH_COMPONENT24,
+			this.distanthorizons$depthHasStencil ? GL30.GL_DEPTH24_STENCIL8 : GL14.GL_DEPTH_COMPONENT24,
 			this.framebufferTextureWidth,
 			this.framebufferTextureHeight,
 			0,
-			GL11.GL_DEPTH_COMPONENT,
-			GL11.GL_FLOAT,
+			this.distanthorizons$depthHasStencil ? GL30.GL_DEPTH_STENCIL : GL11.GL_DEPTH_COMPONENT,
+			this.distanthorizons$depthHasStencil ? GL30.GL_UNSIGNED_INT_24_8 : GL11.GL_FLOAT,
 			(ByteBuffer) null);
 
 		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
@@ -83,7 +91,35 @@ public class MixinFramebuffer
 			return;
 		}
 
-		GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, depthTexture, 0);
+		int attachment = this.distanthorizons$depthHasStencil ? GL30.GL_DEPTH_STENCIL_ATTACHMENT : GL30.GL_DEPTH_ATTACHMENT;
+		GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, attachment, GL11.GL_TEXTURE_2D, depthTexture, 0);
+	}
+
+	/** the texture got its storage when it was created, there's no renderbuffer to allocate */
+	@Redirect(
+		method = "createFramebuffer",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OpenGlHelper;func_153186_a(IIII)V"))
+	private void skipDepthRenderbufferStorage(int target, int internalFormat, int width, int height)
+	{
+		if (!this.distanthorizons$depthIsTexture)
+		{
+			OpenGlHelper.func_153186_a(target, internalFormat, width, height); // glRenderbufferStorage
+		}
+	}
+
+	/**
+	 * the texture is already attached (see bindDepthTexture),
+	 * attaching its ID as a renderbuffer would fail or attach an unrelated renderbuffer with the same ID
+	 */
+	@Redirect(
+		method = "createFramebuffer",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OpenGlHelper;func_153190_b(IIII)V"))
+	private void skipDepthRenderbufferAttach(int target, int attachment, int renderbufferTarget, int renderbuffer)
+	{
+		if (!this.distanthorizons$depthIsTexture)
+		{
+			OpenGlHelper.func_153190_b(target, attachment, renderbufferTarget, renderbuffer); // glFramebufferRenderbuffer
+		}
 	}
 
 	@Redirect(

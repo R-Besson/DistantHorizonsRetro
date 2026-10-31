@@ -37,5 +37,6 @@ public class KeyedLockContainer<TKey>
 	// getters //
 	//=========//
 
-	public ReentrantLock getLockForPos(TKey key) { return this.lockArray[Math.abs(key.hashCode()) % this.lockArray.length]; }
+	/** floorMod since Math.abs(Integer.MIN_VALUE) is still negative */
+	public ReentrantLock getLockForPos(TKey key) { return this.lockArray[Math.floorMod(key.hashCode(), this.lockArray.length)]; }
 }
