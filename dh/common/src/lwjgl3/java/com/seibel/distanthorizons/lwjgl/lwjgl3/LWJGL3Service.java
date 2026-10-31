@@ -34,7 +34,6 @@ import java.nio.IntBuffer;
 /**
  * LWJGL3 implementation of {@link ILWJGLService}.
  */
-// TODO why is this a record?
 @SuppressWarnings("ALL") public class LWJGL3Service implements ILWJGLService
 {
 	private static final Thread RENDER_THREAD = Thread.currentThread();

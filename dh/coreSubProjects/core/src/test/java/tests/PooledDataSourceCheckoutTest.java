@@ -47,9 +47,6 @@ public class PooledDataSourceCheckoutTest
 	//@Test
 	public void TestCheckouts()
 	{
-		// TODO clear FullDataSourceV2's array list pool before starting the test,
-		//  otherwise other tests can clutter up the static state and cause the test to fail
-
 		PhantomArrayListCheckout initialCheckout;
 		try (FullDataSourceV2 initialSource = FullDataSourceV2.createEmpty(DhSectionPos.encode((byte) 6, 0, 0)))
 		{
