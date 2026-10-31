@@ -82,9 +82,6 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	private static final AtomicReferenceArray<BlockStateWrapper> WRAPPER_BY_SMALL_BLOCK_ID_AND_META = new AtomicReferenceArray<>(FAST_CACHE_MAX_BLOCK_ID * 16);
 	public static final ConcurrentHashMap<String, BlockStateWrapper> WRAPPER_BY_RESOURCE_LOCATION = new ConcurrentHashMap<>();
 
-	public static final String AIR_STRING = "AIR";
-	public static final BlockStateWrapper AIR = new BlockStateWrapper(null, 0, null);
-
 	private static final String WATER_RESOURCE_LOCATION_STRING = "minecraft:water";
 	private static BlockStateWrapper waterBlock = null;
 	private static final String DIRT_RESOURCE_LOCATION_STRING = "minecraft:dirt";
@@ -107,6 +104,10 @@ public class BlockStateWrapper implements IBlockStateWrapper
 	/** vanilla's render types end at 41, mod renderers get the ids after it (see RenderingRegistry.getNextAvailableRenderId) */
 	private static final int FIRST_MOD_RENDER_TYPE = 42;
 	private static final int DOUBLE_PLANT_TOP_META = 8;
+
+	public static final String AIR_STRING = "AIR";
+	/** must be defined after every static the constructor reads (IE BEACON_BASE_BLOCK_NAMES), otherwise they're still null */
+	public static final BlockStateWrapper AIR = new BlockStateWrapper(null, 0, null);
 
 	// properties //
 

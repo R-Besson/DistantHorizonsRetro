@@ -40,7 +40,6 @@ public interface IDhApiConfig
 	IDhApiMultiplayerConfig multiplayer();
 	IDhApiMultiThreadingConfig multiThreading();
 	// note: DON'T add the Auto Updater to this API. We only want the user's to have the ability to control when things are downloaded to their machines.
-	//IDhApiLoggingConfig logging(); // TODO implement
 	IDhApiDebuggingConfig debugging();
 
 }

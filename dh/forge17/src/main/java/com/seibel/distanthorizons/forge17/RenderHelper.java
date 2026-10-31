@@ -65,7 +65,6 @@ public class RenderHelper
 
 
 		// set GL state for DH rendering
-		// TODO could we use DH's GLState object? or would that be overkill?
 		if (getAngelicaAccessor() == null)
 		{
 			LWJGL.glDisable(GL32.GL_ALPHA_TEST);
@@ -92,7 +91,7 @@ public class RenderHelper
 		LWJGL.glBindTexture(GL32.GL_TEXTURE_2D, oldBoundTex);
 	}
 
-	// TODO why do we need to disable depth here?
+	/** turns depth writes on for MC's translucent (water) pass */
 	public static void beforeWater() { LWJGL.glDepthMask(true); }
 
 	public static void renderFade(boolean translucent)

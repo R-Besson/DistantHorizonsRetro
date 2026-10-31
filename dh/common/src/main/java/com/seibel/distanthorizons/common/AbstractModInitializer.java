@@ -24,8 +24,6 @@ import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.render.renderer.AbstractDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.render.renderer.StubDebugWireframeRenderer;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
-import com.seibel.distanthorizons.core.wrapperInterfaces.IVersionConstants;
-import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftClientWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IIrisAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModAccessor;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IModChecker;
@@ -90,7 +88,6 @@ public abstract class AbstractModInitializer
 		this.initializeModCompat();
 
 		this.initConfig();
-		logIncompatibilityWarnings(); // needs to be called after config loading
 		setDisabledDhConfigBasedOnMods();
 		setUnsupportedConfigsBasedOnMcVersion();
 		Initializer.postConfigInit();
@@ -246,60 +243,6 @@ public abstract class AbstractModInitializer
 	// compatibility checks //
 	//======================//
 	//region compatibility checks
-
-	// TODO merge with ClientApi.detectAndSendBootTimeWarnings
-	//  probably put in a separate class
-
-	/**
-	 * Some mods will work with a few tweaks
-	 * or will partially work but have some known issues we can't solve.
-	 * This method will log (and display to chat if enabled)
-	 * these warnings and potential fixes.
-	 */
-	private static void logIncompatibilityWarnings()
-	{
-		IVersionConstants versionConstants = SingletonInjector.INSTANCE.get(IVersionConstants.class);
-
-
-
-		//======//
-		// iris //
-		//======//
-		//region
-
-		IIrisAccessor iris = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
-		if (iris != null)
-		{
-			// get the currently selected rendering API
-			EDhApiRenderingEngine renderEngine = Config.Client.Advanced.Graphics.Experimental.renderingEngine.get();
-
-			// Iris only supports native OpenGL
-			if (renderEngine == EDhApiRenderingEngine.BLAZE_3D)
-			{
-				String irisUnsupportedMessage = "Iris doesn't support DH when using the [" + EDhApiRenderingEngine.BLAZE_3D + "] rendering engine, this will need to be fixed on Iris end. As a temporary fix please change the rendering engine to [" + EDhApiRenderingEngine.OPEN_GL + "] or [" + EDhApiRenderingEngine.AUTO + "] in the DH config file.";
-				LOGGER.fatal(irisUnsupportedMessage);
-				NativeDialogUtil.showDialog(ModInfo.READABLE_NAME, irisUnsupportedMessage, "error");
-
-				IMinecraftClientWrapper mc = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
-				String errorMessage = "loading Distant Horizons. " + irisUnsupportedMessage;
-				String exceptionError = "Distant Horizons conditional mod config Exception";
-				mc.crashMinecraft(errorMessage, new Exception(exceptionError));
-			}
-			else if (renderEngine == EDhApiRenderingEngine.AUTO)
-			{
-				Config.Client.Advanced.Graphics.Experimental.renderingEngine.setApiValue(EDhApiRenderingEngine.OPEN_GL, ModInfo.READABLE_NAME + " / " + IIrisAccessor.READABLE_NAME);
-
-				EDhApiRenderingEngine recommendedEngine = versionConstants.getDefaultRenderingEngine();
-				if (recommendedEngine != EDhApiRenderingEngine.OPEN_GL)
-				{
-					LOGGER.warn("Changing Distant Horizons' rendering engine to [" + EDhApiRenderingEngine.OPEN_GL + "] to allow for Iris rendering. This renderer will be unavailable once Minecraft moves to Vulkan and must be fixed on Iris' end.");
-				}
-			}
-		}
-
-		//endregion
-
-	}
 
 	/**
 	 * Minecraft 1.7.10 doesn't support all

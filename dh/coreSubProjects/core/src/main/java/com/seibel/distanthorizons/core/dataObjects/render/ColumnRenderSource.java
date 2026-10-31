@@ -251,7 +251,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 		// linear search is fine, palettes hold the few dozen
 		// distinct block appearances of a single 64x64 section
 		// and most lookups hit the first few entries
-		// TODO: Still see if we can improve this
 		int paletteSize = this.texturePalette.size();
 		for (int i = 0; i < paletteSize; i++)
 		{

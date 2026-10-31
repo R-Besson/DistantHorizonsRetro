@@ -43,7 +43,8 @@ import net.minecraftforge.common.IShearable;
 import net.minecraftforge.common.util.ForgeDirection;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -58,7 +59,8 @@ public class ClientBlockStateColorCache
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-	private static final HashSet<BlockStateWrapper> BROKEN_BLOCK_STATES = new HashSet<>();
+	/** LODs are built on several threads, so this must be concurrent */
+	private static final Set<BlockStateWrapper> BROKEN_BLOCK_STATES = ConcurrentHashMap.newKeySet();
 
 	/** Mod icon lookups aren't guaranteed to be thread safe, so color resolving is done in this lock. */
 	private static final ReentrantLock RESOLVE_LOCK = new ReentrantLock();
@@ -495,10 +497,9 @@ public class ClientBlockStateColorCache
 			catch (Exception e)
 			{
 				// only display the error once per block/biome type to reduce log spam
-				if (!BROKEN_BLOCK_STATES.contains(this.blockStateWrapper))
+				if (BROKEN_BLOCK_STATES.add(this.blockStateWrapper))
 				{
 					LOGGER.warn("Failed to get block color for block: [" + this.blockStateWrapper + "] and biome: [" + biomeWrapper + "] at pos: " + blockPos + ". Error: [" + e.getMessage() + "]. Note: future errors for this block/biome will be ignored.", e);
-					BROKEN_BLOCK_STATES.add(this.blockStateWrapper);
 				}
 			}
 		}

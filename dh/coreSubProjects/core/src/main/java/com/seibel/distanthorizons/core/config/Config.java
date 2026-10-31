@@ -1392,8 +1392,8 @@ public class Config
 				}
 
 				/** This class is used to debug the different features of the config GUI */
-				// FIXME: WARNING: Some of the options in this class dont get show n in the default UI
-				// This will throw a warning when opened in the default ui to tell you about it not showing
+				// Note: some of the options in this class aren't shown in the default UI,
+				// opening it in the default UI logs a warning about them
 				public static class ExampleConfigScreen
 				{
 					public static ConfigUIComment exampleConfigHeader = new ConfigUIComment.Builder().setParentConfigClass(ExampleConfigScreen.class).build();

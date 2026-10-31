@@ -8,7 +8,6 @@ import javax.swing.*;
  */
 public class NativeDialogUtil
 {
-	// TODO these string options should be replaced with an enum
 	/**
 	 * @param iconType the icon type. One of:<br><table><tr><td>"info"</td><td>"warning"</td><td>"error"</td><td>"question"</td></tr></table>
 	 */

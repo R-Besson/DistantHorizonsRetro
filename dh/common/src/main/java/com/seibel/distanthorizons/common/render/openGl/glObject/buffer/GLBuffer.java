@@ -61,7 +61,6 @@ public class GLBuffer implements AutoCloseable
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
 
-	// TODO move to a shared location that can be handled by both GL and Blaze3D buffers
 	/** if enabled the number of GC'ed buffers will be logged */
 	private static final boolean LOG_PHANTOM_RECOVERY = ModInfo.IS_DEV_BUILD;
 	/** If enabled buffers allocation/upload stacks will be logged when GC'ed. */

@@ -121,10 +121,14 @@ public class ClientBlockStateTextureCache
 		BlockFaceTexture[] faceTextures = SNOW_COVERED_TEXTURES_BY_BLOCK_WRAPPER.computeIfAbsent(
 			blockStateWrapper,
 			ClientBlockStateTextureCache::bakeSnowCoveredGrassTextures);
-		return (faceTextures != null) ? faceTextures[direction.faceIndex] : null;
+		return (faceTextures != NO_SNOW_COVERED_TEXTURES) ? faceTextures[direction.faceIndex] : null;
 	}
-	/** @return null if the snow textures aren't in the atlas */
-	@Nullable
+	/**
+	 * Cached when the snow textures can't be baked,
+	 * computeIfAbsent doesn't store null so they would be looked up again on every call.
+	 */
+	private static final BlockFaceTexture[] NO_SNOW_COVERED_TEXTURES = new BlockFaceTexture[0];
+	/** @return {@link #NO_SNOW_COVERED_TEXTURES} if the snow textures aren't in the atlas */
 	private static BlockFaceTexture[] bakeSnowCoveredGrassTextures(BlockStateWrapper grassWrapper)
 	{
 		// the bottom is the grass' own dirt bottom
@@ -138,7 +142,7 @@ public class ClientBlockStateTextureCache
 			if (snowySideSprite == null
 				|| snowSprite == null)
 			{
-				return null;
+				return NO_SNOW_COVERED_TEXTURES;
 			}
 
 			// the top is drawn with the snow's color, grass sides with the dirt color (see LodQuadBuilder)
@@ -160,7 +164,7 @@ public class ClientBlockStateTextureCache
 		catch (Exception bakeError)
 		{
 			LOGGER.warn("Failed to bake snowy grass textures, error: [" + bakeError.getMessage() + "], snowy grass will use the grass textures.", bakeError);
-			return null;
+			return NO_SNOW_COVERED_TEXTURES;
 		}
 		finally
 		{

@@ -467,5 +467,7 @@ public class PositionedBlockTextureCache
 	{
 		AVERAGE_COLOR_BY_APPEARANCE.clear();
 		TEXTURED_COLOR_BY_APPEARANCE.clear();
+		// the new textures may not throw
+		BROKEN_POSITIONED_BLOCK_STATES.clear();
 	}
 }

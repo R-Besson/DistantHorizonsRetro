@@ -576,8 +576,8 @@ public class ChunkWrapper implements IChunkWrapper
 
 
 	/**
-	 * FIXME synchronized is necessary for a rare issue where this method is called from two separate threads at the same time
-	 *  before the list has finished populating.
+	 * Synchronized since this can be called from two threads at the same time,
+	 * the second one would get a partly populated list.
 	 */
 	@Override
 	public synchronized ArrayList<DhBlockPos> getWorldBlockLightPosList()

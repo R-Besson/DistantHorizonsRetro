@@ -123,7 +123,7 @@ public interface IChunkWrapper extends IBindable
 		}
 
 
-		// FIXME +1 is to handle the fact that LodDataBuilder adds +1 to all block lighting calculations, also done in the constructor
+		// +1 since LodDataBuilder adds +1 to all block lighting calculations, also done in the constructor
 		int minHeight = this.getInclusiveMinBuildHeight();
 		int maxHeight = this.getExclusiveMaxBuildHeight() + 1;
 

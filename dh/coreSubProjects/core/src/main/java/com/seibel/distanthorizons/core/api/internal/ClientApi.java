@@ -837,8 +837,6 @@ public class ClientApi
 			MC_CLIENT.sendOverlayMessage(message);
 		}
 	}
-	// TODO merge with AbstractModInitializer.logIncompatibilityWarnings
-	//  probably put in a separate class
 	private void detectAndSendBootTimeWarnings()
 	{
 		// dev build

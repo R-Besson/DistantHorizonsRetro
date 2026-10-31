@@ -314,7 +314,8 @@ public final class BufferQuad
 			maxQuadWidth = MAX_QUAD_WIDTH_FOR_EARTH_CURVATURE;
 		}
 
-		// FIXME: TEMP: Hard limit for width
+		// quads aren't merged past the max width or across a max width grid line,
+		// so curved LODs bend at the same places on neighboring quads
 		if (thisPerpendicularCompareWidth >= maxQuadWidth)
 		{
 			return false;
