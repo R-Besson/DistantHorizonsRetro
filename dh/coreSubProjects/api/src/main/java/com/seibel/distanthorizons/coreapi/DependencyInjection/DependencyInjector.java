@@ -45,15 +45,12 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 		EMPTY_GET_ALL_LIST.add(null);
 	}
 
-
 	protected final HashMap<Class<? extends BindableType>, ArrayList<BindableType>> dependencies = new HashMap<>();
 
 	/** Internal class reference to BindableType since we can't get it any other way. */
 	protected final Class<? extends BindableType> bindableInterface;
 
 	protected final boolean allowDuplicateBindings;
-
-
 
 	//==============//
 	// constructors //
@@ -67,8 +64,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// binding //
@@ -90,7 +85,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 			throw new NullPointerException("Can't bind null to [" + dependencyInterface.getSimpleName() + "]");
 		}
 
-
 		// make sure the given dependency implements the necessary interfaces
 		boolean implementsInterface = this.checkIfClassImplements(dependencyImplementation.getClass(), dependencyInterface) ||
 			this.checkIfClassExtends(dependencyImplementation.getClass(), dependencyInterface);
@@ -105,7 +99,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 		{
 			throw new IllegalArgumentException("The dependency [" + dependencyImplementation.getClass().getSimpleName() + "] doesn't implement the interface: [" + IBindable.class.getSimpleName() + "].");
 		}
-
 
 		// make sure the hashSet has an array to hold the dependency
 		if (!this.dependencies.containsKey(dependencyInterface))
@@ -127,7 +120,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 				return true;
 			}
 		}
-
 
 		// check interfaces
 		for (Class<?> implementationInterface : classToTest.getInterfaces())
@@ -154,8 +146,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 
 	//endregion
 
-
-
 	//===========//
 	// unbinding //
 	//===========//
@@ -181,7 +171,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 			return;
 		}
 
-
 		// make sure the given dependency implements the necessary interfaces
 		boolean implementsInterface = this.checkIfClassImplements(dependencyImplementation.getClass(), dependencyInterface)
 			|| this.checkIfClassExtends(dependencyImplementation.getClass(), dependencyInterface);
@@ -197,7 +186,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 			throw new IllegalArgumentException("The dependency [" + dependencyImplementation.getClass().getSimpleName() + "] doesn't implement the interface: [" + IBindable.class.getSimpleName() + "].");
 		}
 
-
 		// make sure the hashSet has an array to hold the dependency
 		if (!this.dependencies.containsKey(dependencyInterface))
 		{
@@ -210,8 +198,6 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -255,19 +241,15 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 			return (ArrayList<T>) dependencyList;
 		}
 
-
 		// return an empty list to prevent null pointers
 		return (ArrayList<T>) EMPTY_GET_ALL_LIST;
 	}
 
 	//endregion
 
-
 	/** Removes all bound dependencies. */
 	@Override
 	public void clear() { this.dependencies.clear(); }
-
-
 
 	/** Runs delayed setup for any dependencies that require it. */
 	@Override
@@ -282,5 +264,4 @@ public class DependencyInjector<BindableType extends IBindable> implements IDepe
 			}
 		}
 	}
-
 }

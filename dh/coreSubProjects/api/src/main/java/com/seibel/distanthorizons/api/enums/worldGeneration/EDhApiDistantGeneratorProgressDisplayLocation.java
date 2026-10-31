@@ -35,5 +35,4 @@ public enum EDhApiDistantGeneratorProgressDisplayLocation
 	CHAT,
 	LOG,
 	DISABLED;
-
 }

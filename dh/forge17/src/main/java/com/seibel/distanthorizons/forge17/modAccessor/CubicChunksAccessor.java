@@ -26,8 +26,6 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 	/** how many cubes below a column's lowest surface block have to be loaded to update its LOD */
 	private static final int SURFACE_CUBES_BELOW = 2;
 
-
-
 	@Override
 	public String getModName() { return "CubicChunks"; }
 
@@ -156,5 +154,4 @@ public class CubicChunksAccessor implements ICubicChunksCommonAccessor
 		}
 		return column;
 	}
-
 }

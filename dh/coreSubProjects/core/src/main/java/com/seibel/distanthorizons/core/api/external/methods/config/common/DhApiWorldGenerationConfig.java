@@ -41,8 +41,6 @@ public class DhApiWorldGenerationConfig implements IDhApiWorldGenerationConfig
 
 	private DhApiWorldGenerationConfig() { }
 
-
-
 	@Deprecated
 	@Override
 	public IDhApiConfigValue<Boolean> enableDistantWorldGeneration()
@@ -51,10 +49,7 @@ public class DhApiWorldGenerationConfig implements IDhApiWorldGenerationConfig
 	public IDhApiConfigValue<EDhApiGeneratorPlan> GeneratorPlan()
 	{ return new DhApiConfigValue<>(Config.Common.WorldGenerator.generatorPlan); }
 
-
 	@Override
 	public IDhApiConfigValue<EDhApiDistantGeneratorMode> chunkGeneratorMode()
 	{ return new DhApiConfigValue<>(Config.Common.WorldGenerator.chunkGeneratorMode); }
-
-
 }

@@ -66,7 +66,6 @@ public class LodRenderer
 
 	public static final LodRenderer INSTANCE = new LodRenderer();
 
-
 	private boolean vanillaSettingsOverridden = false;
 	private boolean renderersBound = false;
 
@@ -77,8 +76,6 @@ public class LodRenderer
 	private IDhFarFadeRenderer farFadeRenderer;
 	private IDhAntiAliasRenderer antiAliasRenderer;
 	private AbstractDebugWireframeRenderer debugWireframeRenderer;
-
-
 
 	//=============//
 	// constructor //
@@ -99,8 +96,6 @@ public class LodRenderer
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -148,8 +143,6 @@ public class LodRenderer
 
 		//endregion
 
-
-
 		//=================//
 		// rendering setup //
 		//=================//
@@ -167,7 +160,6 @@ public class LodRenderer
 
 			RenderBufferHandler renderBufferHandler = renderParams.renderBufferHandler;
 			IDhGenericRenderer genericRenderer = renderParams.genericRenderer;
-
 
 			this.metaRenderer.runRenderPassSetup(renderParams);
 
@@ -191,7 +183,6 @@ public class LodRenderer
 				renderBufferHandler.buildRenderList(renderParams);
 			}
 
-
 			boolean renderFog;
 			Boolean apiFogOverride = Config.Client.Advanced.Graphics.Fog.enableDhFog.getApiValue();
 			if (apiFogOverride != null)
@@ -214,8 +205,6 @@ public class LodRenderer
 
 			//endregion
 
-
-
 			//===========//
 			// rendering //
 			//===========//
@@ -229,8 +218,6 @@ public class LodRenderer
 					profiler.popPush("LOD Clear");
 					this.metaRenderer.clearDhDepthAndColorTextures(renderParams);
 				}
-
-
 
 				//=========================//
 				// opaque and non-deferred //
@@ -306,8 +293,6 @@ public class LodRenderer
 					this.antiAliasRenderer.render(renderParams);
 				}
 
-
-
 				//=================//
 				// debug rendering //
 				//=================//
@@ -319,7 +304,6 @@ public class LodRenderer
 					// Note: this can be very slow if a lot of boxes are being rendered
 					this.debugWireframeRenderer.render(renderParams);
 				}
-
 
 				if (Config.Client.Advanced.Debugging.PositionFinder.positionFinderEnable.get())
 				{
@@ -336,8 +320,6 @@ public class LodRenderer
 					));
 				}
 
-
-
 				//=========================//
 				// Apply to the MC Texture //
 				//=========================//
@@ -348,7 +330,6 @@ public class LodRenderer
 					profiler.popPush("Apply to MC");
 					this.metaRenderer.copyToMcTexture(renderParams);
 				}
-
 			}
 			else
 			{
@@ -361,7 +342,6 @@ public class LodRenderer
 					profiler.popPush("LOD Transparent");
 					this.renderTerrain(this.terrainRenderer, renderBufferHandler, renderParams, /*opaquePass*/ false);
 
-
 					boolean cancelFogEvent = ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeFogRenderEvent.class, fogRenderEventParam);
 					if (renderFog
 						&& !cancelFogEvent)
@@ -372,8 +352,6 @@ public class LodRenderer
 					}
 				}
 			}
-
-
 
 			//================//
 			// render cleanup //
@@ -387,8 +365,6 @@ public class LodRenderer
 	}
 
 	//endregion
-
-
 
 	//===============//
 	// LOD rendering //
@@ -409,7 +385,4 @@ public class LodRenderer
 	}
 
 	//endregion
-
-
-
 }

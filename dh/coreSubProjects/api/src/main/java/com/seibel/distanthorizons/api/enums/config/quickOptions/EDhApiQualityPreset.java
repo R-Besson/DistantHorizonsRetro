@@ -43,5 +43,4 @@ public enum EDhApiQualityPreset
 	MEDIUM,
 	HIGH,
 	EXTREME;
-
 }

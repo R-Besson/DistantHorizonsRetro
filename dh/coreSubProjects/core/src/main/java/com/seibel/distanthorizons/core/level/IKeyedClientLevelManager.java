@@ -34,5 +34,4 @@ public interface IKeyedClientLevelManager extends IBindable
 
 	boolean isEnabled();
 	void disable();
-
 }

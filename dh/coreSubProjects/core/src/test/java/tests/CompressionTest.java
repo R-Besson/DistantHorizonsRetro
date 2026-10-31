@@ -46,8 +46,6 @@ public class CompressionTest
 	/** -1 will test all of them */
 	public static int MAX_DTO_TEST_COUNT = -1;
 
-
-
 	public void NoCompression()
 	{
 		String compressorName = "Uncompressed";
@@ -72,8 +70,6 @@ public class CompressionTest
 		this.testCompressor(compressorName, EDhApiDataCompressionMode.LZMA2);
 	}
 
-
-
 	//=================//
 	// testing methods //
 	//=================//
@@ -82,7 +78,6 @@ public class CompressionTest
 	{
 		System.out.println("\n");
 		System.out.println("Testing " + compressorName);
-
 
 		long minUncompressedDtoSizeInBytes = Long.MAX_VALUE;
 		long maxUncompressedDtoSizeInBytes = 0;
@@ -95,10 +90,8 @@ public class CompressionTest
 		long totalReadTimeInNano = 0;
 		long totalWriteTimeInNano = 0;
 
-
 		long totalUncompressedFileSizeInBytes;
 		long totalCompressedFileSizeInBytes;
-
 
 		FullDataSourceV2Repo uncompressedRepo = null;
 		FullDataSourceV2Repo compressedRepo = null;
@@ -110,15 +103,12 @@ public class CompressionTest
 
 			uncompressedRepo = new FullDataSourceV2Repo("jdbc:sqlite", uncompressedDatabaseFile);
 
-
 			String compressedDatabaseFilePath = TEST_DIR + "/output/" + DB_FILE_NAME_PREFIX + "_" + compressorName + ".sqlite";
 			File compressedDatabaseFile = new File(compressedDatabaseFilePath);
 			compressedDatabaseFile.mkdirs();
 			compressedDatabaseFile.delete();
 			Assert.assertFalse(compressedDatabaseFile.exists());
 			compressedRepo = new FullDataSourceV2Repo("jdbc:sqlite", compressedDatabaseFile);
-
-
 
 			LongArrayList positionList = uncompressedRepo.getAllPositions();
 			totalUncompressedFileSizeInBytes = uncompressedRepo.getTotalDataSizeInBytes();
@@ -136,8 +126,6 @@ public class CompressionTest
 						System.out.println(i + "/" + maxTestPosition);
 					}
 
-
-
 					// uncompressed input //
 
 					try (FullDataSourceV2DTO uncompressedDto = uncompressedRepo.getByKey(pos))
@@ -150,7 +138,6 @@ public class CompressionTest
 						maxUncompressedDtoSizeInBytes = Math.max(uncompressedDtoSize, maxUncompressedDtoSizeInBytes);
 						avgUncompressedDtoSizeInBytes += uncompressedDtoSize;
 
-
 						// compress file //
 
 						long startWriteNanoTime = System.nanoTime();
@@ -161,12 +148,10 @@ public class CompressionTest
 						long endWriteNanoTime = System.nanoTime();
 						totalWriteTimeInNano += (endWriteNanoTime - startWriteNanoTime);
 
-
 						long compressedDtoSize = compressedRepo.getDataSizeInBytes(pos);
 						minCompressedDtoSizeInBytes = Math.min(compressedDtoSize, minCompressedDtoSizeInBytes);
 						maxCompressedDtoSizeInBytes = Math.max(compressedDtoSize, maxCompressedDtoSizeInBytes);
 						avgCompressedDtoSizeInBytes += compressedDtoSize;
-
 
 						// read compressed file //
 
@@ -178,7 +163,6 @@ public class CompressionTest
 						long endReadMsTime = System.nanoTime();
 						totalReadTimeInNano += (endReadMsTime - startReadNanoTime);
 
-
 						processedDtoCount++;
 					}
 				}
@@ -189,18 +173,14 @@ public class CompressionTest
 				}
 			}
 
-
-
 			totalCompressedFileSizeInBytes = compressedRepo.getTotalDataSizeInBytes();
 
 			avgCompressedDtoSizeInBytes /= processedDtoCount;
 			avgUncompressedDtoSizeInBytes /= processedDtoCount;
 
-
 			double compressionRatio = (totalCompressedFileSizeInBytes / (double) totalUncompressedFileSizeInBytes);
 			String compressionRatioString = compressionRatio + "";
 			compressionRatioString = compressionRatioString.substring(0, Math.min(6, compressionRatioString.length()));
-
 
 			System.out.println("\n");
 			System.out.println("Results: " + compressorName);
@@ -232,7 +212,4 @@ public class CompressionTest
 			}
 		}
 	}
-
-
-
 }

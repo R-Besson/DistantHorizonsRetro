@@ -36,12 +36,9 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
 	public String parentConfigPath;
 	@Nullable
 	public EConfigCommentTextPosition textPosition;
-
-
 
 	//=============//
 	// constructor //
@@ -54,8 +51,6 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 		this.textPosition = textPosition;
 	}
 
-
-
 	//=========//
 	// setters //
 	//=========//
@@ -63,8 +58,6 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 	/** Pointless to set the value */
 	@Override
 	public void set(String newValue) { }
-
-
 
 	//=========//
 	// builder //
@@ -76,8 +69,6 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 		@Nullable
 		public EConfigCommentTextPosition tempTextPosition = null;
 
-
-
 		/** Appearance shouldn't be changed */
 		@Deprecated
 		@Override
@@ -88,7 +79,6 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 		@Override
 		public Builder set(String newValue)
 		{ return this; }
-
 
 		public Builder setParentConfigClass(@NotNull Class<?> parentConfigClass)
 		{
@@ -154,22 +144,15 @@ public class ConfigUIComment extends AbstractConfigBase<String>
 			return result.toString();
 		}
 
-
 		public Builder setTextPosition(EConfigCommentTextPosition textPosition)
 		{
 			this.tempTextPosition = textPosition;
 			return this;
 		}
 
-
-
 		// build //
 
 		public ConfigUIComment build()
 		{ return new ConfigUIComment(this.tempParentConfigPath, this.tempTextPosition); }
-
 	}
-
-
-
 }

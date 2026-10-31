@@ -17,5 +17,4 @@ public class MixinThreadedFileIOBase
 		// 0ms between chunks, 5ms when idle
 		Thread.sleep(millis == 25L ? 5L : 0L);
 	}
-
 }

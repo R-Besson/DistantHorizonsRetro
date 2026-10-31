@@ -37,8 +37,6 @@ public class ThreadUtil
 {
 	public static final String THREAD_NAME_PREFIX = ModInfo.THREAD_NAME_PREFIX;
 
-
-
 	//===============//
 	// standard pool //
 	//===============//
@@ -56,8 +54,6 @@ public class ThreadUtil
 
 	public static ThreadPoolExecutor makeThreadPool(int poolSize, String name) { return makeThreadPool(poolSize, name, Thread.NORM_PRIORITY, false); }
 
-
-
 	//====================//
 	// single thread pool //
 	//====================//
@@ -65,5 +61,4 @@ public class ThreadUtil
 	public static ThreadPoolExecutor makeSingleThreadPool(String name) { return makeThreadPool(1, name, Thread.NORM_PRIORITY, false); }
 
 	public static ThreadPoolExecutor makeSingleDaemonThreadPool(String name) { return makeThreadPool(1, name, Thread.NORM_PRIORITY, true); }
-
 }

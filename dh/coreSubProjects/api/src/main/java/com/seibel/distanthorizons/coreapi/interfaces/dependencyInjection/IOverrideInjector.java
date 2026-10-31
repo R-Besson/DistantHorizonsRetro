@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection;
 
-
 import com.seibel.distanthorizons.api.interfaces.override.IDhApiOverrideable;
 
 public interface IOverrideInjector<BindableType extends IBindable>
@@ -36,8 +35,6 @@ public interface IOverrideInjector<BindableType extends IBindable>
 	int MIN_NON_CORE_OVERRIDE_PRIORITY = 0;
 	/** The priority given to overrides that don't explicitly define a priority. */
 	int DEFAULT_NON_CORE_OVERRIDE_PRIORITY = 10;
-
-
 
 	/**
 	 * Links the given implementation object to an interface, so it can be referenced later. <br>
@@ -83,6 +80,4 @@ public interface IOverrideInjector<BindableType extends IBindable>
 
 	/** Removes all bound overrides. */
 	void clear();
-
-
 }

@@ -27,8 +27,6 @@ public enum EDhApiDirection
 	/** positive X */
 	EAST(1, 0, 0);
 
-
-
 	public final int x;
 	public final int y;
 	public final int z;
@@ -39,5 +37,4 @@ public enum EDhApiDirection
 		this.y = y;
 		this.z = z;
 	}
-
 }

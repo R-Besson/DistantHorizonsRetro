@@ -26,8 +26,6 @@ public interface IProfilerWrapper extends IBindable
 	IProfileBlock push(String newSection);
 	void popPush(String newSection);
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -37,10 +35,7 @@ public interface IProfilerWrapper extends IBindable
 	interface IProfileBlock extends AutoCloseable
 	{
 		@Override void close();
-
 	}
 
 	//endregion
-
-
 }

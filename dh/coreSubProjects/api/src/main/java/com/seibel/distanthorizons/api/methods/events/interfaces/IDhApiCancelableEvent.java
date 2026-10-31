@@ -56,5 +56,4 @@ public interface IDhApiCancelableEvent<T> extends IDhApiEvent<T>
 
 		this.fireEvent((DhApiCancelableEventParam<T>) input);
 	}
-
 }

@@ -31,7 +31,6 @@ import java.nio.FloatBuffer;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-
 /**
  * This object holds the reference to a OpenGL shader program
  * and contains a few methods that can be used with OpenGL shader programs.
@@ -42,8 +41,6 @@ public class GlShaderProgram
 {
 	/** Stores the handle of the program. */
 	public final int id;
-
-
 
 	//=============//
 	// constructor //
@@ -91,8 +88,6 @@ public class GlShaderProgram
 
 	//endregion
 
-
-
 	//=========//
 	// binding //
 	//=========//
@@ -104,8 +99,6 @@ public class GlShaderProgram
 	public void free() { LWJGL.glDeleteProgram(this.id); }
 
 	//endregion
-
-
 
 //==========//
 	// uniforms //
@@ -199,7 +192,4 @@ public class GlShaderProgram
 	}
 
 	//endregion
-
-
-
 }

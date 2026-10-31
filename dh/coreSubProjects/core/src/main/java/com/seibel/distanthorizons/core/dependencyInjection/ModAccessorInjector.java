@@ -42,12 +42,10 @@ public class ModAccessorInjector extends DependencyInjector<IModAccessor>
 
 	public static final ModAccessorInjector INSTANCE = new ModAccessorInjector(IModAccessor.class);
 
-
 	public ModAccessorInjector(Class<IModAccessor> newBindableInterface)
 	{
 		super(newBindableInterface, false);
 	}
-
 
 	/**
 	 * Go to {@link DependencyInjector#bind(Class, IBindable)} DependencyHandler.bind()}
@@ -60,6 +58,4 @@ public class ModAccessorInjector extends DependencyInjector<IModAccessor>
 		super.bind(interfaceClass, modAccessor);
 		LOGGER.info("Registered mod compatibility accessor for: [" + modAccessor.getModName() + "].");
 	}
-
-
 }

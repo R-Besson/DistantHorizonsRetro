@@ -33,5 +33,4 @@ public class MinecraftTextFormat
 	public static final String UNDERLINE = "§n";
 	public static final String ITALIC = "§o";
 	public static final String CLEAR_FORMATTING = "§r";
-
 }

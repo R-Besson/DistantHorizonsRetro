@@ -31,14 +31,12 @@ import java.util.TreeSet;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-
 public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder()
 		.fileLevelConfig(Config.Common.Logging.logRendererGLEventToFile)
 		.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
 		.build();
-
 
 	// I tried to use raw arrays as much as possible since those lookups
 	// happen every frame, and the speed directly affects fps
@@ -49,8 +47,6 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 
 	TreeMap<Integer, TreeSet<Integer>> bindingPointsToIndexBuilder;
 	ArrayList<GlVertexPointer> pointersBuilder;
-
-
 
 	//=============//
 	// constructor //
@@ -63,8 +59,6 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 		this.bindingPointsToIndexBuilder = new TreeMap<>();
 		this.pointersBuilder = new ArrayList<>();
 	}
-
-
 
 	//=========//
 	// binding //
@@ -103,8 +97,6 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 		}
 	}
 
-
-
 	//==========================//
 	// manual attribute setting //
 	//==========================//
@@ -124,8 +116,6 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 		}
 		this.pointersBuilder.set(attributeIndex, attribute);
 	}
-
-
 
 	//============//
 	// validation //
@@ -192,7 +182,5 @@ public final class GlVertexAttributePreGL43 extends GlAbstractVertexAttribute
 					pointer.glType + ", " + pointer.normalized + ", " + this.strideSize + ", " + this.pointersOffset[i]);
 			}
 		}
-
 	}
-
 }

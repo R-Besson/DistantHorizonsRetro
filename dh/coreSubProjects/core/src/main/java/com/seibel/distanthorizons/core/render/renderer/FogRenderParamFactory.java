@@ -24,8 +24,6 @@ public class FogRenderParamFactory
 	/** cached object to reduce GC pressure */
 	private static final DhApiBeforeFogRenderEvent.EventParam EVENT_PARAM = new DhApiBeforeFogRenderEvent.EventParam();
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -43,7 +41,6 @@ public class FogRenderParamFactory
 		float farFogMin = Config.Client.Advanced.Graphics.Fog.farFogMin.get();
 		float farFogMax = Config.Client.Advanced.Graphics.Fog.farFogMax.get();
 		float farFogDensity = Config.Client.Advanced.Graphics.Fog.farFogDensity.get();
-
 
 		// height fog
 		EDhApiFogFalloff heightFogFalloff = Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogFalloff.get();
@@ -109,7 +106,4 @@ public class FogRenderParamFactory
 	}
 
 	//endregion
-
-
-
 }

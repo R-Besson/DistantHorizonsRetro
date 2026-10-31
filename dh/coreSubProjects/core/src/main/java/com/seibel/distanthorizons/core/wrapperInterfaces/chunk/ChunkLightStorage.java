@@ -56,8 +56,6 @@ public class ChunkLightStorage
 	/** @see ChunkLightStorage#aboveMaxYValue */
 	public int belowMinYValue;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -88,8 +86,6 @@ public class ChunkLightStorage
 		this.belowMinYValue = belowMinYValue;
 	}
 
-
-
 	//=====================//
 	// getters and setters //
 	//=====================//
@@ -104,7 +100,6 @@ public class ChunkLightStorage
 		{
 			return this.aboveMaxYValue;
 		}
-
 
 		if (this.lightSections != null)
 		{
@@ -171,8 +166,6 @@ public class ChunkLightStorage
 		}
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -184,7 +177,6 @@ public class ChunkLightStorage
 		public short[] counts;
 
 		private final ReentrantLock concurrencyCheckLock = new ReentrantLock();
-
 
 		public LightSection(int initialValue)
 		{
@@ -297,7 +289,6 @@ public class ChunkLightStorage
 				this.concurrencyCheckLock.unlock();
 			}
 		}
-
 	}
 
 	static class DataRecycler
@@ -342,7 +333,5 @@ public class ChunkLightStorage
 				ACCESS_LOCK.unlock();
 			}
 		}
-
 	}
-
 }

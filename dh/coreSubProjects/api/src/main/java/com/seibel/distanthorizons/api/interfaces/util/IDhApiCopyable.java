@@ -13,5 +13,4 @@ public interface IDhApiCopyable
 {
 	/** Returns a deep clone of all parameters whenever possible. */
 	IDhApiCopyable copy();
-
 }

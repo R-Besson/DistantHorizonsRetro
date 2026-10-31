@@ -37,5 +37,4 @@ public class ExampleCoreTest
 		Assert.assertTrue("Example test 1", true);
 		Assert.assertFalse("Example test 2", false);
 	}
-
 }

@@ -39,15 +39,12 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 	/** Fired before fog is generated. */
 	public abstract void beforeRender(DhApiCancelableEventParam<DhApiBeforeFogRenderEvent.EventParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<DhApiBeforeFogRenderEvent.EventParam> event) { this.beforeRender(event); }
-
-
 
 	//==================//
 	// parameter object //
@@ -58,8 +55,6 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 		private DhApiRenderParam renderParam;
 		private DhApiFogRenderParam originalFogRenderParam;
 		private DhApiMutableFogRenderParam fogRenderParam;
-
-
 
 		//=============//
 		// constructor //
@@ -77,8 +72,6 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 
 		//endregion
 
-
-
 		//=================//
 		// getters/setters //
 		//=================//
@@ -92,8 +85,6 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 		public DhApiMutableFogRenderParam getFogRenderParam() { return this.fogRenderParam; }
 
 		//endregion
-
-
 
 		//==========================//
 		// base api event overrides //
@@ -114,10 +105,5 @@ public abstract class DhApiBeforeFogRenderEvent implements IDhApiCancelableEvent
 		public boolean getCopyBeforeFire() { return false; }
 
 		//endregion
-
-
-
 	}
-
-
 }

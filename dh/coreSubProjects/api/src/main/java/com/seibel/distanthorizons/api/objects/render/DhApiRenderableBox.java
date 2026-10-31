@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.api.objects.render;
 
-
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup;
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3d;
@@ -24,8 +23,6 @@ public class DhApiRenderableBox
 	/** @see EDhApiBlockMaterial */
 	public byte material;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -46,6 +43,5 @@ public class DhApiRenderableBox
 		this.color = color;
 		this.material = material.index;
 	}
-
 }
 

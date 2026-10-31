@@ -68,10 +68,7 @@ public class FullDataSourceV2DTO
 	{
 		public static final int V1_NO_ADJACENT_DATA = 1;
 		public static final int V2_LATEST = 2;
-
 	}
-
-
 
 	public long pos;
 
@@ -114,8 +111,6 @@ public class FullDataSourceV2DTO
 	 */
 	@Nullable
 	public Integer savedMinY;
-
-
 
 	//==============//
 	// constructors //
@@ -173,8 +168,6 @@ public class FullDataSourceV2DTO
 		this.compressedWestAdjDataByteArray = this.pooledArraysCheckout.getByteArray(7, 0);
 	}
 
-
-
 	//========================//
 	// data source population //
 	//========================//
@@ -227,8 +220,6 @@ public class FullDataSourceV2DTO
 			throw new IllegalStateException("Data format [" + this.dataFormatVersion + "] doesn't support adjacent data. Automatic conversion must be done.");
 		}
 
-
-
 		// compression //
 
 		EDhApiDataCompressionMode compressionModeEnum;
@@ -241,8 +232,6 @@ public class FullDataSourceV2DTO
 			// may happen if the compressor value was changed to an invalid option
 			throw new DataCorruptedException(e);
 		}
-
-
 
 		// data //
 
@@ -284,7 +273,6 @@ public class FullDataSourceV2DTO
 			readBlobToDataSourceDataArrayV2(this.compressedDataByteArray, dataSource.dataPoints, direction, compressionModeEnum);
 		}
 
-
 		// mapping //
 
 		dataSource.mapping.clear(dataSource.getPos());
@@ -305,8 +293,6 @@ public class FullDataSourceV2DTO
 				shiftDataPointsY(dataSource.dataPoints, this.savedMinY - levelWrapper.getMinHeight());
 			}
 		}
-
-
 
 		// individual properties //
 
@@ -365,8 +351,6 @@ public class FullDataSourceV2DTO
 			}
 		}
 	}
-
-
 
 	//=================//
 	// (de)serializing //
@@ -610,7 +594,6 @@ public class FullDataSourceV2DTO
 			maxZ = FullDataSourceV2.WIDTH - 1;
 		}
 
-
 		try (PhantomArrayListCheckout checkout = ARRAY_LIST_POOL.checkoutByteArrays(1);
 			DhDataInputStream compressedIn = DhDataInputStream.create(inputCompressedDataByteArray, compressionModeEnum, checkout))
 		{
@@ -735,7 +718,6 @@ public class FullDataSourceV2DTO
 		}
 	}
 
-
 	private static void writeGenerationStepsToBlob(ByteArrayList inputColumnGenStepByteArray, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException
 	{
 		try (DhDataOutputStream compressedOut = DhDataOutputStream.create(compressionModeEnum, outputByteArray, inputColumnGenStepByteArray.size()))
@@ -755,7 +737,6 @@ public class FullDataSourceV2DTO
 			throw new DataCorruptedException(e);
 		}
 	}
-
 
 	private static void writeWorldCompressionModeToBlob(ByteArrayList inputWorldCompressionModeByteArray, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException
 	{
@@ -777,7 +758,6 @@ public class FullDataSourceV2DTO
 		}
 	}
 
-
 	private static void writeDataMappingToBlob(FullDataPointIdMap mapping, ByteArrayList outputByteArray, EDhApiDataCompressionMode compressionModeEnum) throws IOException
 	{
 		int expectedSizeInBytes = Integer.BYTES + (mapping.size() * EXPECTED_BYTES_PER_MAPPING_ENTRY);
@@ -794,8 +774,6 @@ public class FullDataSourceV2DTO
 			FullDataPointIdMap.deserialize(mapping, compressedIn, pos, levelWrapper);
 		}
 	}
-
-
 
 	//============//
 	// networking //
@@ -883,8 +861,6 @@ public class FullDataSourceV2DTO
 		this.createdUnixDateTime = in.readLong();
 	}
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -911,7 +887,4 @@ public class FullDataSourceV2DTO
 			.add("createdUnixDateTime", this.createdUnixDateTime)
 			.toString();
 	}
-
-
-
 }

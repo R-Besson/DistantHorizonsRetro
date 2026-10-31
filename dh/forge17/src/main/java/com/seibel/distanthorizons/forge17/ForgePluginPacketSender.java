@@ -23,8 +23,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 	public static final SimpleNetworkWrapper PLUGIN_CHANNEL = NetworkRegistry.INSTANCE
 		.newSimpleChannel(AbstractPluginPacketSender.WRAPPER_PACKET_RESOURCE);
 
-
-
 	//=================//
 	// packet handling //
 	//=================//
@@ -38,8 +36,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// sending //
@@ -56,8 +52,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -68,8 +62,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 	public static class MessageWrapper implements IMessage
 	{
 		public AbstractNetworkMessage message;
-
-
 
 		//==============//
 		// constructors //
@@ -82,8 +74,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 		public MessageWrapper() { /* For reflection */ }
 
 		//endregion
-
-
 
 		//===============//
 		// byte handling //
@@ -107,8 +97,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 
 		//endregion
 
-
-
 		//================//
 		// helper classes //
 		//================//
@@ -125,7 +113,6 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 					return null;
 				}
 
-
 				if (context.side == Side.SERVER)
 				{
 					consumerPacket.accept(
@@ -139,14 +126,10 @@ public class ForgePluginPacketSender extends AbstractPluginPacketSender
 
 				return null; // No response needed
 			}
-
 		}
 
 		//endregion
 	}
 
 	//endregion
-
-
-
 }

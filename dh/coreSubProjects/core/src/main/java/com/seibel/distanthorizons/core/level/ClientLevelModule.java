@@ -63,8 +63,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 	 */
 	public final IDhGenericRenderer genericRenderer = WRAPPER_FACTORY.createGenericRenderer();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -76,8 +74,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		this.fullDataSourceProvider = this.clientLevel.getFullDataProvider();
 		this.fullDataSourceProvider.addDataSourceUpdateListener(this);
 	}
-
-
 
 	//==============//
 	// tick methods //
@@ -109,7 +105,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 			this.ClientRenderStateRef.set(clientRenderState);
 		}
 
-
 		DhBlockPos2D quadTreeTickBlockPos;
 		if (Config.Client.Advanced.Graphics.Quality.useCameraPositionForQualityDropOff.get())
 		{
@@ -125,8 +120,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 
 		clientRenderState.quadtree.tryTick(quadTreeTickBlockPos);
 	}
-
-
 
 	//========//
 	// render //
@@ -156,8 +149,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		this.ClientRenderStateRef.compareAndSet(clientRenderState, null);
 		clientRenderState.close();
 	}
-
-
 
 	//===============//
 	// data handling //
@@ -189,8 +180,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		this.fullDataSourceProvider.removeDataSourceUpdateListener(this);
 		this.genericRenderer.close();
 	}
-
-
 
 	//=======================//
 	// misc helper functions //
@@ -229,8 +218,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		}
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -241,8 +228,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		public final RenderBufferHandler renderBufferHandler;
 
 		public final int viewDiameterInBlocks;
-
-
 
 		//=============//
 		// constructor //
@@ -275,8 +260,6 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 				* 2;
 		}
 
-
-
 		//================//
 		// base overrides //
 		//================//
@@ -286,7 +269,5 @@ public class ClientLevelModule implements Closeable, IDataSourceUpdateListenerFu
 		{
 			this.quadtree.close();
 		}
-
 	}
-
 }

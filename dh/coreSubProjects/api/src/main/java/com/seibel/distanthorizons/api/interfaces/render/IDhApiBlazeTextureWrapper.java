@@ -40,6 +40,4 @@ public interface IDhApiBlazeTextureWrapper extends IDhApiUnsafeWrapper
 	int getWidth();
 	/** @return -1 if the texture is null */
 	int getHeight();
-
-
 }

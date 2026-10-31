@@ -14,8 +14,6 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 	private final long timeoutInMs;
 	private Timer timer;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -25,8 +23,6 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 
 	//endregion
 
-
-
 	//==================//
 	// abstract methods //
 	//==================//
@@ -35,8 +31,6 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 	public abstract void onConfigTimeout();
 
 	//endregion
-
-
 
 	//========//
 	// events //
@@ -78,7 +72,4 @@ public abstract class AbstractDelayedConfigEventHandler implements IConfigListen
 	}
 
 	//endregion
-
-
-
 }

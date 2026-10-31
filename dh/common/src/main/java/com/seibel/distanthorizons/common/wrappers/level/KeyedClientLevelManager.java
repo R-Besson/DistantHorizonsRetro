@@ -25,8 +25,6 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 	/** Allows to keep level manager enabled between loading different keyed levels */
 	private volatile boolean enabled = false;
 
-
-
 	//======================//
 	// level override logic //
 	//======================//
@@ -119,8 +117,6 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 		this.clearKeyedLevel();
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -136,10 +132,7 @@ public class KeyedClientLevelManager implements IKeyedClientLevelManager
 			this.serverKey = serverKey;
 			this.levelKey = levelKey;
 		}
-
 	}
 
 	//endregion
-
-
 }

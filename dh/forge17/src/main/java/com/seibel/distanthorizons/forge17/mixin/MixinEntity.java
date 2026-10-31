@@ -93,5 +93,4 @@ public class MixinEntity
 		double distance = Math.max(Math.sqrt((offsetX * offsetX) + (offsetZ * offsetZ)), Math.abs(this.posY - camera.posY));
 		return distance > vanillaTerrainDistance;
 	}
-
 }

@@ -13,7 +13,6 @@ public class AdjacentChunkHolder
 {
 	final IChunkWrapper[] chunkArray = new IChunkWrapper[9];
 
-
 	//==============//
 	// constructors //
 	//==============//
@@ -57,8 +56,6 @@ public class AdjacentChunkHolder
 			}
 		}
 	}
-
-
 
 	//=========//
 	// methods //
@@ -111,6 +108,4 @@ public class AdjacentChunkHolder
 		// equivalent to 4 + offsetX + (offsetZ * 3).
 		return this.chunkArray[4 + offsetX + offsetZ + (offsetZ << 1)];
 	}
-
-
 }

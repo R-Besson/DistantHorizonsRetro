@@ -32,5 +32,4 @@ public interface ISingletonTestTwo extends IBindable
 	int getValue();
 
 	int getDependentValue();
-
 }

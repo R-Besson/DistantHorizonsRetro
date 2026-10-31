@@ -44,8 +44,6 @@ public enum EDhApiGpuUploadMethod
 	/** Fast rendering but may stutter when uploading. */
 	DATA(false, false);
 
-
-
 	public final boolean useEarlyMapping;
 	public final boolean useBufferStorage;
 
@@ -54,5 +52,4 @@ public enum EDhApiGpuUploadMethod
 		this.useEarlyMapping = useEarlyMapping;
 		this.useBufferStorage = useBufferStorage;
 	}
-
 }

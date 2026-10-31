@@ -94,7 +94,4 @@ public class JarUtils
 	}
 
 	//endregion
-
-
-
 }

@@ -9,8 +9,6 @@ public final class CubicChunksCompat
 {
 	private CubicChunksCompat() { }
 
-
-
 	/**
 	 * Mod accessors are bound during mod init, long before any world loads,
 	 * so the lookup is only done once.
@@ -54,5 +52,4 @@ public final class CubicChunksCompat
 		}
 		return (world != null) ? world.getHeight() : 256;
 	}
-
 }

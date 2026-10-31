@@ -52,5 +52,4 @@ public class ReducingListReuseTest
 			Assert.assertEquals(RenderDataPointUtil.EMPTY_DATA, output.get(0));
 		}
 	}
-
 }

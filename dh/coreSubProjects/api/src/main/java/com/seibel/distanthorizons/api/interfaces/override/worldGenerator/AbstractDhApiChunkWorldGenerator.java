@@ -46,8 +46,6 @@ public abstract class AbstractDhApiChunkWorldGenerator implements Closeable, IDh
 	@Override
 	public final byte getLargestDataDetailLevel() { return EDhApiDetailLevel.BLOCK.detailLevel; }
 
-
-
 	//=================//
 	// world generator //
 	//=================//
@@ -95,7 +93,6 @@ public abstract class AbstractDhApiChunkWorldGenerator implements Closeable, IDh
 		}, worldGeneratorThreadPool);
 	}
 
-
 	/**
 	 * This method is called to generate terrain over a given area
 	 * from a thread defined by Distant Horizons. <br><br>
@@ -122,5 +119,4 @@ public abstract class AbstractDhApiChunkWorldGenerator implements Closeable, IDh
 	 * @since API 3.0.0
 	 */
 	public abstract DhApiChunk generateApiChunk(int chunkPosX, int chunkPosZ, EDhApiDistantGeneratorMode generatorMode);
-
 }

@@ -27,5 +27,4 @@ public interface ILangWrapper extends IBindable
 	boolean langExists(String str);
 
 	String getLang(String str);
-
 }

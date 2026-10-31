@@ -94,8 +94,6 @@ public class ConfigHandler
 		this.add(HashMap.class);
 	}};
 
-
-
 	public static final ConfigHandler INSTANCE = new ConfigHandler();
 
 	public final ConfigFileHandler configFileHandler = new ConfigFileHandler(getConfigPath());
@@ -107,8 +105,6 @@ public class ConfigHandler
 	 * Fun to use, but should be disabled by default.
 	 */
 	public boolean runMinMaxValidation = true;
-
-
 
 	//=============//
 	// constructor //
@@ -156,7 +152,6 @@ public class ConfigHandler
 				continue;
 			}
 
-
 			// add this config to the master list
 			try
 			{
@@ -168,12 +163,10 @@ public class ConfigHandler
 				continue;
 			}
 
-
 			// set any necessary variables in this config
 			AbstractConfigBase<?> configBase = this.configBaseList.get(this.configBaseList.size() - 1);
 			configBase.category = category;
 			configBase.name = field.getName();
-
 
 			// validate the config's input type
 			if (ConfigEntry.class.isAssignableFrom(field.getType()))
@@ -214,8 +207,6 @@ public class ConfigHandler
 		return ACCEPTABLE_INPUTS.contains(inputClass);
 	}
 
-
-
 	//===============//
 	// lang handling //
 	//===============//
@@ -252,7 +243,6 @@ public class ConfigHandler
 				enumList.add((Class<? extends Enum<?>>) entry.getType());
 			}
 
-
 			// config file items don't need lang entries
 			if (!entry.getAppearance().showInGui)
 			{
@@ -272,13 +262,11 @@ public class ConfigHandler
 				entryPrefix = "distanthorizons.config." + ((ConfigUIComment) entry).parentConfigPath;
 			}
 
-
 			if (langWrapper.langExists(entryPrefix)
 				&& onlyShowMissing)
 			{
 				continue;
 			}
-
 
 			generatedLang.append(starter).append(entryPrefix).append(separator).append(langWrapper.getLang(entryPrefix)).append(ending)
 			;
@@ -295,7 +283,6 @@ public class ConfigHandler
 				;
 			}
 		}
-
 
 		// enums
 		if (!enumList.isEmpty())
@@ -320,7 +307,4 @@ public class ConfigHandler
 
 		return generatedLang.toString();
 	}
-
-
-
 }

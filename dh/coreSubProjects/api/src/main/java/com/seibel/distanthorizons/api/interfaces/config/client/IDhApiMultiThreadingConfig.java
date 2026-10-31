@@ -52,5 +52,4 @@ public interface IDhApiMultiThreadingConfig extends IDhApiConfigGroup
 	 * @since API 4.0.0
 	 */
 	IDhApiConfigValue<Double> threadRuntimeRatio();
-
 }

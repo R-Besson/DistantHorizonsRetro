@@ -51,8 +51,6 @@ public class GlLodVertexFormatElement
 		return this.byteSize;
 	}
 
-
-
 	public enum DataType
 	{
 		UBYTE(1, "Unsigned Byte"),
@@ -78,9 +76,6 @@ public class GlLodVertexFormatElement
 			return this.name;
 		}
 	}
-
-
-
 
 	@Override
 	public int hashCode()
@@ -128,5 +123,4 @@ public class GlLodVertexFormatElement
 			return false;
 		}
 	}
-
 }

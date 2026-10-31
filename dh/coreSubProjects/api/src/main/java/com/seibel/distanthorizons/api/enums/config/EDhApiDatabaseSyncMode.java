@@ -51,13 +51,10 @@ public enum EDhApiDatabaseSyncMode
 	 */
 	OFF(0);
 
-
-
 	/** More stable than using the ordinal of the enum */
 	public final byte value;
 
 	EDhApiDatabaseSyncMode(int value) { this.value = (byte) value; }
-
 
 	public static EDhApiDatabaseSyncMode getFromValue(byte value)
 	{
@@ -72,6 +69,4 @@ public enum EDhApiDatabaseSyncMode
 
 		throw new IllegalArgumentException("No sync mode with the value [" + value + "]");
 	}
-
-
 }

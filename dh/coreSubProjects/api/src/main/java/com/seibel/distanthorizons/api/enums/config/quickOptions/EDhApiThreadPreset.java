@@ -42,5 +42,4 @@ public enum EDhApiThreadPreset
 	BALANCED,
 	AGGRESSIVE,
 	I_PAID_FOR_THE_WHOLE_CPU,
-
 }

@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * @see WorldChunkUpdateManager
  */
@@ -69,11 +68,7 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	/** how long to wait when the closest chunk update is still waiting on {@link #UPDATE_DEBOUNCE_NANOS} */
 	private static final int DEBOUNCE_WAIT_DELAY_MS = 5;
 
-
-
 	private static long lastOverloadedLogMessageMsTime = 0;
-
-
 
 	private final Set<DhChunkPos> ignoredChunkPosSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -98,8 +93,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	/** used to prevent flickering */
 	public long lastMsTimeShownActiveInF3Screen = System.currentTimeMillis();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -115,8 +108,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// list/set methods //
@@ -178,7 +169,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 		}
 	}
 
-
 	private void sendOverloadMessage()
 	{
 		// limit how often an overloaded message can be sent
@@ -230,8 +220,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 
 	//endregion
 
-
-
 	//=========//
 	// ignores //
 	//=========//
@@ -241,8 +229,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	public void removePosToIgnore(DhChunkPos chunkPos) { this.ignoredChunkPosSet.remove(chunkPos); }
 
 	//endregion
-
-
 
 	//===================//
 	// update processing //
@@ -326,8 +312,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 		this.maxSize = MAX_UPDATING_CHUNK_COUNT_PER_THREAD_AND_PLAYER
 			* Config.Common.MultiThreading.numberOfThreads.get()
 			* maxUpdateSizeMultiplier;
-
-
 
 		//===============================//
 		// update the necessary chunk(s) //
@@ -473,8 +457,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 
 	//endregion
 
-
-
 	//==================//
 	// position methods //
 	//==================//
@@ -488,8 +470,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 
 	//endregion
 
-
-
 	//=========//
 	// F3 Menu //
 	//=========//
@@ -500,7 +480,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 		String y = MinecraftTextFormat.YELLOW;
 		String o = MinecraftTextFormat.ORANGE;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-
 
 		String preUpdatingCountStr = F3Screen.NUMBER_FORMAT.format(this.preUpdateQueue.getQueuedCount());
 		String updatingCountStr = F3Screen.NUMBER_FORMAT.format(this.updateQueue.getQueuedCount());
@@ -513,8 +492,6 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -524,7 +501,4 @@ public class ChunkUpdateQueueManager implements AutoCloseable
 	public void close() { this.queueingThread.shutdownNow(); }
 
 	//endregion
-
-
-
 }

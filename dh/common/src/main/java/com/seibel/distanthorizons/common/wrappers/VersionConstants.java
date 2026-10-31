@@ -26,8 +26,6 @@ public class VersionConstants implements IVersionConstants
 {
 	public static final VersionConstants INSTANCE = new VersionConstants();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -36,8 +34,6 @@ public class VersionConstants implements IVersionConstants
 	private VersionConstants() { }
 
 	//endregion
-
-
 
 	//=========//
 	// methods //
@@ -51,7 +47,4 @@ public class VersionConstants implements IVersionConstants
 	}
 
 	//endregion
-
-
-
 }

@@ -94,7 +94,6 @@ public class ClientApi
 	private static class DelayedAccessors
 	{
 		public static final IIrisAccessor IRIS = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
-
 	}
 
 	/** this includes the is dev build message and low allocated memory warning */
@@ -123,7 +122,6 @@ public class ClientApi
 	 */
 	private static final long MIN_MS_BETWEEN_SPEED_CHECKS = 50;
 
-
 	private boolean isDevBuildMessagePrinted = false;
 	private boolean lowMemoryWarningPrinted = false;
 	private boolean highVanillaRenderDistanceWarningPrinted = false;
@@ -142,7 +140,6 @@ public class ClientApi
 	/** publicly available so {@link F3Screen} can display the error */
 	@Nullable
 	public String lastRenderParamValidationMessage = null;
-
 
 	/**
 	 * measured in blocks/second <br>
@@ -171,15 +168,11 @@ public class ClientApi
 	private IClientLevelWrapper heightCheckLevelLastFrame = null;
 	private int levelMinHeightLastFrame = 0;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
 
 	private ClientApi() { }
-
-
 
 	//==============//
 	// world events //
@@ -219,7 +212,6 @@ public class ClientApi
 				}
 			}
 
-
 			DhClientWorld world = new DhClientWorld();
 			SharedApi.setDhWorld(world);
 		}
@@ -241,8 +233,6 @@ public class ClientApi
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// level events //
@@ -279,8 +269,6 @@ public class ClientApi
 	}
 
 	//endregion
-
-
 
 	//============//
 	// networking //
@@ -334,8 +322,6 @@ public class ClientApi
 
 	//endregion
 
-
-
 	//===============//
 	// LOD rendering //
 	//===============//
@@ -357,8 +343,6 @@ public class ClientApi
 		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("DH-RenderLevel"))
 		{
 
-
-
 			//=====================//
 			// render thread tasks //
 			//=====================//
@@ -374,8 +358,6 @@ public class ClientApi
 					//===============//
 
 					this.sendQueuedChatMessages();
-
-
 
 					//====================//
 					// Render Thread jobs //
@@ -393,8 +375,6 @@ public class ClientApi
 					}
 
 					//endregion
-
-
 
 					//==============//
 					// camera speed //
@@ -420,8 +400,6 @@ public class ClientApi
 
 					//endregion
 
-
-
 					//================================//
 					// Iris LOD data re-build trigger //
 					//================================//
@@ -438,8 +416,6 @@ public class ClientApi
 					}
 
 					//endregion
-
-
 
 					//==============================//
 					// level height re-build trigger //
@@ -464,8 +440,6 @@ public class ClientApi
 
 					//endregion
 
-
-
 					//=============//
 					// Camera Zoom //
 					//=============//
@@ -488,9 +462,6 @@ public class ClientApi
 			}
 
 			//endregion
-
-
-
 
 			//=================//
 			// parameter setup //
@@ -521,8 +492,6 @@ public class ClientApi
 			RENDER_PARAMS.update(renderPass, RENDER_STATE);
 
 			//endregion
-
-
 
 			//============//
 			// validation //
@@ -568,8 +537,6 @@ public class ClientApi
 
 			//endregion
 
-
-
 			//===========//
 			// rendering //
 			//===========//
@@ -604,7 +571,6 @@ public class ClientApi
 						{
 							LodRenderer.INSTANCE.renderDeferred(RENDER_PARAMS, profiler);
 						}
-
 
 						if (DhApi.Delayed.renderProxy.getDeferTransparentRendering())
 						{
@@ -652,8 +618,6 @@ public class ClientApi
 	}
 
 	//endregion
-
-
 
 	//================//
 	// fade rendering //
@@ -728,8 +692,6 @@ public class ClientApi
 
 	//endregion
 
-
-
 	//==========//
 	// keyboard //
 	//==========//
@@ -743,7 +705,6 @@ public class ClientApi
 			// keybindings are disabled
 			return;
 		}
-
 
 		if (glfwKey == KeyCodesUtil.F6)
 		{
@@ -764,8 +725,6 @@ public class ClientApi
 
 	//endregion
 
-
-
 	//======//
 	// chat //
 	//======//
@@ -776,7 +735,6 @@ public class ClientApi
 		// this includes if the current build is a dev build
 		// and configuration warnings (IE Java memory amount and MC settings)
 		this.detectAndSendBootTimeWarnings();
-
 
 		// slow chat messages
 		{
@@ -855,7 +813,6 @@ public class ClientApi
 			MC_CLIENT.sendChatMessage(message);
 		}
 
-
 		// memory
 		if (this.chatMessageSentRecently()) return;
 		if (!this.lowMemoryWarningPrinted
@@ -880,7 +837,6 @@ public class ClientApi
 				MC_CLIENT.sendChatMessage(message);
 			}
 		}
-
 
 		// high vanilla render distance
 		if (this.chatMessageSentRecently()) return;
@@ -919,7 +875,6 @@ public class ClientApi
 		return timeSinceLastMessage <= MS_BETWEEN_WARNING_MESSAGES;
 	}
 
-
 	/**
 	 * Queues the given message to appear in chat the next valid frame.
 	 * Useful for queueing up messages that may be triggered before the user has loaded into the world.
@@ -941,7 +896,4 @@ public class ClientApi
 	public void queueOverlayMessage(String message) { this.overlayMessageQueue.add(message); }
 
 	//endregion
-
-
-
 }

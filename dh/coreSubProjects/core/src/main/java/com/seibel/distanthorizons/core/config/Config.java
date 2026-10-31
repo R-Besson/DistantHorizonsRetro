@@ -89,8 +89,6 @@ public class Config
 
 	public static ConfigCategory client = new ConfigCategory.Builder().set(Client.class).build();
 
-
-
 	public static class Client
 	{
 		public static ConfigEntry<Boolean> quickEnableRendering = new ConfigEntry.Builder<Boolean>()
@@ -126,10 +124,7 @@ public class Config
 				"Should Distant Horizon's config button appear in Minecraft's options screen next to the fov slider?")
 			.build();
 
-
 		public static ConfigCategory advanced = new ConfigCategory.Builder().set(Advanced.class).build();
-
-
 
 		public static class Advanced
 		{
@@ -148,15 +143,12 @@ public class Config
 			public static ConfigCategory logging = new ConfigCategory.Builder().set(Common.Logging.class).setDestination("common.logging").build();
 			public static ConfigCategory debugging = new ConfigCategory.Builder().set(Debugging.class).build();
 
-
-
 			public static class Graphics
 			{
 				public static ConfigUIComment advancedGraphicsHeader = new ConfigUIComment.Builder().setParentConfigClass(Graphics.class).build();
 
 				public static ConfigCategory quality = new ConfigCategory.Builder().set(Quality.class).build();
 				public static ConfigUISpacer qualitySpacer = new ConfigUISpacer.Builder().build();
-
 
 				public static ConfigEntry<Boolean> enableSsao = new ConfigEntry.Builder<Boolean>()
 					.set(true)
@@ -199,11 +191,7 @@ public class Config
 					.build();
 				public static ConfigUISpacer overrideVanillaSpacer = new ConfigUISpacer.Builder().build();
 
-
-
 				public static ConfigCategory experimental = new ConfigCategory.Builder().set(Experimental.class).build();
-
-
 
 				public static class Quality
 				{
@@ -395,7 +383,6 @@ public class Config
 							+ "2 = very saturated")
 						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
 						.build();
-
 				}
 
 				public static class GenericRendering
@@ -461,15 +448,12 @@ public class Config
 							+ "Changes require a world re-load.\n"
 							+ "")
 						.build();
-
 				}
 
 				public static class Fog
 				{
 					private static final Float FOG_RANGE_MIN = 0.0f;
 					private static final Float FOG_RANGE_MAX = (float) Math.sqrt(2.0);
-
-
 
 					public static ConfigUIComment fogHeader = new ConfigUIComment.Builder().setParentConfigClass(Fog.class).build();
 
@@ -508,8 +492,6 @@ public class Config
 							+ "Note: Other mods may conflict with this setting. \n"
 							+ "")
 						.build();
-
-
 
 					public static ConfigEntry<Float> farFogStart = new ConfigEntry.Builder<Float>()
 						.setMinDefaultMax(FOG_RANGE_MIN, 0.4f, FOG_RANGE_MAX)
@@ -566,8 +548,6 @@ public class Config
 						.build();
 
 					public static ConfigCategory heightFog = new ConfigCategory.Builder().set(HeightFog.class).build();
-
-
 
 					public static class HeightFog
 					{
@@ -661,9 +641,7 @@ public class Config
 							.setMinDefaultMax(0.01f, 20.0f, 50.0f)
 							.comment("What is the height fog's density?")
 							.build();
-
 					}
-
 				}
 
 				public static class NoiseTexture
@@ -699,7 +677,6 @@ public class Config
 							+ "Set to 0 to disable noise from fading away \n"
 							+ "")
 						.build();
-
 				}
 
 				public static class Texture
@@ -805,7 +782,6 @@ public class Config
 							+ "Changes require a restart. \n"
 							+ "")
 						.build();
-
 				}
 
 				public static class Culling
@@ -1003,7 +979,6 @@ public class Config
 							+ "")
 						.addListener(ReloadLodsConfigEventHandler.DELAYED_INSTANCE)
 						.build();
-
 				}
 
 				public static class Experimental
@@ -1054,10 +1029,7 @@ public class Config
 							+ EDhApiRenderingEngine.BLAZE_3D + " - The Default for MC 26.1.2 and newer (supports Vulkan) \n"
 							+ "")
 						.build();
-
-
 				}
-
 			}
 
 			public static class Multiplayer
@@ -1075,7 +1047,6 @@ public class Config
 						+ EDhApiServerFolderNameMode.NAME_IP_PORT + ": Example: \"Minecraft Server IP 192.168.1.40:25565\""
 						+ EDhApiServerFolderNameMode.NAME_IP_PORT_MC_VERSION + ": Example: \"Minecraft Server IP 192.168.1.40:25565 GameVersion 1.16.5\"")
 					.build();
-
 			}
 
 			public static class Debugging
@@ -1177,8 +1148,6 @@ public class Config
 				public static ConfigCategory f3Screen = new ConfigCategory.Builder().set(F3Screen.class).build();
 				public static ConfigCategory exampleConfigScreen = new ConfigCategory.Builder().set(ExampleConfigScreen.class).build();
 
-
-
 				public static class DebugWireframe
 				{
 					public static ConfigUIComment debugWireframeHeader = new ConfigUIComment.Builder().setParentConfigClass(DebugWireframe.class).build();
@@ -1220,7 +1189,6 @@ public class Config
 						.set(false)
 						.comment("Render full data update/lock status?")
 						.build();
-
 				}
 
 				public static class OpenGl
@@ -1261,7 +1229,6 @@ public class Config
 							+ "           as it may break Minecraft's renderer when an exception is thrown. \n"
 							+ "")
 						.build();
-
 				}
 
 				public static class ColumnBuilderDebugging
@@ -1306,7 +1273,6 @@ public class Config
 						.setAppearance(EConfigEntryAppearance.ONLY_IN_GUI)
 						.addListener(ReloadLodsConfigEventHandler.INSTANT_INSTANCE)
 						.build();
-
 				}
 
 				public static class PositionFinder
@@ -1336,7 +1302,6 @@ public class Config
 					public static ConfigEntry<Float> positionFinderMarginPercent = new ConfigEntry.Builder<Float>()
 						.set(0.0f)
 						.build();
-
 				}
 
 				public static class F3Screen
@@ -1388,7 +1353,6 @@ public class Config
 						.set(true)
 						.comment("Only show levels that DH is actively rendering.")
 						.build();
-
 				}
 
 				/** This class is used to debug the different features of the config GUI */
@@ -1467,20 +1431,14 @@ public class Config
 						.set(420)
 						.build();
 
-
 					public static class CategoryTest
 					{
 						// The name of this can be anything as it will be overwritten by the name of the linked object
 						public static ConfigUiLinkedEntry linkableTest = new ConfigUiLinkedEntry(ExampleConfigScreen.linkableTest);
-
 					}
-
 				}
-
 			}
-
 		}
-
 	}
 
 	public static class Common
@@ -1626,8 +1584,6 @@ public class Config
 					+ "")
 				.build();
 
-
-
 			// file configs //
 
 			public static ConfigEntry<Integer> generationCenterChunkX = new ConfigEntry.Builder<Integer>()
@@ -1672,8 +1628,6 @@ public class Config
 					"Example: \"nether:-1=64,7=32,180=-1\" \n" +
 					"")
 				.build();
-
-
 		}
 
 		public static class LodBuilding
@@ -1769,7 +1723,6 @@ public class Config
 					+ "Example: \"DistantHorizonsData\" \n"
 					+ "")
 				.build();
-
 		}
 
 		public static class MultiThreading
@@ -1811,13 +1764,11 @@ public class Config
 					+ "running C2ME and are seeing thread starvation in either C2ME or DH. \n"
 					+ "")
 				.build();
-
 		}
 
 		public static class Logging
 		{
 			public static ConfigUIComment loggingHeader = new ConfigUIComment.Builder().setParentConfigClass(Logging.class).build();
-
 
 			public static ConfigEntry<EDhApiLoggerLevel> globalFileMaxLevel = new ConfigEntry.Builder<EDhApiLoggerLevel>()
 				.setChatCommandName("logging.globalFileMaxLevel")
@@ -1836,7 +1787,6 @@ public class Config
 				.build();
 
 			public static ConfigUISpacer globalLoggingSpacer = new ConfigUISpacer.Builder().build();
-
 
 			public static ConfigEntry<EDhApiLoggerLevel> logWorldGenEventToFile = new ConfigEntry.Builder<EDhApiLoggerLevel>()
 				.setChatCommandName("logging.logWorldGenEvent")
@@ -1894,8 +1844,6 @@ public class Config
 			public static ConfigUISpacer warningSpacer = new ConfigUISpacer.Builder().build();
 
 			public static ConfigCategory warning = new ConfigCategory.Builder().set(Warning.class).build();
-
-
 
 			public static class Warning
 			{
@@ -1998,11 +1946,8 @@ public class Config
 						+ "and is better solved with a concurrent garbage collector. \n"
 						+ "")
 					.build();
-
 			}
-
 		}
-
 	}
 
 	public static class Server
@@ -2067,7 +2012,6 @@ public class Config
 				"")
 			.build();
 
-
 		// Real-time updates
 		public static ConfigEntry<Boolean> enableRealTimeUpdates = new ConfigEntry.Builder<Boolean>()
 			.setChatCommandName("realTimeUpdates.enable")
@@ -2084,7 +2028,6 @@ public class Config
 				"Defines the distance the player will receive updates around." +
 				"")
 			.build();
-
 
 		// Sync on load
 		public static ConfigEntry<Boolean> synchronizeOnLoad = new ConfigEntry.Builder<Boolean>()
@@ -2113,7 +2056,6 @@ public class Config
 				"")
 			.build();
 
-
 		// Common
 		public static ConfigEntry<Integer> playerBandwidthLimit = new ConfigEntry.Builder<Integer>()
 			.setChatCommandName("common.playerBandwidthLimit")
@@ -2139,10 +2081,7 @@ public class Config
 				+ "If false, transfer speed will remain fixed.\n"
 				+ "")
 			.build();
-
 	}
-
-
 
 	//================//
 	// helper methods //
@@ -2178,5 +2117,4 @@ public class Config
 			}
 		}
 	}
-
 }

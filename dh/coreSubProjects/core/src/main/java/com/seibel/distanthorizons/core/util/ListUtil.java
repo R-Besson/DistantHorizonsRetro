@@ -38,7 +38,4 @@ public class ListUtil
 		arrayList.clear();
 		arrayList.size(size);
 	}
-
-
-
 }

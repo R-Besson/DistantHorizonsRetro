@@ -51,8 +51,6 @@ public class F3Screen
 	public static final NumberFormat NUMBER_FORMAT = NumberFormat.getIntegerInstance();
 	private static final String JAVA_VERSION = System.getProperty("java.version") + " (" + System.getProperty("java.vm.name") + ")";
 
-
-
 	//=================//
 	// injection point //
 	//=================//
@@ -87,8 +85,6 @@ public class F3Screen
 		String a = MinecraftTextFormat.AQUA;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
 
-
-
 		AbstractDhWorld world = SharedApi.getAbstractDhWorld();
 		if (world == null)
 		{
@@ -96,7 +92,6 @@ public class F3Screen
 		}
 
 		Iterable<? extends IDhLevel> levelIterator = world.getAllLoadedLevels();
-
 
 		// DH version
 		messageList.add("");
@@ -113,7 +108,6 @@ public class F3Screen
 		{
 			messageList.add("Render Validation Err: " + r + ClientApi.INSTANCE.lastRenderParamValidationMessage + cf);
 		}
-
 
 		// player pos
 		if (Config.Client.Advanced.Debugging.F3Screen.showPlayerPos.get())
@@ -195,8 +189,6 @@ public class F3Screen
 					}
 				}
 
-
-
 				level.addDebugMenuStringsToList(messageList);
 
 				// LOD rendering
@@ -221,7 +213,4 @@ public class F3Screen
 			}
 		}
 	}
-
-
-
 }

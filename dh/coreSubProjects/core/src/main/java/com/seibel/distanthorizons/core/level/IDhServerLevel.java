@@ -24,5 +24,4 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapp
 public interface IDhServerLevel extends IDhLevel
 {
 	IServerLevelWrapper getServerLevelWrapper();
-
 }

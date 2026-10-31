@@ -29,8 +29,6 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 
 	private final ServerPlayerStateManager serverPlayerStateManager;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -40,7 +38,6 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 		super(worldEnvironment);
 		this.serverPlayerStateManager = new ServerPlayerStateManager();
 	}
-
 
 	//=================//
 	// player handling //
@@ -90,8 +87,6 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 		// If player's left, session is already closed
 	}
 
-
-
 	//================//
 	// level handling //
 	//================//
@@ -108,8 +103,6 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 	}
 	@Override
 	public int getLoadedLevelCount() { return this.dhLevelByLevelWrapper.size(); }
-
-
 
 	//================//
 	// base overrides //
@@ -132,7 +125,6 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 				ApiEventInjector.INSTANCE.fireAllEvents(DhApiLevelUnloadEvent.class, new DhApiLevelUnloadEvent.EventParam(serverLevelWrapper));
 			}
 
-
 			// close levels asynchronously to speed up
 			// shutdown on servers with a lot of levels
 			CompletableFuture<Void> closeFuture = new CompletableFuture<>();
@@ -154,5 +146,4 @@ public abstract class AbstractDhServerWorld<TDhServerLevel extends AbstractDhSer
 		this.dhLevelByLevelWrapper.clear();
 		LOGGER.info("Closed DhWorld of type [" + this.environment + "].");
 	}
-
 }

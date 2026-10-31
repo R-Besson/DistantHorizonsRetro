@@ -80,8 +80,6 @@ public abstract class MixinEntityRenderer
 
 	//endregion
 
-
-
 	//===========//
 	// far plane //
 	//===========//
@@ -114,8 +112,6 @@ public abstract class MixinEntityRenderer
 
 	//endregion
 
-
-
 	//==========//
 	// lightmap //
 	//==========//
@@ -135,7 +131,4 @@ public abstract class MixinEntityRenderer
 	}
 
 	//endregion
-
-
-
 }

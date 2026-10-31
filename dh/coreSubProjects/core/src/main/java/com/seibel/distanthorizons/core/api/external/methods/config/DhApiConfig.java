@@ -37,8 +37,6 @@ public class DhApiConfig implements IDhApiConfig
 
 	private DhApiConfig() { }
 
-
-
 	@Override
 	public IDhApiGraphicsConfig graphics() { return DhApiGraphicsConfig.INSTANCE; }
 	@Override
@@ -49,5 +47,4 @@ public class DhApiConfig implements IDhApiConfig
 	public IDhApiMultiThreadingConfig multiThreading() { return DhApiMultiThreadingConfig.INSTANCE; }
 	@Override
 	public IDhApiDebuggingConfig debugging() { return DhApiDebuggingConfig.INSTANCE; }
-
 }

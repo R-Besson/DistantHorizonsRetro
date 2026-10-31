@@ -34,8 +34,6 @@ public class CompressionRoundTripTest
 		EDhApiDataCompressionMode.LZMA2,
 	};
 
-
-
 	@BeforeClass
 	public static void testSetup()
 	{
@@ -45,8 +43,6 @@ public class CompressionRoundTripTest
 			Assert.assertTrue("unable to delete old test DB File.", dbFile.delete());
 		}
 	}
-
-
 
 	@Test
 	public void everyCompressionModeRoundTrips() throws Exception
@@ -80,8 +76,6 @@ public class CompressionRoundTripTest
 		}
 	}
 
-
-
 	/** random column heights and generation steps, so a shifted or truncated read shows up */
 	private static FullDataSourceV2 createRandomDataSource(long pos, int seed) throws Exception
 	{
@@ -109,5 +103,4 @@ public class CompressionRoundTripTest
 
 		return FullDataSourceV2.createWithData(pos, new FullDataPointIdMap(pos), dataPoints, generationSteps, worldCompressionModes);
 	}
-
 }

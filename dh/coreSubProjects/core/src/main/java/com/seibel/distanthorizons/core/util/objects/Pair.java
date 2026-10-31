@@ -38,5 +38,4 @@ public final class Pair<T, U>
 
 	@Override
 	public int hashCode() { return Objects.hash(this.first, this.second); }
-
 }

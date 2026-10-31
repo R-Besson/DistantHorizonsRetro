@@ -27,8 +27,6 @@ public class BlockBiomeWrapperPair
 	private boolean hashGenerated = false;
 	private String serialString = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -44,7 +42,6 @@ public class BlockBiomeWrapperPair
 		{
 			throw new NullPointerException("Biome wrapper shouldn't be null.");
 		}
-
 
 		// check for existing entry
 		ConcurrentHashMap<IBiomeWrapper, BlockBiomeWrapperPair> pairByBiomeWrapper = CACHED_PAIR_BY_BIOME_BY_BLOCK.get(blockState);
@@ -67,8 +64,6 @@ public class BlockBiomeWrapperPair
 		this.biome = biome;
 		this.blockState = blockState;
 	}
-
-
 
 	//===========//
 	// overrides //
@@ -124,8 +119,6 @@ public class BlockBiomeWrapperPair
 	@Override
 	public String toString() { return this.serialize(); }
 
-
-
 	//=============//
 	// serializing //
 	//=============//
@@ -139,7 +132,4 @@ public class BlockBiomeWrapperPair
 
 		return this.serialString;
 	}
-
-
-
 }

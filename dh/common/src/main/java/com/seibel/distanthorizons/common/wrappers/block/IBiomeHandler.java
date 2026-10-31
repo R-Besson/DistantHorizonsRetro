@@ -9,5 +9,4 @@ import net.minecraft.world.biome.BiomeGenBase;
 public interface IBiomeHandler extends IBindable
 {
 	BiomeGenBase getBiomeByName(String name);
-
 }

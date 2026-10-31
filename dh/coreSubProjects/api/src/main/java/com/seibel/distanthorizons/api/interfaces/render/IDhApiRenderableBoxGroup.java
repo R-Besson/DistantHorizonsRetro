@@ -91,5 +91,4 @@ public interface IDhApiRenderableBoxGroup extends List<DhApiRenderableBox>
 
 	void setShading(DhApiRenderableBoxGroupShading shading);
 	DhApiRenderableBoxGroupShading getShading();
-
 }

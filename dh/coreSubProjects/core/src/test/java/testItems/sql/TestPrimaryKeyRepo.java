@@ -52,8 +52,6 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 		}
 	}
 
-
-
 	@Override
 	public String getTableName() { return "Test"; }
 	@Override
@@ -64,7 +62,6 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 	{
 		statement.setInt(index, id);
 	}
-
 
 	@Override
 	@Nullable
@@ -100,7 +97,4 @@ public class TestPrimaryKeyRepo extends AbstractDhRepo<Integer, TestSingleKeyDto
 
 		return statement;
 	}
-
-
-
 }

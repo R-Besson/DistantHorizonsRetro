@@ -58,8 +58,6 @@ public class VanillaChunkMask
 
 	private int textureId = 0;
 
-
-
 	//========//
 	// update //
 	//========//
@@ -287,8 +285,6 @@ public class VanillaChunkMask
 
 	//endregion
 
-
-
 	//=========//
 	// binding //
 	//=========//
@@ -311,8 +307,6 @@ public class VanillaChunkMask
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -324,7 +318,4 @@ public class VanillaChunkMask
 	public int getCameraChunkZ() { return this.cameraChunkZ; }
 
 	//endregion
-
-
-
 }

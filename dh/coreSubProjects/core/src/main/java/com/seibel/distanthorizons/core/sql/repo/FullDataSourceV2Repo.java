@@ -51,8 +51,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -89,8 +87,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 
 	//endregion
-
-
 
 	//====================//
 	// cache invalidation //
@@ -156,8 +152,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 
 	//endregion
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -177,10 +171,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		statement.setInt(index++, detailLevel);
 		statement.setInt(index++, DhSectionPos.getX(pos));
 		statement.setInt(index, DhSectionPos.getZ(pos));
-
 	}
-
-
 
 	@Override @Nullable
 	public FullDataSourceV2DTO convertResultSetToDto(ResultSet resultSet) throws ClassCastException, IOException, SQLException
@@ -202,7 +193,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		// rows saved before this was used have 0, the vanilla min height
 		int savedMinY = resultSet.getInt("MinY");
 
-
 		byte dataFormatVersion = resultSet.getByte("DataFormatVersion");
 		byte compressionModeValue = resultSet.getByte("CompressionMode");
 
@@ -213,8 +203,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 
 		long lastModifiedUnixDateTime = resultSet.getLong("LastModifiedUnixDateTime");
 		long createdUnixDateTime = resultSet.getLong("CreatedUnixDateTime");
-
-
 
 		//===================//
 		// set DTO variables //
@@ -263,7 +251,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		int dataChecksum = resultSet.getInt("DataChecksum");
 		int savedMinY = resultSet.getInt("MinY");
 
-
 		byte dataFormatVersion = resultSet.getByte("DataFormatVersion");
 		byte compressionModeValue = resultSet.getByte("CompressionMode");
 
@@ -274,8 +261,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 
 		long lastModifiedUnixDateTime = resultSet.getLong("LastModifiedUnixDateTime");
 		long createdUnixDateTime = resultSet.getLong("CreatedUnixDateTime");
-
-
 
 		//===================//
 		// set DTO variables //
@@ -350,13 +335,11 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			// intern should help reduce memory overhead due to this string being dynamic
 		).intern();
 
-
 		PreparedStatement statement = this.createPreparedStatement(upsertSqlTemplate);
 		if (statement == null)
 		{
 			return null;
 		}
-
 
 		int i = 1;
 		statement.setInt(i++, DhSectionPos.getDetailLevel(dto.pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
@@ -391,8 +374,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 
 	//endregion
-
-
 
 	//=================//
 	// partial selects //
@@ -453,13 +434,10 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				return null;
 			}
 
-
-
 			int i = 1;
 			statement.setInt(i++, DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-
 
 			try (ResultSet resultSet = this.query(statement))
 			{
@@ -494,8 +472,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// updates //
@@ -536,7 +512,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				return;
 			}
 
-
 			int i = 1;
 			statement.setBoolean(i++, applyFlag);
 
@@ -554,8 +529,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-
-
 
 	/** should be very similar to {@link FullDataSourceV2Repo#getChildPositionsToUpdateSql} */
 	private final String getParentPositionsToUpdateSql =
@@ -593,7 +566,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				return list;
 			}
 
-
 			int i = 1;
 			statement.setInt(i++, targetBlockPosX);
 			statement.setInt(i++, targetBlockPosZ);
@@ -622,7 +594,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 	}
 
-
 	/** should be very similar to {@link FullDataSourceV2Repo#getParentPositionsToUpdateSql} */
 	private final String getRegenPositionsToUpdateSql =
 		"SELECT DetailLevel, PosX, PosZ, " +
@@ -642,7 +613,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return list;
 			}
-
 
 			int i = 1;
 			statement.setInt(i++, targetBlockPosX);
@@ -681,7 +651,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 	}
 
-
 	private final String getColumnGenerationStepSql =
 		"select ColumnGenerationStep, CompressionMode, MinY " +
 			"from " + this.getTableName() + " " +
@@ -703,16 +672,12 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 				return;
 			}
 
-
 			int detailLevel = DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
-
-
 
 			int i = 1;
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-
 
 			try (ResultSet result = this.query(statement))
 			{
@@ -728,7 +693,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 					}
 					return;
 				}
-
 
 				byte compressionModeEnumValue = result.getByte("CompressionMode");
 				EDhApiDataCompressionMode compressionModeEnum = EDhApiDataCompressionMode.getFromValue(compressionModeEnumValue);
@@ -824,7 +788,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 					return 0L;
 				}
 
-
 				return result.getLong("ChunkCount");
 			}
 		}
@@ -840,10 +803,7 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 		}
 	}
 
-
 	//endregion
-
-
 
 	//=============//
 	// multiplayer //
@@ -865,7 +825,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return null;
 			}
-
 
 			int i = 1;
 			preparedStatement.setInt(i++, DhSectionPos.getDetailLevel(pos) - DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL);
@@ -894,8 +853,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 
 	//endregion
 
-
-
 	//===================//
 	// compression tests //
 	//===================//
@@ -915,7 +872,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			{
 				return list;
 			}
-
 
 			try (ResultSet result = this.query(statement))
 			{
@@ -938,7 +894,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			throw new RuntimeException(e);
 		}
 	}
-
 
 	private final String getDataSizeInBytesSql =
 		"select LENGTH(Data) as dataSize " +
@@ -963,7 +918,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 			statement.setInt(i++, detailLevel);
 			statement.setInt(i++, DhSectionPos.getX(pos));
 			statement.setInt(i, DhSectionPos.getZ(pos));
-
 
 			try (ResultSet result = this.query(statement))
 			{
@@ -1004,8 +958,6 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	}
 
 	//endregion
-
-
 
 	//================//
 	// helper methods //
@@ -1063,7 +1015,4 @@ public class FullDataSourceV2Repo extends AbstractDhRepo<Long, FullDataSourceV2D
 	private static final ThreadLocal<byte[]> BULK_READ_BUFFER = ThreadLocal.withInitial(() -> new byte[8 * 1024]);
 
 	//endregion
-
-
-
 }

@@ -60,8 +60,6 @@ class DhConfigScreen extends DhScreen
 	private GuiButton doneButton;
 	private final Map<GuiTextField, Predicate<String>> textFieldProcessors = new HashMap<>();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -79,8 +77,6 @@ class DhConfigScreen extends DhScreen
 	}
 
 	//endregion
-
-
 
 	//===================//
 	// menu UI lifecycle //
@@ -100,8 +96,6 @@ class DhConfigScreen extends DhScreen
 
 	//endregion
 
-
-
 	//==================//
 	// menu UI creation //
 	//==================//
@@ -116,8 +110,6 @@ class DhConfigScreen extends DhScreen
 		{
 			ConfigHandler.INSTANCE.configFileHandler.loadFromFile();
 		}
-
-
 
 		// back button
 		this.addBtn(MakeBtn(Translatable("distanthorizons.general.back"),
@@ -141,8 +133,6 @@ class DhConfigScreen extends DhScreen
 				}));
 
 		this.configListWidget = new ClassicConfigGUI.ConfigListWidget(this.mc, this.width * 2, this.height, 32, 32, 25);
-
-
 
 		for (AbstractConfigBase<?> configEntry : ConfigHandler.INSTANCE.configBaseList)
 		{
@@ -224,7 +214,6 @@ class DhConfigScreen extends DhScreen
 				LOGGER.error("No definition for config with type: [" + configValueClass.getName() + "], for config: [" + configMenuOption.name + "].");
 			}
 		}
-
 	}
 	private static void setupTextMenuOption(AbstractConfigBase<?> configMenuOption, Function<String, Number> parsingFunc, @Nullable Pattern pattern, boolean cast)
 	{
@@ -241,7 +230,6 @@ class DhConfigScreen extends DhScreen
 					{
 						return false;
 					}
-
 
 					Number numberValue = configMenuOption.typeIsFloatingPointNumber() ? 0.0 : 0; // different default values are needed so implicit casting works correctly (if not done casting from 0 (an int) to a double will cause an exception)
 					configGuiInfo.errorMessage = null;
@@ -280,7 +268,6 @@ class DhConfigScreen extends DhScreen
 					}
 
 					editBox.setTextColor(((ConfigEntry<Number>) configMenuOption).getValidity(numberValue) == EConfigValidity.VALID ? 0xFFFFFFFF : 0xFFFF7777); // white and red
-
 
 					if (configMenuOption.getType() == String.class
 						|| configMenuOption.getType() == List.class)
@@ -352,7 +339,6 @@ class DhConfigScreen extends DhScreen
 						index = enumList.size() - 1;
 					}
 
-
 					// walk through the enums to find the next selectable one
 					while (index != startingIndex)
 					{
@@ -376,7 +362,6 @@ class DhConfigScreen extends DhScreen
 							break;
 						}
 
-
 						// move forward or backwards depending on if the shift key is pressed
 						index = shiftPressed ? index - 1 : index + 1;
 
@@ -391,14 +376,12 @@ class DhConfigScreen extends DhScreen
 						}
 					}
 
-
 					if (index == startingIndex)
 					{
 						// one of the enums should be selectable, this is a programmer error
 						enumValue = enumList.get(startingIndex);
 						LOGGER.warn("Enum [" + enumValue.getClass() + "] doesn't contain any values that should be selectable via the UI, sticking to the currently selected value [" + enumValue + "].");
 					}
-
 
 					enumConfigEntry.uiSetWithoutSaving(enumValue);
 
@@ -414,7 +397,6 @@ class DhConfigScreen extends DhScreen
 		if (configBase instanceof ConfigEntry)
 		{
 			ConfigEntry configEntry = (ConfigEntry) configBase;
-
 
 			//==============//
 			// reset button //
@@ -440,7 +422,6 @@ class DhConfigScreen extends DhScreen
 				btnAction
 			);
 
-
 			if (configEntry.mcVersionOverridePresent())
 			{
 				resetButton.displayString = EnumChatFormatting.DARK_GRAY + Translatable("distanthorizons.general.unsupportedMcVersion");
@@ -457,8 +438,6 @@ class DhConfigScreen extends DhScreen
 			}
 
 			//endregion
-
-
 
 			//==============//
 			// option field //
@@ -490,7 +469,6 @@ class DhConfigScreen extends DhScreen
 					ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH, ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT,
 					widget.getKey());
 
-
 				// deactivate the button if the API is overriding it
 				// or the MC version doesn't support it
 				if (configEntry.mcVersionOverridePresent()
@@ -499,14 +477,11 @@ class DhConfigScreen extends DhScreen
 					button.enabled = false;
 				}
 
-
-
 				this.configListWidget.addButton(this, configEntry,
 					button,
 					resetButton,
 					null,
 					textComponent);
-
 			}
 			else
 			{
@@ -521,7 +496,6 @@ class DhConfigScreen extends DhScreen
 				this.textFieldProcessors.put(widget, processor);
 
 				this.configListWidget.addButton(this, configEntry, widget, resetButton, null, textComponent);
-
 			}
 			return true;
 
@@ -633,8 +607,6 @@ class DhConfigScreen extends DhScreen
 
 	//endregion
 
-
-
 	//===========//
 	// rendering //
 	//===========//
@@ -648,14 +620,12 @@ class DhConfigScreen extends DhScreen
 		// Render buttons
 		this.configListWidget.drawScreen(mouseX, mouseY, delta);
 
-
 		// Render config title
 		this.DhDrawCenteredString(
 			this.title,
 			this.width / 2, 15,
 			0xFFFFFF // RGB white
 		);
-
 
 		// render DH version
 		this.DhDrawString(
@@ -675,9 +645,7 @@ class DhConfigScreen extends DhScreen
 			return;
 		}
 
-
 		ClassicConfigGUI.DhButtonEntry button = ClassicConfigGUI.DhButtonEntry.BUTTON_BY_WIDGET.get(hoveredWidget);
-
 
 		// A quick fix for tooltips on linked entries
 		AbstractConfigBase<?> configBase = ConfigUiLinkedEntry.class.isAssignableFrom(button.dhConfigType.getClass()) ?
@@ -815,8 +783,6 @@ class DhConfigScreen extends DhScreen
 
 	//endregion
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -831,5 +797,4 @@ class DhConfigScreen extends DhScreen
 	}
 
 	//endregion
-
 }

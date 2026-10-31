@@ -62,8 +62,6 @@ public enum Mixins implements IMixins
 			.addRequiredMod(TargetedMod.ANGELICA)
 			.addClientMixins("angelica.MixinRenderGlobal_LodOnly"));
 
-
-
 	private final MixinBuilder builder;
 
 	Mixins(MixinBuilder builder) { this.builder = builder; }
@@ -71,7 +69,4 @@ public enum Mixins implements IMixins
 	@Override
 	@NotNull
 	public MixinBuilder getBuilder() { return this.builder; }
-
-
-
 }

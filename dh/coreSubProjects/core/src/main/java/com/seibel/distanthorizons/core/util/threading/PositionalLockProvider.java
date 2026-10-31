@@ -31,20 +31,15 @@ public class PositionalLockProvider
 	private static final long UNUSED_LOCK_TIMEOUT_IN_MS = 10_000; // 10 seconds
 	private static final int MAX_NUMBER_OF_LOCKS = 100;
 
-
 	private final ConcurrentHashMap<Long, ExpiringLock> lockByPos = new ConcurrentHashMap<>();
 
 	private final AtomicBoolean lockRemovalThreadRunning = new AtomicBoolean(false);
-
-
 
 	//=============//
 	// constructor //
 	//=============//
 
 	public PositionalLockProvider() { }
-
-
 
 	//========//
 	// getter //
@@ -96,7 +91,6 @@ public class PositionalLockProvider
 						}
 						lock.unlock();
 					}
-
 				}
 				catch (NoSuchElementException ignore)
 				{
@@ -113,8 +107,6 @@ public class PositionalLockProvider
 		}
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -128,15 +120,11 @@ public class PositionalLockProvider
 		 */
 		public long expirationTimeInMs;
 
-
-
 		//=============//
 		// constructor //
 		//=============//
 
 		public ExpiringLock() { this.resetExpirationTime(); }
-
-
 
 		//===========//
 		// overrides //
@@ -168,8 +156,6 @@ public class PositionalLockProvider
 			super.unlock();
 		}
 
-
-
 		//================//
 		// helper methods //
 		//================//
@@ -181,8 +167,5 @@ public class PositionalLockProvider
 		}
 
 		public boolean tryLockWithoutUpdatingExpirationTime() { return super.tryLock(); }
-
-
 	}
-
 }

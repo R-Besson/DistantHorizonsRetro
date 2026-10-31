@@ -57,8 +57,6 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 	 */
 	public long futureId;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -68,7 +66,6 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 		EWorldEnvironment worldEnvironment = SharedApi.getEnvironment();
 		LodUtil.assertTrue(worldEnvironment != null, "Message can't be created if no world is loaded.");
 
-
 		// message/Request ID written as the least significant bits
 		long id = LAST_MESSAGE_ID_REF.getAndIncrement();
 		// write requesting side at bit 32
@@ -76,16 +73,12 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 		this.futureId = id;
 	}
 
-
-
 	//==================//
 	// abstract methods //
 	//==================//
 
 	protected abstract void encodeInternal(ByteBuf out) throws Exception;
 	protected abstract void decodeInternal(ByteBuf in) throws Exception;
-
-
 
 	//=================//
 	// getters/setters //
@@ -99,8 +92,6 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 		this.futureId |= (long) networkSession.id << 32;
 	}
 
-
-
 	//==============//
 	// send message //
 	//==============//
@@ -111,8 +102,6 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 		this.getSession().sendMessage(responseMessage);
 	}
 	public void sendResponse(Exception e) { this.sendResponse(new ExceptionMessage(e)); }
-
-
 
 	//=============//
 	// serializing //
@@ -146,8 +135,6 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 		}
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -158,5 +145,4 @@ public abstract class AbstractTrackableMessage extends AbstractNetworkMessage
 		return super.toStringHelper()
 			.add("futureId", this.futureId);
 	}
-
 }

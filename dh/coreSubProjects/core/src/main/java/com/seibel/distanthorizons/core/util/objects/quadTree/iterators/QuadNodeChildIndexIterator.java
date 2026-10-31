@@ -32,8 +32,6 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 {
 	private final Queue<Integer> iteratorQueue = new ArrayDeque<>();
 
-
-
 	public QuadNodeChildIndexIterator(QuadNode<T> parentNode, boolean returnNullChildPos)
 	{
 		// only get the children if this section isn't at the bottom of the tree
@@ -51,8 +49,6 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 		}
 	}
 
-
-
 	@Override
 	public boolean hasNext() { return !this.iteratorQueue.isEmpty(); }
 
@@ -67,12 +63,10 @@ public class QuadNodeChildIndexIterator<T> implements Iterator<Integer>
 		return this.iteratorQueue.poll();
 	}
 
-
 	/** Unimplemented */
 	@Override
 	public void remove() { throw new UnsupportedOperationException("remove"); }
 
 	@Override
 	public void forEachRemaining(Consumer<? super Integer> action) { Iterator.super.forEachRemaining(action); }
-
 }

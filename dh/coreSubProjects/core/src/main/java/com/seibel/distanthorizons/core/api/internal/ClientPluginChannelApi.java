@@ -33,8 +33,6 @@ public class ClientPluginChannelApi
 	@Nullable
 	public NetworkSession networkSession;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -42,8 +40,6 @@ public class ClientPluginChannelApi
 	public ClientPluginChannelApi()
 	{
 	}
-
-
 
 	//============//
 	// properties //
@@ -55,8 +51,6 @@ public class ClientPluginChannelApi
 		return (KEYED_CLIENT_LEVEL_MANAGER.isEnabled() && level instanceof IServerKeyedClientLevel)
 			|| !KEYED_CLIENT_LEVEL_MANAGER.isEnabled();
 	}
-
-
 
 	//================//
 	// network events //
@@ -110,8 +104,6 @@ public class ClientPluginChannelApi
 		});
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -124,5 +116,4 @@ public class ClientPluginChannelApi
 		this.networkSession = null;
 		KEYED_CLIENT_LEVEL_MANAGER.disable();
 	}
-
 }

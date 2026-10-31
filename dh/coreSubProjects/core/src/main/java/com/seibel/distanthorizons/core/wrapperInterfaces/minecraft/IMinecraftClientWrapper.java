@@ -40,8 +40,6 @@ public interface IMinecraftClientWrapper extends IBindable
 	String getCurrentServerIp();
 	String getCurrentServerVersion();
 
-
-
 	//=================//
 	// player handling //
 	//=================//
@@ -53,8 +51,6 @@ public interface IMinecraftClientWrapper extends IBindable
 
 	/** @return (0,0) if no player is loaded */
 	DhChunkPos getPlayerChunkPos();
-
-
 
 	//================//
 	// level handling //
@@ -73,8 +69,6 @@ public interface IMinecraftClientWrapper extends IBindable
 	@Nullable
 	IClientLevelWrapper getWrappedClientLevel(boolean bypassLevelKeyManager);
 
-
-
 	//===========//
 	// messaging //
 	//===========//
@@ -84,15 +78,11 @@ public interface IMinecraftClientWrapper extends IBindable
 	/** Will default to sending a chat message if overlay messages aren't supported. */
 	void sendOverlayMessage(String string);
 
-
-
 	//==========================//
 	// vanilla option overrides //
 	//==========================//
 
 	void disableVanillaClouds();
-
-
 
 	//======//
 	// misc //
@@ -124,7 +114,4 @@ public interface IMinecraftClientWrapper extends IBindable
 
 	void showDialog(String title, String message, String iconType);
 	boolean dialogNeedsAwtHeadless();
-
-
-
 }

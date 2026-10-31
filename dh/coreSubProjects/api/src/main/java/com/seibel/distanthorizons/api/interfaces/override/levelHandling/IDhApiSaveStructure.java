@@ -45,5 +45,4 @@ public interface IDhApiSaveStructure extends IDhApiOverrideable
 	 * @return null if you don't want to override the file path. Non-null if you want to change the file path.
 	 */
 	File overrideFilePath(File currentFilePath, IDhApiLevelWrapper levelWrapper);
-
 }

@@ -44,6 +44,4 @@ public interface IMinecraftSharedWrapper extends IBindable
 
 	/** returns true if this MC version supports surface world generation */
 	boolean supportsSurfaceGeneration();
-
-
 }

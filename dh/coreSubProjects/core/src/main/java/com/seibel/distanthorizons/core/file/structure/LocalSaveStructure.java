@@ -44,11 +44,7 @@ public class LocalSaveStructure implements ISaveStructure
 
 	private final ConcurrentHashMap<ILevelWrapper, File> levelWrapperToFileMap = new ConcurrentHashMap<>();
 
-
-
 	public LocalSaveStructure() { }
-
-
 
 	//================//
 	// folder methods //
@@ -76,7 +72,6 @@ public class LocalSaveStructure implements ISaveStructure
 				LOGGER.info("Using the configured database folder [" + saveFolder.getPath() + "] for [" + levelWrapper.getDhIdentifier() + "].");
 			}
 
-
 			// Allow API users to override the save folder
 			IDhApiSaveStructure saveStructureOverride = OverrideInjector.INSTANCE.get(IDhApiSaveStructure.class);
 			if (saveStructureOverride != null)
@@ -102,7 +97,6 @@ public class LocalSaveStructure implements ISaveStructure
 	/** dimension identifiers can contain characters (IE ':') that aren't allowed in folder names on every OS */
 	private static String cleanFolderName(String name) { return name.replaceAll("[^A-Za-z0-9._ -]", "_"); }
 
-
 	//==================//
 	// override methods //
 	//==================//
@@ -113,5 +107,4 @@ public class LocalSaveStructure implements ISaveStructure
 	@Override
 	public String toString()
 	{ return "[" + this.getClass().getSimpleName() + "@(" + StringUtil.join(";", this.levelWrapperToFileMap.values()) + ")]"; }
-
 }

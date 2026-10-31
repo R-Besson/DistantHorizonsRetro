@@ -48,7 +48,6 @@ public abstract class AbstractNetworkEventSource
 		.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
 		.build();
 
-
 	/**
 	 * Contains all message handlers. <br>
 	 * Grouped by: <br>
@@ -60,7 +59,6 @@ public abstract class AbstractNetworkEventSource
 		ConcurrentMap<AbstractNetworkEventSource, Set<INetworkMessageConsumer>>
 		> networkHandlerSetByMessageClass = new ConcurrentHashMap<>();
 
-
 	private final ConcurrentHashMap<Long, FutureResponseData> pendingFutureById = new ConcurrentHashMap<>();
 	/** automatically forgets about ID's after a set time span. */
 	private final Set<Long> cancelledFutureIdSet = Collections.newSetFromMap(
@@ -68,8 +66,6 @@ public abstract class AbstractNetworkEventSource
 			.expireAfterWrite(10, TimeUnit.SECONDS)
 			.<Long, Boolean>build()
 			.asMap());
-
-
 
 	//=============//
 	// constructor //
@@ -126,8 +122,6 @@ public abstract class AbstractNetworkEventSource
 		}
 	}
 
-
-
 	//==================//
 	// message handlers //
 	//==================//
@@ -172,8 +166,6 @@ public abstract class AbstractNetworkEventSource
 		}
 	}
 
-
-
 	//================//
 	// create message //
 	//================//
@@ -200,8 +192,6 @@ public abstract class AbstractNetworkEventSource
 		return responseFuture;
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -219,8 +209,6 @@ public abstract class AbstractNetworkEventSource
 		}
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -236,7 +224,6 @@ public abstract class AbstractNetworkEventSource
 			//noinspection unchecked
 			this.future = (CompletableFuture<AbstractTrackableMessage>) future;
 		}
-
 	}
 
 	/** Simple wrapper just to make the code here a bit more readable */
@@ -244,7 +231,6 @@ public abstract class AbstractNetworkEventSource
 	private interface INetworkMessageConsumer
 	{
 		void accept(AbstractNetworkMessage message);
-
 	}
 
 	/** Wraps a handler so it can be found and removed again, handlers are compared by identity. */
@@ -267,8 +253,5 @@ public abstract class AbstractNetworkEventSource
 
 		@Override
 		public int hashCode() { return System.identityHashCode(this.handlerImplementation); }
-
 	}
-
-
 }

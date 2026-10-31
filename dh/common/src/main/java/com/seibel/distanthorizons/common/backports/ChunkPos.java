@@ -8,8 +8,6 @@ public class ChunkPos
 	public final int x;
 	public final int z;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -22,8 +20,6 @@ public class ChunkPos
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -58,7 +54,4 @@ public class ChunkPos
 	}
 
 	//endregion
-
-
-
 }

@@ -32,9 +32,6 @@ public class SquareIntersectTest
 		// allow all logging levels
 		Configurator.setRootLevel(Level.ALL);
 	}
-
-
-
 	public static boolean DoSquaresOverlap(long rect1MinPos, int rect1Width, long rect2MinPos, int rect2Width)
 	{
 		// Determine the coordinates of the rectangles
@@ -51,8 +48,6 @@ public class SquareIntersectTest
 		// Check if the rectangles overlap
 		return rect1MinX < rect2MaxX && rect1MaxX > rect2MinX && rect1MinZ < rect2MaxZ && rect1MaxZ > rect2MinZ;
 	}
-
-
 
 	// The first test case checks that two overlapping rectangles are detected as overlapping.
 	@Test
@@ -123,5 +118,4 @@ public class SquareIntersectTest
 		boolean result = DoSquaresOverlap(rect1Min, rect1Width, rect2Min, rect2Width);
 		Assert.assertTrue(result);
 	}
-
 }

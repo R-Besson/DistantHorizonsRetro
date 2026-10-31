@@ -73,8 +73,6 @@ public class FullDataToRenderDataTransformer
 
 	private static HashSet<IBlockStateWrapper> snowLayerBlockStates = null;
 
-
-
 	//==============================//
 	// public transformer interface //
 	//==============================//
@@ -97,7 +95,6 @@ public class FullDataToRenderDataTransformer
 			return null;
 		}
 
-
 		try
 		{
 			return transformCompleteFullDataToColumnData(levelWrapper, fullDataSource, onlyEdge);
@@ -109,8 +106,6 @@ public class FullDataToRenderDataTransformer
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// transformers //
@@ -150,8 +145,6 @@ public class FullDataToRenderDataTransformer
 			configVertSliceCount = Math.max(configVertSliceCount, EDhApiVerticalQuality.HIGH.calculateMaxNumberOfVerticalSlicesAtDetailLevel(dataDetail));
 		}
 		final int maxVertSliceCount = configVertSliceCount;
-
-
 
 		final ColumnRenderSource columnSource = ColumnRenderSource.createEmptyPartial(pos, maxVertSliceCount, minX, maxX, minZ, maxZ);
 		if (fullDataSource.isEmpty)
@@ -380,7 +373,6 @@ public class FullDataToRenderDataTransformer
 		final ObjectOpenHashSet<IBlockStateWrapper> waterSurfaceReplacementBlocks = WRAPPER_FACTORY.getWaterSurfaceReplacementBlocks();
 		final IBlockStateWrapper water = WRAPPER_FACTORY.getWaterBlockStateWrapper();
 
-
 		// build snow block cache if needed
 		if (snowLayerBlockStates == null)
 		{
@@ -428,8 +420,6 @@ public class FullDataToRenderDataTransformer
 		int blocklightToApplyToNextBlock = -1;
 
 		int renderDataIndex = 0;
-
-
 
 		//==================================//
 		// convert full data to render data //
@@ -504,8 +494,6 @@ public class FullDataToRenderDataTransformer
 				blocklightToApplyToNextBlock = -1;
 			}
 
-
-
 			//=================//
 			// special case:   //
 			// water under ice //
@@ -520,8 +508,6 @@ public class FullDataToRenderDataTransformer
 				// under the frozen lakes (which looks bad).
 				block = lastBlock;
 			}
-
-
 
 			//====================//
 			// ignored block and  //
@@ -569,7 +555,6 @@ public class FullDataToRenderDataTransformer
 					continue;
 				}
 
-
 				if (ignoreBlock)
 				{
 					// if this is the bottom datapoint
@@ -596,8 +581,6 @@ public class FullDataToRenderDataTransformer
 				skylightToApplyToNextBlock = skyLight;
 				continue;
 			}
-
-
 
 			//=======================//
 			// non-solid block check //
@@ -643,7 +626,6 @@ public class FullDataToRenderDataTransformer
 				{
 					// this block was entirely removed, just color the block below it
 					ignoreNonSolidBlock = true;
-
 
 					if (isSnowLayer)
 					{
@@ -721,7 +703,6 @@ public class FullDataToRenderDataTransformer
 					blocklightToApplyToNextBlock = blockLight;
 				}
 
-
 				// if this is the bottom datapoint
 				// save it so lighting appears properly for floating
 				// islands over the void
@@ -737,7 +718,6 @@ public class FullDataToRenderDataTransformer
 				// skip this non-colliding block
 				continue;
 			}
-
 
 			// lava pockets hidden inside the Nether's netherrack are enclosed by solid blocks, in game they can't be seen
 			// but LODs are coarser than the real walls so they poke through as orange dots, draw them as the rock above instead
@@ -824,8 +804,6 @@ public class FullDataToRenderDataTransformer
 			// Packs light LODs' sun from their sky light (LODs have no shadow map), lit like the surface
 			// the floor is as bright as dry land and the water over it looks see-through, unlike MC's darker floor
 
-
-
 			// light emitting blocks (lava, glowstone) light themselves. A LOD only stores the light
 			// above it, which can be 0 for lava falls in the Nether or chunks lit before their neighbors
 			int lightEmission = Math.min(block.getLightEmission(), LodUtil.MAX_MC_LIGHT);
@@ -846,8 +824,6 @@ public class FullDataToRenderDataTransformer
 				// or from lower detail LODs merging in a neighbor's hidden lava, both would light up random netherrack
 				blockLight = LodUtil.MIN_MC_LIGHT;
 			}
-
-
 
 			//=============================//
 			// merge same-colored adjacent //
@@ -879,7 +855,6 @@ public class FullDataToRenderDataTransformer
 			lastBlock = block;
 			lastShape = shape;
 		}
-
 
 		if (isColumnVoid)
 		{
@@ -1027,7 +1002,4 @@ public class FullDataToRenderDataTransformer
 	}
 
 	//endregion
-
-
-
 }

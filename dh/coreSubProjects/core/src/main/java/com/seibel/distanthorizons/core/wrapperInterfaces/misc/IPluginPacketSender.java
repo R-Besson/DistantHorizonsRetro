@@ -9,5 +9,4 @@ public interface IPluginPacketSender extends IBindable
 	void sendToServer(AbstractNetworkMessage message);
 	/** Sends a packet from the server */
 	void sendToClient(IServerPlayerWrapper serverPlayer, AbstractNetworkMessage message);
-
 }

@@ -87,5 +87,4 @@ public interface IMinecraftRenderWrapper extends IBindable
 
 	/** Can return null if the given level hasn't had a light map assigned to it */
 	ILightMapWrapper getLightmapWrapper();
-
 }

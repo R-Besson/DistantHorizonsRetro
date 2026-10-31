@@ -26,5 +26,4 @@ public class MixinIrisLodRenderProgram
 	{
 		ShaderPackLodTextures.bindAtlas(this.id);
 	}
-
 }

@@ -29,5 +29,4 @@ public interface IDhTerrainRenderer extends IBindable
 	void render(
 		RenderParams renderEventParam, boolean opaquePass,
 		SortedArraySet<LodBufferContainer> bufferContainers);
-
 }

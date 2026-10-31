@@ -51,8 +51,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-
-
 public class ChunkWrapper implements IChunkWrapper
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
@@ -95,8 +93,6 @@ public class ChunkWrapper implements IChunkWrapper
 	 */
 	@Nullable
 	private final ExtendedBlockStorage[] cubicSections;
-
-
 
 	//=============//
 	// constructor //
@@ -145,8 +141,6 @@ public class ChunkWrapper implements IChunkWrapper
 
 	private ExtendedBlockStorage[] getSections() { return (this.cubicSections != null) ? this.cubicSections : this.chunk.getBlockStorageArray(); }
 
-
-
 	// copiers //
 	//region
 
@@ -163,8 +157,6 @@ public class ChunkWrapper implements IChunkWrapper
 	}
 
 	//endregion
-
-
 
 	// constructor helpers //
 	//region
@@ -211,8 +203,6 @@ public class ChunkWrapper implements IChunkWrapper
 	//endregion
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -231,7 +221,6 @@ public class ChunkWrapper implements IChunkWrapper
 		{
 			return this.minNonEmptyHeight;
 		}
-
 
 		// default if every section is empty or missing
 		this.minNonEmptyHeight = this.getInclusiveMinBuildHeight();
@@ -255,7 +244,6 @@ public class ChunkWrapper implements IChunkWrapper
 		return this.minNonEmptyHeight;
 	}
 
-
 	@Override
 	public int getMaxNonEmptyHeight()
 	{
@@ -263,7 +251,6 @@ public class ChunkWrapper implements IChunkWrapper
 		{
 			return this.maxNonEmptyHeight;
 		}
-
 
 		// default if every section is empty or missing
 		this.maxNonEmptyHeight = this.getExclusiveMaxBuildHeight();
@@ -305,8 +292,6 @@ public class ChunkWrapper implements IChunkWrapper
 			LOGGER.warn("ChunkWrapper Height maps created on non-DH thread [" + Thread.currentThread().getName() + "]. This may cause stuttering.");
 		}
 
-
-
 		this.solidHeightMap = new int[LodUtil.CHUNK_WIDTH][LodUtil.CHUNK_WIDTH];
 		this.lightBlockingHeightMap = new int[LodUtil.CHUNK_WIDTH][LodUtil.CHUNK_WIDTH];
 
@@ -318,7 +303,6 @@ public class ChunkWrapper implements IChunkWrapper
 				// if no blocks are found the height map will be at the bottom of the world
 				int solidHeight = minInclusiveBuildHeight;
 				int lightBlockingHeight = minInclusiveBuildHeight;
-
 
 				int y = this.getMaxNonEmptyHeight();
 				IBlockStateWrapper block = this.getBlockState(x, y, z);
@@ -395,7 +379,6 @@ public class ChunkWrapper implements IChunkWrapper
 			return this.lightBlockingHeightMap[xRel][zRel];
 		}
 	}
-
 
 	@Override
 	public IBiomeWrapper getBiome(int relX, int relZ)
@@ -483,12 +466,10 @@ public class ChunkWrapper implements IChunkWrapper
 	@Override
 	public DhChunkPos getChunkPos() { return this.chunkPos; }
 
-
 	@Override
 	public int getMinBlockX() { return this.chunkPos.getMinBlockX(); }
 	@Override
 	public int getMinBlockZ() { return this.chunkPos.getMinBlockZ(); }
-
 
 	/**
 	 * Returns true if the chunk has
@@ -511,8 +492,6 @@ public class ChunkWrapper implements IChunkWrapper
 
 	//endregion
 
-
-
 	//==========//
 	// lighting //
 	//==========//
@@ -523,7 +502,6 @@ public class ChunkWrapper implements IChunkWrapper
 
 	@Override
 	public boolean isDhBlockLightingCorrect() { return this.isDhBlockLightCorrect; }
-
 
 	@Override
 	public int getDhBlockLight(int relX, int y, int relZ)
@@ -549,7 +527,6 @@ public class ChunkWrapper implements IChunkWrapper
 	@Override
 	public void clearDhBlockLighting() { this.getBlockLightStorage().clear(); }
 
-
 	@Override
 	public int getDhSkyLight(int relX, int y, int relZ)
 	{
@@ -573,7 +550,6 @@ public class ChunkWrapper implements IChunkWrapper
 		}
 		return this.skyLightStorage;
 	}
-
 
 	/**
 	 * Synchronized since this can be called from two threads at the same time,
@@ -619,8 +595,6 @@ public class ChunkWrapper implements IChunkWrapper
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -630,7 +604,4 @@ public class ChunkWrapper implements IChunkWrapper
 	public String toString() { return this.chunk.getClass().getSimpleName() + this.chunkPos; }
 
 	//endregion
-
-
-
 }

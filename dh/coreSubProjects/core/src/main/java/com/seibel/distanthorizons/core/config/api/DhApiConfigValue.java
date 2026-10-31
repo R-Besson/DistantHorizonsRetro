@@ -50,12 +50,9 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 
 	private static final Set<String> CONFIG_NAME_CALLED_DEPRECATED_API = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-
 	private final ConfigEntry<coreType> configBase;
 
 	private final IConverter<coreType, apiType> configConverter;
-
-
 
 	//==============//
 	// constructors //
@@ -86,8 +83,6 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// overrides //
@@ -175,7 +170,6 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 	@Override public apiType getMaxValue() { return this.configConverter.convertToApiType(this.configBase.getMax()); }
 	@Override public apiType getMinValue() { return this.configConverter.convertToApiType(this.configBase.getMin()); }
 
-
 	@Override
 	public void addChangeListener(Consumer<apiType> onValueChangeFunc)
 	{
@@ -187,5 +181,4 @@ public class DhApiConfigValue<coreType, apiType> implements IDhApiConfigValue<ap
 	}
 
 	//endregion
-
 }

@@ -64,15 +64,12 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	private static final IMinecraftClientWrapper MC = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final AbstractDebugWireframeRenderer DEBUG_RENDERER = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
 
-
-
 	public final long pos;
 
 	private final IClientLevelWrapper clientLevelWrapper;
 	@WillNotClose
 	private final FullDataSourceProviderV2 fullDataSourceProvider;
 	private final LodQuadTree quadTree;
-
 
 	private boolean renderingEnabled = false;
 	/**
@@ -89,7 +86,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	/** this reference is necessary so we can determine what VBO to render */
 	public LodBufferContainer renderBufferContainer;
 
-
 	/**
 	 * Encapsulates everything between pulling data from the database (including neighbors)
 	 * up to the point when geometry data is uploaded to the GPU.
@@ -101,8 +97,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	 * unnecessary tasks from the executor.
 	 */
 	private Runnable getAndBuildRenderDataRunnable = null;
-
-
 
 	//=============//
 	// constructor //
@@ -123,8 +117,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	}
 
 	//endregion constructor
-
-
 
 	//======================================//
 	// render data generation and uploading //
@@ -166,7 +158,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 				LodUtil.assertTrue(oldFuture != null, "Concurrency error");
 				return true;
 			}
-
 
 			this.getAndBuildRenderDataRunnable = () ->
 			{
@@ -227,7 +218,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 		}
 	}
 
-
 	//=======================//
 	// Get LOD ID data       //
 	// and build render data //
@@ -245,10 +235,8 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 				return null;
 			}
 
-
 			boolean enableTransparency = Config.Client.Advanced.Graphics.Quality.transparency.get() == EDhApiTransparency.COMPLETE;
 			LodQuadBuilder lodQuadBuilder = LodQuadBuilder.getBuilder(enableTransparency, this.clientLevelWrapper);
-
 
 			// get the adjacent positions
 			try (ColumnRenderSource northRenderSource = this.getRenderSourceForPos(this.pos, EDhDirection.NORTH);
@@ -298,7 +286,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 		}
 		final long finalPos = pos;
 
-
 		try (FullDataSourceV2 fullDataSource =
 			// no direction means get the center LOD
 			(direction == null)
@@ -324,7 +311,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	}
 
 	//endregion
-
 
 	private synchronized CompletableFuture<LodBufferContainer> uploadToGpuAsync(
 		CompletableFuture<Void> parentFuture,
@@ -366,7 +352,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 				// upload complete
 				this.renderDataDirty = false;
 
-
 				if (parentFuture.isCancelled())
 				{
 					// if the parent future was canceled that likely means
@@ -386,8 +371,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	}
 
 	//endregion render data uploading
-
-
 
 	//=================//
 	// rendering state //
@@ -409,8 +392,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 	public boolean gpuUploadInProgress() { return this.getAndBuildRenderDataFutureRef.get() != null; }
 
 	//endregion
-
-
 
 	//==============//
 	// base methods //
@@ -472,7 +453,6 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 			);
 		}
 
-
 		// render loading is no longer needed
 		CompletableFuture<Void> buildFuture = this.getAndBuildRenderDataFutureRef.get();
 		if (buildFuture != null)
@@ -495,17 +475,12 @@ public class LodRenderSection implements IDebugRenderable, AutoCloseable
 			buildFuture.cancel(true);
 		}
 
-
 		this.setRenderingEnabled(false);
 		if (this.renderBufferContainer != null)
 		{
 			this.renderBufferContainer.close();
 		}
-
 	}
 
 	//endregion base methods
-
-
-
 }

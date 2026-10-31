@@ -88,8 +88,6 @@ public interface IDhApiTerrainDataRepo
 	 */
 	DhApiResult<DhApiTerrainDataPoint[][][]> getAllTerrainDataAtDetailLevelAndPos(IDhApiLevelWrapper levelWrapper, byte detailLevel, int posX, int posZ, IDhApiTerrainDataCache dataCache);
 
-
-
 	/**
 	 * Returns the datapoint and position of the LOD
 	 * at the end of the given ray. <br><br>
@@ -104,8 +102,6 @@ public interface IDhApiTerrainDataRepo
 		float rayDirectionX, float rayDirectionY, float rayDirectionZ,
 		int maxRayBlockLength,
 		IDhApiTerrainDataCache dataCache);
-
-
 
 	//=========//
 	// setters //
@@ -128,8 +124,6 @@ public interface IDhApiTerrainDataRepo
 	 */
 	DhApiResult<Void> overwriteChunkDataAsync(IDhApiLevelWrapper levelWrapper, Object[] chunkObjectArray) throws ClassCastException;
 
-
-
 	//=========//
 	// helpers //
 	//=========//
@@ -144,7 +138,4 @@ public interface IDhApiTerrainDataRepo
 	 * @since API 5.0.0
 	 */
 	IDhApiTerrainDataCache createSoftCache();
-
-
-
 }

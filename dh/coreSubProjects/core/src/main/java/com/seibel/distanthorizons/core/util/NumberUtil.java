@@ -63,5 +63,4 @@ public class NumberUtil
 
 		return false;
 	}
-
 }

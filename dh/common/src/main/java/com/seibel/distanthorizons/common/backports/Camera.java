@@ -59,5 +59,4 @@ public class Camera
 		final double camZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks + offset.z;
 		this.pos.set(camX, camY, camZ);
 	}
-
 }

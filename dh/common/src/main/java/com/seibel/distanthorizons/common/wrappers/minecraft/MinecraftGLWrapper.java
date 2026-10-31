@@ -19,11 +19,9 @@
 
 package com.seibel.distanthorizons.common.wrappers.minecraft;
 
-
 import org.lwjgl.opengl.GL11;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
-
 
 /**
  * Wraps the GL state changes DH makes while rendering,
@@ -32,8 +30,6 @@ import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 public class MinecraftGLWrapper
 {
 	public static final MinecraftGLWrapper INSTANCE = new MinecraftGLWrapper();
-
-
 
 	// scissor //
 	//region
@@ -50,8 +46,6 @@ public class MinecraftGLWrapper
 	}
 
 	//endregion
-
-
 
 	// depth //
 	//region
@@ -87,8 +81,6 @@ public class MinecraftGLWrapper
 
 	//endregion
 
-
-
 	// blending //
 	//region
 
@@ -116,8 +108,6 @@ public class MinecraftGLWrapper
 
 	//endregion
 
-
-
 	// frame buffers //
 	//region
 
@@ -128,8 +118,6 @@ public class MinecraftGLWrapper
 	}
 
 	//endregion
-
-
 
 	// buffers //
 	//region
@@ -146,8 +134,6 @@ public class MinecraftGLWrapper
 
 	//endregion
 
-
-
 	// culling //
 	//region
 
@@ -163,8 +149,6 @@ public class MinecraftGLWrapper
 	}
 
 	//endregion
-
-
 
 	// textures //
 	//region
@@ -199,8 +183,6 @@ public class MinecraftGLWrapper
 
 	//endregion
 
-
-
 	// viewport //
 	//region
 
@@ -211,7 +193,4 @@ public class MinecraftGLWrapper
 	}
 
 	//endregion
-
-
-
 }

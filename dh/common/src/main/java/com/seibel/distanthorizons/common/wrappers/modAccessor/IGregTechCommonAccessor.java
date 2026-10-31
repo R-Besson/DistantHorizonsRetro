@@ -34,5 +34,4 @@ public interface IGregTechCommonAccessor extends IGregTechAccessor
 
 	@Nullable
 	IIcon resolveIcon(Block block, int meta);
-
 }

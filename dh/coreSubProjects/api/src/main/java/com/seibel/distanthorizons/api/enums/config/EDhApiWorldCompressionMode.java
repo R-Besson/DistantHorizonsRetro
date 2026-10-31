@@ -40,13 +40,10 @@ public enum EDhApiWorldCompressionMode
 	 */
 	VISUALLY_EQUAL(1);
 
-
-
 	/** More stable than using the ordinal of the enum */
 	public final byte value;
 
 	EDhApiWorldCompressionMode(int value) { this.value = (byte) value; }
-
 
 	public static EDhApiWorldCompressionMode getFromValue(byte value)
 	{
@@ -61,6 +58,4 @@ public enum EDhApiWorldCompressionMode
 
 		throw new IllegalArgumentException("No lossy compression mode with the value [" + value + "]");
 	}
-
-
 }

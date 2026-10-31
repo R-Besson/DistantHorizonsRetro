@@ -67,19 +67,15 @@ public enum EDhApiWorldGenerationStep
 	FEATURES(8, "features"),
 	LIGHT(9, "light");
 
-
-
 	/** used when serializing this enum. */
 	public final String name;
 	public final byte value;
-
 
 	EDhApiWorldGenerationStep(int value, String name)
 	{
 		this.value = (byte) value;
 		this.name = name;
 	}
-
 
 	//=========//
 	// parsing //
@@ -112,5 +108,4 @@ public enum EDhApiWorldGenerationStep
 
 		return null;
 	}
-
 }

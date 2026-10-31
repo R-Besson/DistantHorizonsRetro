@@ -17,15 +17,11 @@ public class MinecraftServerWrapper extends AbstractMinecraftSharedWrapper
 	@Nullable
 	public DedicatedServer dedicatedServer = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	private MinecraftServerWrapper() { }
-
-
 
 	//=========//
 	// methods //
@@ -56,7 +52,6 @@ public class MinecraftServerWrapper extends AbstractMinecraftSharedWrapper
 		return this.dedicatedServer.getCurrentPlayerCount();
 	}
 
-
 	@Nullable
 	@Override
 	public IServerLevelWrapper getLevelWrapper(String dimensionResourceLocation)
@@ -75,5 +70,4 @@ public class MinecraftServerWrapper extends AbstractMinecraftSharedWrapper
 		WorldServer mcLevel = DimensionManager.getWorld(dimensionKey);
 		return ServerLevelWrapper.getWrapper(mcLevel);
 	}
-
 }

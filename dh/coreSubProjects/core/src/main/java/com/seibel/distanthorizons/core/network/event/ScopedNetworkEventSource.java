@@ -37,15 +37,11 @@ public final class ScopedNetworkEventSource extends AbstractNetworkEventSource
 
 	private final Consumer<AbstractNetworkMessage> actualHandleMessageStable = this::handleMessage;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	public ScopedNetworkEventSource(AbstractNetworkEventSource parent) { this.parent = parent; }
-
-
 
 	//==================//
 	// message handlers //
@@ -64,8 +60,6 @@ public final class ScopedNetworkEventSource extends AbstractNetworkEventSource
 		super.registerHandler(this, handlerClass, handlerImplementation);
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -76,5 +70,4 @@ public final class ScopedNetworkEventSource extends AbstractNetworkEventSource
 		this.isClosed = true;
 		this.parent.removeAllHandlers(this);
 	}
-
 }

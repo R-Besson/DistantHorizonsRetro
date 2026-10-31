@@ -43,7 +43,6 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 	private static final long CAPACITY;
 
 	private static final long ADDRESS;
-
 	static
 	{
 		ByteBuffer bb = ByteBuffer.allocateDirect(0).order(NATIVE_ORDER);
@@ -67,10 +66,7 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 			throw new UnsupportedOperationException(t);
 		}
 	}
-
 	private MemoryUtilities() { }
-
-
 
 	// --- [ memAlloc ] ---
 
@@ -123,8 +119,6 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 		}
 	}
 
-
-
 	// --- [ Buffer address ] ---
 
 	/**
@@ -135,8 +129,6 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 	{
 		return buffer.position() + UNSAFE.getLong(buffer, ADDRESS);
 	}
-
-
 
 	// --- [ UTF-8 ] ---
 
@@ -256,8 +248,6 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 		return bytes;
 	}
 
-
-
 	// --- [ Unsafe setup ] ---
 
 	static sun.misc.Unsafe getUnsafeInstance()
@@ -375,8 +365,6 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 		}
 	}
 
-
-
 	// --- [ Buffer wrapping ] ---
 
 	static ByteBuffer wrapBufferByte(long address, int capacity)
@@ -438,5 +426,4 @@ public final class MemoryUtilities // full "utilities" name is to prevent confli
 
 		return buffer;
 	}
-
 }

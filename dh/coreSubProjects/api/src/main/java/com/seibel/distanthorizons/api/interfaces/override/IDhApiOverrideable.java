@@ -38,5 +38,4 @@ public interface IDhApiOverrideable extends IBindable
 	 * @return The priority of this interface, the lowest legal value is {@link IOverrideInjector#MIN_NON_CORE_OVERRIDE_PRIORITY}.
 	 */
 	default int getPriority() { return IOverrideInjector.DEFAULT_NON_CORE_OVERRIDE_PRIORITY; }
-
 }

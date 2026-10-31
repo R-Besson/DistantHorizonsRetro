@@ -52,8 +52,6 @@ public interface IDhApiWorldProxy
 	 */
 	boolean getReadOnly() throws IllegalStateException;
 
-
-
 	//================//
 	// level handlers //
 	//================//
@@ -83,5 +81,4 @@ public interface IDhApiWorldProxy
 	 * @throws IllegalStateException if no world is loaded
 	 */
 	Iterable<IDhApiLevelWrapper> getAllLoadedLevelsWithDimensionNameLike(String dimensionName) throws IllegalStateException;
-
 }

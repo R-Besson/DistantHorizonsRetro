@@ -14,8 +14,6 @@ public abstract class AbstractSaveObjContainer<T>
 	/** the last Unix millisecond time this data source was written to */
 	public long lastWrittenDateTimeMs;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -24,8 +22,6 @@ public abstract class AbstractSaveObjContainer<T>
 	public AbstractSaveObjContainer() { this.lastWrittenDateTimeMs = System.currentTimeMillis(); }
 
 	//endregion
-
-
 
 	//==================//
 	// abstract methods //
@@ -40,8 +36,6 @@ public abstract class AbstractSaveObjContainer<T>
 	public abstract void update(@Nullable T newObj);
 
 	//endregion
-
-
 
 	//=========//
 	// timeout //
@@ -58,7 +52,4 @@ public abstract class AbstractSaveObjContainer<T>
 	}
 
 	//endregion
-
-
-
 }

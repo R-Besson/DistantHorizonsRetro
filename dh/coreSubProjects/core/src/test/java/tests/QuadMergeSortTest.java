@@ -119,5 +119,4 @@ public class QuadMergeSortTest
 		quad.set(x, y, z, widthEastWest, widthNorthSouth, color, (short) 0, (byte) 0, (byte) 15, (byte) 0, direction);
 		return quad;
 	}
-
 }

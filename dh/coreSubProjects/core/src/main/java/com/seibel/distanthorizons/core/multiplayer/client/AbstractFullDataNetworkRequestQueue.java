@@ -57,8 +57,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 
 	protected static final long SHUTDOWN_TIMEOUT_SECONDS = 5;
 
-
-
 	public final ClientNetworkState networkState;
 	protected final DhClientLevel level;
 	private final boolean changedOnly;
@@ -81,8 +79,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 
 	private final SupplierBasedRateLimiter<Void> rateLimiter = new SupplierBasedRateLimiter<>(this::getRequestRateLimit);
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -98,8 +94,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 		DEBUG_RENDERER.register(this, this.showDebugWireframeConfig);
 	}
 
-
-
 	//==================//
 	// abstract methods //
 	//==================//
@@ -108,8 +102,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 	protected abstract boolean sectionInAllowedGenerationRadius(long sectionPos, DhBlockPos2D targetPos);
 
 	protected abstract String getQueueName();
-
-
 
 	//====================//
 	// request submitting //
@@ -124,7 +116,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 			{
 				return existingNetTask;
 			}
-
 
 			NetRequestTask newRequestEntry = new NetRequestTask(pos, clientTimestamp);
 			newRequestEntry.future.whenComplete((DataSourceRetrievalResult requestResult, Throwable throwable) ->
@@ -249,14 +240,12 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 				return;
 			}
 
-
 			try (FullDataSourceV2DTO dataSourceDto = this.networkState.fullDataPayloadReceiver.decodeDataSource(response.payload))
 			{
 				// set application flags based on the received detail level,
 				// this is needed so the data sources propagate correctly
 				dataSourceDto.applyToChildren = DhSectionPos.getDetailLevel(dataSourceDto.pos) > DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL;
 				dataSourceDto.applyToParent = DhSectionPos.getDetailLevel(dataSourceDto.pos) < DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL + 12;
-
 
 				this.level.updateBeaconBeamsForSectionPos(dataSourceDto.pos, response.payload.beaconBeams);
 
@@ -310,8 +299,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 			}
 		}
 	}
-
-
 
 	//=========================================//
 	// IFullDataSourceRetrievalQueue overrides //
@@ -376,12 +363,9 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 	public int getWaitingTaskCount() { return this.waitingTasksBySectionPos.size(); }
 	public int getInProgressTaskCount() { return Short.MAX_VALUE - this.pendingTasksSemaphore.availablePermits(); }
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
-
 
 	public CompletableFuture<Void> startClosingAsync(boolean alsoInterruptRunning)
 	{
@@ -410,8 +394,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 
 	@Override
 	public void close() { DEBUG_RENDERER.unregister(this, this.showDebugWireframeConfig); }
-
-
 
 	//===========//
 	// debugging //
@@ -453,8 +435,6 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 		}
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -469,15 +449,12 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 		@Nullable
 		public final Long updateTimestamp;
 
-
 		/** Will be null until the request has been sent to the server */
 		@CheckForNull
 		public CompletableFuture<FullDataSourceResponseMessage> networkDataSourceFuture;
 
 		/** when this reaches zero then the request will be canceled. */
 		public int retryAttempts = MAX_RETRY_ATTEMPTS;
-
-
 
 		//=============//
 		// constructor //
@@ -488,9 +465,5 @@ public abstract class AbstractFullDataNetworkRequestQueue implements IDebugRende
 			this.pos = pos;
 			this.updateTimestamp = updateTimestamp;
 		}
-
 	}
-
-
-
 }

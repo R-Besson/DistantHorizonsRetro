@@ -46,13 +46,11 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
 	public int frameBuffer = -1;
 
 	private DhApiMat4f inverseMcMvmProjMatrix;
 	private DhApiMat4f inverseDhMvmProjMatrix;
 	private float levelMaxHeight;
-
 
 	// Uniforms
 	public int uMcDepthTexture = -1;
@@ -71,8 +69,6 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 	public int uOnlyRenderLods = -1;
 	public int uIsMcReverseZDepth = -1;
 	public int uDepthIsZeroToPositiveOne = -1;
-
-
 
 	//=============//
 	// constructor //
@@ -109,12 +105,9 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 		this.uOnlyRenderLods = this.shader.tryGetUniformLocation("uOnlyRenderLods");
 		this.uIsMcReverseZDepth = this.shader.tryGetUniformLocation("uIsMcReverseZDepth");
 		this.uDepthIsZeroToPositiveOne = this.shader.tryGetUniformLocation("uDepthIsZeroToPositiveOne");
-
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// render prep //
@@ -126,7 +119,6 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 	{
 		this.shader.setUniform(this.uMcInvMvmProj, this.inverseMcMvmProjMatrix);
 		this.shader.setUniform(this.uDhInvMvmProj, this.inverseDhMvmProjMatrix);
-
 
 		float dhNearClipDistance = RenderUtil.getLodFadeStartDistanceInBlocks();
 
@@ -155,8 +147,6 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -175,8 +165,6 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 			// we don't need to/can't render fading
 			return;
 		}
-
-
 
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.frameBuffer);
 		GLMC.disableScissorTest();
@@ -199,12 +187,8 @@ public class GlDhVanillaFadeShader extends GlAbstractShaderRenderer
 		GLMC.glBindTexture(colorTextureId);
 		LWJGL.glUniform1i(this.uDhColorTexture, 3);
 
-
 		GlScreenQuad.INSTANCE.render();
 	}
 
 	//endregion
-
-
-
 }

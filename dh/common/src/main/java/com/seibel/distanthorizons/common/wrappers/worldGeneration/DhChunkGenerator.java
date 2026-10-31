@@ -37,15 +37,8 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IChunkG
 import com.seibel.distanthorizons.coreapi.ModInfo;
 
 import java.util.Iterator;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
-
-
 
 public final class DhChunkGenerator implements IChunkGenerator
 {
@@ -56,8 +49,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 
 	public static final long EXCEPTION_TIMER_RESET_TIME = TimeUnit.NANOSECONDS.convert(1, TimeUnit.SECONDS);
 	public static final int EXCEPTION_COUNTER_TRIGGER = 20;
-
-
 
 	public final DhInternalServerGenerator internalServerGenerator;
 
@@ -80,15 +71,10 @@ public final class DhChunkGenerator implements IChunkGenerator
 	private static final int FORGE_TICKET_CHUNK_LIMIT = 1000;
 	private static final int MAX_FORCED_CHUNKS_PER_TASK = 6 * 6;
 
-
-
 	public final LinkedBlockingQueue<ChunkGenEvent> generationEventQueue = new LinkedBlockingQueue<>();
-
 
 	public int unknownExceptionCount = 0;
 	public long lastExceptionTriggerTime = 0;
-
-
 
 	//==============//
 	// constructors //
@@ -99,8 +85,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 		GlobalWorldGenParams globalParams = new GlobalWorldGenParams(dhServerLevel);
 		this.internalServerGenerator = new DhInternalServerGenerator(globalParams, dhServerLevel);
 	}
-
-
 
 	//=================//
 	// synchronization //
@@ -115,7 +99,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 				this.unknownExceptionCount = 0;
 			}
 		}
-
 
 		// Update all current out standing jobs
 		Iterator<ChunkGenEvent> iter = this.generationEventQueue.iterator();
@@ -160,8 +143,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 		}
 	}
 
-
-
 	//==================//
 	// world generation //
 	//==================//
@@ -184,8 +165,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 		this.internalServerGenerator.generateChunksViaInternalServer(genEvent);
 	}
 
-
-
 	// queue task //
 
 	@Override
@@ -202,8 +181,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 		return genEvent.future;
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -213,7 +190,6 @@ public final class DhChunkGenerator implements IChunkGenerator
 	public void close()
 	{
 		LOGGER.info("Closing [" + DhChunkGenerator.class.getSimpleName() + "]");
-
 
 		// cancel in-progress tasks
 		Iterator<ChunkGenEvent> genEventIter = this.generationEventQueue.iterator();
@@ -228,7 +204,4 @@ public final class DhChunkGenerator implements IChunkGenerator
 	}
 
 	//endregion
-
-
-
 }

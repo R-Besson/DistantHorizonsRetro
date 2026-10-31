@@ -9,8 +9,6 @@ public enum TargetedMod implements ITargetMod
 	ANGELICA("com.gtnewhorizons.angelica.loading.AngelicaTweaker", "angelica"),
 	HODGEPODGE("com.mitchej123.hodgepodge.core.HodgepodgeCore", "hodgepodge");
 
-
-
 	public final String coreModClass;
 	private final TargetModBuilder builder;
 
@@ -24,7 +22,4 @@ public enum TargetedMod implements ITargetMod
 	@Override
 	@NotNull
 	public TargetModBuilder getBuilder() { return this.builder; }
-
-
-
 }

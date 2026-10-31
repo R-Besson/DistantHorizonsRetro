@@ -8,8 +8,6 @@ import com.seibel.distanthorizons.core.util.AnnotationUtil;
 
 import net.minecraft.command.ICommandSender;
 
-
-
 /**
  * Command for managing config.
  */
@@ -93,5 +91,4 @@ public class ConfigCommand extends AbstractDhCommand
 			}
 		}
 	}
-
 }

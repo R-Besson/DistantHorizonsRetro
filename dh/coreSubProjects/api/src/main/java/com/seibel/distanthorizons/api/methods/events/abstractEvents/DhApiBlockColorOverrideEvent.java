@@ -54,16 +54,12 @@ public abstract class DhApiBlockColorOverrideEvent implements IDhApiEvent<DhApiB
 {
 	public abstract void onBlockColorOverridden(DhApiEventParam<EventParam> event);
 
-
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> event) { this.onBlockColorOverridden(event); }
-
-
 
 	//==================//
 	// parameter object //
@@ -79,8 +75,6 @@ public abstract class DhApiBlockColorOverrideEvent implements IDhApiEvent<DhApiB
 		private int tintColorAsInt = -1;
 		private int baseColorAsInt = -1;
 		private int blockPosX = 0, blockPosY = 0, blockPosZ = 0;
-
-
 
 		//=============//
 		// constructor //
@@ -114,8 +108,6 @@ public abstract class DhApiBlockColorOverrideEvent implements IDhApiEvent<DhApiB
 		}
 
 		//endregion
-
-
 
 		//=================//
 		// getters/setters //
@@ -172,8 +164,6 @@ public abstract class DhApiBlockColorOverrideEvent implements IDhApiEvent<DhApiB
 
 		//endregion
 
-
-
 		//==========================//
 		// base api event overrides //
 		//==========================//
@@ -193,9 +183,5 @@ public abstract class DhApiBlockColorOverrideEvent implements IDhApiEvent<DhApiB
 		public boolean getCopyBeforeFire() { return false; }
 
 		//endregion
-
-
-
 	}
-
 }

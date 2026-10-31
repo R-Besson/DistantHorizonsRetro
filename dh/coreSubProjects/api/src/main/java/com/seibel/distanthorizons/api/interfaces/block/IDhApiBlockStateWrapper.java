@@ -63,5 +63,4 @@ public interface IDhApiBlockStateWrapper extends IDhApiUnsafeWrapper
 	 * @since API 3.0.0
 	 */
 	byte getMaterialId();
-
 }

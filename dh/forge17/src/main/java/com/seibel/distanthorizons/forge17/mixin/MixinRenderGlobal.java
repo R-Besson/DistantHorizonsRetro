@@ -63,5 +63,4 @@ public class MixinRenderGlobal
 			RenderHelper.renderDeferredLods();
 		}
 	}
-
 }

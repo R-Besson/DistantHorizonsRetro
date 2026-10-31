@@ -40,8 +40,6 @@ public interface INetworkObject
 	/** Populates this object's from the given {@link ByteBuf} */
 	void decode(ByteBuf in);
 
-
-
 	//========================//
 	// default/static methods //
 	//========================//
@@ -54,8 +52,6 @@ public interface INetworkObject
 		obj.decode(inputByteBuf);
 		return obj;
 	}
-
-
 
 	@Contract("_, null -> false; _, !null -> true")
 	default boolean writeOptional(ByteBuf outputByteBuf, Object value)
@@ -73,7 +69,6 @@ public interface INetworkObject
 			: null;
 	}
 
-
 	// strings //
 
 	default void writeString(String inputString, ByteBuf outputByteBuf) { INetworkObject.writeStringStatic(inputString, outputByteBuf); }
@@ -90,7 +85,6 @@ public interface INetworkObject
 		int length = inputByteBuf.readUnsignedShort();
 		return inputByteBuf.readSlice(length).toString(StandardCharsets.UTF_8);
 	}
-
 
 	// collections //
 
@@ -129,8 +123,6 @@ public interface INetworkObject
 
 		return collection;
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -175,11 +167,8 @@ public interface INetworkObject
 			));
 		}};
 
-
 		public final BiConsumer<Object, ByteBuf> encode;
 		public final BiFunction<Object, ByteBuf, Object> decode;
-
-
 
 		//=============//
 		// constructor //
@@ -191,8 +180,6 @@ public interface INetworkObject
 			this.encode = (BiConsumer<Object, ByteBuf>) encode;
 			this.decode = (BiFunction<Object, ByteBuf, Object>) decode;
 		}
-
-
 
 		//================//
 		// static methods //
@@ -214,7 +201,5 @@ public interface INetworkObject
 				throw new AssertionError("Class has no compatible codec: " + classToAdd.getSimpleName());
 			});
 		}
-
 	}
-
 }

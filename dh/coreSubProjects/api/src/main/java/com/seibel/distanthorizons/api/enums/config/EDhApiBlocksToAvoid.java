@@ -34,5 +34,4 @@ public enum EDhApiBlocksToAvoid
 	public final boolean noCollision;
 
 	EDhApiBlocksToAvoid(boolean noCollision) { this.noCollision = noCollision; }
-
 }

@@ -50,8 +50,6 @@ public class DelayedSaveCacheTest
 		// allow all logging levels
 		Configurator.setRootLevel(Level.ALL);
 	}
-
-
 	/**
 	 * commented out for now since it makes the normal build take longer
 	 * and due to breaking {@link PooledDataSourceCheckoutTest}
@@ -67,8 +65,6 @@ public class DelayedSaveCacheTest
 			diskSaveCountRef.getAndIncrement();
 			return CompletableFuture.completedFuture(null);
 		}, 1_000);
-
-
 
 		//==============================//
 		// single item and manual flush //
@@ -87,8 +83,6 @@ public class DelayedSaveCacheTest
 		cache.flush();
 		Assert.assertEquals("memory cache should be empty after", 0, cache.getUnsavedCount());
 		Assert.assertEquals("1 manual flush was expected", 1, diskSaveCountRef.get());
-
-
 
 		//======================//
 		// quick group position //
@@ -113,8 +107,6 @@ public class DelayedSaveCacheTest
 		Thread.sleep(4_000);
 		Assert.assertEquals("Cache should have automatically cleared due to inactivity", 0, cache.getUnsavedCount());
 		Assert.assertEquals("second save after timeout expected", 2, diskSaveCountRef.get());
-
-
 
 		//=====================//
 		// slow group position //
@@ -142,9 +134,5 @@ public class DelayedSaveCacheTest
 		Thread.sleep(2_000);
 		Assert.assertEquals("Cache should have automatically cleared due to inactivity", 0, cache.getUnsavedCount());
 		Assert.assertEquals("third timeout expected", 3, diskSaveCountRef.get());
-
 	}
-
-
-
 }

@@ -47,8 +47,6 @@ public class WorldGeneratorInjector
 	 */
 	private final String corePackagePath;
 
-
-
 	public WorldGeneratorInjector()
 	{
 		String thisPackageName = this.getClass().getPackage().getName();
@@ -61,8 +59,6 @@ public class WorldGeneratorInjector
 	{
 		this.corePackagePath = newCorePackagePath;
 	}
-
-
 
 	/**
 	 * Binds a world generator to the given level. <Br>
@@ -85,7 +81,6 @@ public class WorldGeneratorInjector
 			throw new NullPointerException("No [" + IDhApiWorldGenerator.class.getSimpleName() + "] given.");
 		}
 
-
 		// bind this generator to the given level
 		this.worldGeneratorByLevelWrapper
 			.computeIfAbsent(levelForWorldGenerator, (IDhApiLevelWrapper level) -> new OverrideInjector(this.corePackagePath))
@@ -100,8 +95,6 @@ public class WorldGeneratorInjector
 			this.worldGeneratorByLevelWrapper.remove(levelForWorldGenerator);
 		}
 	}
-
-
 
 	/**
 	 * Returns the bound world generator with the highest priority. <br>
@@ -125,11 +118,6 @@ public class WorldGeneratorInjector
 		return injector.get(IDhApiWorldGenerator.class);
 	}
 
-
-
 	/** Removes all bound world generators. */
 	public void clear() { this.worldGeneratorByLevelWrapper.clear(); }
-
-
-
 }

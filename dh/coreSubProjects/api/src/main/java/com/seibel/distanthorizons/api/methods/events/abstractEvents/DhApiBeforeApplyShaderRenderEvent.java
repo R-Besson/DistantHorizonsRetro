@@ -38,12 +38,10 @@ public abstract class DhApiBeforeApplyShaderRenderEvent implements IDhApiCancela
 	/** Fired before the apply shader is run. */
 	public abstract void beforeRender(DhApiCancelableEventParam<DhApiRenderParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<DhApiRenderParam> event) { this.beforeRender(event); }
-
 }

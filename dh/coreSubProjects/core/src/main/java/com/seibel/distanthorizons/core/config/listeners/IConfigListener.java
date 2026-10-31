@@ -26,5 +26,4 @@ public interface IConfigListener
 
 	/** Called whenever the value is changed through the UI */
 	default void onUiModify() { }
-
 }

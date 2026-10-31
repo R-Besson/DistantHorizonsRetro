@@ -95,20 +95,15 @@ public class FullDataSourceV2
 		public final int[] mergeIds = new int[4];
 		public final int[] mergeBlockLights = new int[4];
 		public final int[] mergeSkyLights = new int[4];
-
 	}
 
 	private static final ThreadLocal<FullDataPointIdMap> DATA_MAP_FOR_REMAPPING_REF = ThreadLocal.withInitial(() -> new FullDataPointIdMap(DhSectionPos.encode((byte) 0, 0, 0)));
-
-
 
 	private int cachedHashCode = 0;
 
 	private final long pos;
 
-
 	public final FullDataPointIdMap mapping;
-
 
 	public long lastModifiedUnixDateTime;
 	public long createdUnixDateTime;
@@ -146,8 +141,6 @@ public class FullDataSourceV2
 	/** should only be used by methods exposed via the DH API */
 	private boolean runApiSetterValidation = false;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -165,7 +158,6 @@ public class FullDataSourceV2
 					"input width [" + FullDataSourceV1.WIDTH + "], recipient width [" + WIDTH + "].");
 		}
 
-
 		// Note: this logic only works if the data point data is the same between both versions
 		byte[] columnGenerationSteps = new byte[WIDTH * WIDTH];
 		byte[] columnWorldCompressionMode = new byte[WIDTH * WIDTH];
@@ -179,7 +171,6 @@ public class FullDataSourceV2
 				{
 					int index = relativePosToIndex(x, z);
 					LongArrayList newDataColumn = new LongArrayList(legacyDataColumn);
-
 
 					// convert the data point format
 					boolean columnHasNonAirBlock = false;
@@ -199,14 +190,12 @@ public class FullDataSourceV2
 						dataPoint = FullDataPointUtil.setBlockLight(dataPoint, blockLight);
 						newDataColumn.set(i, dataPoint);
 
-
 						// check if this datapoint is air
 						if (!columnHasNonAirBlock && !isAir)
 						{
 							columnHasNonAirBlock = true;
 						}
 					}
-
 
 					// save the converted data point
 					ensureDataColumnOrder(newDataColumn);
@@ -249,12 +238,9 @@ public class FullDataSourceV2
 
 		LodUtil.assertTrue(data == null || data.length == WIDTH * WIDTH);
 
-
-
 		this.pos = pos;
 		this.mapping = mapping;
 		this.isEmpty = empty;
-
 
 		// pooled data arrays,
 		// size defaulting to 0 since we don't know how many datapoints
@@ -295,8 +281,6 @@ public class FullDataSourceV2
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -319,8 +303,6 @@ public class FullDataSourceV2
 
 	//endregion
 
-
-
 	//==========//
 	// updating //
 	//==========//
@@ -334,10 +316,8 @@ public class FullDataSourceV2
 			return false;
 		}
 
-
 		byte thisDetailLevel = DhSectionPos.getDetailLevel(this.pos);
 		byte inputDetailLevel = DhSectionPos.getDetailLevel(inputDataSource.pos);
-
 
 		// determine the mapping changes necessary for the input to map onto this datasource
 		int[] remappedIds = this.mapping.mergeAndReturnRemappedEntityIds(inputDataSource.mapping);
@@ -397,11 +377,8 @@ public class FullDataSourceV2
 			throw new UnsupportedOperationException("Unsupported data source update. Expected input detail level of [" + (thisDetailLevel - 1) + "], [" + thisDetailLevel + "], or [" + (thisDetailLevel + 1) + "], received detail level [" + inputDetailLevel + "].");
 		}
 
-
 		// needed to prevent infinite mapped ID growth
 		this.removeUnusedIdsAndRemap();
-
-
 
 		if (dataChanged)
 		{
@@ -422,7 +399,6 @@ public class FullDataSourceV2
 					}
 				}
 			}
-
 
 			// update the hash code
 			this.generateHashCode();
@@ -453,11 +429,8 @@ public class FullDataSourceV2
 					continue;
 				}
 
-
-
 				byte thisGenState = this.columnGenerationSteps.getByte(recipientIndex);
 				byte inputGenState = inputDataSource.columnGenerationSteps.getByte(recipientIndex);
-
 
 				// determine if this column should be updated
 				boolean genStateAllowsUpdating = false;
@@ -484,8 +457,6 @@ public class FullDataSourceV2
 				{
 					continue;
 				}
-
-
 
 				// check if the data changed
 				if (this.dataPoints[recipientIndex] == null)
@@ -529,7 +500,6 @@ public class FullDataSourceV2
 					throwIfDataColumnInWrongOrder(inputDataSource.pos, this.dataPoints[recipientIndex]);
 				}
 
-
 				this.columnGenerationSteps.set(recipientIndex, inputGenState);
 				// always overwrite the compression mode since we're replacing this column
 				this.columnWorldCompressionMode.set(recipientIndex, inputDataSource.columnWorldCompressionMode.getByte(recipientIndex));
@@ -550,15 +520,12 @@ public class FullDataSourceV2
 		// input is one detail level lower (higher detail)
 		// so 2x2 input data points will be converted into 1 recipient data point
 
-
 		// determine where in the input data source should be written to
 		// since the input is one detail level below it will be one of this position's 4 children
 		int minChildXPos = DhSectionPos.getX(DhSectionPos.getChildByIndex(this.pos, 0));
 		int recipientOffsetX = (DhSectionPos.getX(inputDataSource.pos) == minChildXPos) ? 0 : (WIDTH / 2);
 		int minChildZPos = DhSectionPos.getZ(DhSectionPos.getChildByIndex(this.pos, 0));
 		int recipientOffsetZ = (DhSectionPos.getZ(inputDataSource.pos) == minChildZPos) ? 0 : (WIDTH / 2);
-
-
 
 		// merge the input's data points
 		// into this data source's
@@ -573,20 +540,16 @@ public class FullDataSourceV2
 				int recipientZ = (z / 2) + recipientOffsetZ;
 				int recipientIndex = relativePosToIndex(recipientX, recipientZ);
 
-
 				// world gen //
 				byte inputGenStep = determineMinWorldGenStepForTwoByTwoColumn(inputDataSource.columnGenerationSteps, x, z);
 				// these are saved with the data, so changing them is a change too
 				dataChanged |= (this.columnGenerationSteps.getByte(recipientIndex) != inputGenStep);
 				this.columnGenerationSteps.set(recipientIndex, inputGenStep);
 
-
 				// world compression //
 				byte worldCompressionMode = determineHighestWorldCompressionForTwoByTwoColumn(inputDataSource.columnWorldCompressionMode, x, z);
 				dataChanged |= (this.columnWorldCompressionMode.getByte(recipientIndex) != worldCompressionMode);
 				this.columnWorldCompressionMode.set(recipientIndex, worldCompressionMode);
-
-
 
 				// data points //
 				LongArrayList mergedInputDataArray = mergeInputTwoByTwoDataColumn(inputDataSource, x, z, mergeScratch);
@@ -645,8 +608,6 @@ public class FullDataSourceV2
 					throwIfDataColumnInWrongOrder(inputDataSource.pos, this.dataPoints[recipientIndex]);
 				}
 
-
-
 				this.isEmpty = false;
 			}
 		}
@@ -696,7 +657,6 @@ public class FullDataSourceV2
 		LongArrayList newColumnList = scratch.mergedColumn;
 		newColumnList.clear();
 
-
 		//=========================//
 		// get the 4 input columns //
 		//=========================//
@@ -715,8 +675,6 @@ public class FullDataSourceV2
 				}
 			}
 		}
-
-
 
 		//========================================//
 		// find all y levels where changes happen //
@@ -781,8 +739,6 @@ public class FullDataSourceV2
 			}
 		}
 
-
-
 		//=======================//
 		// process each Y change //
 		//=======================//
@@ -819,7 +775,6 @@ public class FullDataSourceV2
 					continue;
 				}
 
-
 				LongArrayList column = inputColumns[i];
 				if (column == null)
 				{
@@ -854,8 +809,6 @@ public class FullDataSourceV2
 				}
 			}
 
-
-
 			// Determine merged values for this slice
 			int id = determineMostCommonValueInColumnSlice(mergeIds, inputDataSource.mapping);
 
@@ -865,7 +818,6 @@ public class FullDataSourceV2
 			// causing incorrect bright spots.
 			byte blockLight = (byte) determineAverageValueInColumnSliceWithId(mergeBlockLights, mergeIds, id);
 			byte skyLight = (byte) determineAverageValueInColumnSliceWithId(mergeSkyLights, mergeIds, id);
-
 
 			// Check if we need to start a new datapoint
 			if (accumulatedHeight == 0)
@@ -907,7 +859,6 @@ public class FullDataSourceV2
 			}
 		}
 
-
 		// add the final datapoint if needed
 		if (accumulatedHeight > 0)
 		{
@@ -920,7 +871,6 @@ public class FullDataSourceV2
 				LOGGER.warn("Skipping corrupt datapoint for pos [" + DhSectionPos.toString(inputDataSource.pos) + "] at relative position [" + x + "," + z + "] with data: ID[" + lastId + "], Height[" + accumulatedHeight + "], minY[" + currentMinY + "], lastBlockLight[" + lastBlockLight + "], lastSkyLight[" + lastSkyLight + "].");
 			}
 		}
-
 
 		// confirm the array is in the correct order
 		ensureDataColumnOrder(newColumnList);
@@ -1022,7 +972,6 @@ public class FullDataSourceV2
 			LodUtil.assertTrue(mergeIds.length == 4, "Column Slice should only contain 4 values.");
 		}
 
-
 		int sum = 0;
 		int count = 0;
 		for (int i = 0; i < 4; i++)
@@ -1051,7 +1000,6 @@ public class FullDataSourceV2
 			LodUtil.assertTrue(sliceArray.length == 4, "Column Slice should only contain 4 values.");
 		}
 
-
 		int value = 0;
 		for (int i = 0; i < 4; i++)
 		{
@@ -1077,15 +1025,12 @@ public class FullDataSourceV2
 		// input is one detail level higher (lower detail)
 		// so 1x1 input data points will be converted into 2x2 recipient data point
 
-
 		// determine where in this data source should be read from
 		// since the input is one detail level above this will be one of input position's 4 children
 		int minParentXPos = DhSectionPos.getX(DhSectionPos.getChildByIndex(inputDataSource.pos, 0));
 		int inputOffsetX = (DhSectionPos.getX(this.pos) == minParentXPos) ? 0 : (WIDTH / 2);
 		int minParentZPos = DhSectionPos.getZ(DhSectionPos.getChildByIndex(inputDataSource.pos, 0));
 		int inputOffsetZ = (DhSectionPos.getZ(this.pos) == minParentZPos) ? 0 : (WIDTH / 2);
-
-
 
 		// merge the input's data points
 		// into this data source's
@@ -1101,7 +1046,6 @@ public class FullDataSourceV2
 				int inputZ = (z / 2) + inputOffsetZ;
 				int inputIndex = relativePosToIndex(inputX, inputZ);
 
-
 				// world gen //
 
 				// a separate generation step needs to be used so can replace
@@ -1109,12 +1053,9 @@ public class FullDataSourceV2
 				byte inputGenStep = EDhApiWorldGenerationStep.DOWN_SAMPLED.value;
 				this.columnGenerationSteps.set(recipientIndex, inputGenStep);
 
-
 				// world compression //
 				byte worldCompressionMode = inputDataSource.columnWorldCompressionMode.getByte(recipientIndex);
 				this.columnWorldCompressionMode.set(recipientIndex, worldCompressionMode);
-
-
 
 				// data points //
 
@@ -1176,7 +1117,6 @@ public class FullDataSourceV2
 		FullDataPointIdMap newMap = DATA_MAP_FOR_REMAPPING_REF.get();
 		newMap.clear(this.pos);
 
-
 		// find all the IDs that are currently in use
 		for (int x = 0; x < WIDTH; x++)
 		{
@@ -1198,11 +1138,9 @@ public class FullDataSourceV2
 			}
 		}
 
-
 		// replace the old entries to remove any unneeded ones
 		this.mapping.clear(this.pos);
 		this.mapping.addAll(newMap);
-
 
 		// remap the data
 		for (int x = 0; x < WIDTH; x++)
@@ -1225,8 +1163,6 @@ public class FullDataSourceV2
 	}
 
 	//endregion
-
-
 
 	//===================//
 	// adjacent clearing //
@@ -1261,8 +1197,6 @@ public class FullDataSourceV2
 	}
 
 	//endregion
-
-
 
 	//================//
 	// helper methods //
@@ -1361,8 +1295,6 @@ public class FullDataSourceV2
 
 	//endregion
 
-
-
 	//=====================//
 	// setters and getters //
 	//=====================//
@@ -1378,7 +1310,6 @@ public class FullDataSourceV2
 		this.dataPoints[index] = longArray;
 		this.columnGenerationSteps.set(index, worldGenStep.value);
 		this.columnWorldCompressionMode.set(index, worldCompressionMode.value);
-
 
 		if (RUN_UPDATE_DEV_VALIDATION)
 		{
@@ -1397,8 +1328,6 @@ public class FullDataSourceV2
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// API methods //
@@ -1453,8 +1382,6 @@ public class FullDataSourceV2
 
 	//endregion
 
-
-
 	//============//
 	// unit tests //
 	//============//
@@ -1464,8 +1391,6 @@ public class FullDataSourceV2
 	{ return this.pooledArraysCheckout; }
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -1518,7 +1443,4 @@ public class FullDataSourceV2
 	}
 
 	//endregion
-
-
-
 }

@@ -28,8 +28,6 @@ public class FullDataLookupCache
 	/** striped by position so writes elsewhere don't stop lookups from being cached */
 	private final long[] writeCountByStripe = new long[WRITE_COUNT_STRIPES];
 
-
-
 	//=========//
 	// lookups //
 	//=========//
@@ -78,8 +76,6 @@ public class FullDataLookupCache
 
 	//endregion
 
-
-
 	//=========//
 	// storing //
 	//=========//
@@ -126,8 +122,6 @@ public class FullDataLookupCache
 
 	//endregion
 
-
-
 	//==============//
 	// invalidation //
 	//==============//
@@ -155,8 +149,6 @@ public class FullDataLookupCache
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -175,11 +167,7 @@ public class FullDataLookupCache
 		}
 
 		long sizeInBytes() { return ENTRY_OVERHEAD_BYTES + ((this.generationSteps != null) ? this.generationSteps.length : 0); }
-
 	}
 
 	//endregion
-
-
-
 }

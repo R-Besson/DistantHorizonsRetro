@@ -40,7 +40,6 @@ public class LodUtil
 		ColorUtil.rgbToInt(255, 0, 255), ColorUtil.rgbToInt(255, 127, 255),
 		ColorUtil.rgbToInt(255, 255, 255)};
 
-
 	/** 512 blocks wide */
 	public static final byte REGION_DETAIL_LEVEL = 9;
 	/** 16 blocks wide */
@@ -61,7 +60,6 @@ public class LodUtil
 	 */
 	public static final short CHUNK_WIDTH = 16;
 
-
 	/** maximum possible light level handled by Minecraft */
 	public static final byte MAX_MC_LIGHT = 15;
 	/** lowest possible light level handled by Minecraft */
@@ -74,8 +72,6 @@ public class LodUtil
 
 	public static final double ROCKET_ELYTRA_SPEED_IN_BLOCKS_PER_SEC = 30.0;
 	public static final double MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC = 100.0;
-
-
 
 	//=========//
 	// methods //
@@ -96,7 +92,6 @@ public class LodUtil
 		{
 			super(message);
 		}
-
 	}
 
 	public static void assertTrue(boolean condition)
@@ -117,7 +112,4 @@ public class LodUtil
 	{
 		throw new AssertFailureException("Assert Not Reach failed:\n " + message);
 	}
-
-
-
 }

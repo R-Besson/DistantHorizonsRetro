@@ -48,8 +48,6 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	IDhApiTextureConfig texture();
 	IDhApiGenericRenderingConfig genericRendering();
 
-
-
 	//========================//
 	// basic graphic settings //
 	//========================//
@@ -74,8 +72,6 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * Changing this config also changes {@link IDhApiGraphicsConfig#renderingEnabled()}'s value.
 	 */
 	IDhApiConfigValue<EDhApiRendererMode> renderingMode();
-
-
 
 	//==================//
 	// graphic settings //
@@ -122,8 +118,6 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * ...							<br>
 	 */
 	IDhApiConfigValue<Integer> getBiomeBlending();
-
-
 
 	//===========================//
 	// advanced graphic settings //
@@ -199,5 +193,4 @@ public interface IDhApiGraphicsConfig extends IDhApiConfigGroup
 	 * @since API 2.0.0
 	 */
 	IDhApiConfigValue<Boolean> disableShadowFrustumCulling();
-
 }

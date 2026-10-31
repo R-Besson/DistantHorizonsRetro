@@ -52,8 +52,6 @@ public class DhDataInputStream extends DataInputStream
 
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -125,8 +123,6 @@ public class DhDataInputStream extends DataInputStream
 		}
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -159,7 +155,4 @@ public class DhDataInputStream extends DataInputStream
 			}
 		}
 	}
-
-
-
 }

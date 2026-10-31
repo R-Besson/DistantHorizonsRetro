@@ -32,12 +32,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-
 public final class ChunkGenEvent
 {
 
 	private static final AtomicInteger DEBUG_ID_REF = new AtomicInteger(0);
-
 
 	/** can be used for troubleshooting */
 	public final int id;
@@ -48,8 +46,6 @@ public final class ChunkGenEvent
 	public final EDhApiDistantGeneratorMode generatorMode;
 	public final CompletableFuture<Void> future;
 	public final Consumer<IChunkWrapper> resultConsumer;
-
-
 
 	//=============//
 	// constructor //
@@ -70,8 +66,6 @@ public final class ChunkGenEvent
 		this.future = new CompletableFuture<>();
 		this.resultConsumer = resultConsumer;
 	}
-
-
 
 	//=======//
 	// start //
@@ -163,15 +157,10 @@ public final class ChunkGenEvent
 		generationEvent.future.completeExceptionally(throwable);
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
 
 	@Override
 	public String toString() { return this.id + ":" + this.widthInChunks + "@" + this.minChunkPos + "(" + this.targetGenerationStep + ")"; }
-
-
-
 }

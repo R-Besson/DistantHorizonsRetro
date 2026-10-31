@@ -29,8 +29,6 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 	@Unique
 	private int[][] distanthorizons$spriteFrames;
 
-
-
 	//=====================//
 	// getters and setters //
 	//=====================//
@@ -107,7 +105,4 @@ public class MixinTextureAtlasSprite implements IMixinTextureAtlasSprite
 	}
 
 	//endregion
-
-
-
 }

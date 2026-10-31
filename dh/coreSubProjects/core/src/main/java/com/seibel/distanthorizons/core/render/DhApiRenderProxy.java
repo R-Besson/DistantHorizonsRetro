@@ -59,15 +59,11 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 		return renderApiDef;
 	}
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	private DhApiRenderProxy() { }
-
-
 
 	//=========//
 	// methods //
@@ -82,7 +78,6 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 		{
 			return DhApiResult.createFail("No world loaded");
 		}
-
 
 		// clear the render caches for each level
 		Iterable<? extends IDhLevel> loadedLevels = world.getAllLoadedLevels();
@@ -161,7 +156,6 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 		return apiDef.getDepthDirection();
 	}
 
-
 	public static int activeOpenGlDhDepthTextureId = -1;
 	@Override
 	public DhApiResult<Integer> getDhDepthTextureGlId()
@@ -181,7 +175,6 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 			? DhApiResult.createFail("DH's depth texture hasn't been created and/or bound yet.", null)
 			: DhApiResult.createSuccess(activeTexture);
 	}
-
 
 	public static int activeOpenGlDhColorTextureId = -1;
 	@Override
@@ -203,8 +196,6 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 			: DhApiResult.createSuccess(activeTexture);
 	}
 
-
-
 	public static int getDhBlockRatioAtlasTextureGlId = -1;
 	@Override
 	public DhApiResult<Integer> getDhBlockRatioAtlasTextureGlId()
@@ -225,8 +216,6 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 			: DhApiResult.createSuccess(activeTexture);
 	}
 
-
-
 	@Override
 	public void setDeferTransparentRendering(boolean deferTransparentRendering) { this.deferTransparentRendering = deferTransparentRendering; }
 	@Override
@@ -234,7 +223,4 @@ public class DhApiRenderProxy implements IDhApiRenderProxy
 
 	@Override
 	public float getNearClipPlaneDistanceInBlocks(float partialTicks) { return RenderUtil.getNearClipPlaneInBlocks(); }
-
-
-
 }

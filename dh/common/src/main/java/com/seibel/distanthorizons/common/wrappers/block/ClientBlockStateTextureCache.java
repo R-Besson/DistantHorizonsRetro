@@ -241,8 +241,6 @@ public class ClientBlockStateTextureCache
 
 	//endregion
 
-
-
 	//============//
 	// API events //
 	//============//
@@ -288,7 +286,6 @@ public class ClientBlockStateTextureCache
 		}
 		BlockStateWrapper newBlockState = (BlockStateWrapper) newApiBlockState;
 
-
 		BlockFaceTexture newFaceTexture = bakeFaceTexture(newBlockState, EDhDirection.fromApiVersion(newApiDirection));
 		for (int u = 0; u < TextureUtil.TEXTURE_WIDTH_AND_HEIGHT; u++)
 		{
@@ -306,8 +303,6 @@ public class ClientBlockStateTextureCache
 
 	//endregion
 
-
-
 	//================//
 	// texture baking //
 	//================//
@@ -316,7 +311,6 @@ public class ClientBlockStateTextureCache
 	private static BlockFaceTexture[] bakeAllFaceTextures(BlockStateWrapper blockStateWrapper)
 	{
 		BlockFaceTexture[] faceTextures = new BlockFaceTexture[FACE_DIRECTIONS.length];
-
 
 		// only render textures if requested
 		if (!blockStateWrapper.renderTexture())
@@ -328,7 +322,6 @@ public class ClientBlockStateTextureCache
 			}
 			return faceTextures;
 		}
-
 
 		try
 		{
@@ -373,8 +366,6 @@ public class ClientBlockStateTextureCache
 				faceTextures[faceIndex] = BlockFaceTexture.createErrorGridTexture();
 			}
 		}
-
-
 
 		return faceTextures;
 	}
@@ -495,7 +486,6 @@ public class ClientBlockStateTextureCache
 		}
 	}
 
-
 	/** Copies the given sprite, down-sampled to {@link #TEXTURE_WIDTH_AND_HEIGHT}. */
 	private static BlockFaceTexture bakeSpriteTexture(@Nullable TextureAtlasSprite sprite)
 	{
@@ -570,9 +560,5 @@ public class ClientBlockStateTextureCache
 		return TextureAtlasSpriteWrapper.resolveFaceSprite(blockStateWrapper.block, blockStateWrapper.meta, directionIndex);
 	}
 
-
 	//endregion
-
-
-
 }

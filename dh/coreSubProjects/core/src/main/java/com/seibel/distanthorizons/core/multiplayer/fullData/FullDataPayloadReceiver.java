@@ -68,5 +68,4 @@ public class FullDataPayloadReceiver implements AutoCloseable
 			this.buffersById.remove(payload.dtoBufferId);
 		}
 	}
-
 }

@@ -44,15 +44,12 @@ public class RayCastUtil
 		double squareMaxX = squareMinX + squareWidth;
 		double squareMaxY = squareMinY + squareWidth;
 
-
 		// check if the ray originates in the square
 		if (rayX >= squareMinX && rayX <= squareMaxX &&
 			rayY >= squareMinY && rayY <= squareMaxY)
 		{
 			return true;
 		}
-
-
 
 		if (isRoughly(rayXDirection, 0, roundingValue) && isRoughly(rayYDirection, 0, roundingValue))
 		{
@@ -109,11 +106,8 @@ public class RayCastUtil
 			squareMinY -= rayY;
 			squareMaxY -= rayY;
 
-
 			boolean intersectsX = false;
 			boolean intersectsY = false;
-
-
 
 			// ray Y intersect
 			// y = mx
@@ -136,7 +130,6 @@ public class RayCastUtil
 				intersectsY = true;
 			}
 
-
 			// ray X intersect
 			// x = y/m
 			double xIntersectMin = squareMinY / slope;
@@ -158,7 +151,6 @@ public class RayCastUtil
 				intersectsX = true;
 			}
 
-
 			// if the ray intersects both the top and side of the square, that means
 			// the ray intersects the square as a whole
 			return intersectsX && intersectsY;
@@ -166,6 +158,4 @@ public class RayCastUtil
 	}
 	/** used to get around floating point number rounding errors */
 	private static boolean isRoughly(double input, double equalsVal, double errorValue) { return input >= equalsVal - errorValue && input <= equalsVal + errorValue; }
-
-
 }

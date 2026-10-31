@@ -24,7 +24,6 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 
 	public final GlAbstractVertexAttribute va;
 
-
 	// shader uniforms
 	private final int directShaderTransformUniform;
 	private final int directShaderColorUniform;
@@ -45,8 +44,6 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 	private final int westShadingUniform;
 	private final int topShadingUniform;
 	private final int bottomShadingUniform;
-
-
 
 	//=============//
 	// constructor //
@@ -84,10 +81,7 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 		this.westShadingUniform = this.getUniformLocation("uWestShading");
 		this.topShadingUniform = this.getUniformLocation("uTopShading");
 		this.bottomShadingUniform = this.getUniformLocation("uBottomShading");
-
 	}
-
-
 
 	//=========//
 	// methods //
@@ -128,9 +122,6 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 
 		super.bind();
 
-
-
-
 		this.setUniform(this.instancedShaderOffsetChunkUniform,
 			new DhApiVec3i(
 				LodUtil.getChunkPosFromDouble(boxGroup.getOriginBlockPos().x),
@@ -163,17 +154,13 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 		this.setUniform(this.skyLightUniform, boxGroup.getSkyLight());
 		this.setUniform(this.blockLightUniform, boxGroup.getBlockLight());
 
-
 		this.setUniform(this.northShadingUniform, shading.north);
 		this.setUniform(this.southShadingUniform, shading.south);
 		this.setUniform(this.eastShadingUniform, shading.east);
 		this.setUniform(this.westShadingUniform, shading.west);
 		this.setUniform(this.topShadingUniform, shading.top);
 		this.setUniform(this.bottomShadingUniform, shading.bottom);
-
-
 	}
-
 
 	@Override
 	public void fillSharedDirectUniformData(
@@ -186,14 +173,12 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 		this.setUniform(this.skyLightUniform, boxGroup.getSkyLight());
 		this.setUniform(this.blockLightUniform, boxGroup.getBlockLight());
 
-
 		this.setUniform(this.northShadingUniform, shading.north);
 		this.setUniform(this.southShadingUniform, shading.south);
 		this.setUniform(this.eastShadingUniform, shading.east);
 		this.setUniform(this.westShadingUniform, shading.west);
 		this.setUniform(this.topShadingUniform, shading.top);
 		this.setUniform(this.bottomShadingUniform, shading.bottom);
-
 	}
 
 	public void fillDirectUniformData(
@@ -216,10 +201,7 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 		this.setUniform(this.directShaderTransformUniform, projectionMvmMatrix);
 
 		this.setUniform(this.directShaderColorUniform, box.color);
-
 	}
-
-
 
 	@Override
 	public int getId() { return this.id; }
@@ -227,5 +209,4 @@ public class GlGenericObjectShaderProgram extends GlShaderProgram implements IDh
 	/** The base DH render program should always render */
 	@Override
 	public boolean overrideThisFrame() { return true; }
-
 }

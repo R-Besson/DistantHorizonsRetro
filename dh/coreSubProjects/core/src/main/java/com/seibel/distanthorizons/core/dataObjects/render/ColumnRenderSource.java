@@ -53,8 +53,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Render Source");
 
-
-
 	/**
 	 * will be zero if an empty data source was created
 	 *
@@ -90,8 +88,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 
 	/** the relative columns this source holds (max exclusive), see {@link #createEmptyPartial} */
 	public final int minX, maxX, minZ, maxZ;
-
-
 
 	//==============//
 	// constructors //
@@ -165,8 +161,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 
 	//endregion
 
-
-
 	//========================//
 	// datapoint manipulation //
 	//========================//
@@ -203,8 +197,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// texture handling //
@@ -273,8 +265,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 
 	//endregion
 
-
-
 	//=====================//
 	// data helper methods //
 	//=====================//
@@ -296,8 +286,6 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// base methods //
@@ -332,7 +320,4 @@ public class ColumnRenderSource extends AbstractPhantomArrayList
 	}
 
 	//endregion
-
-
-
 }

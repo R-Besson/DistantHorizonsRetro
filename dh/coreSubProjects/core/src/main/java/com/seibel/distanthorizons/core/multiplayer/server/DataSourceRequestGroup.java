@@ -37,7 +37,6 @@ class DataSourceRequestGroup
 	public final Semaphore pendingAdditionSemaphore = new Semaphore(Short.MAX_VALUE, true);
 	public final AtomicBoolean isClosed = new AtomicBoolean();
 
-
 	DataSourceRequestGroup(long pos)
 	{
 		this.pos = pos;
@@ -67,7 +66,6 @@ class DataSourceRequestGroup
 		return true;
 	}
 
-
 	public RequestData tryRemoveRequest(long requestId, IHangingRequestTransferConsumer hangingRequestTransferConsumer)
 	{
 		RequestData removed = this.requestMessages.remove(requestId);
@@ -79,7 +77,6 @@ class DataSourceRequestGroup
 
 		return removed;
 	}
-
 
 	static class RequestData
 	{
@@ -96,7 +93,6 @@ class DataSourceRequestGroup
 			this.rateLimiterSet = rateLimiterSet;
 			this.message = message;
 		}
-
 	}
 
 	/**
@@ -105,5 +101,4 @@ class DataSourceRequestGroup
 	 */
 	@FunctionalInterface
 	interface IHangingRequestTransferConsumer extends Consumer<Collection<RequestData>> { }
-
 }

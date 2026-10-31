@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.core.config.types;
 
-
 import com.seibel.distanthorizons.core.config.ConfigHandler;
 import com.seibel.distanthorizons.core.config.file.ConfigFileHandler;
 import com.seibel.distanthorizons.core.config.listeners.ConfigChangeListener;
@@ -74,8 +73,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	@Nullable
 	private T mcVersionOverrideValue;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -102,8 +99,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 
 	//endregion
 
-
-
 	//==========================//
 	// property getters/setters //
 	//==========================//
@@ -127,8 +122,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	public T getMax() { return this.max; }
 
 	//endregion
-
-
 
 	//===============//
 	// value setters //
@@ -228,8 +221,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	}
 	//endregion
 
-
-
 	//===============//
 	// value getters //
 	//===============//
@@ -264,8 +255,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 
 	//endregion
 
-
-
 	//===========//
 	// listeners //
 	//===========//
@@ -294,8 +283,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		}
 	}
 	//endregion
-
-
 
 	//====================//
 	// min/max validation //
@@ -351,8 +338,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 
 	//endregion
 
-
-
 	//===============//
 	// file handling //
 	//===============//
@@ -363,8 +348,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -374,8 +357,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	public String toString() { return this.name + ": [" + this.get() + "]"; }
 
 	//endregion
-
-
 
 	//=========//
 	// builder //
@@ -390,8 +371,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 		protected String tmpChatCommandName = null;
 		protected IShowEnumOptionFunc tmpShowEnumOptionFunc = null;
 		protected ArrayList<IConfigListener> tmpIConfigListener = new ArrayList<>();
-
-
 
 		public Builder<T> comment(String newComment)
 		{
@@ -431,8 +410,6 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 			return this;
 		}
 
-
-
 		// build //
 
 		public ConfigEntry<T> build()
@@ -446,11 +423,9 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 				tmpUseApiOverwrite,
 				this.tmpIConfigListener);
 		}
-
 	}
 
 	//endregion
-
 
 	//================//
 	// helper classes //
@@ -461,10 +436,7 @@ public class ConfigEntry<T> extends AbstractConfigBase<T>
 	public interface IShowEnumOptionFunc
 	{
 		boolean shouldShowEnum(Enum<?> enumValue);
-
 	}
 
 	//endregion
-
-
 }

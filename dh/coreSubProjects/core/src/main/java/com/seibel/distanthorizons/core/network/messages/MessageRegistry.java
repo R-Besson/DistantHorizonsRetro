@@ -47,8 +47,6 @@ public class MessageRegistry
 	private final Map<Integer, Supplier<? extends AbstractNetworkMessage>> messageConstructorById = new HashMap<>();
 	private final BiMap<Class<? extends AbstractNetworkMessage>, Integer> messageClassById = HashBiMap.create();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -83,8 +81,6 @@ public class MessageRegistry
 		}
 	}
 
-
-
 	//==================//
 	// message handling //
 	//==================//
@@ -109,8 +105,6 @@ public class MessageRegistry
 		}
 	}
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -127,5 +121,4 @@ public class MessageRegistry
 			throw new IllegalArgumentException("Message does not have ID assigned to it: [" + messageClass.getSimpleName() + "].");
 		}
 	}
-
 }

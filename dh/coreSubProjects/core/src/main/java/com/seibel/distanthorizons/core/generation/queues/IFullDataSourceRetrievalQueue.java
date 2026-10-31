@@ -67,8 +67,6 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 
 	//endregion
 
-
-
 	//=======//
 	// setup //
 	//=======//
@@ -85,8 +83,6 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	void startAndSetTargetPos(DhBlockPos2D targetPos);
 
 	//endregion
-
-
 
 	//===============//
 	// task handling //
@@ -132,8 +128,6 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 
 	//endregion
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -146,8 +140,6 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	void close();
 
 	//endregion
-
-
 
 	//===============//
 	// debug display //
@@ -172,7 +164,4 @@ public interface IFullDataSourceRetrievalQueue extends Closeable
 	RollingAverage getRollingAverageChunkGenTimeInMs();
 
 	//endregion
-
-
-
 }

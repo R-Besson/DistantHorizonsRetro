@@ -44,7 +44,6 @@ public class ConfigFileHandler
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
 	public final Path configPath;
 
 	/** This is the object for night-config */
@@ -52,8 +51,6 @@ public class ConfigFileHandler
 
 	/** prevents readers/writers from overlapping and causing the config file from being duplicated or corrupted */
 	private final ReentrantLock readWriteLock = new ReentrantLock();
-
-
 
 	//=============//
 	// constructor //
@@ -71,8 +68,6 @@ public class ConfigFileHandler
 			.build();
 	}
 
-
-
 	//====================//
 	// entire config file //
 	//====================//
@@ -86,16 +81,12 @@ public class ConfigFileHandler
 		{
 			this.readWriteLock.lock();
 
-
-
 			if (!Files.exists(this.configPath)) // Try to check if the config exists
 			{
 				reCreateFile(this.configPath);
 			}
 
-
 			this.loadNightConfig(nightConfig);
-
 
 			for (AbstractConfigBase<?> entry : ConfigHandler.INSTANCE.configBaseList)
 			{
@@ -106,7 +97,6 @@ public class ConfigFileHandler
 				}
 			}
 
-
 			try
 			{
 				nightConfig.save();
@@ -116,7 +106,6 @@ public class ConfigFileHandler
 				// If it fails to save, crash game
 				SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class).crashMinecraft("Failed to save config at [" + this.configPath + "]", e);
 			}
-
 		}
 		finally
 		{
@@ -196,7 +185,6 @@ public class ConfigFileHandler
 			reCreateFile(this.configPath);
 		}
 
-
 		// Load all the entries
 		for (AbstractConfigBase<?> entry : ConfigHandler.INSTANCE.configBaseList)
 		{
@@ -208,7 +196,6 @@ public class ConfigFileHandler
 			}
 		}
 
-
 		try
 		{
 			nightConfig.save();
@@ -219,8 +206,6 @@ public class ConfigFileHandler
 			SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class).crashMinecraft("Failed to save config at [" + this.configPath + "]", e);
 		}
 	}
-
-
 
 	//=======================//
 	// single config entries //
@@ -262,7 +247,6 @@ public class ConfigFileHandler
 			this.saveEntry(entry, nightConfig);
 			return;
 		}
-
 
 		try
 		{
@@ -307,16 +291,12 @@ public class ConfigFileHandler
 			return;
 		}
 
-
-
 		String comment = entry.getComment().replace("\n", "\n ").trim();
 		// the new line makes it easier to read and separate configs
 		// the space makes sure the first word of a comment isn't directly in line with the "#"
 		comment = "\n " + comment;
 		nightConfig.setComment(entry.getNameAndCategory(), comment);
 	}
-
-
 
 	//=============//
 	// nightconfig //
@@ -357,8 +337,6 @@ public class ConfigFileHandler
 		}
 	}
 
-
-
 	//===============//
 	// file handling //
 	//===============//
@@ -380,7 +358,4 @@ public class ConfigFileHandler
 			LOGGER.error("Unable to recreate config file, error: [" + e.getMessage() + "].", e);
 		}
 	}
-
-
-
 }

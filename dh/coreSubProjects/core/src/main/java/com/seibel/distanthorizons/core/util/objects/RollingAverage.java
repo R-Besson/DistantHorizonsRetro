@@ -19,8 +19,6 @@ public class RollingAverage
 	/** how many items have been added to this average over its lifetime */
 	private long lifetimeCount = 0;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -38,8 +36,6 @@ public class RollingAverage
 	}
 
 	//endregion
-
-
 
 	//=======//
 	// input //
@@ -72,8 +68,6 @@ public class RollingAverage
 
 	//endregion
 
-
-
 	//========//
 	// output //
 	//========//
@@ -100,8 +94,6 @@ public class RollingAverage
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -111,7 +103,5 @@ public class RollingAverage
 	public String toString() { return "avg: [" + this.getAverageRoundedString() + "], count: [" + this.currentSize + "], max count: [" + this.maxSize + "]."; }
 
 	//endregion
-
-
 }
 

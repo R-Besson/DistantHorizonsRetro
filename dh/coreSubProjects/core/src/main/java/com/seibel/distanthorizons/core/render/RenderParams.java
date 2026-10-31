@@ -33,7 +33,6 @@ public class RenderParams extends DhApiRenderParam
 	 */
 	public final DhApiRenderParam apiCopy = new DhApiRenderParam();
 
-
 	public IDhClientWorld dhClientWorld;
 	public IDhClientLevel dhClientLevel;
 	/** more specific override of the API value {@link DhApiRenderParam#clientLevelWrapper} */
@@ -46,8 +45,6 @@ public class RenderParams extends DhApiRenderParam
 	public boolean vanillaFogEnabled;
 
 	public boolean hasBeenValidated = false;
-
-
 
 	//=============//
 	// constructor //
@@ -66,8 +63,6 @@ public class RenderParams extends DhApiRenderParam
 			this.dhProjectionMatrix, this.dhModelViewMatrix,
 			renderState.clientLevelWrapper.getMinHeight(),
 			renderState.clientLevelWrapper);
-
-
 
 		this.clientLevelWrapper = renderState.clientLevelWrapper;
 
@@ -96,8 +91,6 @@ public class RenderParams extends DhApiRenderParam
 
 	//endregion
 
-
-
 	//======================//
 	// parameter validation //
 	//======================//
@@ -113,7 +106,6 @@ public class RenderParams extends DhApiRenderParam
 		// Note: all strings here should be constants to prevent String allocations
 
 		this.hasBeenValidated = true;
-
 
 		if (!MC_CLIENT.playerExists())
 		{
@@ -164,12 +156,8 @@ public class RenderParams extends DhApiRenderParam
 		// projection matrix not checked since there are some MC versions where
 		// the MVM and projection matrices are pre-multiplied together
 
-
 		return null;
 	}
 
 	//endregion
-
-
-
 }

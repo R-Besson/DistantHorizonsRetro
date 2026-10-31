@@ -47,16 +47,12 @@ public abstract class DhApiBlockTextureOverrideEvent implements IDhApiEvent<DhAp
 {
 	public abstract void onBlockTextureOverridden(DhApiEventParam<EventParam> event);
 
-
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> event) { this.onBlockTextureOverridden(event); }
-
-
 
 	//==================//
 	// parameter object //
@@ -73,8 +69,6 @@ public abstract class DhApiBlockTextureOverrideEvent implements IDhApiEvent<DhAp
 		 * Indexed via {@link TextureUtil#getPixelIndex(int, int)} where (0,0) is the face's top left pixel.
 		 */
 		private final int[] argbPixels = new int[TextureUtil.TEXTURE_WIDTH_AND_HEIGHT * TextureUtil.TEXTURE_WIDTH_AND_HEIGHT];
-
-
 
 		//=============//
 		// constructor //
@@ -95,15 +89,12 @@ public abstract class DhApiBlockTextureOverrideEvent implements IDhApiEvent<DhAp
 				this.argbPixels, 0,
 				this.argbPixels.length);
 
-
 			this.blockStateWrapper = blockStateWrapper;
 			this.faceDirection = faceDirection;
 			this.textureRegenFunc = textureRegenFunc;
 		}
 
 		//endregion
-
-
 
 		//=================//
 		// getters/setters //
@@ -160,8 +151,6 @@ public abstract class DhApiBlockTextureOverrideEvent implements IDhApiEvent<DhAp
 
 		//endregion
 
-
-
 		//================//
 		// helper methods //
 		//================//
@@ -172,12 +161,9 @@ public abstract class DhApiBlockTextureOverrideEvent implements IDhApiEvent<DhAp
 		public interface ITextureRegenFunc
 		{
 			void regenTextureFromBlock(EventParam eventParam, IDhApiBlockStateWrapper newApiBlockState, EDhApiDirection newApiDirection);
-
 		}
 
 		//endregion
-
-
 
 		//==========================//
 		// base api event overrides //
@@ -198,9 +184,5 @@ public abstract class DhApiBlockTextureOverrideEvent implements IDhApiEvent<DhAp
 		public boolean getCopyBeforeFire() { return false; }
 
 		//endregion
-
-
-
 	}
-
 }

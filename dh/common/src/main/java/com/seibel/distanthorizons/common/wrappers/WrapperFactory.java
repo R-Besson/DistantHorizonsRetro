@@ -62,8 +62,6 @@ public class WrapperFactory implements IWrapperFactory
 {
 	public static final WrapperFactory INSTANCE = new WrapperFactory();
 
-
-
 	//=====================//
 	// internal properties //
 	//=====================//
@@ -83,8 +81,6 @@ public class WrapperFactory implements IWrapperFactory
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// core methods //
@@ -158,7 +154,6 @@ public class WrapperFactory implements IWrapperFactory
 	@Override
 	public void resetCachedIgnoredBlocksSets() { BlockStateWrapper.clearCachedIgnoreBlocks(); }
 
-
 	/**
 	 * Note: when this is updated, make sure you also update the documentation in
 	 * {@link IDhApiWorldGenerator#generateChunks} and the type list in {@link WrapperFactory#createChunkWrapperErrorMessage}. <br><br>
@@ -189,7 +184,6 @@ public class WrapperFactory implements IWrapperFactory
 			throw new ClassCastException(createChunkWrapperErrorMessage(objectArray));
 		}
 
-
 		// correct number of parameters from the API
 
 		//=======//
@@ -206,8 +200,6 @@ public class WrapperFactory implements IWrapperFactory
 
 		//endregion
 
-
-
 		//=======//
 		// level //
 		//=======//
@@ -221,8 +213,6 @@ public class WrapperFactory implements IWrapperFactory
 		World level = (World) objectArray[1];
 
 		//endregion
-
-
 
 		//===============//
 		// level wrapper //
@@ -241,8 +231,6 @@ public class WrapperFactory implements IWrapperFactory
 
 		//endregion
 
-
-
 		return new ChunkWrapper(chunk, levelWrapper);
 	}
 	/**
@@ -260,15 +248,12 @@ public class WrapperFactory implements IWrapperFactory
 		return createWrapperErrorMessage("Chunk wrapper", expectedClassNames, objectArray);
 	}
 
-
 	@Override public IVertexBufferWrapper createVboWrapper() { return this.getRenderDefinition().createVboWrapper(); }
 	@Override public ILodContainerUniformBufferWrapper createLodContainerUniformWrapper() { return this.getRenderDefinition().createLodContainerUniformWrapper(); }
 	@Override public IDhGenericObjectVertexBufferContainer createGenericObjectVboContainer() { return this.getRenderDefinition().createGenericVboContainer(); }
 	@Override public IDhGenericRenderer createGenericRenderer() { return this.getRenderDefinition().createGenericRenderer(); }
 
 	//endregion
-
-
 
 	//=============//
 	// api methods //
@@ -285,8 +270,6 @@ public class WrapperFactory implements IWrapperFactory
 			throw new ClassCastException("Invalid [" + IDhApiLevelWrapper.class.getSimpleName() + "] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type [" + ILevelWrapper.class.getName() + "].");
 		}
 		ILevelWrapper coreLevelWrapper = (ILevelWrapper) levelWrapper;
-
-
 
 		if (objectArray.length != 1)
 		{
@@ -320,8 +303,6 @@ public class WrapperFactory implements IWrapperFactory
 			throw new ClassCastException("Invalid [" + IDhApiLevelWrapper.class.getSimpleName() + "] value given. Level wrapper object must be one given by the DH API (it can't be a custom implementation), specifically of type [" + ILevelWrapper.class.getName() + "].");
 		}
 
-
-
 		// [block, meta] is what IDhApiBlockStateWrapper.getWrappedMcObject() returns,
 		// the old [block, meta, blockId] is still accepted, the ID comes from the block
 		boolean blockClassCorrect = (objectArray.length == 2 || objectArray.length == 3)
@@ -348,8 +329,6 @@ public class WrapperFactory implements IWrapperFactory
 
 	//endregion
 
-
-
 	//================//
 	// helper methods //
 	//================//
@@ -362,13 +341,11 @@ public class WrapperFactory implements IWrapperFactory
 			wrapperName + " creation failed. \n" +
 				"Expected object array parameters: \n");
 
-
 		// expected parameters
 		for (String expectedClassName : expectedClassNames)
 		{
 			message.append("[").append(expectedClassName).append("], \n");
 		}
-
 
 		// given parameters
 		if (objectArray.length != 0)
@@ -385,12 +362,8 @@ public class WrapperFactory implements IWrapperFactory
 			message.append(" No parameters given.");
 		}
 
-
 		return message.toString();
 	}
 
 	//endregion
-
-
-
 }

@@ -55,7 +55,6 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 		}
 	}
 
-
 	@Override
 	public String getTableName() { return "TestCompound"; }
 	@Override
@@ -67,8 +66,6 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 		statement.setInt(index++, pos.getX());
 		statement.setInt(index, pos.getZ());
 	}
-
-
 
 	@Override
 	@Nullable
@@ -99,7 +96,4 @@ public class TestCompoundKeyRepo extends AbstractDhRepo<DhChunkPos, TestCompound
 
 		return statement;
 	}
-
-
-
 }

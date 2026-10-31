@@ -86,7 +86,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	 */
 	public static final boolean RENDER_DEBUG_OBJECTS = false;
 
-
 	// rendering setup
 	private boolean init = false;
 
@@ -99,11 +98,7 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	private boolean vertexAttribDivisorSupported;
 	private boolean instancedArraysSupported;
 
-
-
 	private final ConcurrentHashMap<Long, RenderableBoxGroup> boxGroupById = new ConcurrentHashMap<>();
-
-
 
 	/** A box from 0,0,0 to 1,1,1 */
 	private static final float[] BOX_VERTICES = {
@@ -145,7 +140,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		//endregion
 	};
 
-
 	private static final int[] BOX_INDICES = {
 		//region
 		// min X, vertical face
@@ -171,8 +165,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		//endregion
 	};
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -187,8 +179,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			return;
 		}
 		this.init = true;
-
-
 
 		//===================================//
 		// is instanced rendering available? //
@@ -213,8 +203,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		{
 			LOGGER.warn("Instanced rendering not supported by this GPU, falling back to direct rendering. Generic object rendering will be slow and some effects may be disabled.");
 		}
-
-
 
 		//======================//
 		// startup the renderer //
@@ -254,7 +242,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	{
 		GenericRenderObjectFactory factory = GenericRenderObjectFactory.INSTANCE;
 
-
 		// single giant box
 		IDhApiRenderableBoxGroup singleGiantBoxGroup = factory.createForSingleBox(
 			ModInfo.NAME + ":CyanChunkBox",
@@ -267,7 +254,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		singleGiantBoxGroup.setBlockLight(LodUtil.MAX_MC_LIGHT);
 		this.add(singleGiantBoxGroup);
 
-
 		// single slender box
 		IDhApiRenderableBoxGroup singleTallBoxGroup = factory.createForSingleBox(
 			ModInfo.NAME + ":GreenBeacon",
@@ -279,7 +265,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		singleTallBoxGroup.setSkyLight(LodUtil.MAX_MC_LIGHT);
 		singleTallBoxGroup.setBlockLight(LodUtil.MAX_MC_LIGHT);
 		this.add(singleTallBoxGroup);
-
 
 		// absolute box group
 		ArrayList<DhApiRenderableBox> absBoxList = new ArrayList<>();
@@ -294,7 +279,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 		}
 		IDhApiRenderableBoxGroup absolutePosBoxGroup = factory.createAbsolutePositionedGroup(ModInfo.NAME + ":OrangeStairs", absBoxList);
 		this.add(absolutePosBoxGroup);
-
 
 		// relative box group
 		ArrayList<DhApiRenderableBox> relBoxList = new ArrayList<>();
@@ -319,7 +303,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			relativePosBoxGroup.setOriginBlockPos(pos);
 		});
 		this.add(relativePosBoxGroup);
-
 
 		// massive relative box group
 		ArrayList<DhApiRenderableBox> massRelBoxList = new ArrayList<>();
@@ -359,8 +342,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 
 	//endregion
 
-
-
 	//==============//
 	// registration //
 	//==============//
@@ -380,7 +361,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			boxGroup.triggerBoxChange();
 		}
 
-
 		long id = boxGroup.getId();
 		if (this.boxGroupById.containsKey(id))
 		{
@@ -394,8 +374,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	public IDhApiRenderableBoxGroup remove(long id) { return this.boxGroupById.remove(id); }
 
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -416,8 +394,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			return;
 		}
 
-
-
 		// render setup //
 		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("setup"))
 		{
@@ -425,7 +401,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			this.init();
 
 			ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeGenericRenderSetupEvent.class, renderEventParam.apiCopy);
-
 
 			boolean renderWireframe = Config.Client.Advanced.Debugging.renderWireframe.get();
 			if (renderWireframe)
@@ -454,8 +429,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			shaderProgram.bindVertexBuffer(this.boxVertexBuffer.getId());
 
 			this.boxIndexBuffer.bind();
-
-
 
 			// rendering //
 
@@ -505,8 +478,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 					}
 				}
 
-
-
 				// render //
 
 				profiler.popPush("rendering");
@@ -525,8 +496,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 
 				boxGroup.postRender(renderEventParam);
 			}
-
-
 
 			//==========//
 			// clean up //
@@ -555,8 +524,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 
 	//endregion
 
-
-
 	//=====================//
 	// instanced rendering //
 	//=====================//
@@ -582,8 +549,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 				renderEventParam,
 				shading, boxGroup,
 				camPos);
-
-
 
 			// Bind instance data //
 			profiler.popPush("binding");
@@ -615,14 +580,12 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			this.vertexAttribDivisor(5, 1);
 			LWJGL.glVertexAttribIPointer(5, 1, GL11.GL_BYTE, Byte.BYTES, 0);
 
-
 			// Draw instanced
 			profiler.popPush("render");
 			if (container.uploadedBoxCount > 0)
 			{
 				LWJGL.glDrawElementsInstanced(GL11.GL_TRIANGLES, BOX_INDICES.length, GL11.GL_UNSIGNED_INT, 0, container.uploadedBoxCount);
 			}
-
 
 			// Clean up
 			profiler.popPush("cleanup");
@@ -655,8 +618,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// direct rendering //
@@ -704,8 +665,6 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 
 	//endregion
 
-
-
 	//=========//
 	// F3 menu //
 	//=========//
@@ -731,14 +690,11 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 			totalBoxCount += renderGroup.size();
 		}
 
-
 		return "Generic Obj #: " + F3Screen.NUMBER_FORMAT.format(activeGroupCount) + "/" + F3Screen.NUMBER_FORMAT.format(totalGroupCount) + ", " +
 			"Cube #: " + F3Screen.NUMBER_FORMAT.format(activeBoxCount) + "/" + F3Screen.NUMBER_FORMAT.format(totalBoxCount);
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -760,7 +716,4 @@ public class GlGenericObjectRenderer implements IDhGenericRenderer
 	}
 
 	//endregion
-
-
-
 }

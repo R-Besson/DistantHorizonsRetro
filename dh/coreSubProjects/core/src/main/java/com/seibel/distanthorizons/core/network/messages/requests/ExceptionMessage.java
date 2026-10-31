@@ -43,16 +43,12 @@ public class ExceptionMessage extends AbstractTrackableMessage
 
 	public Exception exception;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
 
 	public ExceptionMessage() { }
 	public ExceptionMessage(Exception exception) { this.exception = exception; }
-
-
 
 	//===============//
 	// serialization //
@@ -73,8 +69,6 @@ public class ExceptionMessage extends AbstractTrackableMessage
 		this.exception = EXCEPTION_LIST.get(id).getDeclaredConstructor(String.class).newInstance(message);
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -85,5 +79,4 @@ public class ExceptionMessage extends AbstractTrackableMessage
 		return super.toStringHelper()
 			.add("exception", this.exception);
 	}
-
 }

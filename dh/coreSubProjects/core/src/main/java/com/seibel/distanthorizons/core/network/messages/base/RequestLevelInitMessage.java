@@ -28,16 +28,12 @@ public class RequestLevelInitMessage extends AbstractNetworkMessage
 {
 	public String dimensionResourceLocation;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	public RequestLevelInitMessage() { }
 	public RequestLevelInitMessage(String dimensionResourceLocation) { this.dimensionResourceLocation = dimensionResourceLocation; }
-
-
 
 	//===============//
 	// serialization //
@@ -49,8 +45,6 @@ public class RequestLevelInitMessage extends AbstractNetworkMessage
 	@Override
 	public void decode(ByteBuf in) { this.dimensionResourceLocation = this.readString(in); }
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -61,5 +55,4 @@ public class RequestLevelInitMessage extends AbstractNetworkMessage
 		return super.toStringHelper()
 			.add("dimensionResourceLocation", this.dimensionResourceLocation);
 	}
-
 }

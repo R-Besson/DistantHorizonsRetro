@@ -15,8 +15,6 @@ public class UnsynchronizedByteArrayOutputStream extends ByteArrayOutputStream
 {
 	public UnsynchronizedByteArrayOutputStream(int initialCapacity) { super(Math.max(initialCapacity, 32)); }
 
-
-
 	@Override
 	public void write(int b)
 	{
@@ -48,5 +46,4 @@ public class UnsynchronizedByteArrayOutputStream extends ByteArrayOutputStream
 
 	/** appends the written bytes to {@code output} without the extra copy {@link #toByteArray()} makes */
 	public void appendTo(ByteArrayList output) { output.addElements(output.size(), this.buf, 0, this.count); }
-
 }

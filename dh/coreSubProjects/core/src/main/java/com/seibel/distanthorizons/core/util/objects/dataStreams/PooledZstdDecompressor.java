@@ -13,8 +13,6 @@ public class PooledZstdDecompressor
 	/** reuse the ZStd native context for a minor speed improvement */
 	private static final ConcurrentLinkedQueue<ZstdDecompressCtx> ZSTD_CONTEXT_CACHE = new ConcurrentLinkedQueue<>();
 
-
-
 	/**
 	 * Replaces {@link Zstd#decompress} so we can use a pooled byte array
 	 * which significantly reduces GC pressure.
@@ -61,5 +59,4 @@ public class PooledZstdDecompressor
 
 		return destination;
 	}
-
 }

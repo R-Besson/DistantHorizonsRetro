@@ -42,8 +42,6 @@ public class MixinOptionsScreen extends GuiScreen
 
 	private static final int button_id = 99;
 
-
-
 	@Inject(at = @At("HEAD"), method = "initGui")
 	private void lodconfig$init(CallbackInfo ci)
 	{
@@ -75,7 +73,6 @@ public class MixinOptionsScreen extends GuiScreen
 		}
 	}
 
-
 	@Inject(at = @At("HEAD"), method = "actionPerformed", cancellable = true)
 	private void lodconfig$actionPerformed(GuiButton button, CallbackInfo ci)
 	{
@@ -85,5 +82,4 @@ public class MixinOptionsScreen extends GuiScreen
 			ci.cancel();
 		}
 	}
-
 }

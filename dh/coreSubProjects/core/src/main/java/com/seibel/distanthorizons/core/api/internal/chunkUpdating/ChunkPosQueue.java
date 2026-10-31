@@ -15,8 +15,6 @@ public class ChunkPosQueue
 
 	private DhChunkPos center;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -29,8 +27,6 @@ public class ChunkPosQueue
 		// defaulting to 0,0 is fine since it'll be updated once we start adding items
 		this.center = new DhChunkPos(0, 0);
 	}
-
-
 
 	//==============//
 	// list methods //
@@ -53,8 +49,6 @@ public class ChunkPosQueue
 	public int getQueuedCount() { return this.updateDataByChunkPos.size(); }
 
 	public boolean isEmpty() { return this.updateDataByChunkPos.isEmpty(); }
-
-
 
 	//==================//
 	// position methods //
@@ -151,6 +145,5 @@ public class ChunkPosQueue
 		this.compactIfTooStale();
 		return updateData;
 	}
-
 }
 

@@ -42,8 +42,6 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
-
 	public int fadeTexture;
 
 	public int readFramebuffer;
@@ -51,8 +49,6 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 
 	// uniforms
 	public int uFadeColorTextureUniform = -1;
-
-
 
 	//=============//
 	// constructor //
@@ -69,10 +65,7 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 
 		// uniform setup
 		this.uFadeColorTextureUniform = this.shader.getUniformLocation("uFadeColorTextureUniform");
-
 	}
-
-
 
 	//=============//
 	// render prep //
@@ -84,10 +77,7 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(this.fadeTexture);
 		LWJGL.glUniform1i(this.uFadeColorTextureUniform, 0);
-
 	}
-
-
 
 	//========//
 	// render //
@@ -103,7 +93,6 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
 
-
 		// apply the rendered Fade to Minecraft's framebuffer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, this.readFramebuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, this.drawFramebuffer);
@@ -111,9 +100,5 @@ public class GlDhFarFadeApplyShader extends GlAbstractShaderRenderer
 		GlScreenQuad.INSTANCE.render();
 
 		GLMC.enableDepthTest();
-
 	}
-
-
-
 }

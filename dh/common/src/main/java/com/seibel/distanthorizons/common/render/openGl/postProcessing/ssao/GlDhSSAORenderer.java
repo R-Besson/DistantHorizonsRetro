@@ -44,7 +44,6 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	private boolean init = false;
 
 	private int width = -1;
@@ -52,8 +51,6 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 	private int ssaoFramebuffer = -1;
 
 	private int ssaoTexture = -1;
-
-
 
 	//=============//
 	// constructor //
@@ -102,8 +99,6 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 		LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.ssaoTexture, 0);
 	}
 
-
-
 	//========//
 	// render //
 	//========//
@@ -137,7 +132,4 @@ public class GlDhSSAORenderer implements IDhSsaoRenderer
 	}
 
 	//endregion
-
-
-
 }

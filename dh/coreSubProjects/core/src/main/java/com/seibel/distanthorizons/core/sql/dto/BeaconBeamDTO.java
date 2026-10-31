@@ -32,8 +32,6 @@ public class BeaconBeamDTO implements IBaseDTO<DhBlockPos>, INetworkObject
 	public DhBlockPos blockPos;
 	public Color color;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -43,8 +41,6 @@ public class BeaconBeamDTO implements IBaseDTO<DhBlockPos>, INetworkObject
 		this.blockPos = blockPos;
 		this.color = color;
 	}
-
-
 
 	//=========//
 	// network //
@@ -63,7 +59,6 @@ public class BeaconBeamDTO implements IBaseDTO<DhBlockPos>, INetworkObject
 		this.blockPos = INetworkObject.decodeToInstance(new DhBlockPos(), in);
 		this.color = new Color(in.readInt());
 	}
-
 
 	//===========//
 	// overrides //
@@ -92,7 +87,4 @@ public class BeaconBeamDTO implements IBaseDTO<DhBlockPos>, INetworkObject
 
 	@Override
 	public String toString() { return this.blockPos + " " + this.color; }
-
-
-
 }

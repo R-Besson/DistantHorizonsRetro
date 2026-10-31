@@ -60,8 +60,6 @@ public class DependencySetup
 {
 	protected static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
-
 	public static void createSharedBindings()
 	{
 		SingletonInjector.INSTANCE.bind(ILangWrapper.class, LangWrapper.INSTANCE);
@@ -95,8 +93,6 @@ public class DependencySetup
 		}
 		renderingApiBindingsSet = true;
 
-
-
 		EDhApiRenderingEngine renderingApiEnum = Config.Client.Advanced.Graphics.Experimental.renderingEngine.get();
 		if (renderingApiEnum == EDhApiRenderingEngine.AUTO)
 		{
@@ -105,8 +101,6 @@ public class DependencySetup
 		}
 
 		LOGGER.info("Setting DH Rendering API to: [" + renderingApiEnum + "]...");
-
-
 
 		boolean validApi;
 		AbstractDhRenderApiDefinition renderDefinition;
@@ -127,7 +121,6 @@ public class DependencySetup
 			throw new IllegalStateException(message);
 		}
 
-
 		// crash if an invalid API is set
 		if (!validApi)
 		{
@@ -146,11 +139,7 @@ public class DependencySetup
 			throw new IllegalStateException(message);
 		}
 
-
 		renderDefinition.bindRenderers();
 		LOGGER.info("DH Rendering successfully bound to: [" + renderDefinition.getEngineName() + "]...");
 	}
-
-
-
 }

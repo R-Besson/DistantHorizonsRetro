@@ -42,8 +42,6 @@ public interface IChunkWrapper extends IBindable
 	/** useful for debugging, but can slow down chunk operations quite a bit due to being called every time. */
 	boolean RUN_RELATIVE_POS_INDEX_VALIDATION = ModInfo.IS_DEV_BUILD;
 
-
-
 	DhChunkPos getChunkPos();
 
 	/** inclusive (IE if returning -64 the min block can be placed at -64) */
@@ -79,7 +77,6 @@ public interface IChunkWrapper extends IBindable
 
 	boolean isDhBlockLightingCorrect();
 
-
 	int getDhSkyLight(int relX, int relY, int relZ);
 	void setDhSkyLight(int relX, int relY, int relZ, int lightValue);
 	void clearDhSkyLighting();
@@ -88,12 +85,10 @@ public interface IChunkWrapper extends IBindable
 	void setDhBlockLight(int relX, int relY, int relZ, int lightValue);
 	void clearDhBlockLighting();
 
-
 	/** Note: don't modify this array, it will only be generated once and then shared between uses */
 	ArrayList<DhBlockPos> getWorldBlockLightPosList();
 
 	String toString();
-
 
 	default IBlockStateWrapper getBlockState(DhBlockPos pos) { return this.getBlockState(pos.getX(), pos.getY(), pos.getZ()); }
 	IBlockStateWrapper getBlockState(int relX, int relY, int relZ);
@@ -109,7 +104,6 @@ public interface IChunkWrapper extends IBindable
 
 	IBiomeWrapper getBiome(int relX, int relZ);
 
-
 	//========================//
 	// default helper methods //
 	//========================//
@@ -121,7 +115,6 @@ public interface IChunkWrapper extends IBindable
 		{
 			return;
 		}
-
 
 		// +1 since LodDataBuilder adds +1 to all block lighting calculations, also done in the constructor
 		int minHeight = this.getInclusiveMinBuildHeight();
@@ -144,7 +137,6 @@ public interface IChunkWrapper extends IBindable
 		{
 			return;
 		}
-
 
 		if (x < 0 || x >= LodUtil.CHUNK_WIDTH
 			|| z < 0 || z >= LodUtil.CHUNK_WIDTH)
@@ -169,7 +161,6 @@ public interface IChunkWrapper extends IBindable
 		IMutableBlockPosWrapper mcBlockPos = this.getMutableBlockPosWrapper();
 
 		IBlockStateWrapper previousBlockState = null;
-
 
 		// most blocks (only some blocks are sampled since checking every block is a very slow operation)
 		for (int x = 0; x < LodUtil.CHUNK_WIDTH; x += 2)
@@ -223,7 +214,6 @@ public interface IChunkWrapper extends IBindable
 			hash = (hash * primeHeightMultiplier) + relPos.getY();
 		}
 
-
 		return hash;
 	}
 
@@ -241,7 +231,6 @@ public interface IChunkWrapper extends IBindable
 		{
 			DhBlockPos pos = blockPosList.get(i);
 			pos.mutateToChunkRelativePos(relPos);
-
 
 			IBlockStateWrapper block = this.getBlockState(relPos);
 			if (block.isBeaconBlock())
@@ -265,8 +254,6 @@ public interface IChunkWrapper extends IBindable
 	{
 		DhBlockPos beaconRelPos = beaconPos.createChunkRelativePos();
 		DhBlockPosMutable baseRelPos = new DhBlockPosMutable(0, beaconRelPos.getY() - 1, 0);
-
-
 
 		//===========================//
 		// check for the base blocks //
@@ -292,8 +279,6 @@ public interface IChunkWrapper extends IBindable
 				}
 			}
 		}
-
-
 
 		//=========================//
 		// get the beacon color    //
@@ -338,7 +323,4 @@ public interface IChunkWrapper extends IBindable
 	IChunkWrapper copy();
 	/** creates a copy with a different level wrapper reference */
 	IChunkWrapper copyWithLevel(ILevelWrapper levelWrapper);
-
-
-
 }

@@ -46,7 +46,6 @@ public interface IDhApiEvent<T> extends IBindable
 	 */
 	default boolean removeAfterFiring() { return false; }
 
-
 	//==========//
 	// internal //
 	//==========//
@@ -59,5 +58,4 @@ public interface IDhApiEvent<T> extends IBindable
 	 * @param input the parameter object passed in from the event source. Can be null.
 	 */
 	void fireEvent(DhApiEventParam<T> input);
-
 }

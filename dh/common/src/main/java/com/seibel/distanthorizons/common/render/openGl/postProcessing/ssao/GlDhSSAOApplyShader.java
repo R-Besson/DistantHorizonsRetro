@@ -50,7 +50,6 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
 	public int ssaoTexture;
 
 	// uniforms
@@ -61,8 +60,6 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 	public int uNearClipPlane;
 	public int uFarClipPlane;
 	public int uIsReverseZDepth;
-
-
 
 	//=============//
 	// constructor //
@@ -86,8 +83,6 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 		this.uFarClipPlane = this.shader.getUniformLocation("uFarClipPlane");
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
 	}
-
-
 
 	//=============//
 	// render prep //
@@ -128,8 +123,6 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 		LWJGL.glUniform1i(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 	}
 
-
-
 	//========//
 	// render //
 	//========//
@@ -150,10 +143,6 @@ public class GlDhSSAOApplyShader extends GlAbstractShaderRenderer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, GlDhSSAOShader.INSTANCE.frameBuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, GlDhMetaRenderer.INSTANCE.getActiveFramebufferId());
 
-
 		GlScreenQuad.INSTANCE.render();
 	}
-
-
-
 }

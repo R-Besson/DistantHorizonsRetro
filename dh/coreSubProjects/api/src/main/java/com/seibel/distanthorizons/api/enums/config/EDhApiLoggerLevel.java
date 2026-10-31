@@ -47,7 +47,4 @@ public enum EDhApiLoggerLevel
 
 	EDhApiLoggerLevel(Level level)
 	{ this.level = level; }
-
-
-
 }

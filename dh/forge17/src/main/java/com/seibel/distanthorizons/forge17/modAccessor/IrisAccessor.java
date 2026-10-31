@@ -29,7 +29,4 @@ public class IrisAccessor implements IIrisAccessor
 	{
 		return false;
 	}
-
-
-
 }

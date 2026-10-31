@@ -36,8 +36,6 @@ public class ConfigUiLinkedEntry extends AbstractConfigBase<AbstractConfigBase<?
 	public ConfigUiLinkedEntry(AbstractConfigBase<?> value)
 	{ super(EConfigEntryAppearance.ONLY_IN_GUI, value); }
 
-
-
 	//=========//
 	// setters //
 	//=========//
@@ -45,7 +43,4 @@ public class ConfigUiLinkedEntry extends AbstractConfigBase<AbstractConfigBase<?
 	/** Value shouldn't be changed after creation */
 	@Override
 	public void set(AbstractConfigBase<?> newValue) { }
-
-
-
 }

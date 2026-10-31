@@ -90,9 +90,7 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	 */
 	public static final byte LEAF_SECTION_DETAIL_LEVEL = DhSectionPos.SECTION_MINIMUM_DETAIL_LEVEL;
 
-
 	public final FullDataSourceV2Repo repo;
-
 
 	protected final AtomicBoolean isShutdownRef = new AtomicBoolean(false);
 	protected final File saveDir;
@@ -100,12 +98,9 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	protected final ILevelWrapper levelWrapper;
 	protected final String levelId;
 
-
 	protected final FullDataUpdaterV2 dataUpdater;
 	protected final FullDataUpdatePropagatorV2 updatePropagator;
 	protected final DataMigratorV1 dataMigratorV1;
-
-
 
 	//=============//
 	// constructor //
@@ -127,12 +122,9 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 		this.dataMigratorV1 = new DataMigratorV1(this.dataUpdater, this.level, this.levelId, this.saveDir);
 
 		DEBUG_WIREFRAME_RENDERER.register(this, Config.Client.Advanced.Debugging.DebugWireframe.showFullDataUpdateStatus);
-
 	}
 
 	//endregion
-
-
 
 	//=================//
 	// event listeners //
@@ -146,8 +138,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// DTO converters //
 	//================//
@@ -159,8 +149,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	{ return dto.createDataSource(this.level.getLevelWrapper(), direction); }
 
 	//endregion
-
-
 
 	//=========================//
 	// basic DataSource getter //
@@ -185,7 +173,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 		{
 			return CompletableFuture.completedFuture(null);
 		}
-
 
 		try
 		{
@@ -304,8 +291,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//=================//
 	// partial getters //
 	//=================//
@@ -369,8 +354,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//=======================//
 	// retrieval (world gen) //
 	//=======================//
@@ -433,8 +416,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//=============//
 	// data update //
 	//=============//
@@ -444,8 +425,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	{ return this.dataUpdater.updateDataSourceAsync(inputData); }
 
 	//endregion
-
-
 
 	//========================//
 	// multiplayer networking //
@@ -465,8 +444,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -478,8 +455,6 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// overrides //
@@ -510,7 +485,4 @@ public class FullDataSourceProviderV2 implements IDebugRenderable, AutoCloseable
 	}
 
 	//endregion
-
-
-
 }

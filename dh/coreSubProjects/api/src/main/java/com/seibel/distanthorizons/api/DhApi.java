@@ -83,8 +83,6 @@ public class DhApi
 	 */
 	public static String heyYou_YoureFinallyAwake() { return READ_ME; }
 
-
-
 	/**
 	 * <strong>WARNING:</strong>
 	 * All objects in this class will be null until after DH initializes for the first time. <br><br>
@@ -141,10 +139,7 @@ public class DhApi
 		 * @since API 3.0.0
 		 */
 		public static IDhApiCustomRenderObjectFactory customRenderObjectFactory = null;
-
 	}
-
-
 
 	//==================//
 	// always available //
@@ -172,7 +167,6 @@ public class DhApi
 	 * @since API 1.0.0
 	 */
 	public static final IOverrideInjector<IDhApiOverrideable> overrides = OverrideInjector.INSTANCE;
-
 
 	// getters //
 
@@ -217,7 +211,6 @@ public class DhApi
 	 */
 	public static int getNetworkProtocolVersion() { return ModInfo.PROTOCOL_VERSION; }
 
-
 	// methods //
 
 	/**
@@ -226,5 +219,4 @@ public class DhApi
 	 * @since API 2.0.0
 	 */
 	public static boolean isDhThread() { return Thread.currentThread().getName().startsWith(ModInfo.THREAD_NAME_PREFIX); }
-
 }

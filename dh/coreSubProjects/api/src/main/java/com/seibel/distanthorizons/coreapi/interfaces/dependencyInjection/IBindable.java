@@ -46,5 +46,4 @@ public interface IBindable
 	 * method doesn't have to be implemented and should always return true.
 	 */
 	default boolean getDelayedSetupComplete() { return true; }
-
 }

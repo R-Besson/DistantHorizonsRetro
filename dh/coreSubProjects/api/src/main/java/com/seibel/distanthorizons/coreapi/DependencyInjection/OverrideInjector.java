@@ -49,8 +49,6 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 	/** overrides can be bound by other mods while DH's threads are reading them */
 	private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -67,8 +65,6 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 	public OverrideInjector(String newCorePackagePath) { this.corePackagePath = newCorePackagePath; }
 
 	//endregion
-
-
 
 	//=========//
 	// binding //
@@ -88,7 +84,6 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 				overrideContainer = new OverridePriorityListContainer();
 				this.overrideContainerByInterface.put(dependencyInterface, overrideContainer);
 			}
-
 
 			// validate the new override //
 
@@ -117,7 +112,6 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 				// Iris can try to un-bind the wrong objects otherwise
 				overrideContainer.removeOverride(existingOverride);
 			}
-
 
 			// bind the override
 			overrideContainer.addOverride(dependencyImplementation);
@@ -166,8 +160,6 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -207,8 +199,6 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 
 	//endregion
 
-
-
 	//==========//
 	// clearing //
 	//==========//
@@ -229,7 +219,4 @@ public class OverrideInjector implements IOverrideInjector<IDhApiOverrideable>
 	}
 
 	//endregion
-
-
-
 }

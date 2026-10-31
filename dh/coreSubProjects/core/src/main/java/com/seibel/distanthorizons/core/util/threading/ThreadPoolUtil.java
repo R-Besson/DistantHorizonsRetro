@@ -39,8 +39,6 @@ public class ThreadPoolUtil
 {
 	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 
-
-
 	//=========================//
 	// standalone thread pools //
 	//=========================//
@@ -86,18 +84,14 @@ public class ThreadPoolUtil
 	@Nullable
 	public static ThreadPoolExecutor networkClientHandlerExecutor() { return networkClientHandlerThreadPool; }
 
-
 	public static final String FULL_DATA_MIGRATION_THREAD_NAME = "Full Data Migration";
 	private static ThreadPoolExecutor fullDataMigrationThreadPool;
 	@Nullable
 	public static ThreadPoolExecutor getFullDataMigrationExecutor() { return fullDataMigrationThreadPool; }
 
-
 	private static PriorityTaskPicker.Executor chunkToLodBuilderThreadPool;
 	@Nullable
 	public static PriorityTaskPicker.Executor getChunkToLodBuilderExecutor() { return chunkToLodBuilderThreadPool; }
-
-
 
 	//=================//
 	// setup / cleanup //
@@ -124,8 +118,6 @@ public class ThreadPoolUtil
 		updatePropagatorThreadPool = taskPicker.createExecutor("Update Propagator", Thread.NORM_PRIORITY, ThreadPoolUtil::updatePropagatorThreadsCanRun); // the update propagator isn't necessary when moving through the world, so we'll pause it along with the world generator when moving fast
 		worldGenThreadPool = taskPicker.createExecutor("World Gen", Thread.NORM_PRIORITY, ThreadPoolUtil::worldGenThreadsCanRun);
 
-
-
 		//=========================//
 		// standalone thread pools //
 		//=========================//
@@ -141,7 +133,6 @@ public class ThreadPoolUtil
 			fullDataMigrationThreadPool.shutdown();
 		}
 		fullDataMigrationThreadPool = ThreadUtil.makeSingleThreadPool(FULL_DATA_MIGRATION_THREAD_NAME);
-
 	}
 
 	public static void shutdownThreadPools()
@@ -154,8 +145,6 @@ public class ThreadPoolUtil
 	}
 
 	///endregion
-
-
 
 	//================//
 	// helper methods //
@@ -222,8 +211,6 @@ public class ThreadPoolUtil
 		return true;
 	}
 
-
-
 	private static boolean cameraMovingFast()
 	{
 		if (!Config.Common.WorldGenerator.pauseIfMovingQuickly.get())
@@ -250,7 +237,5 @@ public class ThreadPoolUtil
 	}
 
 	///endregion
-
-
 
 }

@@ -39,12 +39,10 @@ public abstract class AbstractDhApiRemoveAfterFireTestEvent implements IDhApiEve
 	@Override
 	public boolean removeAfterFiring() { return true; }
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<Boolean> input) { this.onTestEvent(input); }
-
 }

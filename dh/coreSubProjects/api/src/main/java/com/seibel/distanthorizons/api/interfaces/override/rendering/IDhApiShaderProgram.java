@@ -63,7 +63,6 @@ public interface IDhApiShaderProgram extends IDhApiOverrideable
 	/** Runs any necessary unbinding this program needs so rendering can be done by another program. */
 	void unbind();
 
-
 	/** sets up the necessary uniforms for rendering */
 	void fillUniformData(DhApiRenderParam renderParameters);
 
@@ -72,5 +71,4 @@ public interface IDhApiShaderProgram extends IDhApiOverrideable
 
 	/** Binds the given Vertex Buffer Object to this shader program for rendering. */
 	void bindVertexBuffer(int vbo);
-
 }

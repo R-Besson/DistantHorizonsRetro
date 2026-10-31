@@ -49,12 +49,9 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 	/** the texture unit the atlas is bound to while LODs render, the lightmap uses unit 0 */
 	public static final int GL_BOUND_INDEX = 1;
 
-
 	private final PixelUploadGlState uploadGlState = new PixelUploadGlState();
 
 	private int textureId = 0;
-
-
 
 	//=============//
 	// constructor //
@@ -64,8 +61,6 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 	private GlBlockTextureAtlas() { }
 
 	//endregion
-
-
 
 	//==================//
 	// texture handling //
@@ -105,8 +100,6 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 
 	//endregion
 
-
-
 	//=========//
 	// binding //
 	//=========//
@@ -128,8 +121,6 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// uploading //
@@ -169,8 +160,6 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -184,8 +173,6 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 		private int unpackAlignment = 0;
 
 		private int textureBinding = 0;
-
-
 
 		public void saveState()
 		{
@@ -208,11 +195,7 @@ public class GlBlockTextureAtlas extends AbstractBlockTextureAtlas
 			LWJGL.glPixelStorei(GL11.GL_UNPACK_SKIP_ROWS, this.unpackSkipRows);
 			LWJGL.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, this.unpackAlignment);
 		}
-
 	}
 
 	//endregion
-
-
-
 }

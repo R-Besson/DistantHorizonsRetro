@@ -53,7 +53,6 @@ public class LodBufferContainer implements AutoCloseable
 
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("LodBufferContainer");
 
-
 	/** the position closest to minimum X/Z infinity and the level's lowest Y */
 	public final DhBlockPos minCornerBlockPos;
 	public final long pos;
@@ -64,8 +63,6 @@ public class LodBufferContainer implements AutoCloseable
 	public IVertexBufferWrapper[] vboTransparentWrappers;
 
 	public ILodContainerUniformBufferWrapper uniformContainer = WRAPPER_FACTORY.createLodContainerUniformWrapper();
-
-
 
 	//==============//
 	// constructors //
@@ -82,8 +79,6 @@ public class LodBufferContainer implements AutoCloseable
 
 	//endregion
 
-
-
 	//==================//
 	// buffer uploading //
 	//==================//
@@ -98,8 +93,6 @@ public class LodBufferContainer implements AutoCloseable
 	{
 		// new upload needed
 		CompletableFuture<LodBufferContainer> future = new CompletableFuture<>();
-
-
 
 		//================//
 		// create buffers //
@@ -132,8 +125,6 @@ public class LodBufferContainer implements AutoCloseable
 		@Nullable ArrayList<ByteBuffer> transparentIndexBuffers = useSingleIbo ? null : bufferContainer.createIndexBuffers(transparentIndexCheckout, transparentBuffers);
 
 		//endregion
-
-
 
 		//=============//
 		// create VBOs //
@@ -170,8 +161,6 @@ public class LodBufferContainer implements AutoCloseable
 		});
 
 		//endregion
-
-
 
 		//====================//
 		// upload VBOs to GPU //
@@ -217,11 +206,8 @@ public class LodBufferContainer implements AutoCloseable
 
 		//endregion
 
-
-
 		return future;
 	}
-
 
 	private ArrayList<ByteBuffer> createIndexBuffers(PhantomArrayListCheckout checkout, ArrayList<ByteBuffer> vertexBuffers)
 	{
@@ -297,8 +283,6 @@ public class LodBufferContainer implements AutoCloseable
 				throw new RuntimeException("Too many vertex buffers!!");
 			}
 
-
-
 			// final variables for use in lambdas //
 
 			final IVertexBufferWrapper finalVboWrapper = vboWrappers[vboIndex];
@@ -309,8 +293,6 @@ public class LodBufferContainer implements AutoCloseable
 
 			final int finalVertexCount = vertexByteBufferToVertexCount(finalVertexBuffer);
 
-
-
 			//===============//
 			// vertex upload //
 			//===============//
@@ -318,7 +300,6 @@ public class LodBufferContainer implements AutoCloseable
 
 			CompletableFuture<Void> vertexUploadFuture = new CompletableFuture<>();
 			uploadFutureList.add(vertexUploadFuture);
-
 
 			RenderThreadTaskHandler.INSTANCE.queueRunningOnRenderThread("LodBufferContainer VBO Upload", () ->
 			{
@@ -342,8 +323,6 @@ public class LodBufferContainer implements AutoCloseable
 			});
 
 			//endregion
-
-
 
 			//==============//
 			// index upload //
@@ -378,8 +357,6 @@ public class LodBufferContainer implements AutoCloseable
 			}
 			//endregion
 
-
-
 			vboIndex++;
 		}
 
@@ -387,8 +364,6 @@ public class LodBufferContainer implements AutoCloseable
 		{
 			throw new RuntimeException("Too few vertex buffers!!");
 		}
-
-
 
 		// merge futures //
 
@@ -401,8 +376,6 @@ public class LodBufferContainer implements AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//================//
 	// helper methods //
@@ -437,8 +410,6 @@ public class LodBufferContainer implements AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -482,7 +453,4 @@ public class LodBufferContainer implements AutoCloseable
 	}
 
 	//endregion
-
-
-
 }

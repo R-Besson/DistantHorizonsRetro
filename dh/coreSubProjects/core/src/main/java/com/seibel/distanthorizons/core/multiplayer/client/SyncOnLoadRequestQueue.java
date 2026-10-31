@@ -24,8 +24,6 @@ public class SyncOnLoadRequestQueue extends AbstractFullDataNetworkRequestQueue
 	public SyncOnLoadRequestQueue(DhClientLevel level, ClientNetworkState networkState)
 	{ super(networkState, level, true, Config.Client.Advanced.Debugging.DebugWireframe.showNetworkSyncOnLoadQueue); }
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -41,8 +39,6 @@ public class SyncOnLoadRequestQueue extends AbstractFullDataNetworkRequestQueue
 	@Override
 	protected String getQueueName() { return "Sync On Login Queue"; }
 
-
-
 	//==================//
 	// request handling //
 	//==================//
@@ -57,7 +53,4 @@ public class SyncOnLoadRequestQueue extends AbstractFullDataNetworkRequestQueue
 
 		return super.tick(targetPos);
 	}
-
-
-
 }

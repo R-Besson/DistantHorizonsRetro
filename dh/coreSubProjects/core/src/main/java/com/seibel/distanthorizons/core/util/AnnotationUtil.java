@@ -28,7 +28,6 @@ public class AnnotationUtil
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
 	/** A quick method to test if an enum value has specific runtime annotation. */
 	public static <TEnum extends Enum<?>, TAnno extends java.lang.annotation.Annotation> boolean doesEnumHaveAnnotation(TEnum enumValue, Class<TAnno> annotationToSearchFor)
 	{
@@ -60,5 +59,4 @@ public class AnnotationUtil
 			return false;
 		}
 	}
-
 }

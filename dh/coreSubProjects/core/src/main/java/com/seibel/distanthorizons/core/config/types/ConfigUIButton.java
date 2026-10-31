@@ -30,8 +30,6 @@ public class ConfigUIButton extends AbstractConfigBase<Runnable>
 	public ConfigUIButton(Runnable runnable)
 	{ super(EConfigEntryAppearance.ONLY_IN_GUI, runnable); }
 
-
-
 	//=========//
 	// actions //
 	//=========//
@@ -42,5 +40,4 @@ public class ConfigUIButton extends AbstractConfigBase<Runnable>
 	 * (so it can halt the main process if it takes too long and isn't offloaded to another thread)
 	 */
 	public void runAction() { this.value.run(); }
-
 }

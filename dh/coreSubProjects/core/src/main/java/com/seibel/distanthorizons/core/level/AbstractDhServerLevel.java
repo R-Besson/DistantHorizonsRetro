@@ -57,8 +57,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 
 	private final ConcurrentHashMap<ServerPlayerState, List<Runnable>> unregisterActionsByPlayer = new ConcurrentHashMap<>();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -96,8 +94,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		this.serverPlayerStateManager = serverPlayerStateManager;
 		this.requestHandler = new FullDataSourceRequestHandler(this);
 	}
-
-
 
 	//=======//
 	// ticks //
@@ -146,8 +142,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		}
 		return playersInLevel;
 	}
-
-
 
 	//==================//
 	// network handling //
@@ -214,7 +208,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		serverPlayerState.networkSession.registerHandler(FullDataSourceRequestMessage.class, fullDataSourceRequestHandler);
 		unregisterActions.add(() -> serverPlayerState.networkSession.unregisterHandler(FullDataSourceRequestMessage.class, fullDataSourceRequestHandler));
 
-
 		Consumer<CancelMessage> cancelMessageHandler = msg -> this.requestHandler.cancelRequest(msg.futureId);
 		serverPlayerState.networkSession.registerHandler(CancelMessage.class, cancelMessageHandler);
 		unregisterActions.add(() -> serverPlayerState.networkSession.unregisterHandler(CancelMessage.class, cancelMessageHandler));
@@ -241,7 +234,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		serverPlayerState.removeRateLimiterSet(this);
 	}
 
-
 	/** May send an error message in response if the message is a {@link AbstractTrackableMessage} */
 	private <T extends AbstractNetworkMessage> boolean validatePlayerInCurrentLevel(T message)
 	{
@@ -261,8 +253,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		return true;
 	}
 
-
-
 	//===========//
 	// world gen //
 	//===========//
@@ -278,8 +268,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	{
 		this.requestHandler.onWorldGenTaskFailed(pos);
 	}
-
-
 
 	//=================//
 	// player handling //
@@ -322,8 +310,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 			});
 	}
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -334,8 +320,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		this.serverside.fullDataFileHandler.addDebugMenuStringsToList(messageList);
 		this.serverside.lodRequestModule.addDebugMenuStringsToList(messageList);
 	}
-
-
 
 	//=========//
 	// getters //
@@ -354,8 +338,6 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 	@Override
 	public ISaveStructure getSaveStructure() { return this.serverside.saveStructure; }
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -373,7 +355,4 @@ public abstract class AbstractDhServerLevel extends AbstractDhLevel implements I
 		this.requestHandler.close();
 		LOGGER.info("Closed DHLevel for [" + this.getLevelWrapper() + "].");
 	}
-
-
-
 }

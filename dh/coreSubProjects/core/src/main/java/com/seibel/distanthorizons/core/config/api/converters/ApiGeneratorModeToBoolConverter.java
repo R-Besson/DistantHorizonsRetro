@@ -44,7 +44,4 @@ public class ApiGeneratorModeToBoolConverter implements IConverter<EDhApiGenerat
 	@Override
 	public Boolean convertToApiType(EDhApiGeneratorPlan genMode)
 	{ return genMode.generationEnabled; }
-
-
-
 }

@@ -114,8 +114,6 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 
 	//endregion
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -183,8 +181,6 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -194,8 +190,4 @@ public class DhApiFogRenderParam implements IDhApiEventParam
 	public DhApiFogRenderParam copy() { return new DhApiFogRenderParam(this); }
 
 	//endregion
-
-
-
-
 }

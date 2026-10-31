@@ -27,7 +27,6 @@ public class LzmaArrayCache extends ArrayCache
 	public static final AtomicInteger MAX_INT_CACHE_LENGTH_REF = new AtomicInteger(WARN_CACHE_LENGTH_EXCEEDED);
 	public static final AtomicInteger MAX_BYTE_CACHE_LENGTH_REF = new AtomicInteger(WARN_CACHE_LENGTH_EXCEEDED);
 
-
 	public final IntUnaryOperator maxByteCacheSizeUnaryOperator = (x) -> Math.max(this.byteCache.size(), x);
 	public final IntUnaryOperator maxIntCacheSizeUnaryOperator = (x) -> Math.max(this.intCache.size(), x);
 
@@ -39,8 +38,6 @@ public class LzmaArrayCache extends ArrayCache
 	public final Int2ReferenceArrayMap<ArrayList<byte[]>> byteCache = new Int2ReferenceArrayMap<>();
 	/** generally only 4 items long */
 	public final Int2ReferenceArrayMap<ArrayList<int[]>> intCache = new Int2ReferenceArrayMap<>();
-
-
 
 	//=============//
 	// byte arrays //
@@ -82,7 +79,6 @@ public class LzmaArrayCache extends ArrayCache
 		this.byteCache.computeIfAbsent(size, (newSize) -> new ArrayList<>());
 		this.byteCache.get(size).add(array);
 
-
 		if (this.byteCache.size() > WARN_CACHE_LENGTH_EXCEEDED)
 		{
 			int previousMax = MAX_BYTE_CACHE_LENGTH_REF.getAndUpdate(this.maxByteCacheSizeUnaryOperator);
@@ -93,8 +89,6 @@ public class LzmaArrayCache extends ArrayCache
 			}
 		}
 	}
-
-
 
 	//============//
 	// int arrays //
@@ -136,7 +130,6 @@ public class LzmaArrayCache extends ArrayCache
 		this.intCache.computeIfAbsent(size, (newSize) -> new ArrayList<>());
 		this.intCache.get(size).add(array);
 
-
 		if (this.intCache.size() > WARN_CACHE_LENGTH_EXCEEDED)
 		{
 			int previousMax = MAX_INT_CACHE_LENGTH_REF.getAndUpdate(this.maxIntCacheSizeUnaryOperator);
@@ -147,6 +140,4 @@ public class LzmaArrayCache extends ArrayCache
 			}
 		}
 	}
-
-
 }

@@ -13,8 +13,6 @@ public class UnsynchronizedByteArrayInputStream extends ByteArrayInputStream
 	public UnsynchronizedByteArrayInputStream(byte[] buf) { super(buf); }
 	public UnsynchronizedByteArrayInputStream(byte[] buf, int offset, int length) { super(buf, offset, length); }
 
-
-
 	@Override
 	public int read() { return (this.pos < this.count) ? (this.buf[this.pos++] & 0xFF) : -1; }
 
@@ -47,5 +45,4 @@ public class UnsynchronizedByteArrayInputStream extends ByteArrayInputStream
 
 	@Override
 	public int available() { return this.count - this.pos; }
-
 }

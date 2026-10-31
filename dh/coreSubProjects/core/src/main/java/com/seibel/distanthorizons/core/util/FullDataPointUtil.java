@@ -60,13 +60,11 @@ public class FullDataPointUtil
 	public static final int SKY_LIGHT_OFFSET = MIN_Y_OFFSET + MIN_Y_WIDTH;
 	public static final int BLOCK_LIGHT_OFFSET = SKY_LIGHT_OFFSET + SKY_LIGHT_WIDTH;
 
-
 	public static final long ID_MASK = Integer.MAX_VALUE;
 	public static final int HEIGHT_MASK = (int) Math.pow(2, HEIGHT_WIDTH) - 1;
 	public static final int MIN_Y_MASK = (int) Math.pow(2, MIN_Y_WIDTH) - 1;
 	public static final int SKY_LIGHT_MASK = (int) Math.pow(2, SKY_LIGHT_WIDTH) - 1;
 	public static final int BLOCK_LIGHT_MASK = (int) Math.pow(2, BLOCK_LIGHT_WIDTH) - 1;
-
 
 	//==========//
 	// encoding //
@@ -85,14 +83,12 @@ public class FullDataPointUtil
 			validateData(id, height, relMinY, blockLight, skyLight);
 		}
 
-
 		long data = 0;
 		data |= id & ID_MASK;
 		data |= (long) (height & HEIGHT_MASK) << HEIGHT_OFFSET;
 		data |= (long) (relMinY & MIN_Y_MASK) << MIN_Y_OFFSET;
 		data |= (long) blockLight << BLOCK_LIGHT_OFFSET;
 		data |= (long) skyLight << SKY_LIGHT_OFFSET;
-
 
 		if (RUN_VALIDATION)
 		{
@@ -150,8 +146,6 @@ public class FullDataPointUtil
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -171,8 +165,6 @@ public class FullDataPointUtil
 
 	//endregion
 
-
-
 	//=========//
 	// setters //
 	//=========//
@@ -185,8 +177,6 @@ public class FullDataPointUtil
 	public static long setSkyLight(long data, int skyLight) { return (data & ~((long) SKY_LIGHT_MASK << SKY_LIGHT_OFFSET) | (long) skyLight << SKY_LIGHT_OFFSET); }
 
 	//endregion
-
-
 
 	//================//
 	// helper methods //
@@ -219,7 +209,4 @@ public class FullDataPointUtil
 	}
 
 	//endregion
-
-
-
 }

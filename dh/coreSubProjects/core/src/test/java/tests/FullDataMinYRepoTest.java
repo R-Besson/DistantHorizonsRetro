@@ -24,8 +24,6 @@ public class FullDataMinYRepoTest
 {
 	private static final String DB_FILE_NAME = "minYTest.sqlite";
 
-
-
 	@Test
 	public void minYIsUpdatedWhenARowIsOverwritten() throws Exception
 	{
@@ -110,5 +108,4 @@ public class FullDataMinYRepoTest
 		FullDataSourceV2 dataSource = FullDataSourceV2.createWithData(pos, new FullDataPointIdMap(pos), dataArray, columnGenStep, columnWorldCompressionMode);
 		return FullDataSourceV2DTO.CreateFromDataSource(dataSource, EDhApiDataCompressionMode.LZMA2);
 	}
-
 }

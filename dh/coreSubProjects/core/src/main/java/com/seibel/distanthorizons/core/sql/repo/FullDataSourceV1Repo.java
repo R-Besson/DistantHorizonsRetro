@@ -38,8 +38,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 {
 	public static final String TABLE_NAME = "Legacy_FullData_V1";
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -48,8 +46,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 	{
 		super(databaseType, databaseFile, FullDataSourceV1DTO.class);
 	}
-
-
 
 	//===========//
 	// overrides //
@@ -66,8 +62,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 	{
 		statement.setString(index, serializeSectionPos(pos));
 	}
-
-
 
 	//=======================//
 	// repo required methods //
@@ -102,8 +96,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 	@Override
 	public @Nullable PreparedStatement createUpsertStatement(FullDataSourceV1DTO dto) throws SQLException
 	{ throw new UnsupportedOperationException("V1 data shouldn't be inserted/updated"); }
-
-
 
 	//===========//
 	// migration //
@@ -143,7 +135,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 				return posList;
 			}
 
-
 			int i = 1;
 			statement.setInt(i, returnCount);
 
@@ -178,8 +169,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 
 		this.queryDictionaryFirst(sql);
 	}
-
-
 
 	//======================//
 	// migration - deletion //
@@ -247,8 +236,6 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 		this.queryDictionaryFirst("delete from " + this.getTableName() + " where DhSectionPos in (" + sectionPosCsv + ")");
 	}
 
-
-
 	//=====================//
 	// section pos helpers //
 	//=====================//
@@ -271,7 +258,4 @@ public class FullDataSourceV1Repo extends AbstractDhRepo<Long, FullDataSourceV1D
 
 		return DhSectionPos.encode(Byte.parseByte(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
 	}
-
-
-
 }

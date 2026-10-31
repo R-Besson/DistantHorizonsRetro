@@ -34,7 +34,6 @@ public enum EPlatform
 	UNIX("Unix");
 
 	private static final EPlatform current;
-
 	static
 	{
 		String osName = System.getProperty("os.name").toLowerCase();
@@ -85,7 +84,6 @@ public enum EPlatform
 	{
 		return current;
 	}
-
 
 	@Override
 	public String toString()

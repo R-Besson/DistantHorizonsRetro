@@ -26,11 +26,8 @@ public class CommandInitializer
 					: "/dh <help|debug|config|pregen>";
 			}
 
-
 			@Override
 			public void processCommand(ICommandSender sender, String[] args) { this.executeCommand(MinecraftServer.getServer(), sender, args); }
-
-
 
 			private void executeCommand(MinecraftServer server, ICommandSender sender, String[] args)
 			{
@@ -79,7 +76,5 @@ public class CommandInitializer
 			@Override
 			public int compareTo(@NotNull Object obj) { return 0; }
 		};
-
 	}
-
 }

@@ -24,16 +24,12 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 	private final RollingAverage rollingAverageChunkGenTimeInMs = new RollingAverage(1_000);
 	@Override public RollingAverage getRollingAverageChunkGenTimeInMs() { return this.rollingAverageChunkGenTimeInMs; }
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	public RemoteWorldRetrievalQueue(ClientNetworkState networkState, DhClientLevel level)
 	{ super(networkState, level, false, Config.Client.Advanced.Debugging.DebugWireframe.showWorldGenQueue); }
-
-
 
 	//===========================//
 	// retrieval queue overrides //
@@ -52,7 +48,6 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 	public CompletableFuture<DataSourceRetrievalResult> submitRetrievalTask(long sectionPos, byte requiredDataDetail)
 	{
 		long generationStartMsTime = System.currentTimeMillis();
-
 
 		CompletableFuture<DataSourceRetrievalResult> future = super.submitRequest(sectionPos, /* client timestamp */null);
 		future.thenAccept((DataSourceRetrievalResult result) ->
@@ -86,8 +81,6 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 	public CompletableFuture<Void> startClosingAsync(boolean cancelCurrentGeneration, boolean alsoInterruptRunning)
 	{ return super.startClosingAsync(alsoInterruptRunning); }
 
-
-
 	//=================================//
 	// network request queue overrides //
 	//=================================//
@@ -115,8 +108,6 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 	@Override
 	protected String getQueueName() { return "World Remote Generation Queue"; }
 
-
-
 	//===============//
 	// debug display //
 	//===============//
@@ -128,6 +119,4 @@ public class RemoteWorldRetrievalQueue extends AbstractFullDataNetworkRequestQue
 
 	@Override
 	public int getQueuedChunkCount() { return 0; }
-
-
 }

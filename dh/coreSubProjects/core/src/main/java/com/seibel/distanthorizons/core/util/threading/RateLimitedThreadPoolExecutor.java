@@ -41,8 +41,6 @@ public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 	/** When this thread started running its last task */
 	private final ThreadLocal<Long> runStartTime = ThreadLocal.withInitial(() -> -1L);
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -54,8 +52,6 @@ public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 			workQueue,
 			threadFactory);
 	}
-
-
 
 	//===========//
 	// overrides //
@@ -113,5 +109,4 @@ public class RateLimitedThreadPoolExecutor extends ThreadPoolExecutor
 	{
 		super.purge();
 	}
-
 }

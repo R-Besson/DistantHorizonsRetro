@@ -76,8 +76,6 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 */
 	default boolean runApiValidation() { return true; }
 
-
-
 	//=================//
 	// world generator //
 	//=================//
@@ -203,8 +201,6 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 */
 	default EDhApiWorldGeneratorReturnType getReturnType() { return EDhApiWorldGeneratorReturnType.VANILLA_CHUNKS; }
 
-
-
 	//===============//
 	// event methods //
 	//===============//
@@ -217,8 +213,6 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	 */
 	void preGeneratorTaskStart();
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -227,7 +221,4 @@ public interface IDhApiWorldGenerator extends Closeable, IDhApiOverrideable
 	// that is present in the default Closeable.close() method
 	@Override
 	void close();
-
-
-
 }

@@ -28,5 +28,4 @@ public class UncheckedInterruptedException extends RuntimeException
 		Throwable unwrapped = ExceptionUtil.ensureUnwrap(t);
 		return unwrapped instanceof InterruptedException || unwrapped instanceof UncheckedInterruptedException;
 	}
-
 }

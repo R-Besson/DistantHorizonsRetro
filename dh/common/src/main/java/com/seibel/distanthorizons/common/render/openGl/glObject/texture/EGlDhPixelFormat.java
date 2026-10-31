@@ -6,12 +6,8 @@ public enum EGlDhPixelFormat
 {
 	RGBA(GL11.GL_RGBA, false);
 
-
-
 	private final int glFormat;
 	private final boolean isInteger;
-
-
 
 	EGlDhPixelFormat(int glFormat, boolean isInteger)
 	{
@@ -19,10 +15,7 @@ public enum EGlDhPixelFormat
 		this.isInteger = isInteger;
 	}
 
-
-
 	public int getGlFormat() { return this.glFormat; }
 
 	public boolean isInteger() { return this.isInteger; }
-
 }

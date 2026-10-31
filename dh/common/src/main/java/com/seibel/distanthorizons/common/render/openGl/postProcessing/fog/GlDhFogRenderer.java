@@ -45,7 +45,6 @@ public class GlDhFogRenderer implements IDhFogRenderer
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	private boolean init = false;
 
 	private int width = -1;
@@ -53,8 +52,6 @@ public class GlDhFogRenderer implements IDhFogRenderer
 	private int fogFramebuffer = -1;
 
 	private int fogTexture = -1;
-
-
 
 	//=============//
 	// constructor //
@@ -102,8 +99,6 @@ public class GlDhFogRenderer implements IDhFogRenderer
 		}
 	}
 
-
-
 	//========//
 	// render //
 	//========//
@@ -138,7 +133,4 @@ public class GlDhFogRenderer implements IDhFogRenderer
 	}
 
 	//endregion
-
-
-
 }

@@ -29,5 +29,4 @@ public class MixinTransformPatcher
 	{
 		cir.setReturnValue(ShaderPackLodTextures.patchVanillaTranslucents(cir.getReturnValue()));
 	}
-
 }

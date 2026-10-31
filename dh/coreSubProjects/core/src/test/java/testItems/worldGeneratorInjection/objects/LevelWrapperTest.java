@@ -74,7 +74,4 @@ public class LevelWrapperTest implements IDhApiLevelWrapper
 	@Override
 	public DhApiResult<Color> getBlockColorPreApi(IDhApiBlockStateWrapper blockStateWrapper, IDhApiBiomeWrapper biomeWrapper, int blockWorldPosX, int blockWorldPosY, int blockWorldPosZ, IDhApiFullDataSource dataSource)
 	{ return DhApiResult.createFail("Not Implemented"); }
-
-
-
 }

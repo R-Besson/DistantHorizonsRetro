@@ -37,8 +37,6 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 
 	public final FullDataSourceV1Repo repo;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -55,8 +53,6 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 		this.repo = new FullDataSourceV1Repo(AbstractDhRepo.DEFAULT_DATABASE_TYPE, new File(this.saveDir.getPath() + File.separator + ISaveStructure.DATABASE_NAME));
 	}
 
-
-
 	//==================//
 	// abstract methods //
 	//==================//
@@ -72,8 +68,6 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 		}
 		return dataSource;
 	}
-
-
 
 	//==============//
 	// data reading //
@@ -113,8 +107,6 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 		return dataSource;
 	}
 
-
-
 	//===========//
 	// migration //
 	//===========//
@@ -141,8 +133,6 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 
 	public void markMigrationFailed(long pos) { this.repo.markMigrationFailed(pos); }
 
-
-
 	//=========//
 	// cleanup //
 	//=========//
@@ -162,5 +152,4 @@ public class FullDataSourceProviderV1<TDhLevel extends IDhLevel>
 			this.closeLock.unlock();
 		}
 	}
-
 }

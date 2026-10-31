@@ -26,5 +26,4 @@ public class LWJGL2MemoryStack extends AbstractMemoryStack
 	{
 		return delegate.mallocFloat(count);
 	}
-
 }

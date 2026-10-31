@@ -33,5 +33,4 @@ import net.minecraft.block.Block;
 public interface IRpleCommonAccessor extends IRpleAccessor
 {
 	int getColor(Block block, int meta);
-
 }

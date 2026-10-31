@@ -46,8 +46,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	/** used to iterate over each item in the list in an in-to-out order */
 	private final Pos2D[] ringPositionIteratorArray;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -108,8 +106,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 	//endregion
 
-
-
 	//=====================//
 	// getters and setters //
 	//=====================//
@@ -144,7 +140,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		}
 	}
 
-
 	/** returns false if x,y is outside the grid */
 	public boolean set(int x, int y, T item)
 	{
@@ -177,14 +172,10 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 	//endregion
 
-
-
 	//================//
 	// list modifiers //
 	//================//
 	//region
-
-
 
 	/** see {@link MovableGridRingList#clear(Consumer)} for full documentation */
 	@Override
@@ -293,8 +284,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 	//endregion
 
-
-
 	//==================//
 	// position getters //
 	//==================//
@@ -303,8 +292,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	public Pos2D getCenter() { return new Pos2D(this.minPosRef.get().getX() + this.halfWidth, this.minPosRef.get().getY() + this.halfWidth); }
 
 	//endregion
-
-
 
 	//================//
 	// helper methods //
@@ -324,8 +311,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	private T swapUnsafe(int x, int y, T item) { return super.set(Math.floorMod(x, this.width) + Math.floorMod(y, this.width) * this.width, item); }
 
 	//endregion
-
-
 
 	//===========//
 	// iterators //
@@ -354,8 +339,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 	//endregion
 
-
-
 	//==============//
 	// base methods //
 	//==============//
@@ -370,8 +353,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -384,8 +365,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 		private final int y;
 		public int getY() { return this.y; }
-
-
 
 		//==============//
 		// constructors //
@@ -400,8 +379,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 
 		//endregion
 
-
-
 		//======//
 		// math //
 		//======//
@@ -410,8 +387,6 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 		public Pos2D add(Pos2D other) { return new Pos2D(this.x + other.x, this.y + other.y); }
 
 		//endregion
-
-
 
 		//================//
 		// base overrides //
@@ -441,7 +416,4 @@ public class MovableGridRingList<T> extends ArrayList<T> implements List<T>
 	}
 
 	//endregion
-
-
-
 }

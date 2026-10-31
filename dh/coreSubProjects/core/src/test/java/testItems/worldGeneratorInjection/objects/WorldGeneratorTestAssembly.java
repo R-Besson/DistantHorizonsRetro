@@ -37,5 +37,4 @@ public class WorldGeneratorTestAssembly
 		int secondPackageEndingIndex = StringUtil.nthIndexOf(thisPackageName, ".", numberOfPackagesToReturn);
 		return thisPackageName.substring(0, secondPackageEndingIndex);
 	}
-
 }

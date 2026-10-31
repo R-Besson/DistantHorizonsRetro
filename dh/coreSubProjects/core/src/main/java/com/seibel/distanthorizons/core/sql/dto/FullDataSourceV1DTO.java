@@ -31,8 +31,6 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 
 	public final byte[] dataArray;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -47,8 +45,6 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 		this.dataArray = dataArray;
 	}
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -59,5 +55,4 @@ public class FullDataSourceV1DTO implements IBaseDTO<Long>
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-
 }

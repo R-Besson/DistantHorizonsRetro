@@ -60,11 +60,7 @@ public class ServerThreadTaskHandler
 	private final long[] dhNanosPerTick = new long[DH_TICK_HISTORY_LENGTH];
 	private int dhNanosPerTickIndex = 0;
 
-
-
 	private ServerThreadTaskHandler() { }
-
-
 
 	/**
 	 * Queues a task that may be deferred to a later tick while the server thread is unhealthy. <br>
@@ -271,7 +267,5 @@ public class ServerThreadTaskHandler
 				this.future.completeExceptionally(throwable);
 			}
 		}
-
 	}
-
 }

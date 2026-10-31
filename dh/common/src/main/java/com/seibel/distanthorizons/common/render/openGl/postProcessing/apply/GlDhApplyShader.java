@@ -45,13 +45,10 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
 	// uniforms
 	public int uSourceColorTexture;
 	public int uSourceDepthTexture;
 	public int uIsReverseZDepth;
-
-
 
 	//=======//
 	// setup //
@@ -73,12 +70,9 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 		this.uSourceColorTexture = this.shader.getUniformLocation("uSourceColorTexture");
 		this.uSourceDepthTexture = this.shader.getUniformLocation("uSourceDepthTexture");
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
-
 	}
 
 	//endregion
-
-
 
 	//========//
 	// render //
@@ -134,7 +128,6 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 		}
 		// everything's been restored, except at this point the MC framebuffer should now be used instead
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, targetFrameBuffer);
-
 	}
 
 	@SuppressWarnings({"try", "unused"})
@@ -177,8 +170,6 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 
 			LWJGL.glUniform1i(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 
-
-
 			LWJGL.glFramebufferTexture(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, targetColorTextureId, 0);
 
 			// Copy to MC's texture via MC's framebuffer
@@ -188,11 +179,7 @@ public class GlDhApplyShader extends GlAbstractShaderRenderer
 		}
 		// everything's been restored, except at this point the MC framebuffer should now be used instead
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, mcFrameBufferId);
-
 	}
 
 	//endregion
-
-
-
 }

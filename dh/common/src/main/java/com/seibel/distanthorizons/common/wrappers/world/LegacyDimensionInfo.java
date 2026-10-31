@@ -18,11 +18,7 @@ public final class LegacyDimensionInfo
 	public static final int NETHER = -1;
 	public static final int THE_END = 1;
 
-
-
 	private LegacyDimensionInfo() { }
-
-
 
 	/** Maps a vanilla-style dimension id to the same canonical name modern MC uses. */
 	public static String nameOf(int dimensionId)
@@ -43,7 +39,4 @@ public final class LegacyDimensionInfo
 
 	/** Canonical {@code "{name}:{id}"} string DH uses as the dimension identifier. */
 	public static String fullName(int dimensionId) { return nameOf(dimensionId) + ":" + dimensionId; }
-
-
-
 }

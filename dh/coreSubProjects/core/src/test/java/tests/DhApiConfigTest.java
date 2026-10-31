@@ -49,7 +49,6 @@ public class DhApiConfigTest
 		Assert.assertNull("API Value shouldn't be set yet", apiConfig.getApiValue());
 		Assert.assertEquals("underlying config should be 'DEBUG'", EDhApiRendererMode.DEBUG_TRIANGLE, coreConfig.get());
 
-
 		// set API value
 		apiConfig.setValue(true);
 		Assert.assertTrue("API Value should be 'true'", apiConfig.getApiValue());
@@ -64,8 +63,5 @@ public class DhApiConfigTest
 		apiConfig.clearValue();
 		Assert.assertNull("API Value should be null", apiConfig.getApiValue());
 		Assert.assertEquals("underlying config should be 'DEBUG'", EDhApiRendererMode.DEBUG_TRIANGLE, coreConfig.get());
-
-
 	}
-
 }

@@ -53,5 +53,4 @@ public interface IAngelicaAccessor extends IModAccessor
 	 * showing the LODs past it, -1 if no shader pack is in use or it doesn't
 	 */
 	float getShaderPackVanillaTerrainDistance();
-
 }

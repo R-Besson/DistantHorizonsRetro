@@ -36,7 +36,6 @@ public class SqliteSetupTest
 {
 	public static String DATABASE_TYPE = "jdbc:sqlite";
 
-
 	@Test
 	public void testSqliteFile()
 	{
@@ -46,8 +45,6 @@ public class SqliteSetupTest
 		File dbFile = new File(databaseLocation);
 		Assert.assertTrue("Unable to delete test database.", dbFile.delete());
 	}
-
-
 
 	//================//
 	// helper methods //
@@ -63,7 +60,6 @@ public class SqliteSetupTest
 				Statement statement = connection.createStatement();
 				statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
-
 				// create the database
 				statement.executeUpdate("drop table if exists person");
 				statement.executeUpdate("create table person (id integer, name string)");
@@ -74,7 +70,6 @@ public class SqliteSetupTest
 
 				// get the values
 				ResultSet rs = statement.executeQuery("select * from person");
-
 
 				// read the result set
 				Assert.assertTrue(rs.next());
@@ -105,5 +100,4 @@ public class SqliteSetupTest
 			Assert.fail("Unable to close the connection: " + e.getMessage());
 		}
 	}
-
 }

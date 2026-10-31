@@ -41,12 +41,10 @@ public abstract class DhApiAfterRenderEvent implements IDhApiEvent<Void>
 	/** Fired after Distant Horizons finishes rendering fake chunks. */
 	public abstract void afterRender(DhApiEventParam<Void> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<Void> event) { this.afterRender(event); }
-
 }

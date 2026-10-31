@@ -48,5 +48,4 @@ public interface IDhApiNoiseTextureConfig extends IDhApiConfigGroup
 	 * Set to 0 to disable noise from fading away
 	 */
 	IDhApiConfigValue<Integer> noiseDropoff();
-
 }

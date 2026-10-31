@@ -66,5 +66,4 @@ public interface IDhApiFramebuffer extends IDhApiOverrideable
 
 	/** Destroys this framebuffer's OpenGL object(s). */
 	void destroy();
-
 }

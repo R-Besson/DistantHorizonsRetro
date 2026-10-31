@@ -73,8 +73,6 @@ public class DhApiRenderParam implements IDhApiEventParam
 	 */
 	public IDhApiLevelWrapper clientLevelWrapper;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -139,12 +137,9 @@ public class DhApiRenderParam implements IDhApiEventParam
 
 		this.worldYOffset = worldYOffset;
 		this.clientLevelWrapper = clientLevelWrapper;
-
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -158,7 +153,4 @@ public class DhApiRenderParam implements IDhApiEventParam
 	public DhApiRenderParam copy() { return this; }
 
 	//endregion
-
-
-
 }

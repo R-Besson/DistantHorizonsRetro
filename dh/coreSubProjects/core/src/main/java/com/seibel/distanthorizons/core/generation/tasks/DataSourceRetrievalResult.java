@@ -33,8 +33,6 @@ public class DataSourceRetrievalResult
 	@Nullable
 	public final FullDataSourceV2 dataSource;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -47,6 +45,4 @@ public class DataSourceRetrievalResult
 		this.pos = pos;
 		this.dataSource = dataSource;
 	}
-
-
 }

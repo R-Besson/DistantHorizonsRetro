@@ -20,7 +20,6 @@ public enum EDhApiDepthDirection
 	 */
 	REVERSE_Z(1.0f, 0.0f);
 
-
 	public final float nearDepth;
 	public final float farDepth;
 
@@ -29,7 +28,4 @@ public enum EDhApiDepthDirection
 		this.nearDepth = nearDepth;
 		this.farDepth = farDepth;
 	}
-
-
-
 }

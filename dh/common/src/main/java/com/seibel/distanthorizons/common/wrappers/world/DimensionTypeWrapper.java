@@ -42,8 +42,6 @@ public class DimensionTypeWrapper implements IDimensionTypeWrapper
 
 	private final String name;
 
-
-
 	//=============//
 	// Constructor //
 	//=============//
@@ -69,15 +67,12 @@ public class DimensionTypeWrapper implements IDimensionTypeWrapper
 			return DIMENSION_WRAPPER_BY_NAME.get(dimName);
 		}
 
-
 		// create the missing wrapper
 		DimensionTypeWrapper dimensionTypeWrapper = new DimensionTypeWrapper(dimensionType);
 
 		DIMENSION_WRAPPER_BY_NAME.put(dimName, dimensionTypeWrapper);
 		return dimensionTypeWrapper;
 	}
-
-
 
 	//=================//
 	// wrapper methods //
@@ -110,8 +105,6 @@ public class DimensionTypeWrapper implements IDimensionTypeWrapper
 		return this.coordinateScale;
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -136,6 +129,4 @@ public class DimensionTypeWrapper implements IDimensionTypeWrapper
 
 	@Override
 	public int hashCode() { return Objects.hash(this.getName()); }
-
-
 }

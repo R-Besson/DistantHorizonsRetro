@@ -69,8 +69,6 @@ public interface IDhApiWrapperFactory
 	 */
 	IDhApiBlockStateWrapper getAirBlockStateWrapper();
 
-
-
 	/**
 	 * Constructs a {@link IDhApiBiomeWrapper} for use by other DhApi methods.
 	 *
@@ -95,5 +93,4 @@ public interface IDhApiWrapperFactory
 	 * @since API 3.0.0
 	 */
 	IDhApiBlockStateWrapper getDefaultBlockStateWrapper(String resourceLocationString, IDhApiLevelWrapper levelWrapper) throws IOException, ClassCastException;
-
 }

@@ -86,13 +86,10 @@ public enum EDhApiDataCompressionMode
 	 */
 	LZMA2(3);
 
-
-
 	/** More stable than using the ordinal of the enum */
 	public final byte value;
 
 	EDhApiDataCompressionMode(int value) { this.value = (byte) value; }
-
 
 	/** @throws IllegalArgumentException if the value doesn't map to a value */
 	public static EDhApiDataCompressionMode getFromValue(byte value) throws IllegalArgumentException
@@ -108,6 +105,4 @@ public enum EDhApiDataCompressionMode
 
 		throw new IllegalArgumentException("No compression mode with the value [" + value + "]");
 	}
-
-
 }

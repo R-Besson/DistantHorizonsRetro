@@ -35,8 +35,6 @@ public class ConfigCategory extends AbstractConfigBase<Class<?>>
 	 */
 	public String destination;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -46,8 +44,6 @@ public class ConfigCategory extends AbstractConfigBase<Class<?>>
 		super(appearance, value);
 		this.destination = destination;
 	}
-
-
 
 	//==================//
 	// property getters //
@@ -59,8 +55,6 @@ public class ConfigCategory extends AbstractConfigBase<Class<?>>
 	@Override
 	@Deprecated
 	public Class<?> getType() { return this.value; }
-
-
 
 	//=========//
 	// builder //
@@ -80,7 +74,5 @@ public class ConfigCategory extends AbstractConfigBase<Class<?>>
 		{
 			return new ConfigCategory(tmpAppearance, tmpValue, tmpDestination);
 		}
-
 	}
-
 }

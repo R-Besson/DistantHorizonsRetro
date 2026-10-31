@@ -39,5 +39,4 @@ public interface IDhApiBiomeWrapper extends IDhApiUnsafeWrapper
 	 * @since API 7.1.0
 	 */
 	String getSerialString();
-
 }

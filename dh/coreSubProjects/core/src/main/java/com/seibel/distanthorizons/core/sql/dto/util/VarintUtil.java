@@ -23,8 +23,6 @@ public class VarintUtil
 	public static int zigzagDecode(int n)
 	{ return (n >>> 1) ^ -(n & 1); }
 
-
-
 	/**
 	 * @param value should be a zigzag encoded value
 	 * created via {@link VarintUtil#zigzagEncode(int)}
@@ -62,7 +60,4 @@ public class VarintUtil
 		while ((b & 128) != 0);
 		return value;
 	}
-
-
-
 }

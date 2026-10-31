@@ -27,12 +27,8 @@ public class ProfilerWrapper implements IProfilerWrapper
 {
 	public Profiler profiler;
 
-
-
 	public ProfilerWrapper(Profiler newProfiler)
 	{ this.profiler = newProfiler; }
-
-
 
 	@Override
 	public IProfileBlock push(String newSection)
@@ -46,8 +42,6 @@ public class ProfilerWrapper implements IProfilerWrapper
 	{
 		this.profiler.endStartSection(newSection);
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -66,11 +60,7 @@ public class ProfilerWrapper implements IProfilerWrapper
 		{
 			this.profiler.endSection();
 		}
-
 	}
 
 	//endregion
-
-
-
 }

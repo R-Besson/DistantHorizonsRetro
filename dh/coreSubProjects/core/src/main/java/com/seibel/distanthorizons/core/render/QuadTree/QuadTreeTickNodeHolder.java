@@ -34,8 +34,6 @@ public class QuadTreeTickNodeHolder
 
 	private final QuadNodeNearComparator quadNodeNearComparator = new QuadNodeNearComparator();
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -52,11 +50,9 @@ public class QuadTreeTickNodeHolder
 		this.nodesToEnableDeleteChildrenList.clear();
 	}
 
-
 	// loading
 	public void addLoadSection(LodRenderSection section) { this.sectionsToLoad.add(section); }
 	public HashSet<LodRenderSection> getLoadSections() { return this.sectionsToLoad; }
-
 
 	// enable
 	public void addEnableNode(QuadNode<LodRenderSection> node)
@@ -79,7 +75,6 @@ public class QuadTreeTickNodeHolder
 
 	public HashSet<QuadNode<LodRenderSection>> getEnabledNodes() { return this.nodesToEnable; }
 
-
 	// disable
 	public void addDisableNode(QuadNode<LodRenderSection> node)
 	{
@@ -89,7 +84,6 @@ public class QuadTreeTickNodeHolder
 		}
 	}
 	public HashSet<QuadNode<LodRenderSection>> getDisableNodes() { return this.nodesToDisable; }
-
 
 	// enable - delete children
 	public void addEnableDeleteChildrenNode(QuadNode<LodRenderSection> node)
@@ -114,8 +108,6 @@ public class QuadTreeTickNodeHolder
 
 	///endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -135,11 +127,8 @@ public class QuadTreeTickNodeHolder
 			int bDist = DhSectionPos.getChebyshevSignedBlockDistance(nodeB.sectionPos, this.centerPos);
 			return Integer.compare(aDist, bDist); // smaller numbers first
 		}
-
 	}
 
 	///endregion
-
-
 
 }

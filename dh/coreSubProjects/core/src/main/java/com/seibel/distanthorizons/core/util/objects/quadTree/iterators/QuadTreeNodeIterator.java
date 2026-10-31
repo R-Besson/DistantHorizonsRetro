@@ -36,7 +36,6 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 	/** lowest numerical value, inclusive */
 	private final byte leafDetailLevel;
 
-
 	private final Queue<QuadNode<T>> validNodesForDetailLevel = new ArrayDeque<>();
 	private final Queue<QuadNode<T>> iteratorNodeQueue = new ArrayDeque<>();
 	private byte iteratorDetailLevel;
@@ -44,7 +43,6 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 	private final boolean onlyReturnLeafValues;
 	@Nullable
 	private final QuadTree.INodeIteratorStoppingFunc<T> stopIteratingFunc;
-
 
 	public QuadTreeNodeIterator(
 		QuadNode<T> rootNode,
@@ -54,7 +52,6 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 		this.stopIteratingFunc = stopIteratingFunc;
 		this.leafDetailLevel = rootNode.parentTreeLeafDetailLevel;
 		this.iteratorDetailLevel = DhSectionPos.getDetailLevel(rootNode.sectionPos);
-
 
 		if (!this.onlyReturnLeafValues)
 		{
@@ -102,10 +99,7 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 				}
 			}
 		}
-
 	}// constructor
-
-
 
 	@Override
 	public boolean hasNext() { return !this.iteratorNodeQueue.isEmpty(); }
@@ -122,10 +116,8 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 			throw new NoSuchElementException();
 		}
 
-
 		// get the current iterator node
 		QuadNode<T> currentNode = this.iteratorNodeQueue.poll();
-
 
 		// the iterator queue should be fully populated for leaf values,
 		// for all values, it needs to be populated for each detail level
@@ -149,7 +141,6 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 					{
 						continue;
 					}
-
 
 					for (int i = 0; i < 4; i++)
 					{
@@ -175,12 +166,10 @@ public class QuadTreeNodeIterator<T> implements Iterator<QuadNode<T>>
 		return currentNode;
 	}
 
-
 	/** Unimplemented */
 	@Override
 	public void remove() { throw new UnsupportedOperationException("remove"); }
 
 	@Override
 	public void forEachRemaining(Consumer<? super QuadNode<T>> action) { Iterator.super.forEachRemaining(action); }
-
 }

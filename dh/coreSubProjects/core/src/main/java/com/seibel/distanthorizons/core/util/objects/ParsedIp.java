@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.core.util.objects;
 
-
 /**
  * Represents an IP and includes a couple helper methods.
  *
@@ -31,7 +30,6 @@ public class ParsedIp
 	/** can be used to find numeric IPs, IE: "192.168.1.19" */
 	public static final String NUMERIC_IP_REGEX = "^[0-9]*\\.[0-9]*\\.[0-9]*\\.[0-9]*(:[0-9]*)?$";
 
-
 	/** Examples: "192.168.1.19", "mc.hypixel.net", or "localhost" */
 	public final String ip;
 	/**
@@ -40,7 +38,6 @@ public class ParsedIp
 	 */
 	public final String port;
 	public final boolean isNumeric;
-
 
 	/** parses a standard IP string */
 	public ParsedIp(String fullIp)
@@ -80,7 +77,6 @@ public class ParsedIp
 			// only print the ":port" if a port is present
 			(port != null ? (":" + port) : "");
 	}
-
 }
 
 

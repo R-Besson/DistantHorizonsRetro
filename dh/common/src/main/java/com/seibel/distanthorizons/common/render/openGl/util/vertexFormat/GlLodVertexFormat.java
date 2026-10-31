@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.stream.Collectors;
 
-
 /**
  * This is used to represent a single vertex
  * stored in GPU memory,
@@ -39,7 +38,6 @@ public class GlLodVertexFormat
 {
 	/** the format of data stored in the GPU buffers */
 	public static final GlLodVertexFormat DH_VERTEX_FORMAT = GlVertexFormats.POSITION_COLOR_BLOCK_LIGHT_SKY_LIGHT_MATERIAL_ID_NORMAL_INDEX;
-
 
 	private final ImmutableList<GlLodVertexFormatElement> elements;
 	private final int byteSize;
@@ -62,11 +60,8 @@ public class GlLodVertexFormat
 		return this.byteSize;
 	}
 
-
-
 	@Override
 	public String toString() { return "format: " + this.elements.size() + " elements: " + this.elements.stream().map(Object::toString).collect(Collectors.joining(" ")); }
-
 
 	@Override
 	public boolean equals(Object obj)
@@ -88,7 +83,4 @@ public class GlLodVertexFormat
 
 	@Override
 	public int hashCode() { return this.elements.hashCode(); }
-
-
-
 }

@@ -42,14 +42,12 @@ public abstract class DhApiChunkModifiedEvent implements IDhApiEvent<DhApiChunkM
 	/** Fired after Distant Horizons saves LOD data for the server. */
 	public abstract void onChunkModified(DhApiEventParam<EventParam> input);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.onChunkModified(input); }
-
 
 	//==================//
 	// parameter object //
@@ -65,14 +63,12 @@ public abstract class DhApiChunkModifiedEvent implements IDhApiEvent<DhApiChunkM
 		/** the modified chunk's Z pos in chunk coordinates */
 		public final int chunkZ;
 
-
 		public EventParam(IDhApiLevelWrapper newLevelWrapper, int chunkX, int chunkZ)
 		{
 			this.levelWrapper = newLevelWrapper;
 			this.chunkX = chunkX;
 			this.chunkZ = chunkZ;
 		}
-
 
 		@Override
 		public EventParam copy()
@@ -82,7 +78,5 @@ public abstract class DhApiChunkModifiedEvent implements IDhApiEvent<DhApiChunkM
 				this.chunkX, this.chunkZ
 			);
 		}
-
 	}
-
 }

@@ -44,15 +44,11 @@ public class ServerApi
 
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	private ServerApi() { }
-
-
 
 	//===============//
 	// server events //
@@ -75,7 +71,6 @@ public class ServerApi
 			SharedApi.setDhWorld(null);
 		}
 	}
-
 
 	//==============//
 	// level events //
@@ -102,15 +97,12 @@ public class ServerApi
 		}
 	}
 
-
 	//=======================//
 	// chunk modified events //
 	//=======================//
 
 	public void serverChunkLoadEvent(IChunkWrapper chunkWrapper, ILevelWrapper level) { SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, level, true); }
 	public void serverChunkSaveEvent(IChunkWrapper chunkWrapper, ILevelWrapper level) { SharedApi.INSTANCE.applyChunkUpdate(chunkWrapper, level, true); }
-
-
 
 	//===============//
 	// player events //
@@ -179,5 +171,4 @@ public class ServerApi
 			serverWorld.getServerPlayerStateManager().handlePluginMessage(player, message);
 		}
 	}
-
 }

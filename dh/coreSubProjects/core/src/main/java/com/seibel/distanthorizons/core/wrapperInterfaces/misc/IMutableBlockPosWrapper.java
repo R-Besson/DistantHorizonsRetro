@@ -10,5 +10,4 @@ import com.seibel.distanthorizons.api.interfaces.IDhApiUnsafeWrapper;
 public interface IMutableBlockPosWrapper extends IDhApiUnsafeWrapper
 {
 
-
 }

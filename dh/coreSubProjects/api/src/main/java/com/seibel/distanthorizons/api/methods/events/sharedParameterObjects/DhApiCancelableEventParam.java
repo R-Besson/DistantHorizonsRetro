@@ -33,5 +33,4 @@ public class DhApiCancelableEventParam<T> extends DhApiEventParam<T>
 	public void cancelEvent() { this.eventCanceled = true; }
 	/** @return if this DH event has been canceled, either by this event handler or a previous one. */
 	public boolean isEventCanceled() { return this.eventCanceled; }
-
 }

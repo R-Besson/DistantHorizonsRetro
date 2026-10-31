@@ -43,8 +43,6 @@ public class DhApiGraphicsConfig implements IDhApiGraphicsConfig
 
 	private DhApiGraphicsConfig() { }
 
-
-
 	//==============//
 	// inner layers //
 	//==============//
@@ -59,8 +57,6 @@ public class DhApiGraphicsConfig implements IDhApiGraphicsConfig
 	public IDhApiTextureConfig texture() { return DhApiTextureConfig.INSTANCE; }
 	@Override
 	public IDhApiGenericRenderingConfig genericRendering() { return DhApiGenericRenderingConfig.INSTANCE; }
-
-
 
 	//========================//
 	// basic graphic settings //
@@ -77,8 +73,6 @@ public class DhApiGraphicsConfig implements IDhApiGraphicsConfig
 	@Override
 	public IDhApiConfigValue<EDhApiRendererMode> renderingMode()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.rendererMode); }
-
-
 
 	//==================//
 	// graphic settings //
@@ -115,8 +109,6 @@ public class DhApiGraphicsConfig implements IDhApiGraphicsConfig
 	@Override
 	public IDhApiConfigValue<Integer> getBiomeBlending()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Quality.lodBiomeBlending); }
-
-
 
 	//===========================//
 	// advanced graphic settings //
@@ -161,7 +153,4 @@ public class DhApiGraphicsConfig implements IDhApiGraphicsConfig
 	@Override
 	public IDhApiConfigValue<Boolean> disableShadowFrustumCulling()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Culling.disableShadowPassFrustumCulling); }
-
-
-
 }

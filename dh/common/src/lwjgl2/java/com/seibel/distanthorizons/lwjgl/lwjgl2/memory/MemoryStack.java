@@ -136,5 +136,4 @@ public class MemoryStack implements AutoCloseable
 	{
 		return TLS.get().push();
 	}
-
 }

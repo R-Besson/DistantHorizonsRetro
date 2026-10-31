@@ -19,15 +19,10 @@ public class MixinActiveRenderInfo
 	@Shadow
 	private static FloatBuffer projection;
 
-
-
 	@Inject(method = "updateRenderInfo", at = @At(value = "TAIL"))
 	private static void asini$onUpdateRenderInfo(EntityPlayer p_74583_0_, boolean p_74583_1_, CallbackInfo ci)
 	{
 		RenderHelper.setProjectionMatrixFromBuffer(projection);
 		RenderHelper.setModelViewMatrixFromBuffer(modelview);
 	}
-
-
-
 }

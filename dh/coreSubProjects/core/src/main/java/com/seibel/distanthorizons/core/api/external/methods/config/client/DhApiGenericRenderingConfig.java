@@ -30,8 +30,6 @@ public class DhApiGenericRenderingConfig implements IDhApiGenericRenderingConfig
 
 	private DhApiGenericRenderingConfig() { }
 
-
-
 	@Override
 	public IDhApiConfigValue<Boolean> renderingEnabled()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.GenericRendering.enableGenericRendering); }
@@ -41,5 +39,4 @@ public class DhApiGenericRenderingConfig implements IDhApiGenericRenderingConfig
 	@Override
 	public IDhApiConfigValue<Boolean> cloudRenderingEnabled()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.GenericRendering.enableCloudRendering); }
-
 }

@@ -25,7 +25,6 @@ public class FullDataPayloadSender implements AutoCloseable
 	/** how often the dropped real-time update warning can be logged */
 	private static final long MIN_MS_BETWEEN_REALTIME_DROP_LOGS = 30_000;
 
-
 	private static final Timer UPLOAD_TIMER = TimerUtil.CreateTimer("FullDataPayloadSender");
 	private final TimerTask tickTimerTask = TimerUtil.createTimerTask(this::tick);
 
@@ -39,7 +38,6 @@ public class FullDataPayloadSender implements AutoCloseable
 	private volatile boolean closed = false;
 
 	private long lastRealTimeDropLogMs = 0;
-
 
 	public FullDataPayloadSender(NetworkSession session, IntSupplier maxKBpsSupplier, SharedBandwidthLimit sharedBandwidthLimit)
 	{
@@ -63,7 +61,6 @@ public class FullDataPayloadSender implements AutoCloseable
 			this.transferQueue.clear();
 		}
 	}
-
 
 	/** for generation and sync responses, these are never dropped since the rate limiter already bounds them */
 	public void sendInChunks(FullDataPayload payload, Runnable sendFinalMessage)
@@ -191,7 +188,6 @@ public class FullDataPayloadSender implements AutoCloseable
 		}
 	}
 
-
 	private static class PendingTransfer
 	{
 		public final int bufferId;
@@ -206,7 +202,5 @@ public class FullDataPayloadSender implements AutoCloseable
 			this.sendFinalMessage = sendFinalMessage;
 			this.realTime = realTime;
 		}
-
 	}
-
 }

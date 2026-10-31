@@ -30,8 +30,6 @@ public class SortedArraySet<E>
 
 	private final Comparator<? super E> comparator;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -40,8 +38,6 @@ public class SortedArraySet<E>
 	{
 		this.comparator = comparator;
 	}
-
-
 
 	//==============//
 	// list methods //
@@ -65,8 +61,6 @@ public class SortedArraySet<E>
 		this.set.clear();
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -79,7 +73,4 @@ public class SortedArraySet<E>
 			", comparator=" + this.comparator +
 			'}';
 	}
-
-
-
 }

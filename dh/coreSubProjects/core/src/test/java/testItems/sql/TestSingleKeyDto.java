@@ -28,9 +28,6 @@ public class TestSingleKeyDto implements IBaseDTO<Integer>
 	public long longValue;
 	public byte byteValue;
 
-
-
-
 	public TestSingleKeyDto(int id, String value, long longValue, byte byteValue)
 	{
 		this.id = id;
@@ -41,7 +38,6 @@ public class TestSingleKeyDto implements IBaseDTO<Integer>
 
 	@Override
 	public Integer getKey() { return this.id; }
-
 
 	@Override
 	public boolean equals(Object other)
@@ -70,7 +66,4 @@ public class TestSingleKeyDto implements IBaseDTO<Integer>
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-
-
-
 }

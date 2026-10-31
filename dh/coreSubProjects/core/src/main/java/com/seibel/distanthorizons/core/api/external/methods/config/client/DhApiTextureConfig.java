@@ -30,16 +30,12 @@ public class DhApiTextureConfig implements IDhApiTextureConfig
 
 	private DhApiTextureConfig() { }
 
-
-
 	@Override
 	public IDhApiConfigValue<Boolean> texturesEnabled()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.enableTexturedLods); }
 	@Override
 	public IDhApiConfigValue<Integer> maxTexturedLodDetailLevel()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.maxTexturedLodDetailLevel); }
-
-
 
 	@Override
 	public IDhApiConfigValue<String> blocksDontRenderTextureCsv()
@@ -53,5 +49,4 @@ public class DhApiTextureConfig implements IDhApiTextureConfig
 	@Override
 	public IDhApiConfigValue<String> blocksAlwaysRasterizeTextureCsv()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Texture.blocksAlwaysRasterizeTextureCsv); }
-
 }

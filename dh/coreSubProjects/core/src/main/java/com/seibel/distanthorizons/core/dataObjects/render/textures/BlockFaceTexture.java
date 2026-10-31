@@ -50,8 +50,6 @@ public class BlockFaceTexture
 	 */
 	public int ratioReferenceColor = 0;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -87,8 +85,6 @@ public class BlockFaceTexture
 
 	//endregion
 
-
-
 	//=====//
 	// API //
 	//=====//
@@ -107,7 +103,4 @@ public class BlockFaceTexture
 	}
 
 	//endregion
-
-
-
 }

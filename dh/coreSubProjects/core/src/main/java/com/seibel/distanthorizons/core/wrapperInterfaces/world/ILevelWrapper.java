@@ -93,7 +93,4 @@ public interface ILevelWrapper extends IDhApiLevelWrapper, IBindable
 	void setDhLevel(IDhLevel parentLevel);
 	@Nullable
 	IDhLevel getDhLevel();
-
-
-
 }

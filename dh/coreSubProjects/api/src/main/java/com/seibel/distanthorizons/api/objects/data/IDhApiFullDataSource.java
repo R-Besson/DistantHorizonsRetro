@@ -49,7 +49,4 @@ public interface IDhApiFullDataSource
 	 * @throws IndexOutOfBoundsException if the relative positions are negative or outside the bounds of this data source.
 	 */
 	List<DhApiTerrainDataPoint> getApiDataPointColumn(int relX, int relZ) throws IndexOutOfBoundsException;
-
-
-
 }

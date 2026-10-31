@@ -64,8 +64,6 @@ public class PhantomLoggingHelper
 		logger.warn(prefix + " Stacks: [" + allocationStackTraceCountPairList.size() + "]\n" + stringBuilder);
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -99,10 +97,7 @@ public class PhantomLoggingHelper
 
 		private static final ThreadPoolExecutor CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("BasicPhantom Cleanup");
 
-
 		private final PhantomReference<? extends BasicPhantomReference> phantomReference;
-
-
 
 		//==============//
 		// constructors //
@@ -113,7 +108,6 @@ public class PhantomLoggingHelper
 		{
 			CLEANUP_THREAD.execute(BasicPhantomReference::runPhantomReferenceCleanupLoop);
 		}
-
 		public BasicPhantomReference(Class<?> parentClass)
 		{
 			this.phantomReference = new PhantomReference<>(this, PHANTOM_REFERENCE_QUEUE);
@@ -121,8 +115,6 @@ public class PhantomLoggingHelper
 		}
 
 		//endregion
-
-
 
 		//================//
 		// base overrides //
@@ -137,8 +129,6 @@ public class PhantomLoggingHelper
 		}
 
 		//endregion
-
-
 
 		//================//
 		// static cleanup //
@@ -185,8 +175,6 @@ public class PhantomLoggingHelper
 						phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 					}
 
-
-
 					if (LOG_PHANTOM_RECOVERY)
 					{
 						// we only want to log when something has been returned
@@ -197,7 +185,6 @@ public class PhantomLoggingHelper
 							PhantomLoggingHelper.LogAllocationStackTracePairCounts(LOGGER, "Parent class", parentClassNameCountPairList);
 						}
 					}
-
 				}
 				catch (Exception e)
 				{
@@ -207,12 +194,7 @@ public class PhantomLoggingHelper
 		}
 
 		//endregion
-
-
 	}
 
 	//endregion
-
-
-
 }

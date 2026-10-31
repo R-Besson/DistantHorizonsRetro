@@ -33,10 +33,8 @@ public abstract class GlAbstractShaderRenderer
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	protected GlShaderProgram shader;
 	protected boolean init = false;
-
 
 	//=======//
 	// setup //
@@ -58,7 +56,6 @@ public abstract class GlAbstractShaderRenderer
 
 	//endregion
 
-
 	//==================//
 	// abstract methods //
 	//==================//
@@ -71,8 +68,6 @@ public abstract class GlAbstractShaderRenderer
 	protected void onRender() { }
 
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -97,7 +92,4 @@ public abstract class GlAbstractShaderRenderer
 	}
 
 	//endregion
-
-
-
 }

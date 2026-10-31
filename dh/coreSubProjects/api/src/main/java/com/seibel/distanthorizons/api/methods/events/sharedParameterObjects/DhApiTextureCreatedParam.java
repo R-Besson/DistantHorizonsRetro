@@ -41,7 +41,6 @@ public class DhApiTextureCreatedParam implements IDhApiEventParam
 	/** Measured in pixels */
 	public final int newHeight;
 
-
 	public DhApiTextureCreatedParam(
 		int previousWidth, int previousHeight,
 		int newWidth, int newHeight)
@@ -51,9 +50,7 @@ public class DhApiTextureCreatedParam implements IDhApiEventParam
 
 		this.newWidth = newWidth;
 		this.newHeight = newHeight;
-
 	}
-
 
 	@Override
 	public DhApiTextureCreatedParam copy()
@@ -63,5 +60,4 @@ public class DhApiTextureCreatedParam implements IDhApiEventParam
 			this.newWidth, this.newHeight
 		);
 	}
-
 }

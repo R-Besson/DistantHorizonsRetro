@@ -40,8 +40,6 @@ public final class DataSourceRetrievalTask
 
 	public final CompletableFuture<DataSourceRetrievalResult> future = new CompletableFuture<>();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -54,7 +52,4 @@ public final class DataSourceRetrievalTask
 		int widthInBlocks = BitShiftUtil.powerOfTwo(DhSectionPos.getDetailLevel(this.pos));
 		this.widthInChunks = widthInBlocks / LodUtil.CHUNK_WIDTH;
 	}
-
-
-
 }

@@ -24,12 +24,8 @@ public class WorldChunkUpdateManager
 	/** singleton since we only expect to have one world loaded at a time */
 	public static final WorldChunkUpdateManager INSTANCE = new WorldChunkUpdateManager();
 
-
 	/** Queues are removed when their level unloads, and all of them during world shutdown. */
 	private final ConcurrentHashMap<ILevelWrapper, ChunkUpdateQueueManager> updateQueueByLevelWrapper = new ConcurrentHashMap<>();
-
-
-
 
 	//=============//
 	// constructor //
@@ -39,8 +35,6 @@ public class WorldChunkUpdateManager
 	private WorldChunkUpdateManager() { }
 
 	//endregion
-
-
 
 	//=================//
 	// manager methods //
@@ -81,7 +75,6 @@ public class WorldChunkUpdateManager
 			// ignore client updates on the server
 			return null;
 		}
-
 
 		ChunkUpdateQueueManager queueManager = this.updateQueueByLevelWrapper.get(levelWrapper);
 		if (queueManager != null)
@@ -131,8 +124,6 @@ public class WorldChunkUpdateManager
 
 	//endregion
 
-
-
 	//=========//
 	// F3 Menu //
 	//=========//
@@ -175,7 +166,4 @@ public class WorldChunkUpdateManager
 	}
 
 	//endregion
-
-
-
 }

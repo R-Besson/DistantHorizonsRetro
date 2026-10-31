@@ -57,5 +57,4 @@ public interface ICubicChunksCommonAccessor extends IModAccessor
 	 */
 	@Nullable
 	Chunk generateColumn(World world, int columnX, int columnZ);
-
 }

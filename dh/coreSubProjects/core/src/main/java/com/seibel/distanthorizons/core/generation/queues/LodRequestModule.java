@@ -44,7 +44,6 @@ public class LodRequestModule implements Closeable
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
 	private final GeneratedFullDataSourceProvider.IOnWorldGenCompleteListener onWorldGenCompleteListener;
 	private final ThreadPoolExecutor tickerThread;
 
@@ -52,8 +51,6 @@ public class LodRequestModule implements Closeable
 	private final Supplier<? extends AbstractLodRequestState> worldGenStateSupplier;
 
 	private final AtomicReference<AbstractLodRequestState> lodRequestStateRef = new AtomicReference<>();
-
-
 
 	//=============//
 	// constructor //
@@ -77,8 +74,6 @@ public class LodRequestModule implements Closeable
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// ticking //
@@ -126,8 +121,6 @@ public class LodRequestModule implements Closeable
 		// if the world is read only don't generate anything
 		shouldDoWorldGen &= !DhApiWorldProxy.INSTANCE.tryGetReadOnly();
 
-
-
 		boolean isWorldGenRunning = this.isWorldGenRunning();
 		if (shouldDoWorldGen && !isWorldGenRunning)
 		{
@@ -155,8 +148,6 @@ public class LodRequestModule implements Closeable
 	}
 
 	//endregion
-
-
 
 	//===================//
 	// world gen control //
@@ -202,8 +193,6 @@ public class LodRequestModule implements Closeable
 
 	//endregion
 
-
-
 	//=======================//
 	// base method overrides //
 	//=======================//
@@ -237,8 +226,6 @@ public class LodRequestModule implements Closeable
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -254,7 +241,6 @@ public class LodRequestModule implements Closeable
 		{
 			return;
 		}
-
 
 		// estimated tasks
 		String waitingCountStr = F3Screen.NUMBER_FORMAT.format(worldGenState.retrievalQueue.getWaitingTaskCount());
@@ -275,7 +261,4 @@ public class LodRequestModule implements Closeable
 	}
 
 	//endregion
-
-
-
 }

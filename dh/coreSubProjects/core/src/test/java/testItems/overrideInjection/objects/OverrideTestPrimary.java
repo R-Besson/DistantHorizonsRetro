@@ -34,11 +34,9 @@ public class OverrideTestPrimary implements IOverrideTest
 
 	public static int VALUE = 3;
 
-
 	@Override
 	public int getValue() { return VALUE; }
 
 	@Override
 	public int getPriority() { return PRIORITY; }
-
 }

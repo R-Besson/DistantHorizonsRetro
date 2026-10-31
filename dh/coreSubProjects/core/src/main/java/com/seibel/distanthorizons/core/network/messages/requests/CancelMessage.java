@@ -26,11 +26,8 @@ public class CancelMessage extends AbstractTrackableMessage
 {
 	public CancelMessage() { }
 
-
-
 	@Override
 	public void encodeInternal(ByteBuf out) { }
 	@Override
 	public void decodeInternal(ByteBuf in) { }
-
 }

@@ -333,5 +333,4 @@ public class GLEnums
 				throw new IllegalArgumentException("Unknown type enum: " + getString(glTypeEnum));
 		}
 	}
-
 }

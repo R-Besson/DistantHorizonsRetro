@@ -16,8 +16,6 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 {
 	private final @NotNull ISaveBeaconsFunc saveBeaconsFunc;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -32,8 +30,6 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 	}
 
 	//endregion
-
-
 
 	//================//
 	// save to memory //
@@ -70,8 +66,6 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 	public BeaconSaveObjContainer writeToMemoryAndQueueSave(long inputPos, BeaconBeamDTO inputObj) { throw new UnsupportedOperationException("Use queueBeaconBeamUpdatesForChunkPos instead"); }
 
 	//endregion
-
-
 
 	//====================//
 	// abstract overrides //
@@ -112,8 +106,6 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -129,15 +121,12 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 			int minBlockZ, int maxBlockZ,
 			List<BeaconBeamDTO> activeBeamList
 		);
-
 	}
 
 	public static class BeaconSaveObjContainer extends AbstractSaveObjContainer<BeaconBeamDTO>
 	{
 		public final long pos;
 		public final HashMap<DhChunkPos, HashMap<DhBlockPos, BeaconBeamDTO>> beaconsByBlockPosByChunkPos = new HashMap<>();
-
-
 
 		//=============//
 		// constructor //
@@ -147,8 +136,6 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 		public BeaconSaveObjContainer(long pos) { this.pos = pos; }
 
 		//endregion
-
-
 
 		//===========//
 		// overrides //
@@ -178,11 +165,7 @@ public class DelayedBeaconSaveCache extends AbstractDelayedSaveCache<BeaconBeamD
 		public void update(@Nullable BeaconBeamDTO newObj) { }
 
 		//endregion
-
 	}
 
 	//endregion
-
-
-
 }

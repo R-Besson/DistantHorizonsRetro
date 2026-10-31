@@ -72,5 +72,4 @@ public class DistantHorizonsMixinConfigPlugin implements IMixinConfigPlugin
 	{
 
 	}
-
 }

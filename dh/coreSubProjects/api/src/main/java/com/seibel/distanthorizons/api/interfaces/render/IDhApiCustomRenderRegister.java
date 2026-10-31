@@ -25,5 +25,4 @@ public interface IDhApiCustomRenderRegister
 	void add(IDhApiRenderableBoxGroup cubeGroup) throws IllegalArgumentException;
 
 	IDhApiRenderableBoxGroup remove(long id);
-
 }

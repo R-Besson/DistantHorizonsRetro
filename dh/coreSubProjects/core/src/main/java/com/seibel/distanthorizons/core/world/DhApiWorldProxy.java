@@ -54,15 +54,11 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 
 	private boolean isReadOnly = false;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	private DhApiWorldProxy() { }
-
-
 
 	//===================//
 	// getters / setters //
@@ -109,7 +105,6 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 			throw new IllegalStateException(NO_WORLD_EXCEPTION_STRING);
 		}
 
-
 		return this.isReadOnly;
 	}
 
@@ -130,8 +125,6 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 		return this.isReadOnly;
 	}
 
-
-
 	//================//
 	// level handlers //
 	//================//
@@ -149,10 +142,8 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 			return null;
 		}
 
-
 		return MC_CLIENT.getWrappedClientLevel();
 	}
-
 
 	@Override
 	public Iterable<IDhApiLevelWrapper> getAllLoadedLevelWrappers() throws IllegalStateException
@@ -216,6 +207,4 @@ public class DhApiWorldProxy implements IDhApiWorldProxy
 
 		return returnList;
 	}
-
-
 }

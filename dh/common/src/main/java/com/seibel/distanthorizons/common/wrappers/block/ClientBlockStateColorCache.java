@@ -47,7 +47,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-
 /**
  * This stores and calculates the colors
  * the given BlockState should have based
@@ -86,8 +85,6 @@ public class ClientBlockStateColorCache
 		ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST,
 		ForgeDirection.UP, ForgeDirection.DOWN};
 
-
-
 	private static final ThreadLocal<FakeWorld> FAKE_WORLD_REF = ThreadLocal.withInitial(FakeWorld::new);
 
 	private final IClientLevelWrapper clientLevelWrapper;
@@ -96,8 +93,6 @@ public class ClientBlockStateColorCache
 	private boolean isColorResolved = false;
 	private int baseColor = 0;
 	private boolean needPostTinting = false;
-
-
 
 	//===========//
 	// constants //
@@ -170,8 +165,6 @@ public class ClientBlockStateColorCache
 
 	//endregion
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -186,8 +179,6 @@ public class ClientBlockStateColorCache
 	}
 
 	//endregion
-
-
 
 	//===================//
 	// color calculation //
@@ -267,9 +258,7 @@ public class ClientBlockStateColorCache
 		{
 			RESOLVE_LOCK.unlock();
 		}
-
 	}
-
 
 	/**
 	 * The block's LOD color before biome tinting, the same as {@link #resolveColors()} calculates. <br>
@@ -445,10 +434,7 @@ public class ClientBlockStateColorCache
 		return (bias + (scale * t)) >>> 16;
 	}
 
-
 	//endregion
-
-
 
 	//===============//
 	// public getter //
@@ -481,7 +467,6 @@ public class ClientBlockStateColorCache
 				return baseColor;
 			}
 
-
 			// attempt to get the tint
 			try
 			{
@@ -504,7 +489,6 @@ public class ClientBlockStateColorCache
 			}
 		}
 
-
 		int returnColor;
 		if (tintColor != ClientBlockStateColorCache.INVALID_COLOR)
 		{
@@ -515,7 +499,6 @@ public class ClientBlockStateColorCache
 			// unable to get the tinted color, use the base color instead
 			returnColor = baseColor;
 		}
-
 
 		// only fire the API event if allowed
 		// (done to prevent infinite loops if called during by another color resolution event)
@@ -540,8 +523,6 @@ public class ClientBlockStateColorCache
 	}
 
 	//endregion
-
-
 
 	//================//
 	// helper classes //
@@ -587,7 +568,4 @@ public class ClientBlockStateColorCache
 	}
 
 	//endregion
-
-
-
 }

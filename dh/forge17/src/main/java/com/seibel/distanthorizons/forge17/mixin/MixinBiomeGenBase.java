@@ -13,7 +13,4 @@ public class MixinBiomeGenBase
 	@Inject(method = "<init>(IZ)V", at = @At("TAIL"))
 	private void captureBiome(int p_i1971_1_, boolean register, CallbackInfo ci)
 	{ BiomeHandler.INSTANCE.addBiome((BiomeGenBase) (Object) this); }
-
-
-
 }

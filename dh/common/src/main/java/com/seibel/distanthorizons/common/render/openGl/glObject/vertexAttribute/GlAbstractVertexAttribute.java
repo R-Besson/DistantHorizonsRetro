@@ -34,8 +34,6 @@ public abstract class GlAbstractVertexAttribute
 	/** Stores the handle of the AbstractVertexAttribute. */
 	public final int id;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -59,8 +57,6 @@ public abstract class GlAbstractVertexAttribute
 		}
 	}
 
-
-
 	//=========//
 	// binding //
 	//=========//
@@ -70,8 +66,6 @@ public abstract class GlAbstractVertexAttribute
 
 	/** Always remember to always free your resources! */
 	public void free() { LWJGL.glDeleteVertexArrays(this.id); }
-
-
 
 	//==================//
 	// abstract methods //
@@ -83,5 +77,4 @@ public abstract class GlAbstractVertexAttribute
 	public abstract void setVertexAttribute(int bindingPoint, int attributeIndex, GlVertexPointer attribute);
 	/** Requires both AbstractVertexAttribute to be bound */
 	public abstract void completeAndCheck(int expectedStrideSize);
-
 }

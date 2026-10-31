@@ -46,6 +46,4 @@ public interface IDhApiDebuggingConfig extends IDhApiConfigGroup
 
 	/** If enabled Distant Horizons' debug wireframe rendering will be enabled. */
 	IDhApiConfigValue<Boolean> debugWireframeRendering();
-
-
 }

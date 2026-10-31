@@ -12,8 +12,6 @@ public class AngelicaVersionGuiException extends CustomModLoadingErrorDisplayExc
 	private final String installedVersion;
 	private final String requiredVersion;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -26,8 +24,6 @@ public class AngelicaVersionGuiException extends CustomModLoadingErrorDisplayExc
 	}
 
 	//endregion
-
-
 
 	//=====//
 	// GUI //
@@ -86,7 +82,4 @@ public class AngelicaVersionGuiException extends CustomModLoadingErrorDisplayExc
 	}
 
 	//endregion
-
-
-
 }

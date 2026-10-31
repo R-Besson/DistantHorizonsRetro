@@ -49,8 +49,6 @@ public class PhantomArrayListCheckout implements AutoCloseable
 	/** see {@link #getEmptyLongArrays}, kept since checkouts are reused */
 	private LongArrayList[] longArrayListArray = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -63,8 +61,6 @@ public class PhantomArrayListCheckout implements AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// setters //
@@ -99,8 +95,6 @@ public class PhantomArrayListCheckout implements AutoCloseable
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -111,8 +105,6 @@ public class PhantomArrayListCheckout implements AutoCloseable
 	public int getLongArrayCount() { return this.longArrayLists.size(); }
 	public int getCharArrayCount() { return this.charArrayLists.size(); }
 	public int getByteBufferWrapperCount() { return this.byteBufferWrapperList.size(); }
-
-
 
 	public ByteArrayList getByteArray(int index, int size)
 	{
@@ -192,8 +184,6 @@ public class PhantomArrayListCheckout implements AutoCloseable
 
 	//endregion
 
-
-
 	//===============//
 	// leak tracking //
 	//===============//
@@ -237,8 +227,6 @@ public class PhantomArrayListCheckout implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -248,7 +236,4 @@ public class PhantomArrayListCheckout implements AutoCloseable
 	public void close() { this.owningPool.returnCheckout(this); }
 
 	//endregion
-
-
-
 }

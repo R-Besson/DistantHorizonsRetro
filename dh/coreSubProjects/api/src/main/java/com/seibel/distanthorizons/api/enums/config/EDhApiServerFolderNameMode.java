@@ -62,5 +62,4 @@ public enum EDhApiServerFolderNameMode
 	 * This is just here to provide backwards compatibility.
 	 */
 	NAME_IP_PORT_MC_VERSION;
-
 }

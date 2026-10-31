@@ -46,8 +46,6 @@ public class DhRepoSqliteTest
 	public static String DATABASE_TYPE = "jdbc:sqlite";
 	public static String DB_FILE_NAME = "test.sqlite";
 
-
-
 	@BeforeClass
 	public static void testSetup()
 	{
@@ -58,15 +56,11 @@ public class DhRepoSqliteTest
 		}
 	}
 
-
-
 	@Test
 	public void testPrimaryKeyRepo()
 	{
 		try (TestPrimaryKeyRepo primaryKeyRepo = new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-
-
 
 			//==========================//
 			// Auto update script tests //
@@ -85,12 +79,9 @@ public class DhRepoSqliteTest
 				}
 			}
 
-
 			// check that the update scripts aren't run multiple times
 			new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
 			new TestPrimaryKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME));
-
-
 
 			//===========//
 			// DTO tests //
@@ -109,7 +100,6 @@ public class DhRepoSqliteTest
 			Assert.assertTrue("DTO exists failed", primaryKeyRepo.exists(insertDto));
 			Assert.assertTrue("DTO exists failed", primaryKeyRepo.existsWithKey(insertDto.getKey()));
 
-
 			// update
 			TestSingleKeyDto updateMetaFile = new TestSingleKeyDto(0, "b", Long.MAX_VALUE, Byte.MAX_VALUE);
 			primaryKeyRepo.save(updateMetaFile);
@@ -118,7 +108,6 @@ public class DhRepoSqliteTest
 			getDto = primaryKeyRepo.getByKey(0);
 			Assert.assertNotNull("get failed, null returned", getDto);
 			Assert.assertEquals("get/insert failed, not equal", updateMetaFile, getDto);
-
 
 			// delete
 			primaryKeyRepo.delete(updateMetaFile);
@@ -130,7 +119,6 @@ public class DhRepoSqliteTest
 			// exists - DTO absent
 			Assert.assertFalse("DTO exists failed", primaryKeyRepo.exists(insertDto));
 			Assert.assertFalse("DTO exists failed", primaryKeyRepo.existsWithKey(insertDto.getKey()));
-
 		}
 		catch (SQLException | IOException e)
 		{
@@ -143,8 +131,6 @@ public class DhRepoSqliteTest
 	{
 		try (TestCompoundKeyRepo compoundKeyRepo = new TestCompoundKeyRepo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-
-
 
 			//===========//
 			// DTO tests //
@@ -163,7 +149,6 @@ public class DhRepoSqliteTest
 			Assert.assertTrue("DTO exists failed", compoundKeyRepo.exists(insertDto));
 			Assert.assertTrue("DTO exists failed", compoundKeyRepo.existsWithKey(insertDto.getKey()));
 
-
 			// update
 			TestCompoundKeyDto updateMetaFile = new TestCompoundKeyDto(new DhChunkPos(1, 2), "b");
 			compoundKeyRepo.save(updateMetaFile);
@@ -172,7 +157,6 @@ public class DhRepoSqliteTest
 			getDto = compoundKeyRepo.getByKey(new DhChunkPos(1, 2));
 			Assert.assertNotNull("get failed, null returned", getDto);
 			Assert.assertEquals("get/insert failed, not equal", updateMetaFile, getDto);
-
 
 			// delete
 			compoundKeyRepo.delete(updateMetaFile);
@@ -184,7 +168,6 @@ public class DhRepoSqliteTest
 			// exists - DTO absent
 			Assert.assertFalse("DTO exists failed", compoundKeyRepo.exists(insertDto));
 			Assert.assertFalse("DTO exists failed", compoundKeyRepo.existsWithKey(insertDto.getKey()));
-
 		}
 		catch (SQLException | IOException e)
 		{
@@ -211,10 +194,7 @@ public class DhRepoSqliteTest
 			int insertCount = 10;
 			int readCount = 10;
 
-
-
 			Assert.assertEquals(0, primaryKeyRepo.openClosables.size());
-
 
 			//=============================//
 			// correctly closed statements //
@@ -239,8 +219,6 @@ public class DhRepoSqliteTest
 
 				Assert.assertEquals("Insert leaks", 0, primaryKeyRepo.openClosables.size());
 
-
-
 				// read
 				TestSingleKeyDto expectedReadDto = new TestSingleKeyDto(1, "a", 0L, (byte) 0);
 				for (int i = 0; i < readCount; i++)
@@ -260,8 +238,6 @@ public class DhRepoSqliteTest
 
 				Assert.assertEquals("read leaks", 0, primaryKeyRepo.openClosables.size());
 			}
-
-
 
 			//===================//
 			// leaked statements //
@@ -289,8 +265,6 @@ public class DhRepoSqliteTest
 				Assert.assertNotEquals(0, primaryKeyRepo.openClosables.size());
 				primaryKeyRepo.openClosables.clear();
 
-
-
 				// read
 				for (int i = 0; i < readCount; i++)
 				{
@@ -314,7 +288,6 @@ public class DhRepoSqliteTest
 			Assert.fail(e.getMessage());
 		}
 	}
-
 
 	// can be uncommented to compare different update methods performance
 	//@Test
@@ -349,8 +322,4 @@ public class DhRepoSqliteTest
 			repo.save(dto);
 		}
 	}
-
-
-
-
 }

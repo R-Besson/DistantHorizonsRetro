@@ -51,7 +51,6 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 	protected int vertexCount = 0;
 	public int getVertexCount() { return this.vertexCount; }
 
-
 	private GlQuadIndexBuffer quadIBO = null;
 	private static GlQuadIndexBuffer GLOBAL_QUAD_IBO = null;
 	public GlQuadIndexBuffer getQuadIBO()
@@ -65,8 +64,6 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 			return this.quadIBO;
 		}
 	}
-
-
 
 	//=============//
 	// constructor //
@@ -93,13 +90,10 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 			});
 		}
 	}
-
 	public GLVertexBuffer() { this(GLProxy.getInstance().getGpuUploadMethod() == EDhApiGpuUploadMethod.BUFFER_STORAGE); }
 	public GLVertexBuffer(boolean isBufferStorage) { super(isBufferStorage); }
 
 	//endregion
-
-
 
 	//======================//
 	// uploading/destroying //
@@ -138,7 +132,6 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 		this.vertexCount = vertexCount;
 	}
 
-
 	@Override
 	public void uploadIndexBuffer(ByteBuffer buffer, int vertexCount)
 	{
@@ -154,8 +147,6 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 			return;
 		}
 
-
-
 		if (this.quadIBO != null)
 		{
 			this.quadIBO.close();
@@ -168,8 +159,6 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -190,7 +179,4 @@ public class GLVertexBuffer extends GLBuffer implements IVertexBufferWrapper
 	}
 
 	//endregion
-
-
-
 }

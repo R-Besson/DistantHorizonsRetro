@@ -21,7 +21,6 @@ package com.seibel.distanthorizons.core.config.api.converters;
 
 import com.seibel.distanthorizons.coreapi.interfaces.config.IConverter;
 
-
 /**
  * Returns the object passed in, doesn't do any conversion. <br>
  * Helpful as the default converter in some cases.
@@ -42,5 +41,4 @@ public class DefaultConverter<T> implements IConverter<T, T>
 	{
 		return coreObject;
 	}
-
 }

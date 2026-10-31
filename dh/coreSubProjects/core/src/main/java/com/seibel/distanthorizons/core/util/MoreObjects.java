@@ -210,11 +210,8 @@ public final class MoreObjects
 			String name;
 			Object value;
 			ValueHolder next;
-
 		}
-
 	}
 
 	private MoreObjects() { }
-
 }

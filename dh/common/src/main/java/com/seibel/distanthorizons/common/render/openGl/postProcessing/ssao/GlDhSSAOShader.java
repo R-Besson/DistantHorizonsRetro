@@ -48,12 +48,10 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
 	public int frameBuffer;
 
 	private DhMat4f projection;
 	private DhMat4f invertedProjection;
-
 
 	// uniforms
 	public int uProj;
@@ -69,8 +67,6 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 	public int uFadeDistanceInBlocks;
 	public int uIsReverseZDepth;
 	public int uDepthIsZeroToPositiveOne;
-
-
 
 	//=============//
 	// constructor //
@@ -98,8 +94,6 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
 		this.uDepthIsZeroToPositiveOne = this.shader.getUniformLocation("uDepthIsZeroToPositiveOne");
 	}
-
-
 
 	//=============//
 	// render prep //
@@ -129,10 +123,7 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 
 		this.shader.setUniform(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 		this.shader.setUniform(this.uDepthIsZeroToPositiveOne, (RENDER_DEF.getDepthRange() == EDhApiDepthRange.ZERO_TO_POS_ONE) ? 1 : 0);
-
 	}
-
-
 
 	//========//
 	// render //
@@ -151,7 +142,4 @@ public class GlDhSSAOShader extends GlAbstractShaderRenderer
 
 		GlScreenQuad.INSTANCE.render();
 	}
-
-
-
 }

@@ -23,11 +23,9 @@ public interface IIrisAccessor extends IModAccessor
 {
 	String READABLE_NAME = "Iris";
 
-
 	boolean isShaderPackInUse();
 
 	boolean isRenderingShadowPass();
 
 	boolean isReverseZDuringShaders();
-
 }

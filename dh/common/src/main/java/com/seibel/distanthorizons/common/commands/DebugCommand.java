@@ -7,7 +7,6 @@ import net.minecraft.command.ICommandSender;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DebugCommand extends AbstractDhCommand
 {
 	private static String getDebugString()
@@ -19,5 +18,4 @@ public class DebugCommand extends AbstractDhCommand
 
 	public void execute(ICommandSender sender)
 	{ sendMessage(sender, getDebugString()); }
-
 }

@@ -42,12 +42,10 @@ public abstract class DhApiBeforeRenderPassEvent implements IDhApiEvent<DhApiRen
 	 */
 	public abstract void beforeRender(DhApiEventParam<DhApiRenderParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<DhApiRenderParam> event) { this.beforeRender(event); }
-
 }

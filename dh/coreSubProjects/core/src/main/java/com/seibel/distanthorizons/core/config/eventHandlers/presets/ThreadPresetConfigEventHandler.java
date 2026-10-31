@@ -35,7 +35,6 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 {
 	public static final ThreadPresetConfigEventHandler INSTANCE = new ThreadPresetConfigEventHandler();
 
-
 	public static int getDefaultThreadCount() { return getThreadCountByPercent(0.5); }
 	private final ConfigPresetOptions<EDhApiThreadPreset, Integer> threadCount = new ConfigPresetOptions<>(Config.Common.MultiThreading.numberOfThreads,
 		new HashMap<EDhApiThreadPreset, Integer>()
@@ -57,8 +56,6 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 			this.put(EDhApiThreadPreset.I_PAID_FOR_THE_WHOLE_CPU, 1.0);
 		}});
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -76,8 +73,6 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 			new ConfigChangeListener<>(config.configEntry, (val) -> this.onConfigValueChanged());
 		}
 	}
-
-
 
 	//================//
 	// helper methods //
@@ -108,8 +103,6 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 		return MathUtil.clamp(1, coreCount, totalProcessorCount);
 	}
 
-
-
 	//==============//
 	// enum getters //
 	//==============//
@@ -121,7 +114,4 @@ public class ThreadPresetConfigEventHandler extends AbstractPresetConfigEventHan
 	protected List<EDhApiThreadPreset> getPresetEnumList() { return Arrays.asList(EDhApiThreadPreset.values()); }
 	@Override
 	protected EDhApiThreadPreset getCustomPresetEnum() { return EDhApiThreadPreset.CUSTOM; }
-
-
-
 }

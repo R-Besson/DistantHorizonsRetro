@@ -26,5 +26,4 @@ public interface IDhTestTriangleRenderer extends IBindable
 {
 
 	void render(RenderParams renderParams);
-
 }

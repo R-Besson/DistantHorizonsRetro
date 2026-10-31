@@ -36,7 +36,6 @@ import java.util.ArrayList;
 public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 {
 
-
 	//=============//
 	// constructor //
 	//=============//
@@ -45,8 +44,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 	{
 		super(databaseType, databaseFile, BeaconBeamDTO.class);
 	}
-
-
 
 	//===========//
 	// overrides //
@@ -66,8 +63,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 		statement.setInt(index, pos.getZ());
 	}
 
-
-
 	//=======================//
 	// repo required methods //
 	//=======================//
@@ -83,7 +78,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 		int red = resultSet.getInt("ColorR");
 		int green = resultSet.getInt("ColorG");
 		int blue = resultSet.getInt("ColorB");
-
 
 		return new BeaconBeamDTO(new DhBlockPos(posX, posY, posZ), new Color(red, green, blue));
 	}
@@ -112,7 +106,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 			return null;
 		}
 
-
 		int i = 1;
 		statement.setInt(i++, dto.blockPos.getX());
 		statement.setInt(i++, dto.blockPos.getY());
@@ -127,8 +120,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 
 		return statement;
 	}
-
-
 
 	//====================//
 	// additional methods //
@@ -173,7 +164,6 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 			statement.setInt(i++, minBlockZ);
 			statement.setInt(i, maxBlockZ);
 
-
 			try (ResultSet result = this.query(statement))
 			{
 				while (result != null && result.next())
@@ -196,6 +186,4 @@ public class BeaconBeamRepo extends AbstractDhRepo<DhBlockPos, BeaconBeamDTO>
 
 		return beamList;
 	}
-
-
 }

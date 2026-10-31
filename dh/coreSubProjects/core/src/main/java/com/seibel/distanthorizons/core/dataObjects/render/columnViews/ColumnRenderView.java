@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.core.dataObjects.render.columnViews;
 
-
 import com.seibel.distanthorizons.api.enums.config.EDhApiVerticalQuality;
 import com.seibel.distanthorizons.core.dataObjects.render.ColumnRenderSource;
 import com.seibel.distanthorizons.core.util.RenderDataPointReducingList;
@@ -38,7 +37,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public final class ColumnRenderView implements AutoCloseable
 {
 	private static final ConcurrentLinkedQueue<ColumnRenderView> COLUMN_VIEW_POOL = new ConcurrentLinkedQueue<>();
-
 
 	/** @see ColumnRenderSource#renderDataContainer */
 	public LongArrayList data;
@@ -68,8 +66,6 @@ public final class ColumnRenderView implements AutoCloseable
 	 * since this column is only a single datapoint wide.
 	 */
 	public int voidDataOffset;
-
-
 
 	//=============//
 	// constructor //
@@ -152,8 +148,6 @@ public final class ColumnRenderView implements AutoCloseable
 
 	//endregion
 
-
-
 	//=====================//
 	// getters and setters //
 	//=====================//
@@ -195,8 +189,6 @@ public final class ColumnRenderView implements AutoCloseable
 
 	//endregion
 
-
-
 	//=========//
 	// subview //
 	//=========//
@@ -213,13 +205,10 @@ public final class ColumnRenderView implements AutoCloseable
 			this.maxVerticalSliceCount);
 	}
 
-
 	/** can be used to determine sub-view starting indexes */
 	public int subViewCount() { return (this.maxVerticalSliceCount != 0) ? (this.size / this.maxVerticalSliceCount) : 0; }
 
 	//endregion
-
-
 
 	//======================//
 	// change vertical size //
@@ -356,8 +345,6 @@ public final class ColumnRenderView implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -396,7 +383,4 @@ public final class ColumnRenderView implements AutoCloseable
 	}
 
 	//endregion
-
-
-
 }

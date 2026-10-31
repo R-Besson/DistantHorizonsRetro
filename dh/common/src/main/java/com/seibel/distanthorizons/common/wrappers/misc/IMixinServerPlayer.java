@@ -8,5 +8,4 @@ public interface IMixinServerPlayer
 {
 	@Nullable
 	WorldServer distantHorizons$getDimensionChangeDestination();
-
 }

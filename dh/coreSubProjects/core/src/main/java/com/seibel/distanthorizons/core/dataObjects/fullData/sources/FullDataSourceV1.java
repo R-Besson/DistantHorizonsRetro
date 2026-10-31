@@ -69,10 +69,8 @@ public class FullDataSourceV1
 	/** indicates the binary save file represents an empty data source */
 	private static final int NO_DATA_FLAG_BYTE = 0x00000001;
 
-
 	public final FullDataPointIdMap mapping;
 	public EDhApiWorldGenerationStep worldGenStep = EDhApiWorldGenerationStep.EMPTY;
-
 
 	/** A flattened 2D array (for the X and Z directions) containing an array for the Y direction. */
 	private final long[][] dataArrays;
@@ -80,8 +78,6 @@ public class FullDataSourceV1
 	private final long pos;
 
 	private boolean isEmpty = true;
-
-
 
 	//==============//
 	// constructors //
@@ -95,7 +91,6 @@ public class FullDataSourceV1
 		this.pos = pos;
 	}
 
-
 	//=====================//
 	// setters and getters //
 	//=====================//
@@ -105,7 +100,6 @@ public class FullDataSourceV1
 	public byte getDataDetailLevel() { return (byte) (DhSectionPos.getDetailLevel(this.pos) - SECTION_SIZE_OFFSET); }
 
 	public boolean isEmpty() { return this.isEmpty; }
-
 
 	public long[] get(int relativeX, int relativeZ)
 	{
@@ -121,8 +115,6 @@ public class FullDataSourceV1
 		return this.dataArrays[dataArrayIndex];
 	}
 
-
-
 	//=================//
 	// stream handling //
 	//=================//
@@ -136,7 +128,6 @@ public class FullDataSourceV1
 		FullDataSourceSummaryData summaryData = this.readSourceSummaryInfo(dto, inputStream, level);
 		this.setSourceSummaryData(summaryData);
 
-
 		long[][] dataPoints = this.readDataPoints(summaryData.dataWidth, inputStream);
 		if (dataPoints == null)
 		{
@@ -144,11 +135,8 @@ public class FullDataSourceV1
 		}
 		this.setDataPoints(dataPoints);
 
-
 		this.readIdMappings(this.mapping, inputStream, level.getLevelWrapper());
-
 	}
-
 
 	// low level stream methods //
 
@@ -160,7 +148,6 @@ public class FullDataSourceV1
 		outputStream.writeInt(WIDTH);
 		outputStream.writeInt(level.getLevelWrapper().getMinHeight());
 		outputStream.writeByte(this.worldGenStep.value);
-
 	}
 	public FullDataSourceSummaryData readSourceSummaryInfo(FullDataSourceV1DTO dto, DhDataInputStream inputStream, IDhLevel level) throws IOException
 	{
@@ -190,7 +177,6 @@ public class FullDataSourceV1
 			LOGGER.warn("Missing WorldGenStep, defaulting to: " + worldGenStep.name());
 		}
 
-
 		return new FullDataSourceSummaryData(width, worldGenStep);
 	}
 	public void setSourceSummaryData(FullDataSourceSummaryData summaryData) { this.worldGenStep = summaryData.worldGenStep; }
@@ -206,8 +192,6 @@ public class FullDataSourceV1
 		}
 		outputStream.writeInt(DATA_GUARD_BYTE);
 
-
-
 		// Data array length
 		for (int x = 0; x < WIDTH; x++)
 		{
@@ -216,8 +200,6 @@ public class FullDataSourceV1
 				outputStream.writeInt(this.get(x, z).length);
 			}
 		}
-
-
 
 		// Data array content (only on non-empty columns)
 		outputStream.writeInt(DATA_GUARD_BYTE);
@@ -236,7 +218,6 @@ public class FullDataSourceV1
 			}
 		}
 
-
 		return true;
 	}
 	public long[][] readDataPoints(int width, DhDataInputStream dataInputStream) throws IOException
@@ -252,8 +233,6 @@ public class FullDataSourceV1
 		{
 			throw new IOException("Invalid file format. Data Points guard byte expected: (no data) [" + NO_DATA_FLAG_BYTE + "] or (data present) [" + DATA_GUARD_BYTE + "], but found [" + dataPresentFlag + "].");
 		}
-
-
 
 		long[][] dataPointArrays;
 		if (WIDTH == width) // attempt to use the existing dataArrays if possible
@@ -285,8 +264,6 @@ public class FullDataSourceV1
 			}
 		}
 
-
-
 		// check if the array start flag is present
 		int arrayStartFlag = dataInputStream.readInt();
 		if (arrayStartFlag != DATA_GUARD_BYTE)
@@ -305,8 +282,6 @@ public class FullDataSourceV1
 			}
 		}
 
-
-
 		return dataPointArrays;
 	}
 	public void setDataPoints(long[][] dataPoints)
@@ -316,7 +291,6 @@ public class FullDataSourceV1
 		this.isEmpty = false;
 		System.arraycopy(dataPoints, 0, this.dataArrays, 0, dataPoints.length);
 	}
-
 
 	/** unused, just here for reference as to how the data was written */
 	@Deprecated
@@ -336,8 +310,6 @@ public class FullDataSourceV1
 		FullDataPointIdMap.deserialize(map, inputStream, this.pos, levelWrapper);
 	}
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -351,13 +323,10 @@ public class FullDataSourceV1
 		public final int dataWidth;
 		public EDhApiWorldGenerationStep worldGenStep;
 
-
 		public FullDataSourceSummaryData(int dataWidth, EDhApiWorldGenerationStep worldGenStep)
 		{
 			this.dataWidth = dataWidth;
 			this.worldGenStep = worldGenStep;
 		}
-
 	}
-
 }

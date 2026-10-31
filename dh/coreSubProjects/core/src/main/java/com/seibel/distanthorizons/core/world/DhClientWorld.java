@@ -53,7 +53,6 @@ public class DhClientWorld extends AbstractDhWorld implements IDhClientWorld
 	public final ClientOnlySaveStructure saveStructure;
 	public final ClientNetworkState networkState = new ClientNetworkState();
 
-
 	private final ConcurrentHashMap<String, DhClientLevel> clientLevelByDhId;
 	/**
 	 * Having a set of level wrappers is done to handle an issue where the client
@@ -74,7 +73,6 @@ public class DhClientWorld extends AbstractDhWorld implements IDhClientWorld
 	/** Delay loading the first level to give the server some time to respond with level to actually load */
 	private long allowLoadingLevelsAfter = 0;
 	private final Set</* ClientLevel */ Object> levelInitRequestedClientLevels = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
-
 
 	//==============//
 	// constructors //
@@ -101,8 +99,6 @@ public class DhClientWorld extends AbstractDhWorld implements IDhClientWorld
 			}
 		}, 0, IDhClientWorld.TICK_RATE_IN_MS);
 	}
-
-
 
 	//=========//
 	// methods //
@@ -279,7 +275,6 @@ public class DhClientWorld extends AbstractDhWorld implements IDhClientWorld
 				ApiEventInjector.INSTANCE.fireAllEvents(DhApiLevelUnloadEvent.class, new DhApiLevelUnloadEvent.EventParam(clientLevelWrapper));
 			}
 
-
 			// close levels asynchronously to speed up
 			// shutdown on servers with a lot of levels
 			CompletableFuture<Void> closeFuture = new CompletableFuture<>();
@@ -304,5 +299,4 @@ public class DhClientWorld extends AbstractDhWorld implements IDhClientWorld
 		this.clientTickTimer.cancel();
 		LOGGER.info("Closed DhWorld of type [" + this.environment + "].");
 	}
-
 }

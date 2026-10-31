@@ -80,8 +80,6 @@ public class TextureAtlasSpriteWrapper
 	 */
 	private static final String CONNECTED_TEXTURE_SHEET_SUFFIX = "-ctm";
 
-
-
 	public static int getPixelARGB(TextureAtlasSprite sprite, int frameIndex, int x, int y)
 	{
 		// The sprite's pixel array isn't publicly accessible, so we rely on a Mixin
@@ -102,8 +100,6 @@ public class TextureAtlasSpriteWrapper
 
 		return spriteData[sprite.getIconWidth() * y + x];
 	}
-
-
 
 	/**
 	 * The first frame's pixel at the given fraction (0-1) across the icon. <br>
@@ -157,8 +153,6 @@ public class TextureAtlasSpriteWrapper
 		String iconName = texture.getIconName();
 		return iconName != null && iconName.endsWith(CONNECTED_TEXTURE_SHEET_SUFFIX);
 	}
-
-
 
 	/**
 	 * Resolves the {@link TextureAtlasSprite} for the given block face. <br>
@@ -308,7 +302,4 @@ public class TextureAtlasSpriteWrapper
 			return icon;
 		}
 	}
-
-
-
 }

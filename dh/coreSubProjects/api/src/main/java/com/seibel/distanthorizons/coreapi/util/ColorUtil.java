@@ -61,13 +61,9 @@ public class ColorUtil
 	public static final int LIGHT_BROWN = rgbToInt(130, 112, 67);
 	public static final int PURPLE = rgbToInt(128, 0, 128);
 
-
-
 	public static int rgbToInt(int red, int green, int blue) { return (0xFF << 24) | (red << 16) | (green << 8) | blue; }
 	public static int argbToInt(int alpha, int red, int green, int blue) { return (alpha << 24) | (red << 16) | (green << 8) | blue; }
 	public static int argbToInt(float alpha, float red, float green, float blue) { return argbToInt((int) (alpha * 255f), (int) (red * 255f), (int) (green * 255f), (int) (blue * 255f)); }
-
-
 
 	/** Returns a value between 0 and 255 */
 	public static int getAlpha(int color) { return (color >>> 24) & 0xFF; }
@@ -99,8 +95,6 @@ public class ColorUtil
 		}
 	}
 
-
-
 	public static int applyShade(int color, int shade)
 	{
 		if (shade < 0)
@@ -116,8 +110,6 @@ public class ColorUtil
 		else
 			return (getAlpha(color) << 24) | ((int) Math.min(getRed(color) * shade, 255) << 16) | ((int) Math.min(getGreen(color) * shade, 255) << 8) | (int) Math.min(getBlue(color) * shade, 255);
 	}
-
-
 
 	/** Multiply ARGB with RGB colors */
 	public static int multiplyARGBwithRGB(int argb, int rgb)
@@ -229,5 +221,4 @@ public class ColorUtil
 	public static Color toColorObjARGB(int color) { return new Color(getRed(color), getGreen(color), getBlue(color), getAlpha(color)); }
 
 	public static int toColorInt(Color color) { return argbToInt(color.getAlpha(), color.getRed(), color.getGreen(), color.getBlue()); }
-
 }

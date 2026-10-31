@@ -31,5 +31,4 @@ public interface IDhApiDimensionTypeWrapper extends IDhApiUnsafeWrapper
 	boolean hasCeiling();
 
 	boolean hasSkyLight();
-
 }

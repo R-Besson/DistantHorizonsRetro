@@ -39,14 +39,12 @@ public abstract class DhApiBeforeBufferRenderEvent implements IDhApiEvent<DhApiB
 	/** Fired immediately before Distant Horizons starts rendering a buffer. */
 	public abstract void beforeRender(DhApiEventParam<EventParam> input);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.beforeRender(input); }
-
 
 	//==================//
 	// parameter object //
@@ -60,8 +58,6 @@ public abstract class DhApiBeforeBufferRenderEvent implements IDhApiEvent<DhApiB
 		 */
 		public DhApiVec3f modelPos;
 
-
-
 		public EventParam() { }
 
 		public void update(DhApiRenderParam parent, DhApiVec3f modelPos)
@@ -70,14 +66,10 @@ public abstract class DhApiBeforeBufferRenderEvent implements IDhApiEvent<DhApiB
 			this.modelPos = modelPos;
 		}
 
-
-
 		@Override
 		public boolean getCopyBeforeFire() { return false; }
 
 		@Override
 		public EventParam copy() { return this; }
-
 	}
-
 }

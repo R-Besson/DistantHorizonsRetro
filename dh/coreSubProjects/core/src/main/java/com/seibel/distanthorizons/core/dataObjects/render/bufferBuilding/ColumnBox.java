@@ -46,8 +46,6 @@ public class ColumnBox
 	/** block light falloff on vertical faces is done in steps this tall to keep the quad count down */
 	private static final int BLOCK_LIGHT_FALLOFF_STEP_HEIGHT = 3;
 
-
-
 	//=========//
 	// builder //
 	//=========//
@@ -131,8 +129,6 @@ public class ColumnBox
 			caveCullingMaxY = Config.Client.Advanced.Graphics.Culling.caveCullingHeight.get() - clientLevelWrapper.getMinHeight();
 		}
 
-
-
 		// if there isn't any data below this LOD, make this LOD's color opaque to prevent seeing void through transparent blocks
 		// Note: this LOD should still be considered transparent for this method's checks, otherwise rendering bugs may occur
 		if (!RenderDataPointUtil.doesDataPointExist(bottomData))
@@ -159,8 +155,6 @@ public class ColumnBox
 				skyLight, blockLight);
 			return;
 		}
-
-
 
 		//==========================//
 		// add top and bottom faces //
@@ -235,8 +229,6 @@ public class ColumnBox
 					skyLight, blockLight);
 			}
 		}
-
-
 
 		//========================================//
 		// add North, south, east, and west faces //
@@ -387,8 +379,6 @@ public class ColumnBox
 		LongArrayList segments = phantomArrayCheckout.getLongArray(0, 0);
 		LongArrayList newSegments = phantomArrayCheckout.getLongArray(1, 0);
 
-
-
 		//==================//
 		// create face with //
 		// no adjacent data //
@@ -409,15 +399,12 @@ public class ColumnBox
 			return;
 		}
 
-
-
 		//=================================//
 		// determine face visibility/light //
 		//=================================//
 
 		boolean inputTransparent = ColorUtil.getAlpha(color) < 255 && transparencyEnabled;
 		short yMax = (short) (yMin + ySize);
-
 
 		int adjCount = adjColumnView.size;
 
@@ -444,7 +431,6 @@ public class ColumnBox
 			{
 				continue;
 			}
-
 
 			long adjAbovePoint = (adjIndex > 0) ? adjColumnView.get(adjIndex - 1) : RenderDataPointUtil.EMPTY_DATA;
 			// where the overhang above this point ends, or everything above the adjacent column's top
@@ -556,7 +542,6 @@ public class ColumnBox
 				blockLightToApply = RenderDataPointUtil.getLightBlock(adjBelowPoint);
 			}
 
-
 			// Apply light to the range [adjMinY, adjMaxY)
 			if (adjMaxY > yMin)
 			{
@@ -602,8 +587,6 @@ public class ColumnBox
 				}
 			}
 		}
-
-
 
 		//=======================//
 		// Create vertical faces //
@@ -726,8 +709,6 @@ public class ColumnBox
 
 	//endregion
 
-
-
 	//================//
 	// helper methods //
 	//================//
@@ -844,8 +825,6 @@ public class ColumnBox
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -871,8 +850,6 @@ public class ColumnBox
 		/** set when an adjacent Datapoint covers the segment, overhangs only darken it */
 		private static final int COVERED_OFFSET = BLOCK_LIGHT_OFFSET + SKY_LIGHT_WIDTH;
 
-
-
 		public static long encode(short startY, short endY, byte skyLight, byte blockLight, boolean covered)
 		{
 			long data = 0L;
@@ -889,11 +866,7 @@ public class ColumnBox
 		public static byte getSkyLight(long data) { return (byte) ((data >> SKY_LIGHT_OFFSET) & SKY_LIGHT_MASK); }
 		public static byte getBlockLight(long data) { return (byte) ((data >> BLOCK_LIGHT_OFFSET) & SKY_LIGHT_MASK); }
 		public static boolean isCovered(long data) { return ((data >> COVERED_OFFSET) & 1L) != 0; }
-
 	}
 
 	//endregion
-
-
-
 }

@@ -25,15 +25,12 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		.maxCountPerSecond(1)
 		.build();
 
-
 	protected final RendererLists rendererLists = new RendererLists();
 	protected final PriorityBlockingQueue<BoxParticle> particles = new PriorityBlockingQueue<>();
 
 	// used when rendering
 	protected DhMat4f dhMvmProjMatrixThisFrame;
 	protected DhVec3f camPosFloatThisFrame;
-
-
 
 	//===========//
 	// rendering //
@@ -45,15 +42,12 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		this.dhMvmProjMatrixThisFrame = new DhMat4f(renderParams.dhMvmProjMatrix);
 		this.camPosFloatThisFrame = new DhVec3f(renderParams.exactCameraPosition);
 
-
 		// Allows Blaze3D to batch every renderBox() call made during
 		// this frame into vs one render pass per box.
 		// Does nothing on OpenGL.
 		this.beginRenderBatch();
 
-
 		this.rendererLists.render(this);
-
 
 		// particle cleanup
 		BoxParticle head;
@@ -65,7 +59,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 			this.particles.add(head);
 		}
 
-
 		// particle rendering
 		for (BoxParticle particle : this.particles)
 		{
@@ -73,10 +66,8 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 			this.renderBox(particle.createNewRenderBox());
 		}
 
-
 		// render any remaining queued boxes
 		this.endRenderBatch();
-
 	}
 
 	public abstract void renderBox(Box box);
@@ -87,8 +78,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 	protected void endRenderBatch() { }
 
 	//endregion
-
-
 
 	//==============//
 	// registration //
@@ -113,8 +102,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -125,8 +112,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		public DhVec3f minPos;
 		public DhVec3f maxPos;
 		public Color color;
-
-
 
 		public Box(long pos, float minY, float maxY, float marginPercent, Color color)
 		{
@@ -149,7 +134,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 			this.maxPos = maxPos;
 			this.color = color;
 		}
-
 	}
 
 	public static final class BoxParticle implements Comparable<BoxParticle>
@@ -158,7 +142,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		public long startMsTime;
 		public long durationInMs;
 		public float yChange;
-
 
 		private BoxParticle(Box box, long startMsTime, long durationInMs, float yChange)
 		{
@@ -170,7 +153,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 
 		public BoxParticle(Box box, double secondDuration, float yChange)
 		{ this(box, System.currentTimeMillis(), (long) (secondDuration * 1_000), yChange); }
-
 
 		@Override
 		public int compareTo(@NotNull BoxParticle particle)
@@ -192,7 +174,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		}
 
 		public boolean isDead() { return (System.currentTimeMillis() - this.startMsTime) > this.durationInMs; }
-
 	}
 
 	protected static class RendererLists
@@ -200,8 +181,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 		public final LinkedList<WeakReference<IDebugRenderable>> generalRenderableList = new LinkedList<>();
 
 		private final HashMap<ConfigEntry<Boolean>, LinkedList<WeakReference<IDebugRenderable>>> renderableListByConfig = new HashMap<>();
-
-
 
 		//==============//
 		// registration //
@@ -281,8 +260,6 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 
 		//endregion
 
-
-
 		//===========//
 		// rendering //
 		//===========//
@@ -332,7 +309,4 @@ public abstract class AbstractDebugWireframeRenderer implements IBindable
 	}
 
 	//endregion
-
-
-
 }

@@ -31,8 +31,6 @@ public class MixinFramebuffer
 	@Unique
 	private boolean distanthorizons$depthIsTexture = false;
 
-
-
 	//========================//
 	// depth texture handling //
 	//========================//
@@ -50,7 +48,6 @@ public class MixinFramebuffer
 			// despite the GL method name, this also apparently returns the depth texture ID
 			return OpenGlHelper.func_153185_f(); // glGenRenderbuffers
 		}
-
 
 		int depthTextureId = TextureUtil.glGenTextures();
 
@@ -105,7 +102,4 @@ public class MixinFramebuffer
 	}
 
 	//endregion
-
-
-
 }

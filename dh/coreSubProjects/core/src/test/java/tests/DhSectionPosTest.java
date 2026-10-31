@@ -55,10 +55,7 @@ public class DhSectionPosTest
 		assertSectionPosEqual(2, DhSectionPos.getDetailLevel(pos));
 		assertSectionPosEqual(-1, DhSectionPos.getX(pos));
 		assertSectionPosEqual(-4, DhSectionPos.getZ(pos));
-
 	}
-
-
 
 	@Test
 	public void containsPosTest()
@@ -68,7 +65,6 @@ public class DhSectionPosTest
 
 		Assert.assertTrue("section pos contains fail", DhSectionPos.contains(root, child));
 		Assert.assertFalse("section pos contains fail", DhSectionPos.contains(child, root));
-
 
 		root = DhSectionPos.encode((byte) 10, 1, 0);
 
@@ -95,7 +91,6 @@ public class DhSectionPosTest
 		child = DhSectionPos.encode((byte) 9, 5, 5);
 		Assert.assertFalse("position should be out of bounds", DhSectionPos.contains(root, child));
 
-
 		Assert.assertTrue(DhSectionPos.contains(DhSectionPos.encode((byte) 6, 0, 0), DhSectionPos.encode((byte) 0, 0, 0)));
 		Assert.assertTrue(DhSectionPos.contains(DhSectionPos.encode((byte) 6, 0, 0), DhSectionPos.encode((byte) 1, 0, 0)));
 		Assert.assertTrue(DhSectionPos.contains(DhSectionPos.encode((byte) 6, 0, 0), DhSectionPos.encode((byte) 2, 0, 0)));
@@ -114,13 +109,11 @@ public class DhSectionPosTest
 		Assert.assertFalse(DhSectionPos.contains(left, right));
 		Assert.assertFalse(DhSectionPos.contains(right, left));
 
-
 		// 512 block wide sections that are adjacent, but not overlapping
 		left = DhSectionPos.encode((byte) 9, 0, 0);
 		right = DhSectionPos.encode((byte) 9, 1, 0);
 		Assert.assertFalse(DhSectionPos.contains(left, right));
 		Assert.assertFalse(DhSectionPos.contains(right, left));
-
 	}
 
 	@Test
@@ -131,12 +124,10 @@ public class DhSectionPosTest
 		long parent = DhSectionPos.getParentPos(leaf);
 		assertSectionPosEqual("get parent at 0,0 fail", convert, parent);
 
-
 		leaf = DhSectionPos.encode((byte) 0, 1, 1);
 		convert = DhSectionPos.convertToDetailLevel(leaf, (byte) 1);
 		parent = DhSectionPos.getParentPos(leaf);
 		assertSectionPosEqual("get parent at 1,1 fail", convert, parent);
-
 
 		leaf = DhSectionPos.encode((byte) 1, 2, 2);
 		convert = DhSectionPos.convertToDetailLevel(leaf, (byte) 2);
@@ -145,7 +136,6 @@ public class DhSectionPosTest
 		convert = DhSectionPos.convertToDetailLevel(leaf, (byte) 0);
 		long childIndex = DhSectionPos.getChildByIndex(leaf, 0);
 		assertSectionPosEqual("child detail fail", convert, childIndex);
-
 	}
 
 	@Test
@@ -167,7 +157,6 @@ public class DhSectionPosTest
 		assertSectionPosEqual(sw, DhSectionPos.encode((byte) 0, 4605, 0));
 		assertSectionPosEqual(ne, DhSectionPos.encode((byte) 0, 4604, 1));
 		assertSectionPosEqual(se, DhSectionPos.encode((byte) 0, 4605, 1));
-
 	}
 
 	@Test
@@ -182,7 +171,6 @@ public class DhSectionPosTest
 
 		Assert.assertEquals(new DhBlockPos2D(4606, 2), parentCenter);
 		Assert.assertEquals(new DhBlockPos2D(4606, 0), inputCenter);
-
 	}
 
 	@Test
@@ -194,7 +182,6 @@ public class DhSectionPosTest
 		long originSectionPos = DhSectionPos.encodeContaining(DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL, originBlockPos);
 		assertSectionPosEqual(DhSectionPos.encode(DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL, 0, 0), originSectionPos);
 
-
 		// offset pos //
 		long offsetSectionPos;
 
@@ -205,7 +192,6 @@ public class DhSectionPosTest
 		offsetBlockPos = new DhBlockPos(-987654, 0, 46);
 		offsetSectionPos = DhSectionPos.encodeContaining(DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL, offsetBlockPos);
 		assertSectionPosEqual(DhSectionPos.encode(DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL, -15433, 0), offsetSectionPos);
-
 	}
 
 	@Test
@@ -217,7 +203,6 @@ public class DhSectionPosTest
 		long originSectionPos = DhSectionPos.encodeContaining(DhSectionPos.SECTION_CHUNK_DETAIL_LEVEL, originChunkPos);
 		assertSectionPosEqual(DhSectionPos.encode(DhSectionPos.SECTION_CHUNK_DETAIL_LEVEL, 0, 0), originSectionPos);
 
-
 		// offset pos //
 
 		DhChunkPos offsetChunkPos = new DhChunkPos(1000, 42000);
@@ -227,7 +212,6 @@ public class DhSectionPosTest
 		offsetChunkPos = new DhChunkPos(-987654, 46);
 		offsetSectionPos = DhSectionPos.encodeContaining(DhSectionPos.SECTION_CHUNK_DETAIL_LEVEL, offsetChunkPos);
 		assertSectionPosEqual(DhSectionPos.encode(DhSectionPos.SECTION_CHUNK_DETAIL_LEVEL, -15433, 0), offsetSectionPos);
-
 	}
 
 	@Test
@@ -246,7 +230,6 @@ public class DhSectionPosTest
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
 		assertSectionPosEqual(DhSectionPos.encode(DhSectionPos.SECTION_REGION_DETAIL_LEVEL, 0, 0), originSectionPos);
 
-
 		// offset pos //
 
 		long offsetSectionPos = DhSectionPos.encode((byte) 0, -10000, 5000);
@@ -259,7 +242,6 @@ public class DhSectionPosTest
 
 		offsetSectionPos = DhSectionPos.convertToDetailLevel(offsetSectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
 		assertSectionPosEqual(DhSectionPos.encode(DhSectionPos.SECTION_REGION_DETAIL_LEVEL, -1, 0), offsetSectionPos);
-
 	}
 
 	@Test
@@ -267,8 +249,6 @@ public class DhSectionPosTest
 	{
 		long originSectionPos = DhSectionPos.encode((byte) 0, 0, 0);
 		long sectionPos = DhSectionPos.encode((byte) 0, -10000, 5000);
-
-
 
 		// 1 -> 0
 		byte returnDetailLevel = 0;
@@ -278,7 +258,6 @@ public class DhSectionPosTest
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, (byte) 1);
 		assertSectionPosEqual(2, DhSectionPos.getWidthCountForLowerDetailedSection(sectionPos, returnDetailLevel));
 
-
 		// 2 -> 1
 		returnDetailLevel = 1;
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, (byte) 2);
@@ -286,7 +265,6 @@ public class DhSectionPosTest
 
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, (byte) 2);
 		assertSectionPosEqual(2, DhSectionPos.getWidthCountForLowerDetailedSection(sectionPos, returnDetailLevel));
-
 
 		// Block -> 0
 		returnDetailLevel = 0;
@@ -296,7 +274,6 @@ public class DhSectionPosTest
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL);
 		assertSectionPosEqual(64, DhSectionPos.getWidthCountForLowerDetailedSection(sectionPos, returnDetailLevel));
 
-
 		// Region -> 3
 		returnDetailLevel = 3;
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
@@ -304,7 +281,6 @@ public class DhSectionPosTest
 
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
 		assertSectionPosEqual(4096, DhSectionPos.getWidthCountForLowerDetailedSection(sectionPos, returnDetailLevel));
-
 	}
 
 	@Test
@@ -312,7 +288,6 @@ public class DhSectionPosTest
 	{
 		long originSectionPos = DhSectionPos.encode((byte) 0, 0, 0);
 		long sectionPos = DhSectionPos.encode((byte) 0, -10000, 5000);
-
 
 		assertSectionPosEqual(1, DhSectionPos.getBlockWidth(originSectionPos));
 		assertSectionPosEqual(1, DhSectionPos.getBlockWidth(sectionPos));
@@ -331,7 +306,6 @@ public class DhSectionPosTest
 		assertSectionPosEqual(32768, DhSectionPos.getBlockWidth(originSectionPos));
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
 		assertSectionPosEqual(32768, DhSectionPos.getBlockWidth(sectionPos));
-
 	}
 
 	@Test
@@ -340,12 +314,9 @@ public class DhSectionPosTest
 		long originSectionPos = DhSectionPos.encode((byte) 0, 0, 0);
 		long sectionPos = DhSectionPos.encode((byte) 0, -10000, 5000);
 
-
-
 		// 1x1 blocks
 		Assert.assertEquals(new DhBlockPos2D(0, 0), DhSectionPos.getCenterBlockPos(originSectionPos));
 		Assert.assertEquals(new DhBlockPos2D(-10000, 5000), DhSectionPos.getCenterBlockPos(sectionPos));
-
 
 		// 2x2 blocks
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, (byte) 1);
@@ -353,13 +324,11 @@ public class DhSectionPosTest
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, (byte) 1);
 		Assert.assertEquals(new DhBlockPos2D(-10000, 5000), DhSectionPos.getCenterBlockPos(sectionPos));
 
-
 		// 4x4 blocks
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, (byte) 2);
 		Assert.assertEquals(new DhBlockPos2D(2, 2), DhSectionPos.getCenterBlockPos(originSectionPos));
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, (byte) 2);
 		Assert.assertEquals(new DhBlockPos2D(-9998, 5002), DhSectionPos.getCenterBlockPos(sectionPos));
-
 
 		// 64x64 blocks
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL);
@@ -367,13 +336,11 @@ public class DhSectionPosTest
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL);
 		Assert.assertEquals(new DhBlockPos2D(-10016, 5024), DhSectionPos.getCenterBlockPos(sectionPos));
 
-
 		// 32,768 x 32,768 blocks
 		originSectionPos = DhSectionPos.convertToDetailLevel(originSectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
 		Assert.assertEquals(new DhBlockPos2D(16384, 16384), DhSectionPos.getCenterBlockPos(originSectionPos));
 		sectionPos = DhSectionPos.convertToDetailLevel(sectionPos, DhSectionPos.SECTION_REGION_DETAIL_LEVEL);
 		Assert.assertEquals(new DhBlockPos2D(-16384, 16384), DhSectionPos.getCenterBlockPos(sectionPos));
-
 	}
 
 	@Test
@@ -396,7 +363,6 @@ public class DhSectionPosTest
 		Assert.assertEquals(-1 * DhSectionPos.getBlockWidth(pos), DhSectionPos.getMinCornerBlockX(pos));
 		Assert.assertEquals(-2 * DhSectionPos.getBlockWidth(pos), DhSectionPos.getMinCornerBlockZ(pos));
 
-
 		// origin chunk detail
 		pos = DhSectionPos.encode(DhSectionPos.SECTION_CHUNK_DETAIL_LEVEL, 0, 0);
 		Assert.assertEquals(0, DhSectionPos.getMinCornerBlockX(pos));
@@ -406,8 +372,6 @@ public class DhSectionPosTest
 		pos = DhSectionPos.encode(DhSectionPos.SECTION_CHUNK_DETAIL_LEVEL, 2, 3);
 		Assert.assertEquals(2 * DhSectionPos.getBlockWidth(pos), DhSectionPos.getMinCornerBlockX(pos));
 		Assert.assertEquals(3 * DhSectionPos.getBlockWidth(pos), DhSectionPos.getMinCornerBlockZ(pos));
-
-
 	}
 
 	@Test
@@ -443,11 +407,7 @@ public class DhSectionPosTest
 		Assert.assertTrue(childPosList.contains(DhSectionPos.encode((byte) 0, 1, 0)));
 		Assert.assertTrue(childPosList.contains(DhSectionPos.encode((byte) 0, 0, 1)));
 		Assert.assertTrue(childPosList.contains(DhSectionPos.encode((byte) 0, 1, 1)));
-
 	}
-
-
-
 
 	//================//
 	// helper methods //
@@ -469,7 +429,4 @@ public class DhSectionPosTest
 		Assert.assertEquals(messagePrefix + "X Pos mismatch, " + mismatchSuffix, DhSectionPos.getX(expected), DhSectionPos.getX(actual));
 		Assert.assertEquals(messagePrefix + "Z Pos mismatch, " + mismatchSuffix, DhSectionPos.getZ(expected), DhSectionPos.getZ(actual));
 	}
-
-
-
 }

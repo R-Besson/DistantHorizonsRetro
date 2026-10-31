@@ -35,7 +35,6 @@ import com.seibel.distanthorizons.lwjgl.EGLExtension;
 import com.seibel.distanthorizons.lwjgl.EGLFeature;
 import org.lwjgl.opengl.GL11;
 
-
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
 /**
@@ -47,7 +46,6 @@ public class GLProxy
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-
 
 	public static final DhLogger LOGGER;
 	static
@@ -78,10 +76,7 @@ public class GLProxy
 	 */
 	private static final boolean CHECK_GL_VERSION_ON_STARTUP = false;
 
-
-
 	private static GLProxy instance = null;
-
 
 	public boolean bufferStorageSupported; // ~OpenGL 4.4
 	public boolean vertexAttributeBufferBindingSupported; // ~OpenGL 4.3
@@ -89,8 +84,6 @@ public class GLProxy
 	public boolean vertexAttribDivisorSupported; // OpenGL 3.3 or newer
 
 	private final EDhApiGpuUploadMethod preferredUploadMethod;
-
-
 
 	//=============//
 	// constructor //
@@ -116,9 +109,6 @@ public class GLProxy
 		LOGGER.info("Creating [" + GLProxy.class.getSimpleName() + "]... If this is the last message you see there must have been an OpenGL error.");
 		LOGGER.info("Lod Render OpenGL version [" + LWJGL.glGetString(GL11.GL_VERSION) + "].");
 
-
-
-
 		//============================//
 		// get Minecraft's GL context //
 		//============================//
@@ -139,8 +129,6 @@ public class GLProxy
 			}
 		}
 		LOGGER.info("minecraftGlCapabilities:\n" + this.versionInfoToString());
-
-
 
 		//======================//
 		// get GPU capabilities //
@@ -185,8 +173,6 @@ public class GLProxy
 		}
 		LOGGER.info("GPU Vendor [" + vendor + "] with OS [" + EPlatform.get().getName() + "], Preferred upload method is [" + this.preferredUploadMethod + "].");
 
-
-
 		//==========//
 		// clean up //
 		//==========//
@@ -196,8 +182,6 @@ public class GLProxy
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -224,8 +208,6 @@ public class GLProxy
 
 	//endregion
 
-
-
 	//================//
 	// helper methods //
 	//================//
@@ -251,7 +233,4 @@ public class GLProxy
 	}
 
 	//endregion
-
-
-
 }

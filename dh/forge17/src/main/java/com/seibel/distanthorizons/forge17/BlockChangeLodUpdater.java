@@ -38,11 +38,7 @@ public class BlockChangeLodUpdater implements IWorldAccess
 	private final LinkedHashSet<Long> changedChunkKeys = new LinkedHashSet<>();
 	private final HashMap<Long, Long> lastUpdateMsByChunkKey = new HashMap<>();
 
-
-
 	public BlockChangeLodUpdater(WorldServer world) { this.world = world; }
-
-
 
 	/** called at the end of every server tick */
 	public void updateChangedChunks()
@@ -94,8 +90,6 @@ public class BlockChangeLodUpdater implements IWorldAccess
 		}
 	}
 
-
-
 	//=================//
 	// world listeners //
 	//=================//
@@ -123,5 +117,4 @@ public class BlockChangeLodUpdater implements IWorldAccess
 	@Override public void onStaticEntitiesChanged() { }
 
 	//endregion
-
 }

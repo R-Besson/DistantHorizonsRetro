@@ -53,8 +53,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 
 	protected boolean changingPreset = false;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -67,8 +65,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 			CONFIG_GUI.addOnScreenChangeListener(this::onConfigUiClosed);
 		}
 	}
-
-
 
 	//=========//
 	// methods //
@@ -83,7 +79,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 		TPresetEnum currentQualitySetting = this.getCurrentPreset();
 		this.getPresetConfigEntry().set(currentQualitySetting);
 	}
-
 
 	//===========//
 	// listeners //
@@ -104,8 +99,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 			return;
 		}
 
-
-
 		// if the quick value is custom, nothing needs to be changed
 		TPresetEnum presetEnum = this.getPresetConfigEntry().get();
 		if (presetEnum == this.getCustomPresetEnum())
@@ -113,7 +106,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 			return;
 		}
 		this.waitingPresetEnum = presetEnum;
-
 
 		// stop the previous timer if one exists
 		if (this.applyPresetTimer != null)
@@ -128,7 +120,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 		};
 		this.applyPresetTimer = TimerUtil.CreateTimer("ApplyConfigPresetTimer");
 		this.applyPresetTimer.schedule(task, MS_DELAY_BEFORE_APPLYING_PRESET);
-
 	}
 	private void applyPreset()
 	{
@@ -140,8 +131,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 		{
 			return;
 		}
-
-
 
 		LOGGER.debug("changing preset to: [" + newPresetEnum + "].");
 		this.changingPreset = true;
@@ -170,7 +159,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 			return;
 		}
 
-
 		TPresetEnum newPreset = this.getCurrentPreset();
 		TPresetEnum currentPreset = this.getPresetConfigEntry().get();
 
@@ -190,7 +178,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 		}
 	}
 
-
 	//================//
 	// helper methods //
 	//================//
@@ -201,15 +188,12 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 		// get all quick options
 		HashSet<TPresetEnum> possiblePresetSet = new HashSet<>(this.getPresetEnumList());
 
-
 		// remove any quick options that aren't possible with the currently selected options
 		for (ConfigPresetOptions<TPresetEnum, ?> configEntry : this.configList)
 		{
 			HashSet<TPresetEnum> optionPresetSet = configEntry.getPossibleQualitiesFromCurrentOptionValue();
 			possiblePresetSet.retainAll(optionPresetSet);
 		}
-
-
 
 		ArrayList<TPresetEnum> possiblePrestList = new ArrayList<>(possiblePresetSet);
 		if (possiblePrestList.size() > 1)
@@ -227,8 +211,6 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 		return possiblePrestList.get(0);
 	}
 
-
-
 	//==================//
 	// abstract methods //
 	//==================//
@@ -237,6 +219,4 @@ public abstract class AbstractPresetConfigEventHandler<TPresetEnum extends Enum<
 
 	protected abstract List<TPresetEnum> getPresetEnumList();
 	protected abstract TPresetEnum getCustomPresetEnum();
-
-
 }

@@ -10,7 +10,6 @@ public abstract class AbstractPluginPacketSender implements IPluginPacketSender
 {
 	public static final String WRAPPER_PACKET_RESOURCE = ModInfo.RESOURCE_NAMESPACE + ModInfo.WRAPPER_PACKET_PATH;
 
-
 	@Override
 	public final void sendToClient(IServerPlayerWrapper serverPlayer, AbstractNetworkMessage message)
 	{
@@ -19,8 +18,6 @@ public abstract class AbstractPluginPacketSender implements IPluginPacketSender
 
 	public abstract void sendToClient(EntityPlayerMP serverPlayer, AbstractNetworkMessage message);
 
-
 	@Override
 	public abstract void sendToServer(AbstractNetworkMessage message);
-
 }

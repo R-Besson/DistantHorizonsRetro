@@ -31,7 +31,6 @@ public class PregenManager
 
 	private final AtomicReference<PregenState> pregenFuture = new AtomicReference<>();
 
-
 	public CompletableFuture<Void> startPregen(
 		IServerLevelWrapper levelWrapper,
 		DhBlockPos2D origin,
@@ -76,7 +75,6 @@ public class PregenManager
 		return null;
 	}
 
-
 	private static class PregenState extends CompletableFuture<Void>
 	{
 		private final GeneratedFullDataSourceProvider fullDataSourceProvider;
@@ -93,7 +91,6 @@ public class PregenManager
 
 		private final DynamicNumberFormat generatedRadius = new DynamicNumberFormat(3);
 		private final DynamicNumberFormat generatedPercentage = new DynamicNumberFormat(5);
-
 
 		@SuppressWarnings("DataFlowIssue")
 		private final Cache<Long, Long> pendingGenerations = CacheBuilder.newBuilder()
@@ -112,14 +109,12 @@ public class PregenManager
 			})
 			.build();
 
-
 		public PregenState(GeneratedFullDataSourceProvider fullDataSourceProvider, long originSectionPos, int sectionsToGenerate)
 		{
 			this.fullDataSourceProvider = fullDataSourceProvider;
 			this.originSectionPos = originSectionPos;
 			this.sectionsToGenerate = sectionsToGenerate;
 		}
-
 
 		private void fillPendingQueue()
 		{
@@ -224,7 +219,6 @@ public class PregenManager
 
 			return DhSectionPos.encode(DhSectionPos.getDetailLevel(this.originSectionPos), x, z);
 		}
-
 	}
 
 	private static class DynamicNumberFormat
@@ -267,7 +261,5 @@ public class PregenManager
 		{
 			return this.value;
 		}
-
 	}
-
 }

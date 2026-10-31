@@ -32,8 +32,6 @@ public class DhVec3i extends DhApiVec3i // extends the API object so it can be r
 {
 	// x,y,z variables are handled in the parent object
 
-
-
 	public DhVec3i()
 	{
 		this.x = 0;
@@ -47,5 +45,4 @@ public class DhVec3i extends DhApiVec3i // extends the API object so it can be r
 		this.y = y;
 		this.z = z;
 	}
-
 }

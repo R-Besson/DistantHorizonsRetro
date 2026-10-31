@@ -25,8 +25,6 @@ public class DownsampleMergeTest
 {
 	private static final int COLUMN_COUNT = FullDataSourceV2.WIDTH * FullDataSourceV2.WIDTH;
 
-
-
 	@Test
 	public void mergedColumnsDontShareScratchLists() throws DataCorruptedException
 	{
@@ -75,8 +73,6 @@ public class DownsampleMergeTest
 			}
 		}
 	}
-
-
 
 	//=========//
 	// helpers //
@@ -132,5 +128,4 @@ public class DownsampleMergeTest
 			Assert.assertEquals(message + " at index [" + i + "]", expected[i], actualColumns[i]);
 		}
 	}
-
 }

@@ -25,8 +25,6 @@ public class ChiselAccessor implements IChiselCommonAccessor
 	/** CTM keeps its connections between calls, so each thread needs its own */
 	private static final ThreadLocal<CTM> CTM_REF = ThreadLocal.withInitial(CTM::getInstance);
 
-
-
 	@Override
 	public String getModName() { return "Chisel"; }
 
@@ -69,5 +67,4 @@ public class ChiselAccessor implements IChiselCommonAccessor
 		}
 		return quarters;
 	}
-
 }

@@ -28,5 +28,4 @@ public enum EDhApiGlProfileMode
 	CORE,
 	COMPAT,
 	ANY;
-
 }

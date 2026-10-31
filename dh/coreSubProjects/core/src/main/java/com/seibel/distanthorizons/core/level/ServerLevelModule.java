@@ -40,8 +40,6 @@ public class ServerLevelModule implements AutoCloseable
 
 	public final LodRequestModule lodRequestModule;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -53,8 +51,6 @@ public class ServerLevelModule implements AutoCloseable
 		this.fullDataFileHandler = new GeneratedFullDataSourceProvider(parentServerLevel, saveStructure);
 		this.lodRequestModule = new LodRequestModule(this.parentServerLevel, this.parentServerLevel, this.fullDataFileHandler, () -> new LodRequestState(this.parentServerLevel));
 	}
-
-
 
 	//================//
 	// base overrides //
@@ -71,8 +67,6 @@ public class ServerLevelModule implements AutoCloseable
 		// level wrappers are reused so it'd otherwise be picked up again when the level reloads
 		WorldGeneratorInjector.INSTANCE.unbind(this.parentServerLevel.getLevelWrapper());
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -95,9 +89,5 @@ public class ServerLevelModule implements AutoCloseable
 			}
 			return new WorldGenerationQueue(worldGenerator, level);
 		}
-
-
-
 	}
-
 }

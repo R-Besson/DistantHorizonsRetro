@@ -22,8 +22,6 @@ public class SectionReloadBatcher
 	private final Long2LongOpenHashMap lastRequestMsByPos = new Long2LongOpenHashMap();
 	private final Long2LongOpenHashMap firstRequestMsByPos = new Long2LongOpenHashMap();
 
-
-
 	public synchronized void request(long pos)
 	{
 		long now = System.currentTimeMillis();
@@ -57,5 +55,4 @@ public class SectionReloadBatcher
 			}
 		}
 	}
-
 }

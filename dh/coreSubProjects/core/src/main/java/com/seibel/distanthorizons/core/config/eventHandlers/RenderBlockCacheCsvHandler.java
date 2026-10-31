@@ -27,8 +27,6 @@ public class RenderBlockCacheCsvHandler extends AbstractDelayedConfigEventHandle
 {
 	public static RenderBlockCacheCsvHandler INSTANCE = new RenderBlockCacheCsvHandler();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -38,8 +36,6 @@ public class RenderBlockCacheCsvHandler extends AbstractDelayedConfigEventHandle
 	private RenderBlockCacheCsvHandler() { super(AbstractDelayedConfigEventHandler.DEFAULT_TIMEOUT_IN_MS); }
 
 	//endregion
-
-
 
 	//=================//
 	// config handling //
@@ -58,7 +54,4 @@ public class RenderBlockCacheCsvHandler extends AbstractDelayedConfigEventHandle
 	}
 
 	//endregion
-
-
-
 }

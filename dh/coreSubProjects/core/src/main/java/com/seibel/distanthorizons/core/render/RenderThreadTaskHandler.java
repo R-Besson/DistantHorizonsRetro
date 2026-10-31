@@ -47,9 +47,7 @@ public class RenderThreadTaskHandler
 	private static final long MS_BETWEEN_CLEANUP_TICKS = 1_000L;
 	private static final long NANOS_BEFORE_RUN_CLEANUP_TIMER = TimeUnit.NANOSECONDS.convert(1_000L, TimeUnit.MILLISECONDS);
 
-
 	public static final RenderThreadTaskHandler INSTANCE = new RenderThreadTaskHandler();
-
 
 	private long nanoSinceTasksRun = System.nanoTime();
 	private final boolean running;
@@ -60,8 +58,6 @@ public class RenderThreadTaskHandler
 	 * will be null if nothing is running.
 	 */
 	private volatile @Nullable QueuedRunnable currentQueuedRunnable;
-
-
 
 	//=============//
 	// constructor //
@@ -87,8 +83,6 @@ public class RenderThreadTaskHandler
 
 	//endregion
 
-
-
 	//==============//
 	// task queuing //
 	//==============//
@@ -102,7 +96,6 @@ public class RenderThreadTaskHandler
 			return;
 		}
 
-
 		// don't get the stacktrace on release to reduce GC pressure
 		StackTraceElement[] stackTrace = null;
 		if (ModInfo.IS_DEV_BUILD)
@@ -115,8 +108,6 @@ public class RenderThreadTaskHandler
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// run tasks //
@@ -138,7 +129,6 @@ public class RenderThreadTaskHandler
 			frameLimit = 240;
 		}
 
-
 		long nanoPerFrame = 1_000_000_000L / frameLimit;
 		nanoPerFrame /= 2; // divide the time in half so we can only impact half of the framerate at worst
 		// at high framerates half a frame is only 1-2 ms, which is too little to upload LODs at a decent pace
@@ -150,12 +140,10 @@ public class RenderThreadTaskHandler
 		long loopStartTimeNano = System.nanoTime();
 		this.nanoSinceTasksRun = loopStartTimeNano;
 
-
 		if (this.renderThread == null)
 		{
 			this.renderThread = Thread.currentThread();
 		}
-
 
 		QueuedRunnable runnable = RENDER_THREAD_RUNNABLE_QUEUE.poll();
 		while (runnable != null)
@@ -181,7 +169,6 @@ public class RenderThreadTaskHandler
 
 				COMPLETED_TASK_COUNTER.increment();
 			}
-
 
 			// estimate when our ending nano-time would be once the next task is run
 			long expectedNextTaskNano = totalLoopNano
@@ -239,8 +226,6 @@ public class RenderThreadTaskHandler
 
 	//endregion
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -263,14 +248,11 @@ public class RenderThreadTaskHandler
 			return;
 		}
 
-
 		String o = MinecraftTextFormat.ORANGE;
 		String g = MinecraftTextFormat.GREEN;
 		String b = MinecraftTextFormat.DARK_BLUE;
 		String y = MinecraftTextFormat.YELLOW;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-
-
 
 		String queueSize = DECIMAL_NUMBER_FORMAT.format(RENDER_THREAD_RUNNABLE_QUEUE.size());
 		String completedCount = DECIMAL_NUMBER_FORMAT.format(COMPLETED_TASK_COUNTER.sum());
@@ -300,7 +282,6 @@ public class RenderThreadTaskHandler
 		});
 	}
 
-
 	/** Returns true if the currently running thread is being run by this handler */
 	public boolean isCurrentThread()
 	{
@@ -323,8 +304,6 @@ public class RenderThreadTaskHandler
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -339,8 +318,6 @@ public class RenderThreadTaskHandler
 		@Nullable
 		public final StackTraceElement[] stackTrace;
 
-
-
 		//=============//
 		// constructor //
 		//=============//
@@ -354,8 +331,6 @@ public class RenderThreadTaskHandler
 		}
 
 		//endregion
-
-
 
 		//=========//
 		// running //
@@ -387,8 +362,6 @@ public class RenderThreadTaskHandler
 
 		//endregion
 
-
-
 		//================//
 		// base overrides //
 		//================//
@@ -398,11 +371,7 @@ public class RenderThreadTaskHandler
 		public String toString() { return this.name; }
 
 		//endregion
-
 	}
 
 	//endregion
-
-
-
 }

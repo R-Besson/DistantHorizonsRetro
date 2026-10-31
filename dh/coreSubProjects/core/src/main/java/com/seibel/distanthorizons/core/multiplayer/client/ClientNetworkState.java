@@ -40,11 +40,9 @@ public class ClientNetworkState implements Closeable
 
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 
-
 	public final FullDataPayloadReceiver fullDataPayloadReceiver = new FullDataPayloadReceiver();
 
 	private final SessionConfig.AnyChangeListener configAnyChangeListener = new SessionConfig.AnyChangeListener(this::sendConfigMessage);
-
 
 	private final NetworkSession networkSession = new NetworkSession(null);
 	private final CopyOnWriteArrayList<Runnable> sessionConfigListeners = new CopyOnWriteArrayList<>();
@@ -91,8 +89,6 @@ public class ClientNetworkState implements Closeable
 
 		this.sendConfigMessage();
 	});
-
-
 
 	//=============//
 	// constructor //
@@ -181,8 +177,6 @@ public class ClientNetworkState implements Closeable
 		}
 	}
 
-
-
 	//==============//
 	// send message //
 	//==============//
@@ -208,8 +202,6 @@ public class ClientNetworkState implements Closeable
 		this.getSession().sendMessage(new SessionConfigMessage(sessionConfig));
 	}
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -231,8 +223,6 @@ public class ClientNetworkState implements Closeable
 		messageList.add(this.serverSupportStatus.message);
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -246,8 +236,6 @@ public class ClientNetworkState implements Closeable
 		this.configAnyChangeListener.close();
 		this.networkSession.close();
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -267,7 +255,5 @@ public class ClientNetworkState implements Closeable
 		public final String message;
 
 		EServerSupportStatus(String message) { this.message = message; }
-
 	}
-
 }

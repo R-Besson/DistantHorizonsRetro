@@ -26,5 +26,4 @@ public interface IDhAntiAliasRenderer extends IBindable
 {
 
 	void render(RenderParams renderParams);
-
 }

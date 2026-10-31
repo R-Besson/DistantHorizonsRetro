@@ -35,12 +35,10 @@ public abstract class DhApiBeforeDhInitEvent implements IDhApiEvent<Void>
 	/** Fired before Distant Horizons starts its initial setup on Minecraft startup. */
 	public abstract void beforeDistantHorizonsInit(DhApiEventParam<Void> input);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<Void> input) { this.beforeDistantHorizonsInit(input); }
-
 }

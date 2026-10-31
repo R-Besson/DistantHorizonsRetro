@@ -27,13 +27,10 @@ public class ChunkPosGenStream
 		private final int maxX;
 		private final int maxZ;
 
-
 		/** current X pos */
 		int x;
 		/** current Z pos */
 		private int z;
-
-
 
 		//=============//
 		// constructor //
@@ -58,8 +55,6 @@ public class ChunkPosGenStream
 			int widthPlusExtra = width + (extraRadius * 2);
 			return widthPlusExtra * widthPlusExtra;
 		}
-
-
 
 		//=================//
 		// iterator method //
@@ -88,7 +83,5 @@ public class ChunkPosGenStream
 			consumer.accept(new ChunkPos(this.x, this.z));
 			return true;
 		}
-
 	}
-
 }

@@ -43,7 +43,6 @@ public interface IDhApiEventInjector extends IDependencyInjector<IDhApiEvent>
 	// Note to DH Devs: Don't try adding a generic type to IDhApiEvent, the constructor won't accept it
 	boolean unbind(Class<? extends IDhApiEvent> dependencyInterface, Class<? extends IDhApiEvent> dependencyClassToRemove) throws IllegalArgumentException;
 
-
 	/**
 	 * Fires all bound events of the given type (does nothing if no events are bound).
 	 *
@@ -54,5 +53,4 @@ public interface IDhApiEventInjector extends IDependencyInjector<IDhApiEvent>
 	 * @return if any of the bound event handlers notified that this event should be canceled.
 	 */
 	<T, U extends IDhApiEvent<T>> boolean fireAllEvents(Class<U> abstractEvent, T eventParameterObject);
-
 }

@@ -27,8 +27,6 @@ public class FullDataLookupCacheTest
 	private static final String DB_FILE_NAME = "lookupCacheTest.sqlite";
 	private static final int COLUMN_COUNT = FullDataSourceV2.WIDTH * FullDataSourceV2.WIDTH;
 
-
-
 	@BeforeClass
 	public static void testSetup()
 	{
@@ -38,8 +36,6 @@ public class FullDataLookupCacheTest
 			Assert.assertTrue("unable to delete old test DB File.", dbFile.delete());
 		}
 	}
-
-
 
 	@Test
 	public void repoWritesInvalidateCachedLookups() throws Exception
@@ -110,8 +106,6 @@ public class FullDataLookupCacheTest
 		Assert.assertEquals(new ByteArrayList(new byte[]{1, 2, 3}), output);
 	}
 
-
-
 	//=========//
 	// helpers //
 	//=========//
@@ -143,5 +137,4 @@ public class FullDataLookupCacheTest
 			Assert.assertEquals("column " + i, expectedStep, output.getByte(i));
 		}
 	}
-
 }

@@ -38,14 +38,12 @@ public abstract class DhApiBeforeGenericObjectRenderEvent implements IDhApiCance
 	/** Fired before Distant Horizons renders a generic object. */
 	public abstract void beforeRender(DhApiCancelableEventParam<EventParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<EventParam> input) { this.beforeRender(input); }
-
 
 	//==================//
 	// parameter object //
@@ -56,8 +54,6 @@ public abstract class DhApiBeforeGenericObjectRenderEvent implements IDhApiCance
 		public long boxGroupId;
 		public String resourceLocationNamespace;
 		public String resourceLocationPath;
-
-
 
 		//==============//
 		// constructors //
@@ -78,8 +74,6 @@ public abstract class DhApiBeforeGenericObjectRenderEvent implements IDhApiCance
 
 		//endregion
 
-
-
 		//================//
 		// base overrides //
 		//================//
@@ -89,9 +83,5 @@ public abstract class DhApiBeforeGenericObjectRenderEvent implements IDhApiCance
 		public EventParam copy() { return this; }
 
 		//endregion
-
-
-
 	}
-
 }

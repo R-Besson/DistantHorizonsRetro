@@ -41,5 +41,4 @@ public interface IDhApiConfig
 	IDhApiMultiThreadingConfig multiThreading();
 	// note: DON'T add the Auto Updater to this API. We only want the user's to have the ability to control when things are downloaded to their machines.
 	IDhApiDebuggingConfig debugging();
-
 }

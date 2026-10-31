@@ -47,8 +47,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-
-
 /**
  * A singleton that wraps the Minecraft object.
  *
@@ -62,10 +60,7 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 
 	public static final MinecraftClientWrapper INSTANCE = new MinecraftClientWrapper();
 
-
 	private ProfilerWrapper profilerWrapper;
-
-
 
 	//======================//
 	// multiplayer handling //
@@ -93,7 +88,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	{
 		return MINECRAFT.getCurrentServerData() != null;
 	}
-
 
 	@Override
 	public String getCurrentServerName()
@@ -153,8 +147,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 
 	//endregion
 
-
-
 	//=================//
 	// player handling //
 	//=================//
@@ -206,8 +198,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 
 	//endregion
 
-
-
 	//================//
 	// level handling //
 	//================//
@@ -231,8 +221,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// messaging //
@@ -278,8 +266,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 
 	//endregion
 
-
-
 	//==========================//
 	// vanilla option overrides //
 	//==========================//
@@ -293,8 +279,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	}
 
 	//endregion
-
-
 
 	//======//
 	// misc //
@@ -347,8 +331,6 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 
 	//endregion
 
-
-
 	//========//
 	// shared //
 	//========//
@@ -397,7 +379,4 @@ public class MinecraftClientWrapper extends AbstractMinecraftSharedWrapper imple
 	}
 
 	//endregion
-
-
-
 }

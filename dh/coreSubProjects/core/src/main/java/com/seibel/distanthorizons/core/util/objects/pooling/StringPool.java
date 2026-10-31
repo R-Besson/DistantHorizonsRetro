@@ -17,8 +17,6 @@ public class StringPool
 
 	private final TrieNode root = new TrieNode();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -29,8 +27,6 @@ public class StringPool
 	private StringPool() { }
 
 	///endregion
-
-
 
 	//===================//
 	// get pooled string //
@@ -77,8 +73,6 @@ public class StringPool
 
 	///endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -93,8 +87,6 @@ public class StringPool
 		private volatile ConcurrentHashMap<Character, TrieNode> children;
 		private volatile String value;
 		private final StampedLock lock = new StampedLock();
-
-
 
 		//================//
 		// node interface //
@@ -207,8 +199,6 @@ public class StringPool
 	}
 
 	///endregion
-
-
 
 }
 

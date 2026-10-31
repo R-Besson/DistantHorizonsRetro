@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 
 import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.SetY;
 
-
 /*
  * Based upon TinyConfig but is highly modified
  * https://github.com/Minenash/TinyConfig
@@ -42,8 +41,6 @@ public class ClassicConfigGUI
 		.build();
 
 	public static final ConfigCoreInterface CONFIG_CORE_INTERFACE = new ConfigCoreInterface();
-
-
 
 	//==============//
 	// Initializers //
@@ -66,12 +63,9 @@ public class ClassicConfigGUI
 		public static final int OPTION_FIELD_HEIGHT = 20;
 		public static final int CATEGORY_BUTTON_WIDTH = 200;
 		public static final int CATEGORY_BUTTON_HEIGHT = 20;
-
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// GUI handling //
@@ -82,8 +76,6 @@ public class ClassicConfigGUI
 	{ return new DhConfigScreen(parent, category); }
 
 	//endregion
-
-
 
 	//================//
 	// helper classes //
@@ -181,7 +173,6 @@ public class ClassicConfigGUI
 
 			return null;
 		}
-
 	}
 
 	public static class DhButtonEntry implements GuiListExtended.IGuiListEntry
@@ -248,10 +239,7 @@ public class ClassicConfigGUI
 				}
 			}
 			this.textPosition = textPosition;
-
 		}
-
-
 
 		@Override
 		public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, Tessellator tessellator, int mouseX, int mouseY, boolean isSelected)
@@ -341,19 +329,15 @@ public class ClassicConfigGUI
 			}
 		}
 
-
 		@Override
 		public boolean mousePressed(int slotIndex, int mouseX, int mouseY, int mouseEvent, int relativeX, int relativeY)
 		{ return false; /* handled in DhConfigScreen.mouseClicked */ }
 
 		@Override
 		public void mouseReleased(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY) { }
-
 	}
 
 	//endregion
-
-
 
 	//================//
 	// event handling //
@@ -368,11 +352,8 @@ public class ClassicConfigGUI
 		 */
 		public final ArrayList<Runnable> onScreenChangeListenerList = new ArrayList<>();
 
-
-
 		@Override
 		public void addOnScreenChangeListener(Runnable newListener) { this.onScreenChangeListenerList.add(newListener); }
-
 	}
 
 	//endregion

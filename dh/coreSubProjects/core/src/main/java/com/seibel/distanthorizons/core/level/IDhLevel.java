@@ -98,5 +98,4 @@ public interface IDhLevel extends AutoCloseable, GeneratedFullDataSourceProvider
 	 */
 	@Nullable
 	RenderBufferHandler getRenderBufferHandler();
-
 }

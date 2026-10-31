@@ -19,7 +19,4 @@ public enum EDhApiDepthRange
 	 * -1 can be close or far based on {@link EDhApiDepthDirection}
 	 */
 	NEG_ONE_TO_POS_ONE;
-
-
-
 }

@@ -41,11 +41,8 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 		.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
 		.build();
 
-
 	int numberOfBindingPoints = 0;
 	int strideSize = 0;
-
-
 
 	//=============//
 	// constructor //
@@ -56,8 +53,6 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 	{
 		super(); // also bind AbstractVertexAttribute
 	}
-
-
 
 	//=========//
 	// binding //
@@ -72,8 +67,6 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 			LWJGL.glBindVertexBuffer(i, buffer, 0, this.strideSize);
 		}
 	}
-
-
 
 	//==========================//
 	// manual attribute setting //
@@ -102,8 +95,6 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 		LWJGL.glEnableVertexAttribArray(attributeIndex);
 	}
 
-
-
 	//============//
 	// validation //
 	//============//
@@ -122,5 +113,4 @@ public final class GlVertexAttributePostGL43 extends GlAbstractVertexAttribute
 		LOGGER.info("Vertex Attribute (GL43+) completed. It contains " + this.numberOfBindingPoints
 			+ " binding points and a stride size of " + this.strideSize);
 	}
-
 }

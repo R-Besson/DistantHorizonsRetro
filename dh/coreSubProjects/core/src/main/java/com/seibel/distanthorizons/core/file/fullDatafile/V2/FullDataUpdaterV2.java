@@ -46,8 +46,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 
 	private final FullDataSourceProviderV2 provider;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -59,8 +57,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//===============//
 	// data updating //
@@ -83,7 +79,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 		{
 			return CompletableFuture.completedFuture(null);
 		}
-
 
 		try
 		{
@@ -120,7 +115,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 			return;
 		}
 
-
 		long updatePos = inputData.getPos();
 
 		// a lock is necessary to prevent two threads from writing to the same position at once,
@@ -131,7 +125,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 		{
 			updateLock.lock();
 			this.lockedPosSet.add(updatePos);
-
 
 			// get or create the data source
 			try (FullDataSourceV2 recipientDataSource = this.provider.get(updatePos))
@@ -152,7 +145,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 							DhLightingEngine.INSTANCE.bakeDataSourceSkyLight(recipientDataSource, this.provider.levelWrapper.hasSkyLight() ? LodUtil.MAX_MC_LIGHT : LodUtil.MIN_MC_LIGHT);
 						}
 
-
 						// save the updated data to the database
 						try (FullDataSourceV2DTO dto = this.createDtoFromDataSource(recipientDataSource))
 						{
@@ -161,7 +153,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 								this.provider.repo.save(dto);
 							}
 						}
-
 
 						for (IDataSourceUpdateListenerFunc<FullDataSourceV2> listener : this.dateSourceUpdateListenerSet)
 						{
@@ -202,8 +193,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//========//
 	// events //
 	//========//
@@ -215,8 +204,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 	{ this.dateSourceUpdateListenerSet.remove(listener); }
 
 	//endregion
-
-
 
 	//==================//
 	// debugger methods //
@@ -251,8 +238,6 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 
 	//endregion
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -272,7 +257,4 @@ public class FullDataUpdaterV2 implements IDebugRenderable, AutoCloseable
 	public void close() { this.isShutdownRef.set(true); }
 
 	//endregion
-
-
-
 }

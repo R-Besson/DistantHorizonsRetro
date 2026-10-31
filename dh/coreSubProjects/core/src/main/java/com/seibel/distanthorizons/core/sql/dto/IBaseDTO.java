@@ -30,5 +30,4 @@ public interface IBaseDTO<TKey> extends AutoCloseable
 	// closing a DTO shouldn't have the possibility of throwing anything
 	@Override
 	void close();
-
 }

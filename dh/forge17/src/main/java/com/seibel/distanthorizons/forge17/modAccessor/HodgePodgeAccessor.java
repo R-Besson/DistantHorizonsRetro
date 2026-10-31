@@ -10,8 +10,6 @@ public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 	@Override
 	public String getModName() { return "HodgePodge"; }
 
-
-
 	@Override
 	public void preventChunkSimulation(World world, int x, int z)
 	{ SimulationDistanceHelper.preventChunkSimulation(world, ChunkCoordIntPair.chunkXZ2Int(x, z), true); }
@@ -19,7 +17,4 @@ public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 	@Override
 	public void allowChunkSimulation(World world, int x, int z)
 	{ SimulationDistanceHelper.preventChunkSimulation(world, ChunkCoordIntPair.chunkXZ2Int(x, z), false); }
-
-
-
 }

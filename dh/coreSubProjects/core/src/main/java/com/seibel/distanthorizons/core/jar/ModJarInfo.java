@@ -35,7 +35,6 @@ public final class ModJarInfo
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 	private static final String FILE_NAME = "build_info.json";
-
 	static
 	{
 		String gitBranch = "UNKNOWN";
@@ -67,5 +66,4 @@ public final class ModJarInfo
 	public static final String Git_Branch;
 	public static final String Git_Commit;
 	public static final String Build_Source;
-
 }

@@ -32,11 +32,8 @@ public class CameraZoom
 	 */
 	private static final double ZOOM_CONE_PADDING_MULTIPLIER = 1.5;
 
-
 	public static final CameraZoom INSTANCE = CameraZoom.createNotZoomed();
 	private static final CameraZoom NOT_ZOOMED = CameraZoom.createNotZoomed();
-
-
 
 	/** how many times larger objects appear on screen compared to the player's FOV setting */
 	public double magnification;
@@ -53,8 +50,6 @@ public class CameraZoom
 	/** the camera's look direction projected onto the XZ plane, normalized */
 	public double lookDirectionZ;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -70,8 +65,6 @@ public class CameraZoom
 	}
 
 	//endregion
-
-
 
 	//==========//
 	// updating //
@@ -113,8 +106,6 @@ public class CameraZoom
 				return;
 			}
 		}
-
-
 
 		// For a perspective projection this row's length is the cotangent of half the vertical FOV.
 		// The row's length is used instead of m11 alone so the FOV can also be read from
@@ -160,7 +151,6 @@ public class CameraZoom
 				+ MathUtil.pow2(projectionMatrix.m02));
 		double coneTanHalfAngle = (1.0 / projectionXScale) * ZOOM_CONE_PADDING_MULTIPLIER;
 
-
 		this.set(
 			magnification, coneTanHalfAngle,
 			lookAtVector.x / lookLengthXZ, lookAtVector.z / lookLengthXZ);
@@ -176,8 +166,6 @@ public class CameraZoom
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// intersection //
@@ -208,7 +196,4 @@ public class CameraZoom
 	}
 
 	//endregion
-
-
-
 }

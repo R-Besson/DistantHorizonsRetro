@@ -42,8 +42,6 @@ public class LWJGL2Service implements ILWJGLService
 	private final VAOMode vaoMode;
 	private final VertexAttribIMode vertexAttribIMode;
 
-
-
 	private LWJGL2Service(
 		VAOMode vaoMode,
 		VertexAttribIMode vertexAttribIMode)
@@ -51,8 +49,6 @@ public class LWJGL2Service implements ILWJGLService
 		this.vaoMode = vaoMode;
 		this.vertexAttribIMode = vertexAttribIMode;
 	}
-
-
 
 	private enum VAOMode
 	{
@@ -116,8 +112,6 @@ public class LWJGL2Service implements ILWJGLService
 		public abstract void vertexAttribIPointer(int index, int size, int type, int stride, long pointer);
 	}
 
-
-
 	public static LWJGL2Service create()
 	{
 		ContextCapabilities caps = GLContext.getCapabilities();
@@ -156,9 +150,6 @@ public class LWJGL2Service implements ILWJGLService
 
 		return new LWJGL2Service(vaoMode, vertexAttribIMode);
 	}
-
-
-
 
 	// ===================== CAPABILITIES =====================
 
@@ -874,5 +865,4 @@ public class LWJGL2Service implements ILWJGLService
 			return false;
 		}
 	}
-
 }

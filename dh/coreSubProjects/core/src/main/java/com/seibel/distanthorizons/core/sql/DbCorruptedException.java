@@ -16,5 +16,4 @@ public class DbCorruptedException extends SQLException
 		return message.contains("sqlite_corrupt")
 			|| message.contains("malformed");
 	}
-
 }

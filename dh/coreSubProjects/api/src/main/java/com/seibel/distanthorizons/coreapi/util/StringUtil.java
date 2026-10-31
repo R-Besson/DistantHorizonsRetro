@@ -30,7 +30,6 @@ public class StringUtil
 {
 	private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-
 	/**
 	 * Returns the n-th index of the given string. <br> <br>
 	 *
@@ -118,7 +117,4 @@ public class StringUtil
 		}
 		return String.format("%.1f %cB", bytes / 1000.0, ci.current());
 	}
-
-
-
 }

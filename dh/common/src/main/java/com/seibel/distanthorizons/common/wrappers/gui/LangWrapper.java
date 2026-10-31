@@ -18,7 +18,4 @@ public class LangWrapper implements ILangWrapper
 	{
 		return StatCollector.translateToLocal(str);
 	}
-
-
-
 }

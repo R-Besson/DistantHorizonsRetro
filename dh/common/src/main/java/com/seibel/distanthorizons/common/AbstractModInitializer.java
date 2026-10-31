@@ -45,8 +45,6 @@ public abstract class AbstractModInitializer
 {
 	protected static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
-
 	//==================//
 	// abstract methods //
 	//==================//
@@ -63,8 +61,6 @@ public abstract class AbstractModInitializer
 	protected abstract void runDelayedSetup();
 
 	//endregion
-
-
 
 	//===================//
 	// initialize events //
@@ -137,8 +133,6 @@ public abstract class AbstractModInitializer
 
 	//endregion
 
-
-
 	//===========================//
 	// inner initializer methods //
 	//===========================//
@@ -191,7 +185,6 @@ public abstract class AbstractModInitializer
 		DhLogger.runDelayedConfigSetup();
 	}
 
-
 	private void postInit()
 	{
 		LOGGER.info("Running Delayed setup...");
@@ -236,8 +229,6 @@ public abstract class AbstractModInitializer
 	private void postServerInit() { SingletonInjector.INSTANCE.bind(AbstractDebugWireframeRenderer.class, new StubDebugWireframeRenderer()); }
 
 	//endregion
-
-
 
 	//======================//
 	// compatibility checks //
@@ -286,8 +277,6 @@ public abstract class AbstractModInitializer
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -296,11 +285,7 @@ public abstract class AbstractModInitializer
 	public interface IEventProxy
 	{
 		void registerEvents();
-
 	}
 
 	//endregion
-
-
-
 }

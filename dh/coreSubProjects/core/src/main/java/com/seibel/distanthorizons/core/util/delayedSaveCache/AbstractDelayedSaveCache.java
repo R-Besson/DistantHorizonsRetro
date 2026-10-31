@@ -38,8 +38,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 	/** how long between clean up checks */
 	private static final int CLEANUP_CHECK_TIME_IN_MS = 1_000;
 
-
-
 	protected final ConcurrentHashMap<Long, TSaveContainer> saveContainerByPosition = new ConcurrentHashMap<>();
 
 	/* don't let two threads load the same position at the same time */
@@ -47,8 +45,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 
 	/** how long a {@link TSaveContainer} should have lived before being eligible for automatic flushing. */
 	protected final int saveDelayInMs;
-
-
 
 	//=============//
 	// constructor //
@@ -59,7 +55,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 	{
 		BACKGROUND_CLEAN_UP_THREAD.execute(AbstractDelayedSaveCache::runCleanupLoop);
 	}
-
 	public AbstractDelayedSaveCache(int saveDelayInMs)
 	{
 		// we can't clean items faster than the cleanup timer fires
@@ -69,13 +64,10 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 		}
 		this.saveDelayInMs = saveDelayInMs;
 
-
 		SAVE_CACHE_SET.add(new WeakReference<>(this));
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// abstract methods //
@@ -88,8 +80,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 	protected abstract void handleDataSourceRemoval(@NotNull TSaveContainer saveContainer);
 
 	//endregion
-
-
 
 	//==============//
 	// update queue //
@@ -138,8 +128,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 
 	//endregion
 
-
-
 	//==============//
 	// List methods //
 	//==============//
@@ -148,8 +136,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 	public int getUnsavedCount() { return this.saveContainerByPosition.size(); }
 
 	//endregion
-
-
 
 	//===============//
 	// cleanup/flush //
@@ -194,8 +180,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 				posLock.unlock();
 			}
 		}
-
-
 
 		if (removedContainers != null)
 		{
@@ -253,8 +237,6 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -274,7 +256,4 @@ public abstract class AbstractDelayedSaveCache<TSaveObj, TSaveContainer extends 
 	}
 
 	//endregion
-
-
-
 }

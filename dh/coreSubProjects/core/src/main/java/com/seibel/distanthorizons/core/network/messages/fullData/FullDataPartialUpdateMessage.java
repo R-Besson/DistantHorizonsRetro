@@ -35,8 +35,6 @@ public class FullDataPartialUpdateMessage extends AbstractNetworkMessage impleme
 	@Override
 	public String getLevelName() { return this.levelName; }
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -47,8 +45,6 @@ public class FullDataPartialUpdateMessage extends AbstractNetworkMessage impleme
 		this.levelName = level.getKeyedLevelDimensionName();
 		this.payload = payload;
 	}
-
-
 
 	//===============//
 	// serialization //
@@ -68,8 +64,6 @@ public class FullDataPartialUpdateMessage extends AbstractNetworkMessage impleme
 		this.payload = INetworkObject.decodeToInstance(new FullDataPayload(), in);
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -81,5 +75,4 @@ public class FullDataPartialUpdateMessage extends AbstractNetworkMessage impleme
 			.add("levelName", this.levelName)
 			.add("payload", this.payload);
 	}
-
 }

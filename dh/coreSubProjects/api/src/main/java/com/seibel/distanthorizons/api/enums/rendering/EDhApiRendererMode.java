@@ -33,7 +33,6 @@ public enum EDhApiRendererMode
 	DEBUG_TRIANGLE,
 	DISABLED;
 
-
 	/** Used by the config GUI to cycle through the available rendering options */
 	public static EDhApiRendererMode next(EDhApiRendererMode type)
 	{
@@ -61,5 +60,4 @@ public enum EDhApiRendererMode
 				return DEBUG_TRIANGLE;
 		}
 	}
-
 }

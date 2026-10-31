@@ -17,8 +17,6 @@ public class SupplierBasedConcurrencyLimiter<TFailObj>
 
 	private final AtomicInteger pendingTasks = new AtomicInteger();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -28,8 +26,6 @@ public class SupplierBasedConcurrencyLimiter<TFailObj>
 		this.maxConcurrentTasksSupplier = maxConcurrentTasksSupplier;
 		this.onFailureConsumer = onFailureConsumer;
 	}
-
-
 
 	//===============//
 	// lock handling //
@@ -49,6 +45,4 @@ public class SupplierBasedConcurrencyLimiter<TFailObj>
 	}
 
 	public void release() { this.pendingTasks.decrementAndGet(); }
-
-
 }

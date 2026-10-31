@@ -19,8 +19,6 @@ public class GlDhColorTexture
 
 	private static final ByteBuffer NULL_BUFFER = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -42,8 +40,6 @@ public class GlDhColorTexture
 		// This is strictly defensive to ensure that other buggy code doesn't tamper with our textures
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
-
-
 
 	//=========//
 	// methods //
@@ -92,8 +88,6 @@ public class GlDhColorTexture
 	}
 
 	public static Builder builder() { return new Builder(); }
-
-
 
 	//================//
 	// helper classes //
@@ -149,7 +143,5 @@ public class GlDhColorTexture
 		}
 
 		public GlDhColorTexture build() { return new GlDhColorTexture(this); }
-
 	}
-
 }

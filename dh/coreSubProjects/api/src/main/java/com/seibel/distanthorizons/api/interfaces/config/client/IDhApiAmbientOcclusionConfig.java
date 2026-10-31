@@ -33,5 +33,4 @@ public interface IDhApiAmbientOcclusionConfig extends IDhApiConfigGroup
 {
 	/** Determines if Ambient Occlusion is rendered */
 	IDhApiConfigValue<Boolean> enabled();
-
 }

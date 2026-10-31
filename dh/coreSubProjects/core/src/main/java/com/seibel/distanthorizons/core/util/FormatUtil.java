@@ -12,5 +12,4 @@ public class FormatUtil
 			.replaceAll("\\.\\d+", "")
 			.toLowerCase();
 	}
-
 }

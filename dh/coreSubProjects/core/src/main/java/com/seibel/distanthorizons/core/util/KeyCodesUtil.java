@@ -8,5 +8,4 @@ public class KeyCodesUtil
 	public static final int F8 = 297;
 
 	private KeyCodesUtil() { }
-
 }

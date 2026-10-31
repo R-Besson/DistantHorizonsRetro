@@ -42,5 +42,4 @@ public interface IDhApiGenericRenderingConfig extends IDhApiConfigGroup
 
 	/** If enabled DH will render clouds. */
 	IDhApiConfigValue<Boolean> cloudRenderingEnabled();
-
 }

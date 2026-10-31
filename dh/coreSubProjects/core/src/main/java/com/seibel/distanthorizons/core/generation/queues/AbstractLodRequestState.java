@@ -32,15 +32,11 @@ public abstract class AbstractLodRequestState
 	/** static so we only send the disable message once per session */
 	private static long firstProgressMessageSentMs = 0;
 
-
-
 	public final IDhLevel dhLevel;
 	public final IFullDataSourceRetrievalQueue retrievalQueue;
 
 	private final ThreadPoolExecutor progressUpdaterThread = ThreadUtil.makeSingleDaemonThreadPool("World Gen Progress Updater");
 	private boolean progressUpdateThreadRunning = false;
-
-
 
 	//===========================//
 	// request queue and logging //
@@ -54,8 +50,6 @@ public abstract class AbstractLodRequestState
 	}
 
 	//endregion
-
-
 
 	//===========================//
 	// request queue and logging //
@@ -176,7 +170,6 @@ public abstract class AbstractLodRequestState
 				LOGGER.info(message);
 			}
 
-
 			// mark when the first message was sent
 			if (firstProgressMessageSentMs == 0)
 			{
@@ -193,7 +186,6 @@ public abstract class AbstractLodRequestState
 		{
 			return -1;
 		}
-
 
 		PriorityTaskPicker.Executor executor = ThreadPoolUtil.getWorldGenExecutor();
 		int threadCount = 1;
@@ -212,8 +204,6 @@ public abstract class AbstractLodRequestState
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -242,7 +232,4 @@ public abstract class AbstractLodRequestState
 	}
 
 	//endregion
-
-
-
 }

@@ -42,7 +42,6 @@ public class DhBlockPos implements INetworkObject
 	/** Useful for methods that need a position passed in but won't actually be used */
 	public static final DhBlockPos ZERO = new DhBlockPos(0, 0, 0);
 
-
 	protected int x;
 	public int getX() { return this.x; }
 
@@ -51,8 +50,6 @@ public class DhBlockPos implements INetworkObject
 
 	protected int z;
 	public int getZ() { return this.z; }
-
-
 
 	//==============//
 	// constructors //
@@ -67,8 +64,6 @@ public class DhBlockPos implements INetworkObject
 	public DhBlockPos() { this(0, 0, 0); }
 	public DhBlockPos(DhBlockPos pos) { this(pos.x, pos.y, pos.z); }
 
-
-
 	//========//
 	// offset //
 	//========//
@@ -80,8 +75,6 @@ public class DhBlockPos implements INetworkObject
 		mutablePos.y = this.y + direction.normal.y;
 		mutablePos.z = this.z + direction.normal.z;
 	}
-
-
 
 	//================//
 	// chunk relative //
@@ -102,7 +95,6 @@ public class DhBlockPos implements INetworkObject
 		int relX = convertWorldPosToChunkRelative(this.x);
 		// the y value shouldn't need to be changed
 		int relZ = convertWorldPosToChunkRelative(this.z);
-
 
 		if (mutableBlockPos != null)
 		{
@@ -126,8 +118,6 @@ public class DhBlockPos implements INetworkObject
 		relPos = (relPos < 0) ? (relPos + LodUtil.CHUNK_WIDTH) : relPos;
 		return relPos;
 	}
-
-
 
 	//================//
 	// base overrides //
@@ -156,8 +146,6 @@ public class DhBlockPos implements INetworkObject
 	@Override
 	public String toString() { return "DHBlockPos[" + this.x + ", " + this.y + ", " + this.z + "]"; }
 
-
-
 	//=========//
 	// network //
 	//=========//
@@ -177,5 +165,4 @@ public class DhBlockPos implements INetworkObject
 		this.y = in.readInt();
 		this.z = in.readInt();
 	}
-
 }

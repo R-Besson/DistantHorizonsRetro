@@ -38,5 +38,4 @@ public interface IDhApiMultiplayerConfig extends IDhApiConfigGroup
 	 * Note: Changing this while connected to a multiplayer world will cause undefined behavior!
 	 */
 	IDhApiConfigValue<EDhApiServerFolderNameMode> folderSavingMode();
-
 }

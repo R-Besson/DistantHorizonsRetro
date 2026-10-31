@@ -33,8 +33,6 @@ public class DhApiHeightFogConfig implements IDhApiHeightFogConfig
 
 	private DhApiHeightFogConfig() { }
 
-
-
 	@Override
 	public IDhApiConfigValue<EDhApiHeightFogMixMode> heightFogMixMode()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogMixMode); }
@@ -70,5 +68,4 @@ public class DhApiHeightFogConfig implements IDhApiHeightFogConfig
 	@Override
 	public IDhApiConfigValue<Float> heightFogDensity()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.HeightFog.heightFogDensity); }
-
 }

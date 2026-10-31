@@ -44,7 +44,6 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	private boolean init = false;
 
 	private int width = -1;
@@ -57,8 +56,6 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 
 	/** flips each frame */
 	private boolean textureAIsHistory = true;
-
-
 
 	//=============//
 	// constructor //
@@ -125,8 +122,6 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -169,7 +164,6 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 				framebufferId = this.framebufferA;
 			}
 
-
 			GlDhTaaShader.INSTANCE.renderPrep(
 				framebufferId,
 				historyTextureId, outputTextureId
@@ -181,12 +175,8 @@ public class GlDhTaaRenderer implements IDhAntiAliasRenderer
 			// post-render
 			GlDhTaaShader.INSTANCE.savePostRenderUniformObjects(renderParams);
 			this.textureAIsHistory = !this.textureAIsHistory;
-
 		}
 	}
 
 	//endregion
-
-
-
 }

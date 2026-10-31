@@ -238,8 +238,6 @@ public class ShaderPackLodTextures
 	/** set when the pack's LOD water program is patched, see {@link #isVanillaTerrainFadedAtFar()} */
 	private static volatile boolean vanillaTerrainFadedAtFar = false;
 
-
-
 	//==========//
 	// patching //
 	//==========//
@@ -471,8 +469,6 @@ public class ShaderPackLodTextures
 
 	//endregion
 
-
-
 	//==========//
 	// uniforms //
 	//==========//
@@ -553,5 +549,4 @@ public class ShaderPackLodTextures
 	private static final FloatBuffer MATRIX_BUFFER = BufferUtils.createFloatBuffer(16);
 
 	//endregion
-
 }

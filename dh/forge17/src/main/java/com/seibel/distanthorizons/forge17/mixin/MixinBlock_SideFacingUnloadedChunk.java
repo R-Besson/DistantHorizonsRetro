@@ -108,7 +108,4 @@ public class MixinBlock_SideFacingUnloadedChunk
 			return true;
 		}
 	}
-
-
-
 }

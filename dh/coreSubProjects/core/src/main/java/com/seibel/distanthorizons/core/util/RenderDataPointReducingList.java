@@ -86,9 +86,7 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	/** the default element of {@link #links} to indicate that a node is not linked to any other nodes. */
 	public static final long DEFAULT_LINKS = -1L;
 
-
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Render Reducer");
-
 
 	/**
 	 * indexes of the nodes at the ends of this list.
@@ -113,8 +111,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	 * to the order of elements in this array.
 	 */
 	private ShortArrayList sortingArray;
-
-
 
 	//=============//
 	// constructor //
@@ -263,8 +259,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		if (ASSERTS) this.checkLinks();
 	}
 
-
-
 	//========//
 	// reduce //
 	//========//
@@ -331,8 +325,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		this.forceBottomToMerge(target);
 	}
 
-
-
 	//======================//
 	// reduction operations //
 	//======================//
@@ -397,7 +389,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		int bigger = this.getBigger(index);
 		int alpha = this.getAlpha(index);
 
-
 		if (lower != NULL) this.setHigher(lower, higher);
 		else this.setLowest(higher);
 
@@ -435,7 +426,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		{
 			return;
 		}
-
 
 		LongArrayList datas = this.data;
 		int writeIndex = 0;
@@ -593,7 +583,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		int lower = this.getLower(current);
 		int toExtendDownwards;
 		int toRemove;
-
 
 		if (higher != NULL && this.getAlpha(higher) == this.getAlpha(current))
 		{
@@ -891,7 +880,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		return (highestDataPoint & ~RenderDataPointUtil.MIN_Y_SHIFTED_MASK) | (RenderDataPointUtil.getYMin(lowestDataPoint) << RenderDataPointUtil.MIN_Y_SHIFT);
 	}
 
-
 	/** transfers the contents of this list to the provided view, in order of highest to lowest. */
 	public void copyTo(ColumnRenderView view)
 	{
@@ -919,8 +907,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 			view.set(writeIndex, RenderDataPointUtil.EMPTY_DATA);
 		}
 	}
-
-
 
 	//=========//
 	// getters //
@@ -955,8 +941,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	}
 
 	public int getAlpha(int index) { return RenderDataPointUtil.getAlpha(this.getData(index)); }
-
-
 
 	//=========//
 	// setters //
@@ -998,7 +982,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 		this.data.set(index, (this.data.getLong(index) & ~RenderDataPointUtil.MIN_Y_SHIFTED_MASK) | ((minY & RenderDataPointUtil.MIN_Y_MASK) << RenderDataPointUtil.MIN_Y_SHIFT));
 	}
 
-
 	//================//
 	// helper methods //
 	//================//
@@ -1008,8 +991,6 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 	public static boolean isDataVisible(long data) { return isAlphaVisible(RenderDataPointUtil.getAlpha(data)); }
 
 	public static boolean isAlphaVisible(int alpha) { return alpha >= 16; }
-
-
 
 	//==============//
 	// base methods //
@@ -1032,5 +1013,4 @@ public class RenderDataPointReducingList extends AbstractPhantomArrayList
 
 		return builder.toString();
 	}
-
 }

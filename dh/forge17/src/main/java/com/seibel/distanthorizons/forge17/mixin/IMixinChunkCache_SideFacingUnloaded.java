@@ -17,7 +17,4 @@ public interface IMixinChunkCache_SideFacingUnloaded
 
 	@Accessor
 	int getChunkZ();
-
-
-
 }

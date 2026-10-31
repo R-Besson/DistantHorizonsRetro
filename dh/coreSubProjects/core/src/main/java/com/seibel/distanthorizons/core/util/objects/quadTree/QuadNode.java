@@ -35,7 +35,6 @@ public class QuadNode<T>
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
 	public final long sectionPos;
 	/**
 	 * this is the highest detail level this tree can provide.
@@ -44,7 +43,6 @@ public class QuadNode<T>
 	public final byte parentTreeLeafDetailLevel;
 	@Nullable
 	public T value;
-
 
 	/**
 	 * North West <br>
@@ -75,15 +73,11 @@ public class QuadNode<T>
 	@Nullable
 	public QuadNode<T> seChild;
 
-
-
 	public QuadNode(long sectionPos, byte parentTreeLeafDetailLevel)
 	{
 		this.sectionPos = sectionPos;
 		this.parentTreeLeafDetailLevel = parentTreeLeafDetailLevel;
 	}
-
-
 
 	/** @return the number of non-null direct child nodes */
 	public int getDirectChildCount()
@@ -142,8 +136,6 @@ public class QuadNode<T>
 		return count;
 	}
 
-
-
 	/**
 	 * Returns the DhLodPos 1 detail level lower <br><br>
 	 *
@@ -172,7 +164,6 @@ public class QuadNode<T>
 				throw new IllegalArgumentException("child0to3 must be between 0 and 3");
 		}
 	}
-
 
 	/**
 	 * @param sectionPos must be 1 detail level lower than this node's detail level
@@ -231,8 +222,6 @@ public class QuadNode<T>
 		{
 			throw new IllegalArgumentException("Input position is requesting a detail level lower than what this node can provide. Tree leaf detail level: " + this.parentTreeLeafDetailLevel + ", input pos: " + DhSectionPos.toString(inputSectionPos));
 		}
-
-
 
 		// get/set logic
 		if (DhSectionPos.getDetailLevel(inputSectionPos) == DhSectionPos.getDetailLevel(this.sectionPos))
@@ -313,8 +302,6 @@ public class QuadNode<T>
 		}
 	}
 
-
-
 	//===========//
 	// iterators //
 	//===========//
@@ -325,8 +312,6 @@ public class QuadNode<T>
 
 	/** positions can point to null children */
 	public LongIterator getChildPosIterator() { return new QuadNodeDirectChildPosIterator<>(this); }
-
-
 
 	//==========//
 	// deletion //
@@ -344,8 +329,6 @@ public class QuadNode<T>
 				childNode.deleteAllChildren(removedItemConsumer);
 			}
 		}
-
-
 
 		if (this.nwChild != null && removedItemConsumer != null)
 		{
@@ -372,13 +355,10 @@ public class QuadNode<T>
 		this.swChild = null;
 	}
 
-
-
 	//==============//
 	// base methods //
 	//==============//
 
 	@Override
 	public String toString() { return "pos: " + DhSectionPos.toString(this.sectionPos) + ", children #: " + this.getTotalChildCount() + ", value: " + this.value; }
-
 }

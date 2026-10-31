@@ -30,16 +30,12 @@ public class SessionConfigMessage extends AbstractNetworkMessage
 {
 	public SessionConfig config;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	public SessionConfigMessage() { }
 	public SessionConfigMessage(SessionConfig config) { this.config = config; }
-
-
 
 	//===============//
 	// serialization //
@@ -51,8 +47,6 @@ public class SessionConfigMessage extends AbstractNetworkMessage
 	@Override
 	public void decode(ByteBuf in) { this.config = INetworkObject.decodeToInstance(new SessionConfig(), in); }
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -63,5 +57,4 @@ public class SessionConfigMessage extends AbstractNetworkMessage
 		return super.toStringHelper()
 			.add("config", this.config);
 	}
-
 }

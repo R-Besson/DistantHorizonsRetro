@@ -34,7 +34,6 @@ public class GLState implements AutoCloseable
 {
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	public int program;
 	public int vao;
 	public int vbo;
@@ -69,8 +68,6 @@ public class GLState implements AutoCloseable
 	public boolean cull;
 	public int cullMode;
 	public int polyMode;
-
-
 
 	public GLState() { this.saveState(); }
 
@@ -157,7 +154,6 @@ public class GLState implements AutoCloseable
 			frameBufferSet = true;
 		}
 
-
 		if (this.blend)
 		{
 			GLMC.enableBlend();
@@ -208,7 +204,6 @@ public class GLState implements AutoCloseable
 			{
 				LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_ATTACHMENT, GL11.GL_TEXTURE_2D, this.frameBufferDepthTexture, 0);
 			}
-
 		}
 
 		LWJGL.glBindVertexArray(GL30.glIsVertexArray(this.vao) ? this.vao : 0);
@@ -280,7 +275,4 @@ public class GLState implements AutoCloseable
 			", cullMode=" + GLEnums.getString(this.cullMode) + ", polyMode=" + GLEnums.getString(this.polyMode) +
 			'}';
 	}
-
-
-
 }

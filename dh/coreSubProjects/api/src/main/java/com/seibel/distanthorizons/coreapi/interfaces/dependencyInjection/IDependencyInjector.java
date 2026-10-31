@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.coreapi.interfaces.dependencyInjection;
 
-
 import java.util.ArrayList;
 
 public interface IDependencyInjector<BindableType extends IBindable>
@@ -41,7 +40,6 @@ public interface IDependencyInjector<BindableType extends IBindable>
 	boolean checkIfClassImplements(Class<?> classToTest, Class<?> interfaceToLookFor);
 	/** Checks if classToTest extends the given class. */
 	boolean checkIfClassExtends(Class<?> classToTest, Class<?> extensionToLookFor);
-
 
 	/**
 	 * Does not return incomplete dependencies. <Br>
@@ -80,14 +78,9 @@ public interface IDependencyInjector<BindableType extends IBindable>
 	 */
 	@SuppressWarnings("unchecked") <T extends BindableType> T get(Class<T> interfaceClass, boolean allowIncompleteDependencies) throws ClassCastException;
 
-
-
 	/** Removes all bound dependencies. */
 	void clear();
 
-
-
 	/** Runs delayed setup for any dependencies that require it. */
 	void runDelayedSetup();
-
 }

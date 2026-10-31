@@ -42,11 +42,7 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 
 	private final HashMap<Class<? extends IDhApiEvent>, Object> firedOneTimeEventParamsByEventInterface = new HashMap<>();
 
-
-
 	private ApiEventInjector() { super(IDhApiEvent.class, true); }
-
-
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -90,7 +86,6 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 			throw new IllegalArgumentException("The event handler [" + eventClassToRemove.getSimpleName() + "] doesn't implement the interface: [" + IBindable.class.getSimpleName() + "].");
 		}
 
-
 		// actually remove the dependency
 		if (this.dependencies.containsKey(abstractEvent))
 		{
@@ -126,7 +121,6 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 			this.firedOneTimeEventParamsByEventInterface.put(abstractEventClass, eventInput);
 		}
 
-
 		// fire each bound event
 		boolean cancelEvent = false;
 		ArrayList<U> eventList = this.getAll(abstractEventClass);
@@ -142,7 +136,6 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 				{
 					// fire each event and record if any of them
 					// request to cancel the event.
-
 
 					// attempt to clone the event input if possible
 					// this is done to reduce the likelihood that one event listener
@@ -164,7 +157,6 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 							}
 						}
 					}
-
 
 					DhApiEventParam<T> eventParam = createEventParamWrapper(event, input);
 					event.fireEvent(eventParam);
@@ -191,7 +183,6 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 			}
 		}
 
-
 		// remove any removeAfterFire events
 		if (eventsToRemove != null)
 		{
@@ -203,7 +194,6 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 
 		return cancelEvent;
 	}
-
 
 	/**
 	 * Wraps the event parameter object in a {@link DhApiCancelableEventParam} or {@link DhApiEventParam} depending on
@@ -218,5 +208,4 @@ public class ApiEventInjector extends DependencyInjector<IDhApiEvent> implements
 	{
 		return (event instanceof IDhApiCancelableEvent) ? new DhApiCancelableEventParam<>(parameter) : new DhApiEventParam<>(parameter);
 	}
-
 }

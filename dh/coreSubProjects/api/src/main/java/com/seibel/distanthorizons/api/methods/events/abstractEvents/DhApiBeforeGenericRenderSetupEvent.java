@@ -37,13 +37,10 @@ public abstract class DhApiBeforeGenericRenderSetupEvent implements IDhApiEvent<
 	/** Fired before Distant Horizons has started setting up OpenGL objects for rendering generic objects. */
 	public abstract void beforeSetup(DhApiEventParam<DhApiRenderParam> input);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<DhApiRenderParam> input) { this.beforeSetup(input); }
-
-
 }

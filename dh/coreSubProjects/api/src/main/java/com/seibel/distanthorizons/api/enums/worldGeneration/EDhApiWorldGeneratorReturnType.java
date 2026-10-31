@@ -62,5 +62,4 @@ public enum EDhApiWorldGeneratorReturnType
 	 * @since API 4.0.0
 	 */
 	API_DATA_SOURCES;
-
 }

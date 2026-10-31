@@ -24,7 +24,6 @@ public final class PhantomArrayListPoolStatTracker<T>
 	/** total number of backing lists ever created by this pool */
 	public final AtomicInteger totalArrayCountRef = new AtomicInteger(0);
 
-
 	/** used for debugging: estimated byte-size of all lists currently in the pool */
 	public long lastPoolSizeInBytes = -1;
 	/** used for debugging: number of lists currently in the pool */
@@ -34,8 +33,6 @@ public final class PhantomArrayListPoolStatTracker<T>
 	// the debug screen
 	private long pendingPoolByteSize = 0;
 	private int pendingPoolCount = 0;
-
-
 
 	//=============//
 	// constructor //
@@ -49,8 +46,6 @@ public final class PhantomArrayListPoolStatTracker<T>
 	}
 
 	//endregion
-
-
 
 	//===================//
 	// checkout tracking //
@@ -75,8 +70,6 @@ public final class PhantomArrayListPoolStatTracker<T>
 	}
 
 	//endregion
-
-
 
 	//=====================//
 	// debug size tracking //
@@ -120,7 +113,4 @@ public final class PhantomArrayListPoolStatTracker<T>
 	}
 
 	//endregion
-
-
-
 }

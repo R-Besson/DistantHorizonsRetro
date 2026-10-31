@@ -57,8 +57,6 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 
 	//endregion
 
-
-
 	//============//
 	// singletons //
 	//============//
@@ -96,8 +94,6 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 
 	//endregion
 
-
-
 	//===========//
 	// factories //
 	//===========//
@@ -116,7 +112,4 @@ public abstract class AbstractDhRenderApiDefinition implements IBindable
 	public abstract IDhGenericObjectVertexBufferContainer createGenericVboContainer();
 
 	//endregion
-
-
-
 }

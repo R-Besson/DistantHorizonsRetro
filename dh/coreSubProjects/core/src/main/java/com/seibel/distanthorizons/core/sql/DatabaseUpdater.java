@@ -54,8 +54,6 @@ public class DatabaseUpdater
 	 */
 	private static final String SQL_SCRIPT_LIST_FILE = SQL_SCRIPT_RESOURCE_FOLDER + "scriptList.txt";
 
-
-
 	//================//
 	// script running //
 	//================//
@@ -74,8 +72,6 @@ public class DatabaseUpdater
 			return;
 		}
 
-
-
 		// create the base update table if necessary
 		Map<String, Object> schemaTableExistsResult = repo.queryDictionaryFirst("SELECT COUNT(name) as 'tableCount' FROM sqlite_master WHERE type='table' AND name='" + SCHEMA_TABLE_NAME + "';");
 		if (schemaTableExistsResult == null || (int) schemaTableExistsResult.get("tableCount") == 0)
@@ -90,7 +86,6 @@ public class DatabaseUpdater
 			repo.queryDictionaryFirst(createBaseSchemaTable);
 		}
 
-
 		// attempt to run any new update scripts
 		for (SqlScript resource : scriptList)
 		{
@@ -99,7 +94,6 @@ public class DatabaseUpdater
 			{
 				LOGGER.info("Running SQL update script: [" + resource.name + "], for repo: [" + repo.databaseFile + "]");
 
-
 				int sqlIndex = 0;
 				try
 				{
@@ -107,8 +101,6 @@ public class DatabaseUpdater
 					String[] fileUpdateSqlArray = resource.queryString.split(UPDATE_SCRIPT_BATCH_SEPARATOR);
 
 					boolean transactScript = !resource.queryString.contains(UPDATE_SCRIPT_NO_TRANSACTION_FLAG);
-
-
 
 					Connection connection = repo.getConnection();
 					connection.setAutoCommit(!transactScript);
@@ -159,14 +151,11 @@ public class DatabaseUpdater
 					throw e;
 				}
 
-
 				// record the successfully run script
 				repo.queryDictionaryFirst("INSERT INTO " + SCHEMA_TABLE_NAME + " (ScriptName) VALUES('" + resource.name + "');");
 			}
 		}
 	}
-
-
 
 	//===============//
 	// file handling //
@@ -176,7 +165,6 @@ public class DatabaseUpdater
 	private static ArrayList<SqlScript> getAutoUpdateScripts() throws NullPointerException, IOException
 	{
 		final ClassLoader loader = DatabaseUpdater.class.getClassLoader();
-
 
 		// get the script list
 		String scriptListString;
@@ -192,8 +180,6 @@ public class DatabaseUpdater
 				scriptListString = scanner.hasNext() ? scanner.next() : "";
 			}
 		}
-
-
 
 		// get each script
 		ArrayList<SqlScript> scriptList = new ArrayList<>();
@@ -228,8 +214,6 @@ public class DatabaseUpdater
 		return scriptList;
 	}
 
-
-
 	//====================//
 	// startup validation //
 	//====================//
@@ -239,8 +223,6 @@ public class DatabaseUpdater
 	 * Will throw an exception if the scripts are missing or malformed.
 	 */
 	public static int getAutoUpdateScriptCount() throws NullPointerException, IOException { return getAutoUpdateScripts().size(); }
-
-
 
 	//================//
 	// helper classes //
@@ -256,7 +238,5 @@ public class DatabaseUpdater
 			this.name = name;
 			this.queryString = queryString;
 		}
-
 	}
-
 }

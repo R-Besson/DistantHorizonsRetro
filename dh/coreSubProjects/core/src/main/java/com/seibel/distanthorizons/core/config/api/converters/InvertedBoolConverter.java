@@ -38,5 +38,4 @@ public class InvertedBoolConverter implements IConverter<Boolean, Boolean>
 	@Override
 	public Boolean convertToApiType(Boolean api)
 	{ return !api; }
-
 }

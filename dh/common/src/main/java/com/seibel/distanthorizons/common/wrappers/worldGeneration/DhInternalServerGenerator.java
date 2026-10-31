@@ -74,7 +74,6 @@ public class DhInternalServerGenerator
 	 */
 	private static final int MAX_UNLOAD_DRAIN_ATTEMPT_COUNT = 100;
 
-
 	private final GlobalWorldGenParams params;
 	private final IDhServerLevel dhServerLevel;
 	@Nullable
@@ -87,8 +86,6 @@ public class DhInternalServerGenerator
 	 * This map tracks how many in-flight generation events currently need each chunk pos loaded.
 	 */
 	private final ConcurrentHashMap<DhChunkPos, Integer> generationChunkRefCountMap = new ConcurrentHashMap<>();
-
-
 
 	//=============//
 	// constructor //
@@ -142,8 +139,6 @@ public class DhInternalServerGenerator
 		}
 	}
 
-
-
 	//===================================//
 	// neighbor-chunk reference counting //
 	//===================================//
@@ -190,9 +185,6 @@ public class DhInternalServerGenerator
 
 	/** @return true if no generation event currently needs the given pos loaded. */
 	private boolean chunkRefCountIsZero(DhChunkPos chunkPos) { return !this.generationChunkRefCountMap.containsKey(chunkPos); }
-
-
-
 
 	//============//
 	// generation //
@@ -249,8 +241,6 @@ public class DhInternalServerGenerator
 				getChunkFutureList.add(requestChunkFuture);
 			}
 
-
-
 			//==============================//
 			// wait for generation requests //
 			//==============================//
@@ -268,8 +258,6 @@ public class DhInternalServerGenerator
 					chunkWrappers.add(chunkWrapper);
 				}
 			}
-
-
 
 			//==========================//
 			// process generated chunks //
@@ -518,5 +506,4 @@ public class DhInternalServerGenerator
 			return null;
 		});
 	}
-
 }

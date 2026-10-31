@@ -56,10 +56,7 @@ public class RenderUtil
 		public static final float MIN_SPEED = 10.0f; // a little faster than sprinting (7)
 		public static final float MAX_SPEED = (float) LodUtil.MAX_SPECTATOR_SPEED_IN_BLOCKS_PER_SEC;
 		public static final float MIN_OVERDRAW_RATIO = 0.2f;
-
 	}
-
-
 
 	//=====================//
 	// matrix manipulation //
@@ -107,7 +104,6 @@ public class RenderUtil
 			return;
 		}
 
-
 		// Set new far and near clip plane values.
 		if (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.FORWARD_Z)
 		{
@@ -134,8 +130,6 @@ public class RenderUtil
 	}
 
 	//endregion
-
-
 
 	//=================//
 	// near clip plane //
@@ -189,7 +183,6 @@ public class RenderUtil
 			overdraw = MathUtil.clamp(0.05f, overdraw, 1.0f);
 		}
 
-
 		if (Config.Client.Advanced.Graphics.Culling.reduceOverdrawWithFastMovement.get())
 		{
 			double avgSpeed = ClientApi.INSTANCE.getAvgCameraSpeed();
@@ -237,13 +230,11 @@ public class RenderUtil
 			}
 		}
 
-
 		float heightOverride = getHeightBasedNearClipOverrideBlockDistance();
 		if (heightOverride != -1.0f)
 		{
 			nearClipPlane = heightOverride;
 		}
-
 
 		// the player's FOV setting doesn't affect vanilla's render distance,
 		// so zoom mods (which lower the FOV) shouldn't push the near clip plane out,
@@ -338,8 +329,6 @@ public class RenderUtil
 
 	//endregion
 
-
-
 	//================//
 	// far clip plane //
 	//================//
@@ -374,7 +363,4 @@ public class RenderUtil
 	}
 
 	//endregion
-
-
-
 }

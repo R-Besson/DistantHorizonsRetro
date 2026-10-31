@@ -12,8 +12,6 @@ public class ServerKeyedClientLevelWrapper extends ClientLevelWrapper implements
 	/** A unique identifier (generally the level's name) for differentiating multiverse levels */
 	private final String serverLevelKey;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -27,8 +25,6 @@ public class ServerKeyedClientLevelWrapper extends ClientLevelWrapper implements
 	}
 
 	//endregion
-
-
 
 	//======================//
 	// level identification //
@@ -45,7 +41,4 @@ public class ServerKeyedClientLevelWrapper extends ClientLevelWrapper implements
 	public String getDhIdentifier() { return this.getServerLevelKey(); }
 
 	//endregion
-
-
-
 }

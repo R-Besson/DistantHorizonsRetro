@@ -32,8 +32,6 @@ public class ReloadLodsConfigEventHandler extends AbstractDelayedConfigEventHand
 	/** should be used for debug options so their change can be seen instantly */
 	public static ReloadLodsConfigEventHandler INSTANT_INSTANCE = new ReloadLodsConfigEventHandler(0);
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -42,8 +40,6 @@ public class ReloadLodsConfigEventHandler extends AbstractDelayedConfigEventHand
 	public ReloadLodsConfigEventHandler(long timeoutInMs) { super(timeoutInMs); }
 
 	//endregion
-
-
 
 	//========//
 	// events //
@@ -61,7 +57,4 @@ public class ReloadLodsConfigEventHandler extends AbstractDelayedConfigEventHand
 	}
 
 	//endregion
-
-
-
 }

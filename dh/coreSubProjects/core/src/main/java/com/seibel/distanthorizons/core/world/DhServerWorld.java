@@ -39,7 +39,6 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 	private final PregenManager pregenManager = new PregenManager();
 	public PregenManager getPregenManager() { return this.pregenManager; }
 
-
 	//==============//
 	// constructors //
 	//==============//
@@ -49,8 +48,6 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 		super(EWorldEnvironment.SERVER_ONLY);
 		LOGGER.info("Started [" + DhServerWorld.class.getSimpleName() + "] of type [" + this.environment + "].");
 	}
-
-
 
 	//================//
 	// level handling //
@@ -64,7 +61,7 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 			return null;
 		}
 
-		final boolean[] levelCreated = { false };
+		final boolean[] levelCreated = {false};
 		DhServerLevel level = this.dhLevelByLevelWrapper.computeIfAbsent(wrapper,
 			(serverLevelWrapper) ->
 			{
@@ -137,5 +134,4 @@ public class DhServerWorld extends AbstractDhServerWorld<DhServerLevel>
 
 		super.close();
 	}
-
 }

@@ -25,8 +25,6 @@ public class RenderHelper
 	private static DhMat4f modelViewMatrix;
 	private static DhMat4f projectionMatrix;
 
-
-
 	//=================//
 	// matrix handling //
 	//=================//
@@ -41,8 +39,6 @@ public class RenderHelper
 	{ projectionMatrix = McObjectConverter.convert(new Matrix4f(projectionBuffer)); }
 
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -62,8 +58,6 @@ public class RenderHelper
 			ClientApi.RENDER_STATE.canRenderOrThrow();
 		}
 
-
-
 		// set GL state for DH rendering
 		if (getAngelicaAccessor() == null)
 		{
@@ -73,11 +67,7 @@ public class RenderHelper
 		int oldActiveTex = LWJGL.glGetInteger(GL32.GL_ACTIVE_TEXTURE);
 		int oldBoundTex = LWJGL.glGetInteger(GL32.GL_TEXTURE_BINDING_2D);
 
-
-
 		ClientApi.INSTANCE.renderLods();
-
-
 
 		// restore the GL State
 		LWJGL.glDepthFunc(GL32.GL_LEQUAL);
@@ -142,10 +132,6 @@ public class RenderHelper
 
 	//endregion
 
-
-
-
-
 	/**
 	 * Unbinding is necessary to prevent
 	 * a crash if DH is enabled while MC starts loading into the world
@@ -188,8 +174,6 @@ public class RenderHelper
 		}
 	}
 
-
-
 	//=====//
 	// fog //
 	//=====//
@@ -225,9 +209,4 @@ public class RenderHelper
 	}
 
 	//endregion
-
-
-
-
-
 }

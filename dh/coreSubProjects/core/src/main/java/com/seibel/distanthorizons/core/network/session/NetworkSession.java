@@ -41,8 +41,6 @@ public class NetworkSession extends AbstractNetworkEventSource
 	@Nullable
 	public final IServerPlayerWrapper serverPlayer;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -54,8 +52,6 @@ public class NetworkSession extends AbstractNetworkEventSource
 		this.registerHandler(CloseReasonMessage.class, msg ->
 			this.close(new SessionClosedException(msg.reason)));
 	}
-
-
 
 	//==================//
 	// message handling //
@@ -99,8 +95,6 @@ public class NetworkSession extends AbstractNetworkEventSource
 		this.unregisterHandler(this, handlerClass, handlerImplementation);
 	}
 
-
-
 	//==============//
 	// send message //
 	//==============//
@@ -142,8 +136,6 @@ public class NetworkSession extends AbstractNetworkEventSource
 		}
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -166,5 +158,4 @@ public class NetworkSession extends AbstractNetworkEventSource
 
 		super.close();
 	}
-
 }

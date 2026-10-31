@@ -36,7 +36,6 @@ public class FullDataSplitMessage extends AbstractNetworkMessage
 	public ByteBuf buffer;
 	public boolean isFirst;
 
-
 	//==============//
 	// constructors //
 	//==============//
@@ -48,8 +47,6 @@ public class FullDataSplitMessage extends AbstractNetworkMessage
 		this.buffer = buffer;
 		this.isFirst = isFirst;
 	}
-
-
 
 	//===============//
 	// serialization //
@@ -77,8 +74,6 @@ public class FullDataSplitMessage extends AbstractNetworkMessage
 		this.isFirst = in.readBoolean();
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -91,5 +86,4 @@ public class FullDataSplitMessage extends AbstractNetworkMessage
 			.add("buffer", this.buffer)
 			.add("isFirst", this.isFirst);
 	}
-
 }

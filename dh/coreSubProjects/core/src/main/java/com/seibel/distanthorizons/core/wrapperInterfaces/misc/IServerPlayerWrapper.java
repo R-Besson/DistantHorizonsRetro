@@ -30,5 +30,4 @@ public interface IServerPlayerWrapper extends IDhApiUnsafeWrapper
 	IServerLevelWrapper getLevel();
 
 	DhVec3d getPosition();
-
 }

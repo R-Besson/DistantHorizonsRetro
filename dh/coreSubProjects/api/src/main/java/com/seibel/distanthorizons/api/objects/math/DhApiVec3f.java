@@ -35,8 +35,6 @@ public class DhApiVec3f implements IDhApiCopyable
 	public float y;
 	public float z;
 
-
-
 	/** creates a Vec3 at (0,0,0) */
 	public DhApiVec3f()
 	{
@@ -94,5 +92,4 @@ public class DhApiVec3f implements IDhApiCopyable
 
 	@Override
 	public DhApiVec3f copy() { return new DhApiVec3f(this.x, this.y, this.z); }
-
 }

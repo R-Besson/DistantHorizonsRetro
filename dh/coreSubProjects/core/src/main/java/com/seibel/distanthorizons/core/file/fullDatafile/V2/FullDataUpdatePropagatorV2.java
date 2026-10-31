@@ -72,8 +72,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	private int idleBackoffTicks = 0;
 	private int idleTicksToSkip = 0;
 
-
-
 	/**
 	 * Tracks which positions are currently being updated
 	 * to prevent duplicate concurrent updates.
@@ -90,11 +88,8 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 
 	private final IDhLevel dhLevel;
 
-
 	private final FullDataSourceProviderV2 provider;
 	private final FullDataUpdaterV2 dataUpdater;
-
-
 
 	//=============//
 	// constructor //
@@ -116,8 +111,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	}
 
 	//endregion
-
-
 
 	//================//
 	// queue handling //
@@ -187,8 +180,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 		}
 	}
 
-
-
 	//================//
 	// parent updates //
 	//================//
@@ -209,7 +200,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 		{
 			return true;
 		}
-
 
 		// get the positions that need to be applied to their parents
 		LongArrayList outputChildPosList = this.provider.repo.getParentPositionsToUpdate(targetBlockPos.getX(), targetBlockPos.getZ(), maxUpdateTaskCount * PARENT_UPDATE_CHILDREN_READ_MULTIPLIER);
@@ -313,7 +303,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 								}
 							}
 
-
 							// if nothing was changed we don't want to propagate up any further
 							// since the further up nodes won't need any changes either
 							if (parentUpdated)
@@ -321,7 +310,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 								// propagating up, parent will need changes
 								parentInputDataSource.applyToParent =
 									(DhSectionPos.getDetailLevel(parentInputDataSource.getPos()) < FullDataSourceProviderV2.ROOT_SECTION_DETAIL_LEVEL);
-
 
 								// only leaf nodes will ever need regenerating
 								parentInputDataSource.regenerateLeaf = false;
@@ -360,8 +348,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	}
 
 	//endregion
-
-
 
 	//===============//
 	// child updates //
@@ -404,7 +390,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 					continue;
 				}
 
-
 				try
 				{
 					executor.execute(() ->
@@ -431,7 +416,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 								return;
 							}
 
-
 							parentLocked = true;
 							this.dataUpdater.lockedPosSet.add(parentOutputPos);
 
@@ -442,8 +426,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 								{
 									return;
 								}
-
-
 
 								// apply parent to each child
 								for (int i = 0; i < 4; i++)
@@ -488,7 +470,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 												{
 													childInputDataSource.applyToParent = null;
 												}
-
 
 												this.dataUpdater.updateDataSource(childInputDataSource);
 											}
@@ -539,8 +520,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 
 	//endregion
 
-
-
 	//=============//
 	// regen queue //
 	//=============//
@@ -571,7 +550,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 			return;
 		}
 
-
 		// only let one queue thread run at a time
 		if (this.generationQueueRunning)
 		{
@@ -585,7 +563,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 			try
 			{
 				GeneratedFullDataSourceProvider genProvider = (GeneratedFullDataSourceProvider) this.provider;
-
 
 				// queue generation tasks until the generator is full, or there are no more tasks to generate
 				boolean taskStarted = true;
@@ -636,8 +613,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 		{
 			return false;
 		}
-
-
 
 		// get the positions that need to be regenerated
 		int maxRegenBlockDistance = WorldGenUtil.getMaxRegenDistanceInBlocks();
@@ -695,7 +670,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 			return true;
 		}
 
-
 		// just generate highest detail
 		LongArrayList posToGen = genProvider.getPositionsToRetrieve(updatePos, DhSectionPos.SECTION_BLOCK_DETAIL_LEVEL);
 		if (posToGen == null)
@@ -709,8 +683,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 			this.provider.repo.setRegenerate(updatePos, false);
 			return true;
 		}
-
-
 
 		if (!this.generatingPosSet.add(updatePos))
 		{
@@ -736,7 +708,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 				{
 					LOGGER.error("Unexpected error on Update gen future: [" + throwable.getMessage() + "].", throwable);
 				}
-
 
 				boolean finishedGenerating = true;
 				for (int i = 0; i < futureArray.length; i++)
@@ -773,8 +744,6 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	//endregion
 	//endregion
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -805,7 +774,4 @@ public class FullDataUpdatePropagatorV2 implements IDebugRenderable, AutoCloseab
 	}
 
 	//endregion
-
-
-
 }

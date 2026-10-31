@@ -46,11 +46,8 @@ public class GlShader
 		.chatLevelConfig(Config.Common.Logging.logRendererGLEventToChat)
 		.build();
 
-
 	/** OpenGL shader ID */
 	public final int id;
-
-
 
 	//==============//
 	// constructors //
@@ -96,8 +93,6 @@ public class GlShader
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// helpers //
@@ -147,7 +142,4 @@ public class GlShader
 	}
 
 	//endregion
-
-
-
 }

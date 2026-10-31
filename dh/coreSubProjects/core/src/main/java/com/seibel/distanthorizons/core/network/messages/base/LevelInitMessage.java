@@ -20,13 +20,10 @@ public class LevelInitMessage extends AbstractNetworkMessage
 	public static final String LEVEL_KEY_REGEX = String.format("^(?=.{1,%s}$)([%s]+@)?[%s]+(:[%s]+)?$",
 		MAX_LENGTH, ALLOWED_CHARS_REGEX, ALLOWED_CHARS_REGEX, ALLOWED_CHARS_REGEX);
 
-
 	public String dimensionResourceLocation;
 	public String serverKey;
 	public String levelKey;
 	public long serverTime;
-
-
 
 	//==============//
 	// constructors //
@@ -40,8 +37,6 @@ public class LevelInitMessage extends AbstractNetworkMessage
 		this.levelKey = levelKey;
 		this.serverTime = System.currentTimeMillis();
 	}
-
-
 
 	//===============//
 	// serialization //
@@ -65,8 +60,6 @@ public class LevelInitMessage extends AbstractNetworkMessage
 		this.serverTime = in.readLong();
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -80,5 +73,4 @@ public class LevelInitMessage extends AbstractNetworkMessage
 			.add("levelKey", this.levelKey)
 			.add("serverTime", this.serverTime);
 	}
-
 }

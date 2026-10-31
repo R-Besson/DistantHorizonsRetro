@@ -42,8 +42,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 
 	public final ClientLevelModule clientside;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -63,8 +61,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// tick methods //
@@ -87,8 +83,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -102,8 +96,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	public boolean isRendering() { return this.clientside.isRendering(); }
 
 	//endregion
-
-
 
 	//================//
 	// level handling //
@@ -119,8 +111,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 
 	//endregion
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -135,7 +125,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 		String r = MinecraftTextFormat.RED;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
 
-
 		String dimName = this.serverLevelWrapper.getDhIdentifier();
 		boolean rendering =
 			this.clientside.isRendering()
@@ -145,7 +134,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 
 		super.addDebugMenuStringsToList(messageList);
 	}
-
 
 	@Override
 	public IDhGenericRenderer getGenericRenderer() { return this.clientside.genericRenderer; }
@@ -157,8 +145,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	}
 
 	//endregion
-
-
 
 	//===============//
 	// data handling //
@@ -173,8 +159,6 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -194,7 +178,4 @@ public class DhClientServerLevel extends AbstractDhServerLevel implements IDhCli
 	}
 
 	//endregion
-
-
-
 }

@@ -39,7 +39,6 @@ public class RenderQualityPresetConfigEventHandler extends AbstractPresetConfigE
 {
 	public static final RenderQualityPresetConfigEventHandler INSTANCE = new RenderQualityPresetConfigEventHandler();
 
-
 	private final ConfigPresetOptions<EDhApiQualityPreset, EDhApiMaxHorizontalResolution> drawResolution = new ConfigPresetOptions<>(Config.Client.Advanced.Graphics.Quality.maxHorizontalResolution,
 		new HashMap<EDhApiQualityPreset, EDhApiMaxHorizontalResolution>()
 		{{
@@ -131,8 +130,6 @@ public class RenderQualityPresetConfigEventHandler extends AbstractPresetConfigE
 			this.put(EDhApiQualityPreset.EXTREME, 3);
 		}});
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -152,15 +149,12 @@ public class RenderQualityPresetConfigEventHandler extends AbstractPresetConfigE
 		this.configList.add(this.caveCulling);
 		this.configList.add(this.biomeBlending);
 
-
 		for (ConfigPresetOptions<EDhApiQualityPreset, ?> config : this.configList)
 		{
 			// ignore try-using, the listener should only ever be added once and should never be removed
 			new ConfigChangeListener<>(config.configEntry, (val) -> this.onConfigValueChanged());
 		}
 	}
-
-
 
 	//==============//
 	// enum getters //
@@ -173,5 +167,4 @@ public class RenderQualityPresetConfigEventHandler extends AbstractPresetConfigE
 	protected List<EDhApiQualityPreset> getPresetEnumList() { return Arrays.asList(EDhApiQualityPreset.values()); }
 	@Override
 	protected EDhApiQualityPreset getCustomPresetEnum() { return EDhApiQualityPreset.CUSTOM; }
-
 }

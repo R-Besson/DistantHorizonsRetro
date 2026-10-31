@@ -66,7 +66,6 @@ public class FullDataPointIdMap
 	/** Distant Horizons - Block State Wrapper */
 	public static final String BLOCK_STATE_SEPARATOR_STRING = "_DH-BSW_";
 
-
 	/** should only be used for debugging */
 	private long pos;
 
@@ -76,8 +75,6 @@ public class FullDataPointIdMap
 
 	private int cachedHashCode = 0;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -86,8 +83,6 @@ public class FullDataPointIdMap
 	public FullDataPointIdMap(long pos) { this.pos = pos; }
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -114,7 +109,6 @@ public class FullDataPointIdMap
 		return pair;
 	}
 
-
 	/** @return -1 if the list is empty */
 	public int getMaxValidId() { return this.blockBiomePairList.size() - 1; }
 	public int size() { return this.blockBiomePairList.size(); }
@@ -124,8 +118,6 @@ public class FullDataPointIdMap
 	public long getPos() { return this.pos; }
 
 	//endregion
-
-
 
 	//=========//
 	// setters //
@@ -146,7 +138,6 @@ public class FullDataPointIdMap
 			return nullableId;
 		}
 
-
 		// create the new ID
 		return this.idMap.compute(pair, (BlockBiomeWrapperPair newPair, Integer currentId) ->
 		{
@@ -154,7 +145,6 @@ public class FullDataPointIdMap
 			{
 				return currentId;
 			}
-
 
 			// Add the new ID
 			currentId = this.blockBiomePairList.size();
@@ -229,8 +219,6 @@ public class FullDataPointIdMap
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// serializing //
@@ -315,7 +303,6 @@ public class FullDataPointIdMap
 				BlockBiomeWrapperPair newPair = BlockBiomeWrapperPair.get(blockState, biome);
 				map.blockBiomePairList.add(newPair);
 
-
 				if (RUN_SERIALIZATION_DUPLICATE_VALIDATION)
 				{
 					String entryString = StringPool.INSTANCE.getPooledString(fullCharList);
@@ -377,7 +364,6 @@ public class FullDataPointIdMap
 			}
 		}
 
-
 		if (foundStartIndex == -1)
 		{
 			throw new DataCorruptedException("Failed to deserialize BiomeBlockStateEntry [" + input + "], unable to find separator.");
@@ -399,8 +385,6 @@ public class FullDataPointIdMap
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// overrides //
@@ -431,7 +415,4 @@ public class FullDataPointIdMap
 	}
 
 	//endregion
-
-
-
 }

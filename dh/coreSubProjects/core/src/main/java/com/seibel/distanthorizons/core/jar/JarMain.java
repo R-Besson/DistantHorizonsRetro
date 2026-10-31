@@ -32,5 +32,4 @@ public class JarMain
 		System.out.println(ModInfo.READABLE_NAME + " " + ModInfo.VERSION + " is a Minecraft Forge 1.7.10 mod, "
 			+ "put this jar in your instance's mods folder to use it.");
 	}
-
 }

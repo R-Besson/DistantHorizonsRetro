@@ -8,5 +8,4 @@ public class MixinFlags
 {
 	/** will be set to true if the mixin is applied */
 	public static volatile boolean framebufferMixinEnabled = false;
-
 }

@@ -52,7 +52,6 @@ public interface IDhApiWorldGenerationConfig extends IDhApiConfigGroup
 	 */
 	IDhApiConfigValue<EDhApiGeneratorPlan> GeneratorPlan();
 
-
 	/**
 	 * Defines to what level LOD chunks will be generated.
 	 *
@@ -66,7 +65,4 @@ public interface IDhApiWorldGenerationConfig extends IDhApiConfigGroup
 	 * @since API 7.1.0
 	 */
 	IDhApiConfigValue<EDhApiDistantGeneratorMode> chunkGeneratorMode();
-
-
-
 }

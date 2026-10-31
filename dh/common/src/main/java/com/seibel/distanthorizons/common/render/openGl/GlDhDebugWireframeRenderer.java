@@ -47,16 +47,12 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
-
 	// rendering setup
 	private GlShaderProgram basicShader;
 	private GLVertexBuffer vertexBuffer;
 	private GLIndexBuffer indexBuffer;
 	private GlAbstractVertexAttribute va;
 	private boolean init = false;
-
-
 
 	/** A box from 0,0,0 to 1,1,1 */
 	private static final float[] BOX_VERTICES = {
@@ -91,8 +87,6 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 		3, 7,
 		//endregion
 	};
-
-
 
 	//=============//
 	// constructor //
@@ -133,7 +127,6 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 		this.vertexBuffer.bind();
 		this.vertexBuffer.uploadBuffer(boxVerticesBuffer, 8, EDhApiGpuUploadMethod.DATA, BOX_VERTICES.length * Float.BYTES);
 
-
 		// outline vertex indexes
 		ByteBuffer boxOutlineBuffer = ByteBuffer.allocateDirect(BOX_OUTLINE_INDICES.length * Integer.BYTES);
 		boxOutlineBuffer.order(ByteOrder.nativeOrder());
@@ -141,13 +134,9 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 		boxOutlineBuffer.rewind();
 		this.indexBuffer = new GLIndexBuffer(false);
 		this.indexBuffer.uploadBuffer(boxOutlineBuffer, EDhApiGpuUploadMethod.DATA, BOX_OUTLINE_INDICES.length * Integer.BYTES, GL15.GL_STATIC_DRAW);
-
 	}
 
-
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -190,7 +179,4 @@ public class GlDhDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 	}
 
 	//endregion
-
-
-
 }

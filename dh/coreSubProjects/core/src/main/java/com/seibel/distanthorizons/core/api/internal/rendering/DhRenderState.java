@@ -38,8 +38,6 @@ public class DhRenderState
 	 */
 	public boolean vanillaFogEnabled = false;
 
-
-
 	//========//
 	// checks //
 	//========//
@@ -84,7 +82,4 @@ public class DhRenderState
 	}
 
 	//endregion
-
-
-
 }

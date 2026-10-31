@@ -33,5 +33,4 @@ public class GetConfigScreen
 
 		return ClassicConfigGUI.getScreen(parent, "client");
 	}
-
 }

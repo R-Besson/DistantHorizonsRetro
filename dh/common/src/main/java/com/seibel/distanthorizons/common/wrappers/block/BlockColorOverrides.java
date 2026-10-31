@@ -50,8 +50,6 @@ public class BlockColorOverrides
 	private static volatile Map<String, Map<Integer, Integer>> overrides = new HashMap<>();
 	private static volatile boolean loaded = false;
 
-
-
 	//=========//
 	// loading //
 	//=========//
@@ -166,8 +164,6 @@ public class BlockColorOverrides
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -200,7 +196,4 @@ public class BlockColorOverrides
 	}
 
 	//endregion
-
-
-
 }

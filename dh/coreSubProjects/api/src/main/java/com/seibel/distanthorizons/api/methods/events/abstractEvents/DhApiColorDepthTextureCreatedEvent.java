@@ -41,14 +41,12 @@ public abstract class DhApiColorDepthTextureCreatedEvent implements IDhApiEvent<
 	/** Fired before Distant Horizons creates. */
 	public abstract void onResize(DhApiEventParam<EventParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> event) { this.onResize(event); }
-
 
 	//==================//
 	// parameter object //
@@ -66,7 +64,6 @@ public abstract class DhApiColorDepthTextureCreatedEvent implements IDhApiEvent<
 		/** Measured in pixels */
 		public final int newHeight;
 
-
 		public EventParam(
 			int previousWidth, int previousHeight,
 			int newWidth, int newHeight)
@@ -76,7 +73,6 @@ public abstract class DhApiColorDepthTextureCreatedEvent implements IDhApiEvent<
 
 			this.newWidth = newWidth;
 			this.newHeight = newHeight;
-
 		}
 		public EventParam(DhApiTextureCreatedParam textureCreatedParam)
 		{
@@ -85,9 +81,7 @@ public abstract class DhApiColorDepthTextureCreatedEvent implements IDhApiEvent<
 
 			this.newWidth = textureCreatedParam.newWidth;
 			this.newHeight = textureCreatedParam.newHeight;
-
 		}
-
 
 		@Override
 		public EventParam copy()
@@ -97,7 +91,5 @@ public abstract class DhApiColorDepthTextureCreatedEvent implements IDhApiEvent<
 				this.newWidth, this.newHeight
 			);
 		}
-
 	}
-
 }

@@ -14,7 +14,6 @@ public class KeyedLockContainer<TKey>
 {
 	protected final ReentrantLock[] lockArray;
 
-
 	//==============//
 	// constructors //
 	//==============//
@@ -34,12 +33,9 @@ public class KeyedLockContainer<TKey>
 		}
 	}
 
-
-
 	//=========//
 	// getters //
 	//=========//
 
 	public ReentrantLock getLockForPos(TKey key) { return this.lockArray[Math.abs(key.hashCode()) % this.lockArray.length]; }
-
 }

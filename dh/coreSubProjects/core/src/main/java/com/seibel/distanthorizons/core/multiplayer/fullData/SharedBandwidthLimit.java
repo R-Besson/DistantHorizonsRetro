@@ -32,5 +32,4 @@ public class SharedBandwidthLimit
 
 		return globalBandwidthLimit / Math.max(this.senders.size(), 1);
 	}
-
 }

@@ -43,5 +43,4 @@ public enum EDhApiFogDrawMode
 
 	FOG_ENABLED,
 	FOG_DISABLED;
-
 }

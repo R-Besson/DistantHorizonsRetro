@@ -62,8 +62,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 
 	public final IChunkGenerator chunkGenerator;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -78,8 +76,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 
 	//endregion
 
-
-
 	//=====================//
 	// override parameters //
 	//=====================//
@@ -89,8 +85,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	public int getPriority() { return IOverrideInjector.CORE_PRIORITY; }
 
 	//endregion
-
-
 
 	//======================//
 	// generator parameters //
@@ -121,8 +115,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	public boolean runApiValidation() { return ModInfo.IS_DEV_BUILD; }
 
 	//endregion
-
-
 
 	//===================//
 	// generator methods //
@@ -215,7 +207,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 				throw new IllegalArgumentException("no target step defined for generator mode: [" + generatorMode + "].");
 		}
 
-
 		ArrayList<IChunkWrapper> chunkList = new ArrayList<>(widthInChunks * widthInChunks);
 
 		CompletableFuture<Void> genFuture = this.chunkGenerator.queueGenEvent(
@@ -258,8 +249,6 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -272,7 +261,4 @@ public class DhWorldGenerator implements IDhApiWorldGenerator
 	}
 
 	//endregion
-
-
-
 }

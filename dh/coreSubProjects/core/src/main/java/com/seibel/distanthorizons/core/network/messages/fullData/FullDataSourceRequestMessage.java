@@ -39,8 +39,6 @@ public class FullDataSourceRequestMessage extends AbstractTrackableMessage imple
 	@Override
 	public String getLevelName() { return this.levelName; }
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -52,8 +50,6 @@ public class FullDataSourceRequestMessage extends AbstractTrackableMessage imple
 		this.sectionPos = sectionPos;
 		this.clientTimestamp = clientTimestamp;
 	}
-
-
 
 	//===============//
 	// serialization //
@@ -78,8 +74,6 @@ public class FullDataSourceRequestMessage extends AbstractTrackableMessage imple
 		this.clientTimestamp = this.readOptional(in, in::readLong);
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -92,5 +86,4 @@ public class FullDataSourceRequestMessage extends AbstractTrackableMessage imple
 			.add("sectionPos", this.sectionPos)
 			.add("clientTimestamp", this.clientTimestamp);
 	}
-
 }

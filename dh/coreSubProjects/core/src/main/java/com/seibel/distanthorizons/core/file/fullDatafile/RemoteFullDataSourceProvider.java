@@ -55,8 +55,6 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 		.<Long, Boolean>build()
 		.asMap());
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -71,8 +69,6 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 		this.syncOnLoadRequestQueue = syncOnLoadRequestQueue;
 		this.networkState = networkState;
 	}
-
-
 
 	//==================//
 	// override methods //
@@ -105,8 +101,6 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 			return super.get(pos);
 		}
 
-
-
 		//===========================//
 		// request timestamp updates //
 		// from server               //
@@ -134,8 +128,6 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 		return super.get(pos);
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -149,5 +141,4 @@ public class RemoteFullDataSourceProvider extends GeneratedFullDataSourceProvide
 		}
 		super.close();
 	}
-
 }

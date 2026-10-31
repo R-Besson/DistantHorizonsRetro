@@ -25,8 +25,6 @@ public abstract class AbstractPhantomArrayList implements AutoCloseable
 	 */
 	protected final PhantomArrayListCheckout pooledArraysCheckout;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -56,8 +54,6 @@ public abstract class AbstractPhantomArrayList implements AutoCloseable
 
 	//endregion
 
-
-
 	//===============//
 	// leak tracking //
 	//===============//
@@ -68,8 +64,6 @@ public abstract class AbstractPhantomArrayList implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -79,6 +73,4 @@ public abstract class AbstractPhantomArrayList implements AutoCloseable
 	public void close() { this.phantomArrayListPool.returnParentPhantomRef(this.phantomReference); }
 
 	//endregion
-
-
 }

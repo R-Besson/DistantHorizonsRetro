@@ -56,14 +56,11 @@ public class DhSectionPos
 	public static final byte SECTION_CHUNK_DETAIL_LEVEL = SECTION_MINIMUM_DETAIL_LEVEL + LodUtil.CHUNK_DETAIL_LEVEL;
 	public static final byte SECTION_REGION_DETAIL_LEVEL = SECTION_MINIMUM_DETAIL_LEVEL + LodUtil.REGION_DETAIL_LEVEL;
 
-
-
 	public static final int DETAIL_LEVEL_WIDTH = 8;
 	public static final int X_POS_WIDTH = 28;
 	public static final int Z_POS_WIDTH = 28;
 	public static final int X_POS_MISSING_WIDTH = 32 - 28;
 	public static final int Z_POS_MISSING_WIDTH = 32 - 28;
-
 
 	public static final int DETAIL_LEVEL_OFFSET = 0;
 	public static final int POS_X_OFFSET = DETAIL_LEVEL_OFFSET + DETAIL_LEVEL_WIDTH;
@@ -73,8 +70,6 @@ public class DhSectionPos
 	public static final long DETAIL_LEVEL_MASK = Byte.MAX_VALUE;
 	public static final int POS_X_MASK = (int) Math.pow(2, X_POS_WIDTH) - 1;
 	public static final int POS_Z_MASK = (int) Math.pow(2, Z_POS_WIDTH) - 1;
-
-
 
 	//==============//
 	// constructors //
@@ -88,8 +83,6 @@ public class DhSectionPos
 	 * Use one of the {@link DhSectionPos#encode(byte, int, int)} methods instead
 	 */
 	private DhSectionPos() { }
-
-
 
 	/**
 	 * Note:
@@ -135,8 +128,6 @@ public class DhSectionPos
 
 	//endregion
 
-
-
 	//============//
 	// converters //
 	//============//
@@ -165,8 +156,6 @@ public class DhSectionPos
 
 	//endregion
 
-
-
 	//==================//
 	// property getters //
 	//==================//
@@ -189,8 +178,6 @@ public class DhSectionPos
 	}
 
 	//endregion
-
-
 
 	//=================//
 	// complex getters //
@@ -231,7 +218,6 @@ public class DhSectionPos
 		return BitShiftUtil.powerOfTwo(offset);
 	}
 
-
 	/** @return how wide this section is in chunks */
 	public static int getChunkWidth(long pos) { return DhSectionPos.getBlockWidth(pos) / LodUtil.CHUNK_WIDTH; }
 	/** @see DhSectionPos#getDetailLevelWidthInBlocks(byte) */
@@ -252,7 +238,6 @@ public class DhSectionPos
 	 */
 	public static int getDetailLevelWidthInBlocks(byte detailLevel) { return BitShiftUtil.powerOfTwo(detailLevel); }
 
-
 	public static DhBlockPos2D getCenterBlockPos(long pos) { return new DhBlockPos2D(getCenterBlockPosX(pos), getCenterBlockPosZ(pos)); }
 
 	public static int getCenterBlockPosX(long pos) { return getCenterBlockPosXOrZ(pos, true); }
@@ -262,7 +247,6 @@ public class DhSectionPos
 		byte detailLevel = getDetailLevel(pos);
 		int x = getX(pos);
 		int z = getZ(pos);
-
 
 		int centerBlockPos = returnX ? x : z;
 
@@ -288,7 +272,6 @@ public class DhSectionPos
 			+ Math.abs(getCenterBlockPosZ(pos) - blockPos.z);
 	}
 
-
 	/** see: {@link DhSectionPos#getChebyshevSignedBlockDistance(long, int, int)} */
 	public static int getChebyshevSignedBlockDistance(long pos, DhBlockPos blockPos)
 	{ return getChebyshevSignedBlockDistance(pos, blockPos.getX(), blockPos.getZ()); }
@@ -309,7 +292,6 @@ public class DhSectionPos
 		) - getBlockWidth(pos) / 2;
 	}
 
-
 	/**
 	 * Returns a {@link DhSectionPos} with the given detail level and an X/Z position somewhere between (0,0) and (63,63).
 	 * This is done to access specific sections from a {@link FullDataSourceV2} where LOD columns are stored
@@ -329,8 +311,6 @@ public class DhSectionPos
 			throw new IllegalArgumentException("The output Detail Level [" + outputDetailLevel + "] is less than the input pos's detail level [" + DhSectionPos.getDetailLevel(pos) + "].");
 		}
 
-
-
 		// negative values need to be offset by the detail level difference squared (in blocks)
 		// to skip over -0 (relative position) to -1 (relative position)
 		int blockOffset = BitShiftUtil.powerOfTwo(detailLevelDifference) - 1;
@@ -346,7 +326,6 @@ public class DhSectionPos
 		int xRelativePos = xInput / BitShiftUtil.powerOfTwo(detailLevelDifference);
 		int zRelativePos = zInput / BitShiftUtil.powerOfTwo(detailLevelDifference);
 
-
 		// width inclusive
 		final int WIDTH_IN = FullDataSourceV2.WIDTH;
 		// width exclusive
@@ -360,8 +339,6 @@ public class DhSectionPos
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// parent child pos //
@@ -403,7 +380,6 @@ public class DhSectionPos
 
 	//endregion
 
-
 	public static long getAdjacentPos(long pos, EDhDirection dir) throws IllegalArgumentException
 	{
 		if (dir == EDhDirection.UP || dir == EDhDirection.DOWN)
@@ -415,10 +391,6 @@ public class DhSectionPos
 			getX(pos) + dir.normal.x,
 			getZ(pos) + dir.normal.z);
 	}
-
-
-
-
 
 	//=============//
 	// comparisons //
@@ -442,8 +414,6 @@ public class DhSectionPos
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// iterators //
@@ -476,8 +446,6 @@ public class DhSectionPos
 
 	//endregion
 
-
-
 	//==============//
 	// Base methods //
 	//==============//
@@ -489,8 +457,6 @@ public class DhSectionPos
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -501,10 +467,7 @@ public class DhSectionPos
 	public interface IPrimitiveLongConsumer
 	{
 		boolean accept(long value);
-
 	}
 
 	//endregion
-
-
 }

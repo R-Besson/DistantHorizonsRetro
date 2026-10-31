@@ -40,8 +40,6 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	@Override
 	public String getModName() { return ANGELICA_MOD_ID; }
 
-
-
 	//====================//
 	// version validation //
 	//====================//
@@ -70,8 +68,6 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// accessor methods //
@@ -289,7 +285,4 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	}
 
 	//endregion
-
-
-
 }

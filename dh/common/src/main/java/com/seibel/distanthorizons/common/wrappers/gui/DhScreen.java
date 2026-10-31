@@ -59,5 +59,4 @@ public class DhScreen extends GuiScreen
 	{
 		drawHoveringText(Collections.singletonList(text), x, y, fontRendererObj);
 	}
-
 }

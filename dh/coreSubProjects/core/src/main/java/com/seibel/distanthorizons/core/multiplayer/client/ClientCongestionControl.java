@@ -16,7 +16,6 @@ public class ClientCongestionControl
 	private double desiredRate;
 	private long lastAdjustTime;
 
-
 	public ClientCongestionControl(
 		Runnable rateUpdateHandler
 	)
@@ -31,7 +30,6 @@ public class ClientCongestionControl
 		this.lastAdjustTime = System.currentTimeMillis();
 		this.bytesReceived.set(0);
 	}
-
 
 	public void onPayloadReceived(FullDataSplitMessage message)
 	{
@@ -64,5 +62,4 @@ public class ClientCongestionControl
 	{
 		return (int) (this.desiredRate / 1000);
 	}
-
 }

@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.coreapi.interfaces.config;
 
-
 /**
  * Interface used for converting Core and API objects.
  *
@@ -34,6 +33,5 @@ public interface IConverter<CoreType, ApiType>
 	CoreType convertToCoreType(ApiType apiObject);
 
 	ApiType convertToApiType(CoreType coreObject);
-
 }
 

@@ -38,5 +38,4 @@ public class RenderModeEnabledConverter implements IConverter<EDhApiRendererMode
 	@Override
 	public Boolean convertToApiType(EDhApiRendererMode renderingMode)
 	{ return renderingMode == EDhApiRendererMode.DEFAULT; }
-
 }

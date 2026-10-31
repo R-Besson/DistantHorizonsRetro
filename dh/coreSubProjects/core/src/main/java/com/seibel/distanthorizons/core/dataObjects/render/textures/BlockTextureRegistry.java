@@ -63,12 +63,8 @@ public class BlockTextureRegistry
 	/** renders every face flat, also used when set registration overflows */
 	public static final short UNTEXTURED_ID = 0;
 
-
 	// needs to be defined after the other static variables so it can reference them
 	public static final BlockTextureRegistry INSTANCE = new BlockTextureRegistry();
-
-
-
 
 	/** indexed by tile id, holds the ratio-encoded RGBA pixels ready for GPU upload */
 	private final ArrayList<byte[]> tilePixelsById = new ArrayList<>();
@@ -96,8 +92,6 @@ public class BlockTextureRegistry
 	 */
 	private volatile short[][][] sideRowTileIdsBySetId = new short[0][][];
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -123,8 +117,6 @@ public class BlockTextureRegistry
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// tile getters //
@@ -236,7 +228,6 @@ public class BlockTextureRegistry
 
 		@Override
 		public int hashCode() { return this.blockState.hashCode() * 31 + this.color; }
-
 	}
 
 	/**
@@ -400,8 +391,6 @@ public class BlockTextureRegistry
 
 	//endregion
 
-
-
 	//===================//
 	// tile registration //
 	//===================//
@@ -481,7 +470,6 @@ public class BlockTextureRegistry
 			averageBlue = Math.max(ColorUtil.getBlue(faceTexture.ratioReferenceColor), 1.0f);
 		}
 
-
 		byte[] uploadPixels = new byte[TILE_BYTE_COUNT];
 		boolean anyPixelDiffersFromAverage = false;
 		for (int v = 0; v < TextureUtil.TEXTURE_WIDTH_AND_HEIGHT; v++)
@@ -524,7 +512,6 @@ public class BlockTextureRegistry
 				uploadPixels[outIndex + 2] = blue;
 				uploadPixels[outIndex + 3] = alpha;
 
-
 				// only check if the pixel differs when the alpha is visible (non-zero)
 				if (alpha != 0)
 				{
@@ -565,8 +552,6 @@ public class BlockTextureRegistry
 	}
 
 	//endregion
-
-
 
 	//============//
 	// GPU upload //
@@ -627,8 +612,6 @@ public class BlockTextureRegistry
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -664,7 +647,6 @@ public class BlockTextureRegistry
 
 			return Arrays.equals(this.pixels, ((TileKey) obj).pixels);
 		}
-
 	}
 
 	public static class PendingTiles
@@ -677,11 +659,7 @@ public class BlockTextureRegistry
 			this.firstTileId = firstTileId;
 			this.tilePixels = tilePixels;
 		}
-
 	}
 
 	//endregion
-
-
-
 }

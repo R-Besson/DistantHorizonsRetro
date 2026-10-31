@@ -103,8 +103,6 @@ public class LodQuadBuilder implements AutoCloseable
 		};
 	//endregion
 
-
-
 	@SuppressWarnings("unchecked")
 	private final ArrayList<BufferQuad>[] opaqueQuads = (ArrayList<BufferQuad>[]) new ArrayList[6];
 	@SuppressWarnings("unchecked")
@@ -182,8 +180,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	private int premergeCount = 0;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -220,8 +216,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	//endregion
 
-
-
 	//===========//
 	// add quads //
 	//===========//
@@ -244,7 +238,6 @@ public class LodQuadBuilder implements AutoCloseable
 			this.addRowSplitQuadAdj(dir, x, y, z, width, height, color, faceTextureId, irisBlockMaterialId, skyLight, blockLight);
 			return;
 		}
-
 
 		ArrayList<BufferQuad> quadList;
 		if (this.doTransparency && ColorUtil.getAlpha(color) < 255)
@@ -398,8 +391,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	//endregion
 
-
-
 	//=================//
 	// data finalizing //
 	//=================//
@@ -422,7 +413,6 @@ public class LodQuadBuilder implements AutoCloseable
 			{
 				mergeCount += mergeQuadsInternal(this.transparentQuads, directionIndex, BufferMergeDirectionEnum.EastWest);
 			}
-
 
 			// only run the second merge if the face is the top or bottom
 			if (directionIndex == EDhDirection.UP.faceIndex
@@ -561,8 +551,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	//endregion
 
-
-
 	//==============//
 	// buffer setup //
 	//==============//
@@ -680,7 +668,6 @@ public class LodQuadBuilder implements AutoCloseable
 					throw new IllegalArgumentException("Invalid Axis enum: " + axis);
 			}
 
-
 			int color = quad.color;
 
 			// use custom side color logic for grass blocks
@@ -713,7 +700,6 @@ public class LodQuadBuilder implements AutoCloseable
 					}
 				}
 			}
-
 
 			byte skyLight = quad.skyLight;
 			byte blockLight = quad.blockLight;
@@ -843,8 +829,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -906,8 +890,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	//endregion
 
-
-
 	//=====================//
 	// buffer quad pooling //
 	//=====================//
@@ -951,8 +933,6 @@ public class LodQuadBuilder implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -968,7 +948,4 @@ public class LodQuadBuilder implements AutoCloseable
 	}
 
 	//endregion
-
-
-
 }

@@ -71,10 +71,7 @@ public class PhantomArrayListPool
 	/** if enabled the number of GC'ed arrays will be logged */
 	private static final boolean LOG_ARRAY_RECOVERY = ModInfo.IS_DEV_BUILD;
 
-
 	private static boolean lowMemoryWarningLogged = false;
-
-
 
 	/** used for debugging and tracking what the pool contains */
 	public final String name;
@@ -88,7 +85,6 @@ public class PhantomArrayListPool
 	public final ConcurrentHashMap<Reference<? extends AbstractPhantomArrayList>, PhantomArrayListCheckout>
 		phantomRefToCheckout = new ConcurrentHashMap<>();
 	public final ReferenceQueue<AbstractPhantomArrayList> phantomRefQueue = new ReferenceQueue<>();
-
 
 	private final ConcurrentLinkedQueue<SoftReference<PhantomArrayListCheckout>> pooledCheckoutsRefs = new ConcurrentLinkedQueue<>();
 
@@ -128,8 +124,6 @@ public class PhantomArrayListPool
 
 	//endregion
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -139,8 +133,6 @@ public class PhantomArrayListPool
 	{
 		RECYCLER_THREAD.execute(PhantomArrayListPool::runPhantomReferenceCleanupLoop);
 	}
-
-
 	public PhantomArrayListPool(String name) { this(name, false); }
 	public PhantomArrayListPool(String name, boolean logGarbageCollectedStacks)
 	{
@@ -148,8 +140,6 @@ public class PhantomArrayListPool
 		this.name = name;
 		this.logGarbageCollectedStacks = logGarbageCollectedStacks;
 	}
-
-
 
 	//==============//
 	// get checkout //
@@ -226,7 +216,6 @@ public class PhantomArrayListPool
 			}
 		}
 
-
 		// get any missing arrays
 		this.bytePoolStatTracker.fillCheckout(byteArrayCount, checkout::getByteArrayCount, checkout::addByteArrayList);
 		this.shortPoolStatTracker.fillCheckout(shortArrayCount, checkout::getShortArrayCount, checkout::addShortArrayList);
@@ -236,8 +225,6 @@ public class PhantomArrayListPool
 
 		return checkout;
 	}
-
-
 
 	//==================//
 	// phantom recovery //
@@ -261,7 +248,6 @@ public class PhantomArrayListPool
 				catch (InterruptedException ignore)
 				{
 				}
-
 
 				for (int poolIndex = 0; poolIndex < POOL_LIST.size(); poolIndex++)
 				{
@@ -348,8 +334,6 @@ public class PhantomArrayListPool
 
 	//endregion
 
-
-
 	//=================//
 	// return checkout //
 	//=================//
@@ -381,8 +365,6 @@ public class PhantomArrayListPool
 	}
 
 	//endregion
-
-
 
 	//===============//
 	// debug methods //
@@ -445,7 +427,6 @@ public class PhantomArrayListPool
 			totalCounts, pooledCounts, poolSizesBytes);
 	}
 
-
 	private static void addDebugMenuStringsToList(
 		List<String> messageList,
 		String name,
@@ -458,7 +439,6 @@ public class PhantomArrayListPool
 		String o = MinecraftTextFormat.ORANGE;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
 
-
 		// total pool
 		long totalByteSize = 0L;
 		for (int i = 0; i < POOL_STAT_TYPE_NAMES.length; i++)
@@ -466,7 +446,6 @@ public class PhantomArrayListPool
 			totalByteSize += poolSizesBytes[i];
 		}
 		String totalByteSizeStr = StringUtil.convertBytesToHumanReadable(totalByteSize);
-
 
 		// header
 		messageList.add(a + name + cf + " - Pools");
@@ -500,7 +479,6 @@ public class PhantomArrayListPool
 		}
 	}
 
-
 	/**
 	 * Shouldn't be called on the render thread as it can
 	 * take 10's of milliseconds to complete.
@@ -522,7 +500,6 @@ public class PhantomArrayListPool
 			byteBufferPoolStatTracker.debugAddPoolByteSize(pooledCheckout.getAllByteBufferWrappers());
 		}
 
-
 		// clear the old count if something was garbage collected
 		// so the size can shrink
 		boolean clearLastPoolSize = this.clearLastPoolSizes;
@@ -539,7 +516,4 @@ public class PhantomArrayListPool
 	}
 
 	//endregion
-
-
-
 }

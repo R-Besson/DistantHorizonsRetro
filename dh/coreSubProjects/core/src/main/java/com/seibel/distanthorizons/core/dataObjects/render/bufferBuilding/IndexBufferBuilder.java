@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 public class IndexBufferBuilder
 {
 
-
 	//==========//
 	// building //
 	//==========//
@@ -45,7 +44,4 @@ public class IndexBufferBuilder
 	}
 
 	//endregion
-
-
-
 }

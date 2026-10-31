@@ -23,8 +23,6 @@ public class BiomeHandler implements IBiomeHandler
 	private final List<BiomeGenBase> biomeList = new ArrayList<>();
 	private ConcurrentHashMap<String, BiomeGenBase> biomeByName;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -33,8 +31,6 @@ public class BiomeHandler implements IBiomeHandler
 	private BiomeHandler() { }
 
 	//endregion
-
-
 
 	//=========//
 	// methods //
@@ -68,7 +64,4 @@ public class BiomeHandler implements IBiomeHandler
 	}
 
 	//endregion
-
-
-
 }

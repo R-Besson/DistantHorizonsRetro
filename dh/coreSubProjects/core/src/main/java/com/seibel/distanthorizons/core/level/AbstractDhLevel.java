@@ -70,9 +70,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 	protected final ConcurrentHashMap<Long, HashSet<DhChunkPos>> updatedChunkPosSetBySectionPos = new ConcurrentHashMap<>();
 	protected final ConcurrentHashMap<DhChunkPos, Integer> updatedChunkHashesByChunkPos = new ConcurrentHashMap<>();
 
-
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -97,7 +94,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 			LOGGER.fatal("Unable to create [" + ChunkHashRepo.class.getSimpleName() + "], error: [" + e.getMessage() + "].", e);
 		}
 		this.chunkHashRepo = newChunkHashRepo;
-
 
 		// beacon beam
 		BeaconBeamRepo newBeaconBeamRepo = null;
@@ -135,8 +131,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 
 	//endregion
 
-
-
 	//=================//
 	// default methods //
 	//=================//
@@ -152,7 +146,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 				// This can happen if, among other reasons, a chunk save is superseded by a later event
 				return;
 			}
-
 
 			this.updatedChunkPosSetBySectionPos.compute(dataSource.getPos(), (dataSourcePos, chunkPosSet) ->
 			{
@@ -242,8 +235,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 
 	//endregion
 
-
-
 	//=======//
 	// repos //
 	//=======//
@@ -262,8 +253,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 	}
 
 	//endregion
-
-
 
 	//=================//
 	// beacon handling //
@@ -309,7 +298,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 			return;
 		}
 
-
 		// locked to prevent two threads from updating the same position at the same time
 		ReentrantLock lock = this.beaconUpdateLockContainer.getLockForPos(sectionPosForLock);
 		try
@@ -337,9 +325,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 				allPosSet.add(beam.blockPos);
 			}
 
-
-
-
 			for (DhBlockPos beaconPos : allPosSet)
 			{
 				if (minBlockX > beaconPos.getX() || beaconPos.getX() > maxBlockX
@@ -348,7 +333,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 					// don't modify beacons outside the updated range
 					continue;
 				}
-
 
 				BeaconBeamDTO existingBeam = existingBeamByPos.get(beaconPos);
 				BeaconBeamDTO activeBeam = activeBeamByPos.get(beaconPos);
@@ -384,8 +368,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -402,11 +384,6 @@ public abstract class AbstractDhLevel implements IDhLevel
 			this.beaconBeamRepo.close();
 		}
 
-
-
 		this.delayedFullDataSourceSaveCache.close();
 	}
-
-
-
 }

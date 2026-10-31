@@ -44,8 +44,6 @@ public class DhApiResult<T>
 	 */
 	public final T payload;
 
-
-
 	// these constructors are private because the create methods below are easier to understand
 	private DhApiResult(boolean success, String message) { this(success, message, null); }
 	private DhApiResult(boolean success, String message, T payload)
@@ -56,8 +54,6 @@ public class DhApiResult<T>
 		this.payload = payload;
 	}
 
-
-
 	public static <Pt> DhApiResult<Pt> createSuccess() { return new DhApiResult<>(true, ""); }
 	public static <Pt> DhApiResult<Pt> createSuccess(Pt payload) { return new DhApiResult<Pt>(true, "", payload); }
 	// There is no createSuccess(String message) method because it would be too easy to confuse with createSuccess(Pt payload) when returning null
@@ -66,5 +62,4 @@ public class DhApiResult<T>
 	// there is no createFail() since all fail results should give a reason for their failure
 	public static <Pt> DhApiResult<Pt> createFail(String message) { return new DhApiResult<>(false, message); }
 	public static <Pt> DhApiResult<Pt> createFail(String message, Pt payload) { return new DhApiResult<Pt>(false, message, payload); }
-
 }

@@ -38,15 +38,11 @@ public class GenericRenderObjectFactory implements IDhApiCustomRenderObjectFacto
 {
 	public static final GenericRenderObjectFactory INSTANCE = new GenericRenderObjectFactory();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	private GenericRenderObjectFactory() { }
-
-
 
 	//================//
 	// group creation //
@@ -67,5 +63,4 @@ public class GenericRenderObjectFactory implements IDhApiCustomRenderObjectFacto
 	@Override
 	public IDhApiRenderableBoxGroup createAbsolutePositionedGroup(String resourceLocation, List<DhApiRenderableBox> boxList)
 	{ return new RenderableBoxGroup(resourceLocation, new DhApiVec3d(0, 0, 0), boxList); }
-
 }

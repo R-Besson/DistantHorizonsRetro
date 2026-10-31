@@ -17,8 +17,6 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 	/** out of the last 100 ticks */
 	private static final int MAX_SLOW_TICKS = 5;
 
-
-
 	@Nullable
 	protected Integer deserializeDimensionResourceKey(String dimensionResourceLocation)
 	{
@@ -111,10 +109,6 @@ public abstract class AbstractMinecraftSharedWrapper implements IMinecraftShared
 		return server.tickTimeArray;
 	}
 
-
 	@Override
 	public boolean supportsSurfaceGeneration() { return supportsSurfaceGeneration; }
-
-
-
 }

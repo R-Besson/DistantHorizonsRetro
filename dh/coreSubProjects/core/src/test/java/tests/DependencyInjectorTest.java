@@ -42,7 +42,6 @@ import testItems.worldGeneratorInjection.objects.WorldGeneratorTestCore;
 import testItems.worldGeneratorInjection.objects.WorldGeneratorTestPrimary;
 import testItems.worldGeneratorInjection.objects.WorldGeneratorTestSecondary;
 
-
 /**
  * @author James Seibel
  * @version 2022-12-10
@@ -56,17 +55,14 @@ public class DependencyInjectorTest
 		// Injector setup
 		DependencyInjector<IBindable> TEST_SINGLETON_HANDLER = new DependencyInjector<>(IBindable.class, false);
 
-
 		// pre-dependency setup
 		Assert.assertNull(ISingletonTestOne.class.getSimpleName() + " should not have been bound.", TEST_SINGLETON_HANDLER.get(ISingletonTestOne.class));
-
 
 		// dependency setup
 		TEST_SINGLETON_HANDLER.bind(ISingletonTestOne.class, new ConcreteSingletonTestOne(TEST_SINGLETON_HANDLER));
 		TEST_SINGLETON_HANDLER.bind(ISingletonTestTwo.class, new ConcreteSingletonTestTwo(TEST_SINGLETON_HANDLER));
 
 		TEST_SINGLETON_HANDLER.runDelayedSetup();
-
 
 		// basic dependencies
 		ISingletonTestOne testInterOne = TEST_SINGLETON_HANDLER.get(ISingletonTestOne.class);
@@ -79,11 +75,9 @@ public class DependencyInjectorTest
 		Assert.assertEquals(ISingletonTestTwo.class.getSimpleName() + " incorrect value.", testInterTwo.getValue(), ConcreteSingletonTestTwo.VALUE);
 		Assert.assertEquals(ISingletonTestTwo.class.getSimpleName() + " incorrect value.", TEST_SINGLETON_HANDLER.get(ISingletonTestTwo.class).getValue(), ConcreteSingletonTestTwo.VALUE);
 
-
 		// circular dependencies (if this throws an exception the dependency isn't set up)
 		Assert.assertEquals(ISingletonTestOne.class.getSimpleName() + " incorrect value.", testInterOne.getDependentValue(), ConcreteSingletonTestTwo.VALUE);
 		Assert.assertEquals(ISingletonTestTwo.class.getSimpleName() + " incorrect value.", testInterTwo.getDependentValue(), ConcreteSingletonTestOne.VALUE);
-
 	}
 
 	@Test
@@ -92,17 +86,14 @@ public class DependencyInjectorTest
 		// Injector setup
 		DependencyInjector<IBindable> TEST_SINGLETON_HANDLER = new DependencyInjector<>(IBindable.class, false);
 
-
 		// pre-dependency setup
 		Assert.assertNull(ISingletonTestOne.class.getSimpleName() + " should not have been bound.", TEST_SINGLETON_HANDLER.get(ISingletonTestOne.class));
-
 
 		// dependency setup
 		ConcreteSingletonTestBoth concreteInstance = new ConcreteSingletonTestBoth();
 
 		TEST_SINGLETON_HANDLER.bind(ISingletonTestOne.class, concreteInstance);
 		TEST_SINGLETON_HANDLER.bind(ISingletonTestTwo.class, concreteInstance);
-
 
 		// basic dependencies
 		ISingletonTestOne testInterOne = TEST_SINGLETON_HANDLER.get(ISingletonTestOne.class);
@@ -112,7 +103,6 @@ public class DependencyInjectorTest
 		ISingletonTestTwo testInterTwo = TEST_SINGLETON_HANDLER.get(ISingletonTestTwo.class);
 		Assert.assertNotNull(ISingletonTestTwo.class.getSimpleName() + " not bound.", testInterTwo);
 		Assert.assertEquals(ISingletonTestTwo.class.getSimpleName() + " incorrect value.", ConcreteSingletonTestBoth.VALUE, testInterTwo.getValue());
-
 	}
 
 	@Test
@@ -121,17 +111,14 @@ public class DependencyInjectorTest
 		OverrideInjector TEST_INJECTOR = new OverrideInjector(OverrideTestAssembly.getPackagePath(2));
 		OverrideInjector CORE_INJECTOR = new OverrideInjector();
 
-
 		// pre-dependency setup
 		Assert.assertNull("Nothing should have been bound.", TEST_INJECTOR.get(IOverrideTest.class));
 		Assert.assertNull("Nothing should have been bound.", CORE_INJECTOR.get(IOverrideTest.class));
-
 
 		// variables to use later
 		IOverrideTest override;
 		OverrideTestCore coreOverride = new OverrideTestCore();
 		OverrideTestPrimary primaryOverride = new OverrideTestPrimary();
-
 
 		// core override binding
 		try
@@ -151,7 +138,6 @@ public class DependencyInjectorTest
 		catch (IllegalArgumentException e)
 		{ /* this exception should be thrown */ }
 
-
 		// core override
 		Assert.assertNotNull("Test injector should've bound core override.", TEST_INJECTOR.get(IOverrideTest.class));
 		Assert.assertNull("Core injector should not have bound core override.", CORE_INJECTOR.get(IOverrideTest.class));
@@ -162,7 +148,6 @@ public class DependencyInjectorTest
 		override = TEST_INJECTOR.get(IOverrideTest.class);
 		Assert.assertEquals("Override returned incorrect override type.", OverrideInjector.CORE_PRIORITY, override.getPriority());
 		Assert.assertEquals("Incorrect override object returned.", override.getValue(), OverrideTestCore.VALUE);
-
 
 		// default override
 		TEST_INJECTOR.bind(IOverrideTest.class, primaryOverride);
@@ -175,18 +160,15 @@ public class DependencyInjectorTest
 		Assert.assertEquals("Override returned incorrect override type.", override.getPriority(), OverrideTestPrimary.PRIORITY);
 		Assert.assertEquals("Incorrect override object returned.", override.getValue(), OverrideTestPrimary.VALUE);
 
-
 		// in-line get
 		// (make sure the returned type is correct and compiles, the actual value doesn't matter)
 		TEST_INJECTOR.get(IOverrideTest.class).getValue();
-
 	}
 
 	@Test
 	public void testWorldGeneratorInjection()
 	{
 		WorldGeneratorInjector TEST_INJECTOR = new WorldGeneratorInjector(WorldGeneratorTestAssembly.getPackagePath(2));
-
 
 		// variables to use later
 		IDhApiWorldGenerator generator;
@@ -197,11 +179,8 @@ public class DependencyInjectorTest
 		IDhApiLevelWrapper boundLevel = new LevelWrapperTest();
 		IDhApiLevelWrapper unboundLevel = new LevelWrapperTest();
 
-
 		// validate nothing has been bound yet
 		Assert.assertNull("Nothing should have been bound yet.", TEST_INJECTOR.get(boundLevel));
-
-
 
 		// bind the core generator //
 		try
@@ -222,8 +201,6 @@ public class DependencyInjectorTest
 		// unbound level should still return null
 		Assert.assertNull("Nothing should have been bound to this level.", TEST_INJECTOR.get(unboundLevel));
 
-
-
 		// bind the secondary generator //
 		try
 		{
@@ -243,8 +220,6 @@ public class DependencyInjectorTest
 		// the unbound level should still return null
 		Assert.assertNull("Nothing should have been bound to this level.", TEST_INJECTOR.get(unboundLevel));
 
-
-
 		// bind the primary generator //
 		try
 		{
@@ -263,10 +238,7 @@ public class DependencyInjectorTest
 
 		// the unbound level should still return null
 		Assert.assertNull("Nothing should have been bound to this level.", TEST_INJECTOR.get(unboundLevel));
-
-
 	}
-
 }
 
 

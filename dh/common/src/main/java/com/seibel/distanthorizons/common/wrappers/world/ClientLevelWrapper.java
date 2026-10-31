@@ -51,8 +51,6 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-
-
 public class ClientLevelWrapper implements IClientLevelWrapper
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
@@ -74,16 +72,12 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	/** how long in milliseconds can a level be unused before it's automatically unloaded */
 	private static final long INACTIVE_TIME_BEFORE_UNLOADED_IN_MS = 30 * 1000;
 
-
-
 	private final WorldClient level;
 	private final ConcurrentHashMap<BlockStateWrapper, ClientBlockStateColorCache> blockColorCacheByBlockState = new ConcurrentHashMap<>();
-
 
 	/** cached method reference to reduce GC overhead */
 	private final Function<BlockStateWrapper, ClientBlockStateColorCache> createCachedBlockColorCacheFunc
 		= (blockState) -> new ClientBlockStateColorCache(blockState, this);
-
 
 	private boolean cloudColorFailLogged = false;
 	/** only used by the render thread */
@@ -94,8 +88,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	private volatile IDhLevel dhLevel;
 	private volatile long lastAccessTime = System.currentTimeMillis();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -104,8 +96,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	protected ClientLevelWrapper(WorldClient level) { this.level = level; }
 
 	//endregion
-
-
 
 	//======================//
 	// inactivity unloading //
@@ -121,7 +111,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		// fire 20 times per second (i.e. 50ms interval)
 		CLIENT_CLEANUP_TIMER.scheduleAtFixedRate(CLIENT_CLEANUP_TASK, 0, 1000 / 20);
 	}
-
 	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	public static void tickCleanup()
 	{
@@ -171,8 +160,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	}
 
 	//endregion
-
-
 
 	//================//
 	// level handling //
@@ -227,7 +214,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 			}
 		}
 
-
 		WeakReference<ClientLevelWrapper> levelRef = LEVEL_WRAPPER_REF_BY_CLIENT_LEVEL.get(level);
 		if (levelRef != null)
 		{
@@ -237,7 +223,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 				return levelWrapper;
 			}
 		}
-
 
 		return LEVEL_WRAPPER_REF_BY_CLIENT_LEVEL.compute(level, (newLevel, newLevelRef) ->
 		{
@@ -290,8 +275,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	}
 
 	//endregion
-
-
 
 	//====================//
 	// base level methods //
@@ -474,8 +457,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 
 		//endregion
 
-
-
 		// use a mutable thread local to reduce allocations slightly
 		DhBlockPosMutable blockWorldPos = MUTABLE_BLOCK_POS_THREAD_LOCAL.get();
 		blockWorldPos.setX(blockWorldPosX);
@@ -487,8 +468,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -579,8 +558,6 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -598,7 +575,4 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 	}
 
 	//endregion
-
-
-
 }

@@ -54,7 +54,4 @@ public interface IDhWorld extends Closeable
 	 * or couldn't be unloaded for some other reason
 	 */
 	boolean unloadLevel(@NotNull ILevelWrapper levelWrapper);
-
-
-
 }

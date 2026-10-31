@@ -9,5 +9,4 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.render.objects.ILodCont
 public class GlDummyUniformData implements ILodContainerUniformBufferWrapper
 {
 	@Override public void close() { }
-
 }

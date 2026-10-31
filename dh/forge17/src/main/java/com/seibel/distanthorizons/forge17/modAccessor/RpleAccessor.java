@@ -20,8 +20,6 @@ public class RpleAccessor implements IRpleCommonAccessor
 	@Override
 	public String getModName() { return "rple"; }
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -34,8 +32,6 @@ public class RpleAccessor implements IRpleCommonAccessor
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -51,8 +47,6 @@ public class RpleAccessor implements IRpleCommonAccessor
 	}
 
 	//endregion
-
-
 
 	//==========//
 	// lightmap //
@@ -70,7 +64,4 @@ public class RpleAccessor implements IRpleCommonAccessor
 	public int getLightmapTextureId() { return this.lightmapTexture.getGlTextureId(); }
 
 	//endregion
-
-
-
 }

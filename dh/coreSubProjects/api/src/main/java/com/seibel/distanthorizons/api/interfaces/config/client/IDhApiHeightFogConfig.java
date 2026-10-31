@@ -72,5 +72,4 @@ public interface IDhApiHeightFogConfig extends IDhApiConfigGroup
 
 	/** Defines the height fog's density. */
 	IDhApiConfigValue<Float> heightFogDensity();
-
 }

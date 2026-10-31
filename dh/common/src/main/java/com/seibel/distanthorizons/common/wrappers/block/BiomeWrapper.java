@@ -32,8 +32,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-
-
 /** This class wraps Minecraft's BiomeGenBase class */
 public class BiomeWrapper implements IBiomeWrapper
 {
@@ -51,8 +49,6 @@ public class BiomeWrapper implements IBiomeWrapper
 
 	public static final String PLAINS_RESOURCE_LOCATION_STRING = "biome:Plains";
 
-
-
 	/** keep track of broken biomes so we don't log every time */
 	private static final HashSet<String> brokenResourceLocationStrings = new HashSet<>();
 
@@ -63,8 +59,6 @@ public class BiomeWrapper implements IBiomeWrapper
 	private static boolean emptyStringWarningLogged = false;
 	private static boolean emptyLevelSerializeFailLogged = false;
 
-
-
 	// properties //
 
 	public final BiomeGenBase biome;
@@ -72,8 +66,6 @@ public class BiomeWrapper implements IBiomeWrapper
 	/** technically final, but since it requires a method call to generate it can't be marked as such */
 	private String serialString;
 	private final int hashCode;
-
-
 
 	//==============//
 	// constructors //
@@ -86,7 +78,6 @@ public class BiomeWrapper implements IBiomeWrapper
 		{
 			return EMPTY_WRAPPER;
 		}
-
 
 		BiomeWrapper biomeWrapper = WRAPPER_BY_BIOME.get(biome);
 		if (biomeWrapper != null)
@@ -109,8 +100,6 @@ public class BiomeWrapper implements IBiomeWrapper
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// methods //
@@ -136,8 +125,6 @@ public class BiomeWrapper implements IBiomeWrapper
 
 	//endregion
 
-
-
 	//=======================//
 	// serialization methods //
 	//=======================//
@@ -150,8 +137,6 @@ public class BiomeWrapper implements IBiomeWrapper
 			return EMPTY_BIOME_STRING;
 		}
 
-
-
 		// we can't generate a serial string if the level is null
 		if (levelWrapper == null)
 		{
@@ -163,8 +148,6 @@ public class BiomeWrapper implements IBiomeWrapper
 
 			return EMPTY_BIOME_STRING;
 		}
-
-
 
 		// generate the serial string //
 
@@ -206,8 +189,6 @@ public class BiomeWrapper implements IBiomeWrapper
 			return cachedWrapper;
 		}
 
-
-
 		// if no wrapper is found, default to the empty wrapper
 		BiomeWrapper foundWrapper = EMPTY_WRAPPER;
 		try
@@ -215,7 +196,6 @@ public class BiomeWrapper implements IBiomeWrapper
 			try
 			{
 				BiomeDeserializeResult deserializeResult = deserializeBiome(resourceLocationString);
-
 
 				if (!deserializeResult.success)
 				{
@@ -226,7 +206,6 @@ public class BiomeWrapper implements IBiomeWrapper
 					}
 					return EMPTY_WRAPPER;
 				}
-
 
 				foundWrapper = getBiomeWrapper(deserializeResult.biome, levelWrapper);
 				return foundWrapper;
@@ -260,8 +239,6 @@ public class BiomeWrapper implements IBiomeWrapper
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -278,12 +255,9 @@ public class BiomeWrapper implements IBiomeWrapper
 			this.success = success;
 			this.biome = biome;
 		}
-
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -314,6 +288,4 @@ public class BiomeWrapper implements IBiomeWrapper
 	public String toString() { return this.getSerialString(); }
 
 	//endregion
-
-
 }

@@ -18,8 +18,6 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
-
 	//==================//
 	// internal methods //
 	//==================//
@@ -62,8 +60,6 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// API methods //
@@ -110,8 +106,6 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -124,7 +118,4 @@ public class DhApiTerrainDataCache implements IDhApiTerrainDataCache
 	public String toString() { return "Size: " + this.posToFullDataRef.size(); }
 
 	//endregion
-
-
-
 }

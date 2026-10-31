@@ -30,8 +30,6 @@ import java.nio.ByteBuffer;
 public class GlQuadIndexBuffer extends GLIndexBuffer
 {
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -65,8 +63,6 @@ public class GlQuadIndexBuffer extends GLIndexBuffer
 
 	//endregion
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -75,7 +71,4 @@ public class GlQuadIndexBuffer extends GLIndexBuffer
 	public int getCapacity() { return super.getSize() / GLEnums.getTypeSize(this.getGlType()); }
 
 	//endregion
-
-
-
 }

@@ -55,8 +55,6 @@ public class DhApiTerrainDataPoint
 	public final IDhApiBlockStateWrapper blockStateWrapper;
 	public final IDhApiBiomeWrapper biomeWrapper;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -94,8 +92,6 @@ public class DhApiTerrainDataPoint
 		this.biomeWrapper = biomeWrapper;
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -111,7 +107,4 @@ public class DhApiTerrainDataPoint
 			",SkyLight:" + this.skyLightLevel
 			;
 	}
-
-
-
 }

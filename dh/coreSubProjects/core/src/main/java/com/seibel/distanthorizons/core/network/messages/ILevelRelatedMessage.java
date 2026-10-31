@@ -19,5 +19,4 @@ public interface ILevelRelatedMessage
 
 		return this.getLevelName().equals(levelWrapper.getDhIdentifier());
 	}
-
 }

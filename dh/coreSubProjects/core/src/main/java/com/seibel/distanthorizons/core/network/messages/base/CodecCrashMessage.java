@@ -27,16 +27,12 @@ public class CodecCrashMessage extends AbstractNetworkMessage
 {
 	public ECrashPhase crashPhase;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
 
 	public CodecCrashMessage() { }
 	public CodecCrashMessage(ECrashPhase crashPhase) { this.crashPhase = crashPhase; }
-
-
 
 	//===============//
 	// serialization //
@@ -54,8 +50,6 @@ public class CodecCrashMessage extends AbstractNetworkMessage
 	@Override
 	public void decode(ByteBuf in) { throw new RuntimeException("decode force crash"); }
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -66,8 +60,6 @@ public class CodecCrashMessage extends AbstractNetworkMessage
 		return super.toStringHelper()
 			.add("crashPhase", this.crashPhase);
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -82,5 +74,4 @@ public class CodecCrashMessage extends AbstractNetworkMessage
 		ENCODE,
 		DECODE
 	}
-
 }

@@ -26,5 +26,4 @@ public interface IHodgePodgeCommonAccessor extends IHodgePodgeAccessor
 {
 	void preventChunkSimulation(World world, int x, int z);
 	void allowChunkSimulation(World world, int x, int z);
-
 }

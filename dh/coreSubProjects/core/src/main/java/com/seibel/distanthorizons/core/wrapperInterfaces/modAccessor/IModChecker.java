@@ -31,5 +31,4 @@ public interface IModChecker extends IBindable
 {
 	/** Checks if a mod is loaded */
 	boolean isModLoaded(String modId);
-
 }

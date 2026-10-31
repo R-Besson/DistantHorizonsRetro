@@ -50,5 +50,4 @@ public enum EDhApiMcRenderingFadeMode
 	 * Slowest, but oceans and rivers look better.
 	 */
 	DOUBLE_PASS;
-
 }

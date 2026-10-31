@@ -37,14 +37,12 @@ public abstract class DhApiWorldUnloadEvent implements IDhApiEvent<DhApiWorldUnl
 	/** Fired before Distant Horizons unloads a world. */
 	public abstract void onWorldUnload(DhApiEventParam<EventParam> input);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.onWorldUnload(input); }
-
 
 	//==================//
 	// parameter object //
@@ -54,10 +52,7 @@ public abstract class DhApiWorldUnloadEvent implements IDhApiEvent<DhApiWorldUnl
 	{
 		public EventParam() { }
 
-
 		@Override
 		public DhApiWorldLoadEvent.EventParam copy() { return new DhApiWorldLoadEvent.EventParam(); }
-
 	}
-
 }

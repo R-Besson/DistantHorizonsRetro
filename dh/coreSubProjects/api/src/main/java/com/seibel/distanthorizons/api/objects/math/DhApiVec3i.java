@@ -33,8 +33,6 @@ public class DhApiVec3i
 	public int y;
 	public int z;
 
-
-
 	/** creates a Vec3 at (0,0,0) */
 	public DhApiVec3i()
 	{
@@ -89,5 +87,4 @@ public class DhApiVec3i
 
 	@Override
 	public String toString() { return "[" + this.x + ", " + this.y + ", " + this.z + "]"; }
-
 }

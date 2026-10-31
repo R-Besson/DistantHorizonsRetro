@@ -52,20 +52,17 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 
 	public static final GlDhMetaRenderer INSTANCE = new GlDhMetaRenderer();
 
-
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 
-
 	private int activeFramebufferId = -1;
 	private int activeColorTextureId = -1;
 	private int activeDepthTextureId = -1;
 	private int textureWidth;
 	private int textureHeight;
-
 
 	// framebuffer and texture ID's for this renderer
 	private IDhApiFramebuffer framebuffer;
@@ -86,8 +83,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	private int previousBlendSrcAlpha;
 	private int previousBlendDstAlpha;
 	private boolean previousDepthMask;
-
-
 
 	//============//
 	// pre render //
@@ -119,7 +114,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		{
 			this.shaderProgramForThisFrame = lodShaderProgramOverride;
 		}
-
 
 		this.setGLState(renderParams, firstPass);
 
@@ -160,8 +154,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		int viewportWidth = MC_RENDER.getTargetFramebufferViewportWidth();
 		int viewportHeight = MC_RENDER.getTargetFramebufferViewportHeight();
 
-
-
 		//===================//
 		// framebuffer setup //
 		//===================//
@@ -175,8 +167,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		}
 		this.setActiveFramebufferId(framebuffer.getId());
 		framebuffer.bind();
-
-
 
 		//==========//
 		// bindings //
@@ -215,8 +205,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 
 		this.shaderProgramForThisFrame.bind();
 
-
-
 		//==========//
 		// uniforms //
 		//==========//
@@ -228,8 +216,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		}
 
 		this.shaderProgramForThisFrame.fillUniformData(renderEventParam);
-
-
 
 		//===============//
 		// texture setup //
@@ -243,11 +229,9 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 			this.createAndBindTextures();
 		}
 
-
 		// set the active textures
 		this.setActiveDepthTextureId(this.depthTexture.getTextureId());
 		this.setActiveColorTextureId(this.colorTexture.getTextureId());
-
 
 		// needs to be fired after all the textures have been created/bound
 		boolean clearTextures = !ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeTextureClearEvent.class, renderEventParam);
@@ -278,10 +262,7 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		// GLProxy should have already been created by this point, but just in case create it now
 		GLProxy.getInstance();
 
-
-
 		LOGGER.info("Setting up renderer");
-
 
 		this.framebuffer = new GlDhFramebuffer();
 
@@ -294,8 +275,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 			LOGGER.warn("Framebuffer [" + this.framebuffer.getId() + "] isn't complete.");
 			return false;
 		}
-
-
 
 		LOGGER.info("Renderer setup complete");
 		return true;
@@ -314,15 +293,12 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 			this.textureWidth, this.textureHeight
 		);
 
-
 		// DhApiColorDepthTextureCreatedEvent needs to be kept around since old versions of Iris need it
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiColorDepthTextureCreatedEvent.class, new DhApiColorDepthTextureCreatedEvent.EventParam(textureCreatedParam));
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeColorDepthTextureCreatedEvent.class, textureCreatedParam);
 
-
 		// also update the framebuffer override if present
 		IDhApiFramebuffer framebufferOverride = OverrideInjector.INSTANCE.get(IDhApiFramebuffer.class);
-
 
 		// On a resize the existing textures are resized in place instead of replaced,
 		// Angelica's shaders cache DH's texture IDs, with new IDs they kept sampling the old texture
@@ -340,7 +316,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		{
 			framebufferOverride.addDepthAttachment(this.depthTexture.getTextureId(), EGlDhDepthBufferFormat.DEPTH32F.isCombinedStencil());
 		}
-
 
 		if (this.colorTexture != null)
 		{
@@ -366,13 +341,10 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		// (or the shader pack's) chunk rendering and make nearby chunks look transparent
 		LWJGL.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 
-
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiAfterColorDepthTextureCreatedEvent.class, textureCreatedParam);
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// post render //
@@ -416,8 +388,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 
 	//endregion
 
-
-
 	//================//
 	// clear textures //
 	//================//
@@ -429,8 +399,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		boolean firstPass =
 			(renderParams.renderPass == EDhApiRenderPass.OPAQUE
 				|| renderParams.renderPass == EDhApiRenderPass.OPAQUE_AND_TRANSPARENT);
-
-
 
 		float clearDepth = RENDER_DEF.getDepthDirection().farDepth;
 		LWJGL.glClearDepth(clearDepth);
@@ -445,12 +413,9 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 		{
 			LWJGL.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		}
-
 	}
 
 	//endregion
-
-
 
 	//===============//
 	// API functions //
@@ -479,7 +444,6 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 
 	//endregion
 
-
 	//================//
 	// helper methods //
 	//================//
@@ -499,6 +463,4 @@ public class GlDhMetaRenderer implements IDhMetaRenderer
 	}
 
 	//endregion
-
-
 }

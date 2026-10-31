@@ -69,15 +69,12 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Generated Provider");
 
-
 	public final AtomicReference<IFullDataSourceRetrievalQueue> worldGenQueueRef = new AtomicReference<>(null);
 	private final ArrayList<IOnWorldGenCompleteListener> onWorldGenTaskCompleteListeners = new ArrayList<>();
 
 	protected final DelayedDataSourceSaveCache delayedFullDataSourceSaveCache = new DelayedDataSourceSaveCache(this::onDataSourceSaveAsync, 10_000);
 
 	private final ConcurrentHashMap<Long, CompletableFuture<DataSourceRetrievalResult>> queuedRetrievalFutureByPos = new ConcurrentHashMap<>();
-
-
 
 	//=============//
 	// constructor //
@@ -90,8 +87,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 	{ super(level, saveStructure, saveDirOverride); }
 
 	//endregion constructor
-
-
 
 	//=================//
 	// event listeners //
@@ -114,8 +109,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 	}
 
 	//endregion event listeners
-
-
 
 	//========//
 	// events //
@@ -193,8 +186,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 
 	//endregion events
 
-
-
 	//===================================//
 	// world gen (data source retrieval) //
 	//===================================//
@@ -214,8 +205,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 
 	public static int getMaxRetrievalQueueCount()
 	{ return MAX_RETRIEVAL_REQUESTS_PER_THREAD * Config.Common.MultiThreading.numberOfThreads.get(); }
-
-
 
 	/**
 	 * Assigns the queue for handling world gen and does first time setup as well. <br>
@@ -257,7 +246,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			return false;
 		}
 
-
 		// we can't queue anything if the world generator isn't set up yet
 		IFullDataSourceRetrievalQueue worldGenQueue = this.worldGenQueueRef.get();
 		if (worldGenQueue == null)
@@ -265,12 +253,8 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			return false;
 		}
 
-
-
 		int maxWorldGenQueueCount = getMaxRetrievalQueueCount();
 		int currentQueueCount = WorldChunkUpdateManager.INSTANCE.getTotalQueuedCount();
-
-
 
 		// don't queue additional world gen requests if there are
 		// a lot of chunks waiting to update
@@ -278,7 +262,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 		{
 			return false;
 		}
-
 
 		if (this.delayedFullDataSourceSaveCache.getUnsavedCount() >= maxWorldGenQueueCount)
 		{
@@ -290,7 +273,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			// we can start queuing new world gen tasks
 			this.delayedFullDataSourceSaveCache.flush();
 		}
-
 
 		int availableTaskSlots = maxWorldGenQueueCount - worldGenQueue.getWaitingTaskCount();
 		if (availableTaskSlots == 0)
@@ -370,7 +352,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 
 	public void clearRetrievalQueue() { this.worldGenQueueRef.set(null); }
 
-
 	public boolean generationStepsAreFullyGenerated(ByteArrayList columnGenerationSteps)
 	{
 		return IntStream.range(0, columnGenerationSteps.size())
@@ -382,7 +363,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			});
 	}
 
-
 	@Override
 	public LongArrayList getPositionsToRetrieve(long pos, byte generatorDetailLevel)
 	{
@@ -391,7 +371,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 		{
 			return null;
 		}
-
 
 		EDhApiWorldGenerationStep requiredWorldGenStep;
 		EDhApiGeneratorPlan genPlan = this.getGeneratorPlan();
@@ -408,8 +387,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 		{
 			requiredWorldGenStep = EDhApiWorldGenerationStep.FEATURES;
 		}
-
-
 
 		// don't check any child positions if this position is already fully generated
 		if (this.repo.existsWithKey(pos))
@@ -443,8 +420,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 			}
 		}
 
-
-
 		// this section is missing one or more columns, queue the missing ones for generation.
 		LongArrayList generationList = new LongArrayList();
 
@@ -468,8 +443,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 						// shouldn't happen, but just in case
 						return;
 					}
-
-
 
 					checkWorldGenLoop:
 					for (int x = 0; x < FullDataSourceV2.WIDTH; x++)
@@ -516,8 +489,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 
 	//endregion world gen
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -532,9 +503,6 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 	}
 
 	//endregion base overrides
-
-
-
 
 	//================//
 	// helper classes //
@@ -556,10 +524,7 @@ public class GeneratedFullDataSourceProvider extends FullDataSourceProviderV2 im
 
 		/** Fired when generating a section threw, so anything waiting on it can give up */
 		default void onWorldGenTaskFailed(long pos) { }
-
 	}
 
 	//endregion helper classes
-
-
 }

@@ -83,8 +83,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	/** address space only, the memory is the OS's page cache */
 	private static final long SQLITE_MMAP_SIZE_BYTES = 256L * 1024 * 1024;
 
-
-
 	private final String connectionString;
 	private String getConnectionString() { return this.connectionString; }
 	private final ConcurrentHashMap<Thread, Connection> connectionByThread = new ConcurrentHashMap<>();
@@ -99,8 +97,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	private final AtomicBoolean databaseCorruptedRef = new AtomicBoolean(false);
 	private final AtomicBoolean repoClosedRef = new AtomicBoolean(false);
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -113,7 +109,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		this.databaseFile = databaseFile;
 		this.dtoClass = dtoClass;
 
-
 		try
 		{
 			// needed by Forge to load the Java database connection
@@ -123,8 +118,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			throw new RuntimeException(e);
 		}
-
-
 
 		//==========================//
 		// database file validation //
@@ -197,16 +190,12 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			this.connectionString = this.databaseType + ":" + this.databaseFile.getPath();
 		}
 
-
-
 		ACTIVE_CONNECTION_STRINGS_BY_REPO.put(this, this.connectionString);
 
 		DatabaseUpdater.runAutoUpdateScripts(this);
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// abstract methods //
@@ -233,8 +222,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	public abstract PreparedStatement createUpsertStatement(TDTO dto) throws SQLException;
 
 	//endregion
-
-
 
 	//===============//
 	// high level DB //
@@ -267,7 +254,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 	}
 
-
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
 	public void save(TDTO dto)
 	{
@@ -287,7 +273,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			throw new RuntimeException(message, e);
 		}
 	}
-
 
 	public void delete(TDTO dto) { this.deleteWithKey(dto.getKey()); }
 	@SuppressWarnings({"unused", "EmptyTryBlock"})
@@ -318,7 +303,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 	}
 
-
 	public boolean exists(TDTO dto) { return this.existsWithKey(dto.getKey()); }
 	public boolean existsWithKey(TKey key)
 	{
@@ -337,8 +321,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// low level DB //
@@ -402,8 +384,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 	}
 
-
-
 	/**
 	 * Warning: both the returned {@link ResultSet} and incoming {@link PreparedStatement}
 	 * must be wrapped in a try-resource block to prevent memory
@@ -431,8 +411,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		{
 			return null;
 		}
-
-
 
 		try
 		{
@@ -495,8 +473,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 		}
 	}
 
-
-
 	/**
 	 * @return Null if the database was closed
 	 * @throws RuntimeException if there was a problem with the given SQL string
@@ -534,8 +510,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// connections //
@@ -612,8 +586,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 
 	//endregion
 
-
-
 	//====================//
 	// connection closing //
 	//====================//
@@ -638,7 +610,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					continue;
 				}
 
-
 				// wait a few moments for any last queries to finish
 				int waitCount = 0;
 				while (!this.openClosables.isEmpty()
@@ -654,7 +625,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					{
 					}
 				}
-
 
 				// log any leaked objects
 				int openClosableCount = this.openClosables.size();
@@ -738,8 +708,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 
 	//endregion
 
-
-
 	//================//
 	// helper methods //
 	//================//
@@ -781,7 +749,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 					throw new RuntimeException("SQL result set is missing a column name for column [" + resultMetaData.getTableName(columnIndex) + "." + columnIndex + "].");
 				}
 
-
 				// some values need explicit conversion
 				// Example: Long values that are within the bounds of an int would automatically be incorrectly returned as "Integer" objects
 				String columnType = resultMetaData.getColumnTypeName(columnIndex).toUpperCase();
@@ -801,7 +768,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 						columnValue = resultSet.getObject(columnIndex);
 						break;
 				}
-
 
 				object.put(columnName, columnValue);
 			}
@@ -839,7 +805,6 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 			{
 				str += " @ " + closableWrapper.wrappedClosable;
 			}
-
 
 			closableCountsByToString.compute(str, (stringVal, countRef) ->
 			{
@@ -913,7 +878,4 @@ public abstract class AbstractDhRepo<TKey, TDTO extends IBaseDTO<TKey>> implemen
 	}
 
 	//endregion
-
-
-
 }

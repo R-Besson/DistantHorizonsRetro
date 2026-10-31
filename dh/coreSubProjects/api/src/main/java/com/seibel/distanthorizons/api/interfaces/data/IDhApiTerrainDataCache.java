@@ -26,7 +26,4 @@ public interface IDhApiTerrainDataCache extends AutoCloseable
 	// override without an exception
 	@Override
 	void close();
-
-
-
 }

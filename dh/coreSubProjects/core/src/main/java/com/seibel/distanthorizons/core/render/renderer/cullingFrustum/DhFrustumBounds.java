@@ -9,7 +9,6 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 
-
 public class DhFrustumBounds implements IDhApiCullingFrustum
 {
 	private final FrustumIntersection frustum;
@@ -17,8 +16,6 @@ public class DhFrustumBounds implements IDhApiCullingFrustum
 	private final Vector3f boundsMax = new Vector3f();
 	public float worldMinY;
 	public float worldMaxY;
-
-
 
 	//=============//
 	// constructor //
@@ -28,8 +25,6 @@ public class DhFrustumBounds implements IDhApiCullingFrustum
 	{
 		this.frustum = new FrustumIntersection();
 	}
-
-
 
 	//=========//
 	// methods //
@@ -57,13 +52,10 @@ public class DhFrustumBounds implements IDhApiCullingFrustum
 		return this.frustum.testAab(lodMin, lodMax);
 	}
 
-
-
 	//=====================//
 	// overridable methods //
 	//=====================//
 
 	@Override
 	public int getPriority() { return IOverrideInjector.CORE_PRIORITY; }
-
 }

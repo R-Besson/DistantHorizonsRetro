@@ -16,5 +16,4 @@ public interface IMixinTextureAtlasSprite
 
 	/** set from the base texture */
 	void distanthorizons$setSpriteData();
-
 }

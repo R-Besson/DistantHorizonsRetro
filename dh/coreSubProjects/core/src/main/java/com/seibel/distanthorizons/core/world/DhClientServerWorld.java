@@ -62,8 +62,6 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 
 	private final Timer clientTickTimer = TimerUtil.CreateTimer("ClientTickTimer");
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -83,8 +81,6 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 		}, 0, IDhClientWorld.TICK_RATE_IN_MS);
 	}
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -94,7 +90,7 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 	{
 		if (wrapper instanceof IServerLevelWrapper)
 		{
-			final boolean[] levelCreated = { false };
+			final boolean[] levelCreated = {false};
 			DhClientServerLevel serverLevel = this.dhLevelByLevelWrapper.computeIfAbsent(wrapper, (levelWrapper) ->
 			{
 				try
@@ -155,7 +151,6 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 					LodUtil.assertNotReach("tryGetServerSideWrapper returned a level for a different dimension. ClientLevelWrapper dim: [" + clientLevelWrapper.getDhIdentifier() + "] ServerLevelWrapper dim: [" + serverLevelWrapper.getDhIdentifier() + "].");
 				}
 
-
 				DhClientServerLevel level = this.dhLevelByLevelWrapper.get(serverLevelWrapper);
 				if (level == null)
 				{
@@ -213,8 +208,6 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 		return false;
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -268,10 +261,8 @@ public class DhClientServerWorld extends AbstractDhServerWorld<DhClientServerLev
 			future.join();
 		}
 
-
 		this.dhLevelByLevelWrapper.clear();
 		this.clientTickTimer.cancel();
 		LOGGER.info("Closed DhWorld of type [" + this.environment + "].");
 	}
-
 }

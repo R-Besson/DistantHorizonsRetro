@@ -39,5 +39,4 @@ public class MixinRenderGlobal_LodOnly
 
 		renderer.drawChunkLayer(layer, cameraX, cameraY, cameraZ);
 	}
-
 }

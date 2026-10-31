@@ -57,8 +57,6 @@ public class BeaconRenderHandler
 	/** how often should we check if a beacon should be culled? */
 	private static final int MAX_CULLING_FREQUENCY_IN_MS = 1_000;
 
-
-
 	private final ReentrantLock updateLock = new ReentrantLock();
 
 	/** only contains the beacons currently being rendered (culled beacons will be missing) */
@@ -68,8 +66,6 @@ public class BeaconRenderHandler
 
 	private boolean cullingThreadRunning = false;
 	private boolean updateRenderDataNextFrame = false;
-
-
 
 	//=============//
 	// constructor //
@@ -90,8 +86,6 @@ public class BeaconRenderHandler
 
 	//endregion
 
-
-
 	//===============//
 	// before render //
 	//===============//
@@ -105,7 +99,6 @@ public class BeaconRenderHandler
 			// so there isn't much of a reason to bother
 			this.tryUpdateBeaconCullingAsync();
 		}
-
 
 		// this must be called on the render thread to prevent concurrency issues
 		if (this.updateRenderDataNextFrame)
@@ -147,7 +140,6 @@ public class BeaconRenderHandler
 						// on the border of DH's render distance
 						float dhFadeDistance = RenderUtil.getNearClipPlaneInBlocks();
 
-
 						// Clear the existing box group so we can re-populate it.
 						// Since the box group is only used when we trigger an update, clearing it here
 						// and repopulating it is fine.
@@ -185,8 +177,6 @@ public class BeaconRenderHandler
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// registration //
@@ -235,7 +225,6 @@ public class BeaconRenderHandler
 				}
 			}
 
-
 			this.activeBeaconBoxRenderGroup.clear();
 			this.fullBeaconBoxList.clear();
 
@@ -265,8 +254,6 @@ public class BeaconRenderHandler
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -279,7 +266,6 @@ public class BeaconRenderHandler
 		public BeaconBeamWithWidth(BeaconBeamDTO beaconBeamDTO, byte lodDetailLevel)
 		{
 			super(beaconBeamDTO.blockPos, beaconBeamDTO.color);
-
 
 			// how wide should each beacon be?
 			if (Config.Client.Advanced.Graphics.GenericRendering.expandDistantBeacons.get())
@@ -309,7 +295,6 @@ public class BeaconRenderHandler
 
 			return super.equals(that);
 		}
-
 	}
 
 	public static class NegativeInfiniteBlockPosComparator implements Comparator<BeaconBeamWithWidth>
@@ -329,11 +314,7 @@ public class BeaconRenderHandler
 			}
 			return Integer.compare(blockPos1.getZ(), blockPos2.getZ());
 		}
-
 	}
 
 	//endregion
-
-
-
 }

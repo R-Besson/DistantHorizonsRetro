@@ -28,17 +28,11 @@ public class DimensionCsv
 	public static int getGenerationMaxChunkRadius(ILevelWrapper levelWrapper)
 	{ return GENERATION_RADIUS.getIntValue(levelWrapper, Config.Common.WorldGenerator.generationMaxChunkRadius.get()); }
 
-
-
 	private final ConfigEntry<String> configEntry;
 
 	private volatile ParsedCsv parsedCsv = new ParsedCsv("");
 
-
-
 	public DimensionCsv(ConfigEntry<String> configEntry) { this.configEntry = configEntry; }
-
-
 
 	public boolean contains(ILevelWrapper levelWrapper) { return this.getValue(levelWrapper) != null; }
 
@@ -91,8 +85,6 @@ public class DimensionCsv
 		}
 		return parsed;
 	}
-
-
 
 	private static class ParsedCsv
 	{
@@ -150,7 +142,5 @@ public class DimensionCsv
 
 			return Optional.ofNullable(value);
 		}
-
 	}
-
 }

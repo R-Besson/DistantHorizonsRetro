@@ -60,7 +60,6 @@ public class GLBuffer implements AutoCloseable
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	/** if enabled the number of GC'ed buffers will be logged */
 	private static final boolean LOG_PHANTOM_RECOVERY = ModInfo.IS_DEV_BUILD;
 	/** If enabled buffers allocation/upload stacks will be logged when GC'ed. */
@@ -92,7 +91,6 @@ public class GLBuffer implements AutoCloseable
 	private static final ReferenceQueue<GLBuffer> PHANTOM_REFERENCE_QUEUE = new ReferenceQueue<>();
 	private static final ThreadPoolExecutor CLEANUP_THREAD = ThreadUtil.makeSingleDaemonThreadPool("GLBuffer Cleanup");
 
-
 	protected volatile int id = 0;
 	public final int getId() { return this.id; }
 	protected int size = 0;
@@ -111,8 +109,6 @@ public class GLBuffer implements AutoCloseable
 	 */
 	public final StampedLock renderStampLock = new StampedLock();
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -122,12 +118,9 @@ public class GLBuffer implements AutoCloseable
 	{
 		CLEANUP_THREAD.execute(GLBuffer::runPhantomReferenceCleanupLoop);
 	}
-
 	public GLBuffer(boolean isBufferStorage) { this.destroyOldAndCreate(isBufferStorage); }
 
 	//endregion
-
-
 
 	//=========//
 	// methods //
@@ -142,8 +135,6 @@ public class GLBuffer implements AutoCloseable
 
 	//endregion
 
-
-
 	//====================//
 	// create and destroy //
 	//====================//
@@ -155,7 +146,6 @@ public class GLBuffer implements AutoCloseable
 		{
 			LodUtil.assertNotReach("Thread [" + Thread.currentThread() + "] tried to create a GLBuffer outside the MC render thread.");
 		}
-
 
 		// lock to prevent the render thread from accessing the buffer's ID
 		// while we are removing it
@@ -175,7 +165,6 @@ public class GLBuffer implements AutoCloseable
 				tryRemoveBufferIdFromPhantom(oldId);
 				destroyBufferIdNow(oldId, "destroyOldAndCreate");
 			}
-
 
 			this.bufferStorage = asBufferStorage;
 			bufferCount.getAndIncrement();
@@ -271,8 +260,6 @@ public class GLBuffer implements AutoCloseable
 
 	//endregion
 
-
-
 	//==================//
 	// buffer uploading //
 	//==================//
@@ -296,8 +283,6 @@ public class GLBuffer implements AutoCloseable
 		{
 			return;
 		}
-
-
 
 		// the previously bound buffers are re-bound afterwards,
 		// otherwise MC's own rendering (IE the main menu and UI) can break
@@ -405,8 +390,6 @@ public class GLBuffer implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -423,8 +406,6 @@ public class GLBuffer implements AutoCloseable
 	}
 
 	//endregion
-
-
 
 	//================//
 	// helper methods //
@@ -545,8 +526,6 @@ public class GLBuffer implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// static cleanup //
 	//================//
@@ -595,12 +574,9 @@ public class GLBuffer implements AutoCloseable
 						LOGGER.warn("Failed to find Buffer ID for phantom reference: [" + phantomRef + "]");
 					}
 
-
 					collectedCount++;
 					phantomRef = PHANTOM_REFERENCE_QUEUE.poll();
 				}
-
-
 
 				if (LOG_PHANTOM_RECOVERY)
 				{
@@ -616,7 +592,6 @@ public class GLBuffer implements AutoCloseable
 						}
 					}
 				}
-
 			}
 			catch (Exception e)
 			{
@@ -626,7 +601,4 @@ public class GLBuffer implements AutoCloseable
 	}
 
 	//endregion
-
-
-
 }

@@ -41,8 +41,6 @@ public enum EDhApiHorizontalQuality
 	EXTREME(2.2f, 20),
 	;
 
-
-
 	public final double quadraticBase;
 	public final int distanceUnitInBlocks;
 
@@ -51,5 +49,4 @@ public enum EDhApiHorizontalQuality
 		this.quadraticBase = quadraticBase;
 		this.distanceUnitInBlocks = distanceUnitInBlocks;
 	}
-
 }

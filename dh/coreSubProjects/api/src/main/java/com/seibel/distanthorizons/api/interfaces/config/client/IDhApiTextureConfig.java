@@ -78,7 +78,4 @@ public interface IDhApiTextureConfig extends IDhApiConfigGroup
 	 * Example: "minecraft:beacon"
 	 */
 	IDhApiConfigValue<String> blocksAlwaysRasterizeTextureCsv();
-
-
-
 }

@@ -8,7 +8,6 @@ import com.seibel.distanthorizons.core.world.IDhServerWorld;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-
 public class CrashCommand extends AbstractDhCommand
 {
 	public void execute(ICommandSender sender, String[] args)
@@ -53,5 +52,4 @@ public class CrashCommand extends AbstractDhCommand
 				sendMessage(sender, "Usage: /dh crash <encode|decode>");
 		}
 	}
-
 }

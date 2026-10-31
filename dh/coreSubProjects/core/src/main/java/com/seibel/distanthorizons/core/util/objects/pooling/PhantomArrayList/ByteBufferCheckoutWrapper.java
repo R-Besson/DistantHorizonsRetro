@@ -15,8 +15,6 @@ public class ByteBufferCheckoutWrapper
 	 */
 	public ByteBuffer bufferSlice = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -30,8 +28,6 @@ public class ByteBufferCheckoutWrapper
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// methods //
@@ -67,7 +63,4 @@ public class ByteBufferCheckoutWrapper
 	}
 
 	//endregion
-
-
-
 }

@@ -16,12 +16,8 @@ public abstract class AbstractMemoryStack implements AutoCloseable
 
 	public static AbstractMemoryStack stackPush() { return LWJGLServiceProvider.LWJGL.stackPush(); }
 
-
-
 	@Override
 	public abstract void close();
-
-
 
 	// ===================== MALLOC OPERATIONS =====================
 	//region
@@ -29,7 +25,4 @@ public abstract class AbstractMemoryStack implements AutoCloseable
 	public abstract FloatBuffer mallocFloat(int count);
 
 	//endregion
-
-
-
 }

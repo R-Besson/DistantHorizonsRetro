@@ -37,10 +37,7 @@ public class DataMigratorV1 implements AutoCloseable
 	 */
 	private static final int MIGRATION_MAX_UPDATE_TIMEOUT_IN_MS = 5 * 60 * 1_000;
 
-
-
 	private final FullDataUpdaterV2 dataUpdater;
-
 
 	private boolean migrationStartMessageQueued = false;
 
@@ -58,8 +55,6 @@ public class DataMigratorV1 implements AutoCloseable
 	private final String levelId;
 	private final File saveDir;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -75,7 +70,6 @@ public class DataMigratorV1 implements AutoCloseable
 
 		this.levelId = levelId;
 
-
 		// start migrating any legacy data sources present in the background
 		ThreadPoolExecutor executor = ThreadPoolUtil.getFullDataMigrationExecutor();
 		if (executor != null)
@@ -87,9 +81,7 @@ public class DataMigratorV1 implements AutoCloseable
 			// shouldn't happen, but just in case
 			LOGGER.error("Unable to start migration for level: [" + this.levelId + "] due to missing executor.");
 		}
-
 	}
-
 
 	//=======================//
 	// data source migration //
@@ -101,8 +93,6 @@ public class DataMigratorV1 implements AutoCloseable
 		{
 			LOGGER.debug("Attempting to migrate data sources for: [" + this.levelId + "]-[" + this.saveDir + "]...");
 			this.migrationThreadRunning.set(true);
-
-
 
 			//============================//
 			// delete unused data sources //
@@ -118,7 +108,6 @@ public class DataMigratorV1 implements AutoCloseable
 				// either when the deletion or migration phases start
 				this.showMigrationStartMessage();
 
-
 				LOGGER.info("deleting [" + this.levelId + "] - [" + totalDeleteCount + "] unused data sources...");
 				this.legacyDeletionCount = totalDeleteCount;
 
@@ -127,7 +116,6 @@ public class DataMigratorV1 implements AutoCloseable
 				{
 					unusedCount += unusedDataPosList.size();
 					this.legacyDeletionCount -= unusedDataPosList.size();
-
 
 					long startTime = System.currentTimeMillis();
 
@@ -138,7 +126,6 @@ public class DataMigratorV1 implements AutoCloseable
 					long endStart = System.currentTimeMillis();
 					long deleteTime = endStart - startTime;
 					LOGGER.info("Deleting [" + this.levelId + "] - [" + unusedCount + "/" + totalDeleteCount + "] in [" + deleteTime + "]ms ...");
-
 
 					// a slight delay is added to prevent accidentally locking the database when deleting a lot of rows
 					// (that shouldn't be the case since we're using WAL journaling, but just in case)
@@ -153,10 +140,7 @@ public class DataMigratorV1 implements AutoCloseable
 					}
 				}
 				LOGGER.info("Done deleting [" + this.levelId + "] - [" + totalDeleteCount + "] unused data sources.");
-
 			}
-
-
 
 			//===========//
 			// migration //
@@ -210,7 +194,6 @@ public class DataMigratorV1 implements AutoCloseable
 								this.v1DataSourceProvider.markMigrationFailed(migrationPos);
 							}
 						}
-
 
 						try
 						{
@@ -266,7 +249,6 @@ public class DataMigratorV1 implements AutoCloseable
 		}
 	}
 
-
 	private void showMigrationStartMessage()
 	{
 		if (this.migrationStartMessageQueued)
@@ -298,8 +280,6 @@ public class DataMigratorV1 implements AutoCloseable
 		}
 	}
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -328,8 +308,6 @@ public class DataMigratorV1 implements AutoCloseable
 		}
 	}
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -343,7 +321,4 @@ public class DataMigratorV1 implements AutoCloseable
 		// so not closing it here kept it (and its connection) alive after the level unloaded
 		this.v1DataSourceProvider.close();
 	}
-
-
-
 }

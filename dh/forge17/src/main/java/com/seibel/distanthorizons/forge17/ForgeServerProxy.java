@@ -41,8 +41,6 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 	private static final Set<Long> PENDING_CLICK_TASK_KEYS = ConcurrentHashMap.newKeySet();
 	private static final AtomicInteger PENDING_CLICK_TASK_COUNT = new AtomicInteger(0);
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -51,7 +49,6 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 	public ForgeServerProxy(boolean isDedicated)
 	{
 		this.isDedicated = isDedicated;
-
 	}
 
 	@Override
@@ -69,8 +66,6 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 	}
 
 	//endregion
-
-
 
 	//========//
 	// events //
@@ -279,8 +274,6 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 
 	//endregion
 
-
-
 	//================//
 	// helper methods //
 	//================//
@@ -303,5 +296,4 @@ public class ForgeServerProxy implements AbstractModInitializer.IEventProxy
 	{ return ServerPlayerWrapper.getWrapper((EntityPlayerMP) event.player); }
 
 	//endregion
-
 }

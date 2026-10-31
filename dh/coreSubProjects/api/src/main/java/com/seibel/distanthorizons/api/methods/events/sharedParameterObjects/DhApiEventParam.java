@@ -31,7 +31,5 @@ public class DhApiEventParam<T>
 	/** Depending on the {@link IDhApiEvent} this can be null. */
 	public final T value;
 
-
 	public DhApiEventParam(T value) { this.value = value; }
-
 }

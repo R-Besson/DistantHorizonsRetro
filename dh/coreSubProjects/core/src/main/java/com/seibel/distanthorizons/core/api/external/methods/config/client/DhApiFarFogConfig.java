@@ -31,8 +31,6 @@ public class DhApiFarFogConfig implements IDhApiFarFogConfig
 
 	private DhApiFarFogConfig() { }
 
-
-
 	@Override
 	public IDhApiConfigValue<Float> farFogStartDistance()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.farFogStart); }
@@ -56,5 +54,4 @@ public class DhApiFarFogConfig implements IDhApiFarFogConfig
 	@Override
 	public IDhApiConfigValue<Float> farFogDensity()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.farFogDensity); }
-
 }

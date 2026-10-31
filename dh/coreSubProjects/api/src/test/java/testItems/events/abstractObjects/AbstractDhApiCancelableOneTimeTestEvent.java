@@ -36,8 +36,6 @@ public abstract class AbstractDhApiCancelableOneTimeTestEvent implements IDhApiC
 	/** just used for testing */
 	public abstract Boolean getTestValue();
 
-
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
@@ -51,5 +49,4 @@ public abstract class AbstractDhApiCancelableOneTimeTestEvent implements IDhApiC
 			input.cancelEvent();
 		}
 	}
-
 }

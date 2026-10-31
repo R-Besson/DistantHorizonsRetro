@@ -86,8 +86,6 @@ public class DhApiMutableFogRenderParam extends DhApiFogRenderParam
 
 	//endregion
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -98,8 +96,6 @@ public class DhApiMutableFogRenderParam extends DhApiFogRenderParam
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -109,8 +105,4 @@ public class DhApiMutableFogRenderParam extends DhApiFogRenderParam
 	public DhApiMutableFogRenderParam copy() { return new DhApiMutableFogRenderParam(this); }
 
 	//endregion
-
-
-
-
 }

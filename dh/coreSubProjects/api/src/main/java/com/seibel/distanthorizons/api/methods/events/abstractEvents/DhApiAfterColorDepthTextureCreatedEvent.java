@@ -36,13 +36,10 @@ public abstract class DhApiAfterColorDepthTextureCreatedEvent implements IDhApiE
 	/** Fired before Distant Horizons creates. */
 	public abstract void onResize(DhApiEventParam<DhApiTextureCreatedParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<DhApiTextureCreatedParam> event) { this.onResize(event); }
-
-
 }

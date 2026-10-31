@@ -27,5 +27,4 @@ public interface IDhApiEventParam extends IDhApiCopyable
 	 * @since API 4.1.0
 	 */
 	default boolean getCopyBeforeFire() { return true; }
-
 }

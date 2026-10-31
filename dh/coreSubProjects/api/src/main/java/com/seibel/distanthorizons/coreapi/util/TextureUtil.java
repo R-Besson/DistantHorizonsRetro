@@ -19,7 +19,4 @@ public class TextureUtil
 
 		return (v * TEXTURE_WIDTH_AND_HEIGHT) + u;
 	}
-
-
-
 }

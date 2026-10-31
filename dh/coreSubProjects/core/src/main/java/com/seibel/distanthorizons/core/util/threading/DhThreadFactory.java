@@ -42,8 +42,6 @@ public class DhThreadFactory implements ThreadFactory
 	private int threadCount = 0;
 	private final LinkedList<WeakReference<Thread>> threads = new LinkedList<>();
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -70,8 +68,6 @@ public class DhThreadFactory implements ThreadFactory
 		this.threads.add(new WeakReference<>(thread));
 		return thread;
 	}
-
-
 
 	//===========//
 	// debugging //
@@ -112,5 +108,4 @@ public class DhThreadFactory implements ThreadFactory
 
 		this.threads.removeIf((weakRef) -> weakRef.get() == null);
 	}
-
 }

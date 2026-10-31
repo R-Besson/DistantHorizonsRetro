@@ -19,7 +19,6 @@ public class ServerPlayerStateManager implements AutoCloseable
 
 	private final SharedBandwidthLimit sharedBandwidthLimit = new SharedBandwidthLimit();
 
-
 	//========================//
 	// player joining/leaving //
 	//========================//
@@ -43,8 +42,6 @@ public class ServerPlayerStateManager implements AutoCloseable
 		}
 	}
 
-
-
 	//==========//
 	// messages //
 	//==========//
@@ -56,7 +53,6 @@ public class ServerPlayerStateManager implements AutoCloseable
 		{
 			return;
 		}
-
 
 		MessageQueueState messageQueue = this.messageQueueByPlayerWrapper.computeIfAbsent(player, k -> new MessageQueueState());
 		messageQueue.messageQueue.add(message);
@@ -85,8 +81,6 @@ public class ServerPlayerStateManager implements AutoCloseable
 		}
 	}
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -96,15 +90,11 @@ public class ServerPlayerStateManager implements AutoCloseable
 	public Collection<ServerPlayerState> getConnectedPlayers() { return this.connectedPlayerStateByPlayerWrapper.values(); }
 	public Iterable<ServerPlayerState> getReadyPlayers() { return this.getConnectedPlayers().stream().filter(ServerPlayerState::isReady)::iterator; }
 
-
 	private static class MessageQueueState
 	{
 		public final Queue<AbstractNetworkMessage> messageQueue = new ConcurrentLinkedQueue<>();
 		public final AtomicBoolean isBeingDrained = new AtomicBoolean();
-
 	}
-
-
 
 	//================//
 	// base overrides //
@@ -120,6 +110,4 @@ public class ServerPlayerStateManager implements AutoCloseable
 		}
 		this.messageQueueByPlayerWrapper.clear();
 	}
-
-
 }

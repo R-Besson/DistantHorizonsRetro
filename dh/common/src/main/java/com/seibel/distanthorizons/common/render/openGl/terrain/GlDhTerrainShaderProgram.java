@@ -53,16 +53,12 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	/** single event object used to reduce GC pressure */
 	private static final DhApiBeforeBufferRenderEvent.EventParam BEFORE_BUFFER_RENDER_EVENT_PARAM = new DhApiBeforeBufferRenderEvent.EventParam();
 
-
-
 	private boolean init = false;
 
 	public GlAbstractVertexAttribute vao;
 
 	/** used for TAA jitter, the 8 represents how many jitter points are available */
 	private int frameIndexMod8 = 0;
-
-
 
 	// uniforms //
 	//region
@@ -99,8 +95,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 
 	//endregion
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -121,7 +115,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		{
 			return;
 		}
-
 
 		this.uCombinedMatrix = this.getUniformLocation("uCombinedMatrix");
 		this.uModelOffset = this.getUniformLocation("uModelOffset");
@@ -151,7 +144,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 
 		// Debug Uniform
 		this.uIsWhiteWorld = this.getUniformLocation("uIsWhiteWorld");
-
 
 		if (GLProxy.getInstance().vertexAttributeBufferBindingSupported)
 		{
@@ -189,8 +181,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// API methods //
@@ -257,7 +247,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		}
 		this.setUniform(this.uEarthRadius, curveRatio);
 
-
 		if (Config.Client.Advanced.Graphics.enableAntiAliasing.get()
 			&&
 			(
@@ -316,8 +305,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 
 	//endregion
 
-
-
 	//===========//
 	// rendering //
 	//===========//
@@ -361,8 +348,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 		// can override it as needed
 		ApiEventInjector.INSTANCE.fireAllEvents(DhApiBeforeRenderPassEvent.class, renderEventParam.apiCopy);
 
-
-
 		//===========//
 		// rendering //
 		//===========//
@@ -394,8 +379,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 			this.renderBuffers(renderEventParam, false, bufferContainers);
 			LWJGL.glColorMask(true, true, true, true);
 		}
-
-
 
 		//=========================//
 		// debug wireframe cleanup //
@@ -463,7 +446,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 						continue;
 					}
 
-
 					// for lock information please view the lock's javadocs
 					long vboReadStamp = vbo.renderStampLock.readLock();
 					long iboReadStamp = vbo.getQuadIBO().renderStampLock.readLock();
@@ -508,7 +490,4 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	}
 
 	//endregion
-
-
-
 }

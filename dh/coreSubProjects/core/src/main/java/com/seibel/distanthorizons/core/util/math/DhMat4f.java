@@ -53,8 +53,6 @@ public class DhMat4f extends DhApiMat4f
 		IDENTITY.setIdentity();
 	}
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -112,8 +110,6 @@ public class DhMat4f extends DhApiMat4f
 		);
 	}
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -141,14 +137,9 @@ public class DhMat4f extends DhApiMat4f
 		return matrix;
 	}
 
-
-
 	//===============//
 	// Forge methods //
 	//===============//
 
 	public DhMat4f copy() { return new DhMat4f(this); }
-
-
-
 }

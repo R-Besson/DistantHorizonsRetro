@@ -38,7 +38,6 @@ public class FullDataOcclusionCuller
 			return;
 		}
 
-
 		int centerIndex = centerColumn.size() - 1;
 		int posXIndex = (posXColumn.size() - 1);
 		int negXIndex = (negXColumn.size() - 1);
@@ -77,7 +76,6 @@ public class FullDataOcclusionCuller
 				continue;
 			}
 
-
 			posXIndex = checkOcclusion(dataSource, currentPoint, posXColumn, posXIndex);
 			if (posXIndex < 0)
 			{
@@ -105,7 +103,6 @@ public class FullDataOcclusionCuller
 				negZIndex = ~negZIndex;
 				continue;
 			}
-
 
 			// Current point is fully surrounded. remove it.
 			centerColumn.removeLong(centerIndex);
@@ -155,7 +152,6 @@ public class FullDataOcclusionCuller
 			return ~adjacentIndex;
 		}
 
-
 		int bottomOfCenter = FullDataPointUtil.getBottomY(centerPoint);
 		int topOfCenter = bottomOfCenter + FullDataPointUtil.getHeight(centerPoint);
 		for (; adjacentIndex >= 0; adjacentIndex--)
@@ -179,7 +175,6 @@ public class FullDataOcclusionCuller
 			}
 		}
 
-
 		// the Adjacent column ends before center column does,
 		// this point should be visible
 		return ~adjacentIndex;
@@ -190,7 +185,4 @@ public class FullDataOcclusionCuller
 		int opacity = source.mapping.getBlockStateWrapper(id).getOpacity();
 		return opacity < LodUtil.BLOCK_FULLY_OPAQUE;
 	}
-
-
-
 }

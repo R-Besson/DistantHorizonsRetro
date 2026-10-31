@@ -44,5 +44,4 @@ public enum EDhApiFogColorMode
 	 * https://www.curseforge.com/minecraft/mc-mods/clear-skies-forge-port
 	 */
 	USE_SKY_COLOR,
-
 }

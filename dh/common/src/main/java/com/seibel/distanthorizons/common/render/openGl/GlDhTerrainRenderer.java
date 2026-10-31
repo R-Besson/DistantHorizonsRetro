@@ -12,8 +12,6 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 
 	private GlDhTerrainShaderProgram terrainShaderProgram = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -22,8 +20,6 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 	private GlDhTerrainRenderer() { }
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -43,8 +39,6 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -60,7 +54,4 @@ public class GlDhTerrainRenderer implements IDhTerrainRenderer
 	}
 
 	//endregion
-
-
-
 }

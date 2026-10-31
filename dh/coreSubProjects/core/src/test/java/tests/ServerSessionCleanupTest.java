@@ -79,5 +79,4 @@ public class ServerSessionCleanupTest
 		sendersField.setAccessible(true);
 		return (Set<?>) sendersField.get(sharedBandwidthLimit);
 	}
-
 }

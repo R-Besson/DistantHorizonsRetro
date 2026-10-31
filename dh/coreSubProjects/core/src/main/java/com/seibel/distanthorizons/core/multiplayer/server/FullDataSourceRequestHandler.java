@@ -33,7 +33,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 		.fileLevelConfig(Config.Common.Logging.logNetworkEventToFile)
 		.build();
 
-
 	private final AbstractDhServerLevel serverLevel;
 	private final ThreadPoolExecutor tickerThread;
 
@@ -43,8 +42,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 
 	private final ConcurrentMap<Long, DataSourceRequestGroup> requestGroupsByPos = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Long, DataSourceRequestGroup> requestGroupsByFutureId = new ConcurrentHashMap<>();
-
-
 
 	//=============//
 	// constructor //
@@ -58,8 +55,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 		this.tickerThread = ThreadUtil.makeSingleDaemonThreadPool("DataSource Request Ticker [" + levelId + "]");
 		this.tickerThread.execute(this::tickLoop);
 	}
-
-
 
 	//==================//
 	// network handling //
@@ -78,8 +73,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 			return;
 		}
 
-
-
 		AbstractExecutorService fileHandlerExecutor = ThreadPoolUtil.getFileHandlerExecutor();
 		if (fileHandlerExecutor == null)
 		{
@@ -95,7 +88,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 			LOGGER.warn("Unable to send FullDataSourceResponseMessage - getNetworkCompressionExecutor() is null");
 			return;
 		}
-
 
 		// get the data requested by the client
 		CompletableFuture<FullDataSourceV2> getServerDatasourceFuture = CompletableFuture.supplyAsync(() ->
@@ -152,7 +144,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 				LOGGER.error("Unexpected issue sending request for pos [" + DhSectionPos.toString(message.sectionPos) + "], error: [" + e.getMessage() + "].", e);
 			}
 		}, networkCompressionExecutor);
-
 	}
 
 	public void queueWorldGenForRequestMessage(ServerPlayerState serverPlayerState, FullDataSourceRequestMessage message, ServerPlayerState.RateLimiterSet rateLimiterSet)
@@ -337,8 +328,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 		}
 	}
 
-
-
 	//=========//
 	// ticking //
 	//=========//
@@ -401,8 +390,6 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 		}
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -412,7 +399,4 @@ public class FullDataSourceRequestHandler implements AutoCloseable
 	{
 		this.tickerThread.shutdownNow();
 	}
-
-
-
 }

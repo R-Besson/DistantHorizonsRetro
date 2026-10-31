@@ -93,8 +93,6 @@ public class Initializer
 
 		//endregion
 
-
-
 		//==========================//
 		// check resource directory //
 		//==========================//
@@ -114,8 +112,6 @@ public class Initializer
 		}
 
 		//endregion
-
-
 
 		//===========================//
 		// Java AWT Headless setting //
@@ -151,8 +147,6 @@ public class Initializer
 
 		//endregion
 
-
-
 		//===================//
 		// API delayed setup //
 		//===================//
@@ -185,7 +179,6 @@ public class Initializer
 	public static void postConfigInit()
 	{
 
-
 		//==============================//
 		// G1 Garbage collector warning //
 		//==============================//
@@ -213,7 +206,6 @@ public class Initializer
 				}
 			}
 			LOGGER.info("Garbage collectors: [" + garbageCollectorNames + "]");
-
 
 			if (g1GcInUse)
 			{
@@ -243,8 +235,6 @@ public class Initializer
 
 		//endregion
 
-
-
 		//==============================//
 		// Explicit GC disabled warning //
 		//==============================//
@@ -267,7 +257,6 @@ public class Initializer
 				}
 			}
 			LOGGER.info("Explicit Garbage Collection: [" + (explicitGcDisabled ? "Disabled" : "Enabled") + "]");
-
 
 			if (explicitGcDisabled)
 			{
@@ -299,6 +288,4 @@ public class Initializer
 		//endregion
 
 	}
-
-
 }

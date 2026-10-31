@@ -67,5 +67,4 @@ public interface IDhApiFarFogConfig extends IDhApiConfigGroup
 
 	/** Defines the fog density. */
 	IDhApiConfigValue<Float> farFogDensity();
-
 }

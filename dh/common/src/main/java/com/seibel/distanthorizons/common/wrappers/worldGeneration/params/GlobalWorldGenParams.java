@@ -24,13 +24,9 @@ import com.seibel.distanthorizons.core.level.IDhServerLevel;
 
 import net.minecraft.world.WorldServer;
 
-
-
 public final class GlobalWorldGenParams
 {
 	public final WorldServer mcServerLevel;
-
-
 
 	//=============//
 	// constructor //
@@ -40,7 +36,4 @@ public final class GlobalWorldGenParams
 	{
 		this.mcServerLevel = ((ServerLevelWrapper) dhServerLevel.getServerLevelWrapper()).getWrappedMcObject();
 	}
-
-
-
 }

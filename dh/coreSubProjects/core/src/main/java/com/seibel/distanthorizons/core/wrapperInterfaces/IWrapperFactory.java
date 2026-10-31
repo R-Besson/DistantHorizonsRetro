@@ -62,7 +62,6 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 		return biome;
 	}
 
-
 	IBlockStateWrapper deserializeBlockStateWrapper(String str) throws IOException;
 	IBlockStateWrapper getAirBlockStateWrapper();
 	IBlockStateWrapper getWaterBlockStateWrapper();
@@ -82,7 +81,6 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 		return blockState;
 	}
 
-
 	/**
 	 * Returns the set of {@link IBlockStateWrapper}'s that shouldn't be rendered. <br>
 	 * Generally this contains blocks like: air, barriers, light blocks, etc.
@@ -99,7 +97,6 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 	/** clears the cached values */
 	void resetCachedIgnoredBlocksSets();
 
-
 	/**
 	 * Specifically designed to be used with the API.
 	 *
@@ -111,5 +108,4 @@ public interface IWrapperFactory extends IDhApiWrapperFactory, IBindable
 	ILodContainerUniformBufferWrapper createLodContainerUniformWrapper();
 	IDhGenericObjectVertexBufferContainer createGenericObjectVboContainer();
 	IDhGenericRenderer createGenericRenderer();
-
 }

@@ -57,14 +57,12 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 {
 	public abstract void blockOrBiomeChangedDuringChunkProcessing(DhApiEventParam<EventParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> event) { this.blockOrBiomeChangedDuringChunkProcessing(event); }
-
 
 	//==================//
 	// parameter object //
@@ -80,7 +78,6 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 		/** the processed chunk's Z pos in chunk coordinates */
 		public final int chunkZ;
 
-
 		public int relativeBlockPosX;
 		public int blockPosY;
 		public int relativeBlockPosZ;
@@ -90,8 +87,6 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 
 		private IDhApiBlockStateWrapper newBlock;
 		private IDhApiBiomeWrapper newBiome;
-
-
 
 		//=============//
 		// constructor //
@@ -124,8 +119,6 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 			this.currentBiome = currentBiome;
 		}
 
-
-
 		//=================//
 		// getters/setters //
 		//=================//
@@ -153,8 +146,6 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 		 */
 		public IDhApiBlockStateWrapper getBlockOverride() { return this.newBlock; }
 
-
-
 		/**
 		 * Sets the {@link IDhApiBiomeWrapper} that should be used at this event's current position in the chunk.
 		 * If you don't want to modify the biome at this event's current position,
@@ -178,8 +169,6 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 		 */
 		public IDhApiBiomeWrapper getBiomeOverride() { return this.newBiome; }
 
-
-
 		/**
 		 * Returns the same instance of this event.
 		 * Copying this event isn't recommended due to
@@ -191,7 +180,5 @@ public abstract class DhApiChunkProcessingEvent implements IDhApiEvent<DhApiChun
 
 		@Override
 		public boolean getCopyBeforeFire() { return false; }
-
 	}
-
 }

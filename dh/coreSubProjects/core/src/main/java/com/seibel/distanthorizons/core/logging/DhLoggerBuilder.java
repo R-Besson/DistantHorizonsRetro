@@ -34,8 +34,6 @@ public class DhLoggerBuilder
 	private @Nullable ConfigEntry<EDhApiLoggerLevel> fileLevelConfig;
 	private int maxLogPerSec = -1;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -59,8 +57,6 @@ public class DhLoggerBuilder
 
 		return callerClassName;
 	}
-
-
 
 	//===========//
 	// variables //
@@ -90,8 +86,6 @@ public class DhLoggerBuilder
 		return this;
 	}
 
-
-
 	//=======//
 	// build //
 	//=======//
@@ -111,7 +105,4 @@ public class DhLoggerBuilder
 			throw new RuntimeException(e);
 		}
 	}
-
-
-
 }

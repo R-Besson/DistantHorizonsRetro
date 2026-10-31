@@ -28,8 +28,6 @@ public class ChunkHashDTO implements IBaseDTO<DhChunkPos>
 	public DhChunkPos pos;
 	public int chunkHash;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -39,8 +37,6 @@ public class ChunkHashDTO implements IBaseDTO<DhChunkPos>
 		this.pos = pos;
 		this.chunkHash = chunkHash;
 	}
-
-
 
 	//===========//
 	// overrides //
@@ -52,7 +48,4 @@ public class ChunkHashDTO implements IBaseDTO<DhChunkPos>
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-
-
-
 }

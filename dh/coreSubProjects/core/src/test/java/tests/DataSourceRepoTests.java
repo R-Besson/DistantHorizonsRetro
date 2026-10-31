@@ -54,8 +54,6 @@ public class DataSourceRepoTests
 	public static String DATABASE_TYPE = "jdbc:sqlite";
 	public static String DB_FILE_NAME = "test.sqlite";
 
-
-
 	@BeforeClass
 	public static void testSetup()
 	{
@@ -66,15 +64,11 @@ public class DataSourceRepoTests
 		}
 	}
 
-
-
 	@Test
 	public void test()
 	{
 		try (final FullDataSourceV2Repo repo = new FullDataSourceV2Repo(DATABASE_TYPE, new File(DB_FILE_NAME)))
 		{
-
-
 
 			//========================//
 			// create test datasource //
@@ -112,12 +106,9 @@ public class DataSourceRepoTests
 			byte[] columnWorldCompressionMode = new byte[FullDataSourceV2.WIDTH * FullDataSourceV2.WIDTH];
 			Arrays.fill(columnWorldCompressionMode, (byte) 3);
 
-
-
 			FullDataSourceV2 originalDataSource = FullDataSourceV2.createWithData(pos, dataMapping, fullDataArray, columnGenStep, columnWorldCompressionMode);
 			FullDataSourceV2DTO originalDto = FullDataSourceV2DTO.CreateFromDataSource(originalDataSource, EDhApiDataCompressionMode.LZMA2);
 			repo.save(originalDto);
-
 
 			// also create format-1 encoded version to ensure backwards compatibility
 			long posV1 = DhSectionPos.encode((byte) 6, 2, 3);
@@ -129,8 +120,6 @@ public class DataSourceRepoTests
 				EDhApiDataCompressionMode.LZMA2);
 			dtoFormatV1.dataFormatVersion = FullDataSourceV2DTO.DATA_FORMAT.V1_NO_ADJACENT_DATA;
 			repo.save(dtoFormatV1);
-
-
 
 			//=======================//
 			// confirm DTO data is   //
@@ -149,8 +138,6 @@ public class DataSourceRepoTests
 			assertArraysAreEqual(originalDto.compressedSouthAdjDataByteArray, savedDto.compressedSouthAdjDataByteArray);
 			assertArraysAreEqual(originalDto.compressedEastAdjDataByteArray, savedDto.compressedEastAdjDataByteArray);
 			assertArraysAreEqual(originalDto.compressedWestAdjDataByteArray, savedDto.compressedWestAdjDataByteArray);
-
-
 
 			//========================//
 			// confirm data source is //
@@ -190,8 +177,6 @@ public class DataSourceRepoTests
 				}
 			}
 
-
-
 			//==============//
 			// adjacent DTO //
 			//==============//
@@ -215,8 +200,6 @@ public class DataSourceRepoTests
 			{
 				assertArraysAreEqual(adjDto.compressedDataByteArray, savedDto.compressedWestAdjDataByteArray);
 			}
-
-
 
 			//======================//
 			// adjacent datasources //
@@ -255,7 +238,6 @@ public class DataSourceRepoTests
 								continue;
 							}
 
-
 							int index = FullDataSourceV2.relativePosToIndex(x, z);
 							LongArrayList adjDataColumn = adjSource.dataPoints[index];
 							Assert.assertEquals(1, adjDataColumn.size());
@@ -264,9 +246,6 @@ public class DataSourceRepoTests
 					}
 				}
 			}
-
-
-
 
 			//=========================//
 			// (optional) loop forever //
@@ -326,8 +305,6 @@ public class DataSourceRepoTests
 								{
 									repo.save(compressedDto);
 
-
-
 									iterateCount.increment();
 
 									long time = System.currentTimeMillis();
@@ -361,7 +338,6 @@ public class DataSourceRepoTests
 		}
 	}
 
-
 	//================//
 	// helper methods //
 	//================//
@@ -393,7 +369,4 @@ public class DataSourceRepoTests
 			Assert.assertEquals(message + "value mismatch at index [" + i + "]", expectedNumb, actualNumb);
 		}
 	}
-
-
-
 }

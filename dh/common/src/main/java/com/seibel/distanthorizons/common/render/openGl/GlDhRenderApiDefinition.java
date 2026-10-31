@@ -35,8 +35,6 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 {
 	private static final IIrisAccessor IRIS_ACCESSOR = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 
-
-
 	//=========//
 	// getters //
 	//=========//
@@ -71,8 +69,6 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 
 	//endregion
 
-
-
 	//============//
 	// singletons //
 	//============//
@@ -91,8 +87,6 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 
 	//endregion
 
-
-
 	//===========//
 	// factories //
 	//===========//
@@ -105,7 +99,4 @@ public class GlDhRenderApiDefinition extends AbstractDhRenderApiDefinition
 	@Override public IDhGenericObjectVertexBufferContainer createGenericVboContainer() { return new GlGenericObjectVertexContainer(); }
 
 	//endregion
-
-
-
 }

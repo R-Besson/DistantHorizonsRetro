@@ -22,8 +22,6 @@ public class ServerPlayerWrapper implements IServerPlayerWrapper
 
 	private final NetHandlerPlayServer connection;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -44,8 +42,6 @@ public class ServerPlayerWrapper implements IServerPlayerWrapper
 	{ this.connection = connection; }
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -90,8 +86,6 @@ public class ServerPlayerWrapper implements IServerPlayerWrapper
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -122,7 +116,4 @@ public class ServerPlayerWrapper implements IServerPlayerWrapper
 	public int hashCode() { return Objects.hashCode(this.connection); }
 
 	//endregion
-
-
-
 }

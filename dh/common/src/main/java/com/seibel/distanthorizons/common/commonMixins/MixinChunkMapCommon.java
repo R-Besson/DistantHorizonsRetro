@@ -23,8 +23,6 @@ public class MixinChunkMapCommon
 			return;
 		}
 
-
-
 		// corrupt/incomplete chunk validation //
 
 		// MC has a tendency to try saving incomplete or corrupted chunks (which show up as empty or black chunks)
@@ -38,13 +36,10 @@ public class MixinChunkMapCommon
 		// ChunkWrapper reads biomes via World.getBiomeGenForCoords instead. Touching the array would
 		// also crash under EndlessIDs, which replaces it with a short array.
 
-
-
 		// submit the update event
 		ServerApi.INSTANCE.serverChunkSaveEvent(
 			new ChunkWrapper(chunk, levelWrapper),
 			levelWrapper
 		);
 	}
-
 }

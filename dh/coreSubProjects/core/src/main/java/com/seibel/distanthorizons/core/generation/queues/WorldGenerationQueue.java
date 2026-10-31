@@ -72,14 +72,12 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	private static final IWrapperFactory WRAPPER_FACTORY = SingletonInjector.INSTANCE.get(IWrapperFactory.class);
 	private static final AbstractDebugWireframeRenderer DEBUG_RENDERER = SingletonInjector.INSTANCE.get(AbstractDebugWireframeRenderer.class);
 
-
 	private final IDhApiWorldGenerator generator;
 	private final IDhServerLevel level;
 
 	/** contains the positions that need to be generated */
 	private final ConcurrentHashMap<Long, DataSourceRetrievalTask> waitingTaskByPos = new ConcurrentHashMap<>();
 	private final ConcurrentHashMap<Long, DataSourceRetrievalTask> inProgressGenTasksByLodPos = new ConcurrentHashMap<>();
-
 
 	private boolean canRegenerate = false;
 
@@ -101,8 +99,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	private final RollingAverage rollingAverageChunkGenTimeInMs = new RollingAverage(Runtime.getRuntime().availableProcessors() * 500);
 	@Override public RollingAverage getRollingAverageChunkGenTimeInMs() { return this.rollingAverageChunkGenTimeInMs; }
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -119,8 +115,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	}
 
 	//endregion constructor
-
-
 
 	//===============//
 	// task handling //
@@ -147,7 +141,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			// otherwise issues will occur (holes and/or out-of-place LOD data)
 			return existingGenTask.future;
 		}
-
 
 		// make sure the generator can provide the requested position
 		if (requiredDataDetail < this.generator.getSmallestDataDetailLevel())
@@ -254,8 +247,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 
 	//endregion task handling
 
-
-
 	//===============//
 	// running tasks //
 	//===============//
@@ -282,8 +273,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			return;
 		}
 		this.generationQueueRunning = true;
-
-
 
 		// queue world generation tasks on its own thread since this process is very slow and would lag the server thread
 		this.queueingThread.execute(() ->
@@ -336,7 +325,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		{
 			return false;
 		}
-
 
 		// find the closest task,
 		// strictly by the distance to its nearest edge so holes next to the player
@@ -412,7 +400,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 
 			closestTask.future.complete(DataSourceRetrievalResult.CreateSplit());
 		}
-
 
 		// a task has been started or queued,
 		// queue another task
@@ -606,7 +593,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			generatedChunks::add
 		);
 
-
 		chunkGenFuture.exceptionally((throwable) ->
 		{
 			returnFuture.completeExceptionally(throwable);
@@ -650,7 +636,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	{
 		final CompletableFuture<FullDataSourceV2> returnFuture = new CompletableFuture<>();
 
-
 		// done to reduce GC overhead
 		FullDataSourceV2 pooledDataSource = FullDataSourceV2.createEmpty(task.pos);
 		// set here so the API user doesn't have to pass in this value anywhere themselves
@@ -671,7 +656,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			(IDhApiFullDataSource apiDataSource) -> { }
 		);
 
-
 		lodGenFuture.exceptionally((throwable) ->
 		{
 			returnFuture.completeExceptionally(throwable);
@@ -687,8 +671,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 
 		return returnFuture;
 	}
-
-
 
 	//===================//
 	// getters / setters //
@@ -723,8 +705,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 
 	//endregion getters/setters
 
-
-
 	//=======//
 	// debug //
 	//=======//
@@ -741,7 +721,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		int levelHeightRange = (levelMaxY - levelMinY);
 		int maxY = levelMaxY - (levelHeightRange / 2);
 
-
 		// blue - queued
 		this.waitingTaskByPos.keySet().forEach((Long pos) ->
 			renderer.renderBox(
@@ -757,8 +736,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 
 	//endregion debug
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -769,7 +746,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 	{
 		LOGGER.info("Closing world gen queue");
 		this.queueingThread.shutdownNow();
-
 
 		// stop and remove any in progress tasks
 		ArrayList<CompletableFuture<Void>> inProgressTasksCancelingFutures = new ArrayList<>(this.inProgressGenTasksByLodPos.size());
@@ -820,7 +796,6 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		}
 		LodUtil.assertTrue(this.generatorClosingFuture != null);
 
-
 		LOGGER.info("Shutting down world generator thread pool...");
 
 		PriorityTaskPicker.Executor executor = ThreadPoolUtil.getWorldGenExecutor();
@@ -834,10 +809,8 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 		this.inProgressGenTasksByLodPos.values().forEach((inProgressWorldGenTaskGroup) -> inProgressWorldGenTaskGroup.future.cancel(true));
 		this.waitingTaskByPos.values().forEach((worldGenTask) -> worldGenTask.future.cancel(true));
 
-
 		this.generator.close();
 		DEBUG_RENDERER.unregister(this, Config.Client.Advanced.Debugging.DebugWireframe.showWorldGenQueue);
-
 
 		try
 		{
@@ -848,13 +821,10 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			LOGGER.warn("Failed to close generation queue: ", e);
 		}
 
-
 		LOGGER.info("Finished closing " + WorldGenerationQueue.class.getSimpleName());
 	}
 
 	//endregion shutdown
-
-
 
 	//================//
 	// helper classes //
@@ -872,11 +842,7 @@ public class WorldGenerationQueue implements IFullDataSourceRetrievalQueue, IDeb
 			this.task = task;
 			this.dist = dist;
 		}
-
 	}
 
 	//endregion helper classes
-
-
-
 }

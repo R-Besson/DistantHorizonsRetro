@@ -64,12 +64,8 @@ public enum EDhApiDistantGeneratorMode
 	 */
 	INTERNAL_SERVER((byte) 6);
 
-
-
 	/** The higher the number the more complete the generation is. */
 	public final byte complexity;
 
-
 	EDhApiDistantGeneratorMode(byte complexity) { this.complexity = complexity; }
-
 }

@@ -58,19 +58,16 @@ public class DhLogger implements IConfigListener
 	 */
 	private static final Logger LOGGER = LogManager.getLogger();
 
-
 	private static IMinecraftClientWrapper mc_client = null;
 
 	// both global configs start at "all" so we don't accidentally loose any logging messages
 	private static EDhApiLoggerLevel globalMaxFileLevel = EDhApiLoggerLevel.ALL;
 	private static EDhApiLoggerLevel globalMaxChatLevel = EDhApiLoggerLevel.ALL;
 
-
 	private EDhApiLoggerLevel fileLevel;
 	private EDhApiLoggerLevel chatLevel;
 
 	private boolean delayedSetupComplete = false;
-
 
 	@Nullable
 	private final ConfigEntry<EDhApiLoggerLevel> fileLevelConfig;
@@ -82,8 +79,6 @@ public class DhLogger implements IConfigListener
 	private final AtomicInteger logCountsThisSecondRef = new AtomicInteger(0);
 	private final Logger logger;
 
-
-
 	//==============//
 	// static setup //
 	//==============//
@@ -92,7 +87,6 @@ public class DhLogger implements IConfigListener
 	{
 		TICKER_THREAD.execute(DhLogger::runTickerLoop);
 	}
-
 	/**
 	 * needs to be run at a later date since loggers
 	 * are created before the config is set up.
@@ -118,8 +112,6 @@ public class DhLogger implements IConfigListener
 		});
 	}
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -132,7 +124,6 @@ public class DhLogger implements IConfigListener
 		this.logger = LogManager.getLogger(ModInfo.NAME + "-" + loggerName);
 
 		this.maxLogCountPerSecond = maxLogPerSec;
-
 
 		// chat config //
 
@@ -148,7 +139,6 @@ public class DhLogger implements IConfigListener
 			this.chatLevel = EDhApiLoggerLevel.DISABLED;
 		}
 
-
 		// file config //
 
 		this.fileLevelConfig = fileLevelConfig;
@@ -162,11 +152,8 @@ public class DhLogger implements IConfigListener
 			this.fileLevel = EDhApiLoggerLevel.ALL;
 		}
 
-
 		LOGGER_REF_LIST.add(new WeakReference<>(this));
 	}
-
-
 
 	//========//
 	// events //
@@ -188,8 +175,6 @@ public class DhLogger implements IConfigListener
 		globalMaxFileLevel = Config.Common.Logging.globalFileMaxLevel.get();
 		globalMaxChatLevel = Config.Common.Logging.globalChatMaxLevel.get();
 	}
-
-
 
 	//===============//
 	// log filtering //
@@ -216,8 +201,6 @@ public class DhLogger implements IConfigListener
 			|| this.logCountsThisSecondRef.get() < this.maxLogCountPerSecond;
 	}
 
-
-
 	//=========//
 	// logging //
 	//=========//
@@ -237,12 +220,10 @@ public class DhLogger implements IConfigListener
 			return;
 		}
 
-
 		Message msg = this.logger.getMessageFactory().newMessage(str, param);
 		String msgStr = msg.getFormattedMessage();
 
 		boolean messageLogged = false;
-
 
 		// file
 		if (canLogThisLevel(this.fileLevel.level, globalMaxFileLevel.level, level))
@@ -279,7 +260,6 @@ public class DhLogger implements IConfigListener
 				messageLogged = true;
 			}
 		}
-
 
 		if (messageLogged)
 		{
@@ -331,8 +311,6 @@ public class DhLogger implements IConfigListener
 		mc_client.sendChatMessage(prefix + message);
 	}
 
-
-
 	//===============//
 	// static ticker //
 	//===============//
@@ -371,7 +349,4 @@ public class DhLogger implements IConfigListener
 			}
 		}
 	}
-
-
-
 }

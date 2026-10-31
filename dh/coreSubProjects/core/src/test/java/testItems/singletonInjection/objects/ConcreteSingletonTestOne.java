@@ -37,23 +37,19 @@ public class ConcreteSingletonTestOne implements ISingletonTestOne, IBindable
 
 	public static int VALUE = 1;
 
-
 	public ConcreteSingletonTestOne(DependencyInjector<IBindable> newDependencyInjector)
 	{
 		dependencyInjector = newDependencyInjector;
 	}
-
 
 	@Override
 	public void finishDelayedSetup() { testInterTwo = dependencyInjector.get(ISingletonTestTwo.class, true); }
 	@Override
 	public boolean getDelayedSetupComplete() { return testInterTwo != null; }
 
-
 	@Override
 	public int getValue() { return VALUE; }
 
 	@Override
 	public int getDependentValue() { return testInterTwo.getValue(); }
-
 }

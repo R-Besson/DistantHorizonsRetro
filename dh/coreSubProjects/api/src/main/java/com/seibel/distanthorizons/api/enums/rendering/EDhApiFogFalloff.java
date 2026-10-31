@@ -34,7 +34,6 @@ public enum EDhApiFogFalloff
 	EXPONENTIAL(1),
 	EXPONENTIAL_SQUARED(2);
 
-
 	/**
 	 * Stable version of {@link EDhApiFogFalloff#ordinal()}
 	 *
@@ -43,5 +42,4 @@ public enum EDhApiFogFalloff
 	public final int value;
 
 	EDhApiFogFalloff(int value) { this.value = value; }
-
 }

@@ -23,5 +23,4 @@ public interface IChiselCommonAccessor extends IModAccessor
 	 */
 	@Nullable
 	IIcon[] getFaceIcons(IBlockAccess world, Block block, int x, int y, int z, int side);
-
 }

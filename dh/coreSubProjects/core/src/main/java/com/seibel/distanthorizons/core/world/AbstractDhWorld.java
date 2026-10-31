@@ -36,21 +36,15 @@ public abstract class AbstractDhWorld implements IDhWorld, Closeable
 
 	public final EWorldEnvironment environment;
 
-
-
 	// constructor //
 
 	protected AbstractDhWorld(EWorldEnvironment environment) { this.environment = environment; }
-
-
 
 	// abstract methods //
 
 	// removes the "throws IOException"
 	@Override
 	public abstract void close();
-
-
 
 	// helper methods //
 
@@ -72,5 +66,4 @@ public abstract class AbstractDhWorld implements IDhWorld, Closeable
 		String message = environment + " World with " + levelCountStr + " levels" + readOnlyStr;
 		messageList.add(message);
 	}
-
 }

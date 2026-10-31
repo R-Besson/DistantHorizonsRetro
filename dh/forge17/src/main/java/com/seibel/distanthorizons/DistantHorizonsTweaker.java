@@ -40,5 +40,4 @@ public class DistantHorizonsTweaker implements IFMLLoadingPlugin, IEarlyMixinLoa
 
 	@Override
 	public String getAccessTransformerClass() { return null; }
-
 }

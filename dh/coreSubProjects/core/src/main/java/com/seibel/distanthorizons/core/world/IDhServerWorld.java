@@ -34,5 +34,4 @@ public interface IDhServerWorld extends IDhWorld
 
 	@Nullable
 	default IDhServerLevel getOrLoadServerLevel(ILevelWrapper levelWrapper) { return (IDhServerLevel) this.getOrLoadLevel(levelWrapper); }
-
 }

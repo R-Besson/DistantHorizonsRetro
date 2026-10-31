@@ -67,5 +67,4 @@ public class DhApiEventRegister
 			return DhApiResult.createFail("No event handler [" + eventHandlerClass.getSimpleName() + "] was bound for the event [" + eventInterface.getSimpleName() + "].");
 		}
 	}
-
 }

@@ -53,5 +53,4 @@ public interface IDhApiCullingFrustum extends IDhApiOverrideable
 	 * @see EDhApiDetailLevel
 	 */
 	boolean intersects(int lodBlockPosMinX, int lodBlockPosMinZ, int lodBlockWidth, int lodDetailLevel);
-
 }

@@ -15,13 +15,9 @@ public enum EGlDhDepthBufferFormat
 	DEPTH24_STENCIL8(true),
 	DEPTH32F_STENCIL8(true);
 
-
-
 	private final boolean combinedStencil;
 
 	EGlDhDepthBufferFormat(boolean combinedStencil) { this.combinedStencil = combinedStencil; }
-
-
 
 	public int getGlInternalFormat()
 	{
@@ -73,5 +69,4 @@ public enum EGlDhDepthBufferFormat
 	}
 
 	public boolean isCombinedStencil() { return combinedStencil; }
-
 }

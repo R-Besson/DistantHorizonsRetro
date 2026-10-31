@@ -43,8 +43,6 @@ import java.awt.*;
 
 import static com.seibel.distanthorizons.lwjgl.LWJGLServiceProvider.LWJGL;
 
-
-
 /**
  * A singleton that contains everything
  * related to rendering in Minecraft.
@@ -60,14 +58,10 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	{
 		private static final IIrisAccessor IRIS = ModAccessorInjector.INSTANCE.get(IIrisAccessor.class);
 		private static final IAngelicaAccessor ANGELICA = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
-
 	}
 
 	/** {@link LightMapWrapper} queries MC directly, so one instance can be shared by every level. */
 	private final LightMapWrapper lightmapWrapper = new LightMapWrapper();
-
-
-
 
 	//=========//
 	// methods //
@@ -175,7 +169,6 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 		return MC.gameSettings.limitFramerate;
 	}
 
-
 	@Override
 	public boolean mcRendersToFrameBuffer()
 	{
@@ -269,8 +262,6 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	 */
 	public static volatile boolean modDensityFogActive = false;
 
-
-
 	//==========//
 	// lightmap //
 	//==========//
@@ -280,7 +271,4 @@ public class MinecraftRenderWrapper implements IMinecraftRenderWrapper
 	public ILightMapWrapper getLightmapWrapper() { return this.lightmapWrapper; }
 
 	//endregion
-
-
-
 }

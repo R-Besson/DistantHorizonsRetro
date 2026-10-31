@@ -32,5 +32,4 @@ public interface IVertexBufferWrapper extends IBindable, AutoCloseable
 
 	@Override
 	void close();
-
 }

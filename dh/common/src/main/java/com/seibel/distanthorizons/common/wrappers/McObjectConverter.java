@@ -38,7 +38,6 @@ import java.nio.FloatBuffer;
 @SuppressWarnings("ALL") public class McObjectConverter
 {
 
-
 	//========//
 	// matrix //
 	//========//
@@ -74,8 +73,6 @@ import java.nio.FloatBuffer;
 	private static int bufferIndex(int x, int y) { return y * 4 + x; }
 
 	//endregion
-
-
 
 	//===========//
 	// direction //
@@ -113,8 +110,6 @@ import java.nio.FloatBuffer;
 
 	//endregion
 
-
-
 	//==================//
 	// position objects //
 	//==================//
@@ -126,7 +121,4 @@ import java.nio.FloatBuffer;
 	}
 
 	//endregion
-
-
-
 }

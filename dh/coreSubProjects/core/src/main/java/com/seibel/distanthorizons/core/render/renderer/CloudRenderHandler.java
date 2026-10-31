@@ -79,7 +79,6 @@ public class CloudRenderHandler
 
 	private static final float MOVE_SPEED_IN_BLOCKS_PER_SECOND = 6.0f;
 
-
 	private final IDhApiRenderableBoxGroup[][][] boxGroupByOffset
 		// radius * 2 to get the diameter
 		// + 1 so we get an odd number wide (needed so we can have a center position)
@@ -99,8 +98,6 @@ public class CloudRenderHandler
 			new DhVec3d(),
 		};
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -109,8 +106,6 @@ public class CloudRenderHandler
 	public CloudRenderHandler(IDhClientLevel level, IDhGenericRenderer renderer)
 	{
 		this.level = level;
-
-
 
 		//=======================//
 		// get the cloud texture //
@@ -140,8 +135,6 @@ public class CloudRenderHandler
 
 		//endregion
 
-
-
 		//===================//
 		// parse the texture //
 		//===================//
@@ -160,8 +153,6 @@ public class CloudRenderHandler
 					int endZ = startZ;
 					int endX = x + 1;
 
-
-
 					//==========================//
 					// merge in the Z direction //
 					//==========================//
@@ -174,8 +165,6 @@ public class CloudRenderHandler
 					}
 					// update the z iterator so we can skip over everything included in this cloud
 					z = endZ - 1;
-
-
 
 					//==========================//
 					// merge in the X direction //
@@ -197,7 +186,6 @@ public class CloudRenderHandler
 							}
 						}
 
-
 						if (canMergeInXDir)
 						{
 							// mark the adjacent column as processed
@@ -215,8 +203,6 @@ public class CloudRenderHandler
 							break;
 						}
 					}
-
-
 
 					//============================//
 					//  Create the renderable box //
@@ -264,8 +250,6 @@ public class CloudRenderHandler
 		}
 
 		//endregion
-
-
 
 		//========================//
 		// create the renderables //
@@ -316,8 +300,6 @@ public class CloudRenderHandler
 
 	//endregion
 
-
-
 	//===========//
 	// rendering //
 	//===========//
@@ -326,8 +308,6 @@ public class CloudRenderHandler
 	private void preRender(DhApiRenderParam renderParam, CloudParams cloudParams)
 	{
 		IDhApiRenderableBoxGroup boxGroup = this.boxGroupByOffset[cloudParams.instanceOffsetY][cloudParams.instanceOffsetX + CLOUD_INSTANCE_RADIUS_COUNT][cloudParams.instanceOffsetZ + CLOUD_INSTANCE_RADIUS_COUNT];
-
-
 
 		//===================//
 		// should we render? //
@@ -357,8 +337,6 @@ public class CloudRenderHandler
 
 		//endregion
 
-
-
 		//================//
 		// cloud movement //
 		//================//
@@ -375,8 +353,6 @@ public class CloudRenderHandler
 		cloudParams.deltaOffsetX %= cloudParams.widthInBlocks;
 
 		//endregion
-
-
 
 		//============================//
 		// camera movement and offset //
@@ -405,7 +381,6 @@ public class CloudRenderHandler
 		float instanceOffsetX = (cloudInstanceOffsetCountX * cloudParams.widthInBlocks);
 		float instanceOffsetZ = (cloudInstanceOffsetCountZ * cloudParams.widthInBlocks);
 
-
 		float newMinPosX =
 			cloudParams.deltaOffsetX
 				+ (cloudParams.instanceOffsetX * cloudParams.widthInBlocks)
@@ -431,8 +406,6 @@ public class CloudRenderHandler
 		boxGroup.setOriginBlockPos(new DhApiVec3d(newMinPosX, newMinPosY, newMinPosZ));
 
 		//endregion
-
-
 
 		//===========================//
 		// update color and position //
@@ -479,8 +452,6 @@ public class CloudRenderHandler
 			return false;
 		}
 
-
-
 		//==============//
 		// culling prep //
 		//==============//
@@ -514,8 +485,6 @@ public class CloudRenderHandler
 				// necessary to prevent seeing the cloud border
 				* LodUtil.CHUNK_WIDTH * 1.5;
 
-
-
 		//===================//
 		// check each corner //
 		//===================//
@@ -539,7 +508,6 @@ public class CloudRenderHandler
 				allOutsideRenderDistance = false;
 			}
 
-
 			// Check if the corner is in front of the camera (dot product > 0 means in front)
 			DhVec3f toCorner = new DhVec3f(
 				(float) (corner.x - cameraPos.x),
@@ -558,8 +526,6 @@ public class CloudRenderHandler
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// texture handling //
@@ -600,8 +566,6 @@ public class CloudRenderHandler
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -620,7 +584,6 @@ public class CloudRenderHandler
 		public final int heightOffset;
 		public final float heightSpeedOffset;
 
-
 		/** how far this cloud group has moved in the X direction based on time */
 		public float deltaOffsetX;
 		/** how far this cloud group has moved in the Z direction based on time */
@@ -630,8 +593,6 @@ public class CloudRenderHandler
 
 		/** used so we can trigger a VBO update when necessary */
 		public Color previousColor = Color.WHITE;
-
-
 
 		// constructor //
 
@@ -645,7 +606,6 @@ public class CloudRenderHandler
 			this.instanceOffsetX = instanceOffsetX;
 			this.instanceOffsetZ = instanceOffsetZ;
 
-
 			// each layer up increases by 512 blocks
 			this.heightOffset = instanceOffsetY * 512;
 			// have higher cloud layers move faster
@@ -655,11 +615,7 @@ public class CloudRenderHandler
 			this.deltaOffsetX = this.widthInBlocks * instanceOffsetY * 0.75f;
 			this.deltaOffsetZ = this.widthInBlocks * instanceOffsetY * 1.5f;
 		}
-
 	}
 
 	//endregion
-
-
-
 }

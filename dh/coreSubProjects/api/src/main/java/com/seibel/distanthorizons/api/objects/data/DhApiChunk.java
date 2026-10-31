@@ -45,8 +45,6 @@ public class DhApiChunk
 
 	private final List<List<DhApiTerrainDataPoint>> dataPoints;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -70,8 +68,6 @@ public class DhApiChunk
 			this.dataPoints.add(i, null);
 		}
 	}
-
-
 
 	//=================//
 	// getters/setters //
@@ -113,8 +109,6 @@ public class DhApiChunk
 			throw new IllegalArgumentException("Null columns aren't allowed. If you want to remove all data from a column please clear the list or pass in an empty list.");
 		}
 
-
-
 		//================//
 		// set datapoints //
 		//================//
@@ -127,8 +121,6 @@ public class DhApiChunk
 		}
 		column.addAll(dataPoints);
 	}
-
-
 
 	//================//
 	// helper methods //
@@ -143,5 +135,4 @@ public class DhApiChunk
 			throw new IndexOutOfBoundsException("Relative block positions must be between 0 and 15 (inclusive) the block pos: (" + relX + "," + relZ + ") is outside of those boundaries.");
 		}
 	}
-
 }

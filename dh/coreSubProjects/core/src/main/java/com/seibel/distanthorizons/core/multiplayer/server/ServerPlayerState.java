@@ -35,7 +35,6 @@ public class ServerPlayerState implements Closeable
 		.replaceAll("[^" + LevelInitMessage.ALLOWED_CHARS_REGEX + " ]", "")
 		.replace(" ", "_");
 
-
 	public final NetworkSession networkSession;
 	public IServerPlayerWrapper getServerPlayer() { return this.networkSession.serverPlayer; }
 
@@ -49,7 +48,6 @@ public class ServerPlayerState implements Closeable
 	public RateLimiterSet getRateLimiterSet(AbstractDhServerLevel level) { return this.rateLimiterSets.computeIfAbsent(level, levelKey -> new RateLimiterSet()); }
 	/** called when the level unloads, otherwise this player would keep the closed level alive */
 	public void removeRateLimiterSet(AbstractDhServerLevel level) { this.rateLimiterSets.remove(level); }
-
 
 	//==============//
 	// constructors //
@@ -83,7 +81,6 @@ public class ServerPlayerState implements Closeable
 			this.networkSession.sendMessage(new LevelInitMessage(msg.dimensionResourceLocation, this.serverKey, levelKey));
 		});
 
-
 		this.networkSession.registerHandler(CloseInternalEvent.class, event -> {
 			// No-op. prevents "Unhandled message" log entries
 		});
@@ -95,8 +92,6 @@ public class ServerPlayerState implements Closeable
 			this.close();
 		});
 	}
-
-
 
 	//=================//
 	// client updating //
@@ -111,8 +106,6 @@ public class ServerPlayerState implements Closeable
 		this.networkSession.sendMessage(new SessionConfigMessage(this.sessionConfig));
 	}
 
-
-
 	//==========//
 	// shutdown //
 	//==========//
@@ -124,8 +117,6 @@ public class ServerPlayerState implements Closeable
 		this.configAnyChangeListener.close();
 		this.networkSession.close();
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -142,7 +133,5 @@ public class ServerPlayerState implements Closeable
 			() -> Config.Server.syncOnLoadRateLimit.get(),
 			msg -> msg.sendResponse(new RateLimitedException("Sync on login rate limit: " + ServerPlayerState.this.sessionConfig.getSyncOnLoginRateLimit()))
 		);
-
 	}
-
 }

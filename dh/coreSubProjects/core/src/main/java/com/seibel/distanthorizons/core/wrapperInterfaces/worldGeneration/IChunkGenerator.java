@@ -44,5 +44,4 @@ public interface IChunkGenerator extends AutoCloseable
 	 * without holding a world gen thread can return more than 1 to keep that thread busy.
 	 */
 	default int getInProgressTasksPerThread() { return 1; }
-
 }

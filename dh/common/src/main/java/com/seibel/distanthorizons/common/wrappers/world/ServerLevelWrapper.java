@@ -54,7 +54,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	private static final Map<WorldServer, WeakReference<ServerLevelWrapper>>
 		LEVEL_WRAPPER_REF_BY_SERVER_LEVEL = Collections.synchronizedMap(new WeakHashMap<>());
 
-
 	private final WorldServer level;
 	private IDhLevel dhLevel;
 
@@ -63,8 +62,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	 * the server variables needed may no longer be available.
 	 */
 	private final String keyedLevelDimensionName;
-
-
 
 	//==============//
 	// constructors //
@@ -95,8 +92,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// instance methods //
@@ -162,7 +157,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 		}
 	}
 
-
 	@Override
 	public DimensionTypeWrapper getDimensionType()
 	{
@@ -221,7 +215,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	@Override
 	public void onUnload() { LEVEL_WRAPPER_REF_BY_SERVER_LEVEL.remove(this.level); }
 
-
 	@Override
 	public void setDhLevel(IDhLevel dhLevel) { this.dhLevel = dhLevel; }
 	@Override
@@ -260,8 +253,6 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -271,7 +262,4 @@ public class ServerLevelWrapper implements IServerLevelWrapper
 	public String toString() { return "Wrapped{" + this.level.toString() + "@" + this.getDhIdentifier() + "}"; }
 
 	//endregion
-
-
-
 }

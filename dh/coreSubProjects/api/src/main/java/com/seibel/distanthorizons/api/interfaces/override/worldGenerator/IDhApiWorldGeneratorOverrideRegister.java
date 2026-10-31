@@ -39,5 +39,4 @@ public interface IDhApiWorldGeneratorOverrideRegister
 	 * the name of the previously registered generator and success = false.
 	 */
 	DhApiResult<Void> registerWorldGeneratorOverride(IDhApiLevelWrapper levelWrapper, IDhApiWorldGenerator worldGenerator);
-
 }

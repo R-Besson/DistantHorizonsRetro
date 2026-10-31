@@ -58,9 +58,6 @@ public class DhVec3f extends DhApiVec3f
 		this.z = (float) pos.z;
 	}
 
-
-
-
 	//==============//
 	// math methods //
 	//==============//
@@ -85,8 +82,6 @@ public class DhVec3f extends DhApiVec3f
 		}
 	}
 
-
-
 	//==============//
 	// misc methods //
 	//==============//
@@ -99,5 +94,4 @@ public class DhVec3f extends DhApiVec3f
 	}
 
 	public DhVec3f copy() { return new DhVec3f(this.x, this.y, this.z); }
-
 }

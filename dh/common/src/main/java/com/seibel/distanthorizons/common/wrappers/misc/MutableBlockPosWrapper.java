@@ -7,8 +7,6 @@ public class MutableBlockPosWrapper implements IMutableBlockPosWrapper
 {
 	public final BlockPos pos;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -21,8 +19,6 @@ public class MutableBlockPosWrapper implements IMutableBlockPosWrapper
 
 	//endregion
 
-
-
 	//===========//
 	// overrides //
 	//===========//
@@ -32,7 +28,4 @@ public class MutableBlockPosWrapper implements IMutableBlockPosWrapper
 	public Object getWrappedMcObject() { return this.pos; }
 
 	//endregion
-
-
-
 }

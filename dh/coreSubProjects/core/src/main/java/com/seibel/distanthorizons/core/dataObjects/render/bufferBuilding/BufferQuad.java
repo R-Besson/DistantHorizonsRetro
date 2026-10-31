@@ -41,7 +41,6 @@ public final class BufferQuad
 	 */
 	public static final int MAX_QUAD_WIDTH_FOR_EARTH_CURVATURE = LodUtil.CHUNK_WIDTH;
 
-
 	public short x;
 	public short y;
 	public short z;
@@ -77,8 +76,6 @@ public final class BufferQuad
 	// Slight increase in memory for reduction in cpu usage
 	public long sortKeyEastWest;
 	public long sortKeyNorthSouth;
-
-
 
 	//=============//
 	// constructor //
@@ -156,8 +153,6 @@ public final class BufferQuad
 
 	//endregion
 
-
-
 	/** compares this quad's position to the given quad using pre-computed sort keys */
 	public int compare(BufferQuad quad, BufferMergeDirectionEnum compareDirection)
 	{
@@ -168,7 +163,6 @@ public final class BufferQuad
 			? Long.compare(this.sortKeyEastWest, quad.sortKeyEastWest)
 			: Long.compare(this.sortKeyNorthSouth, quad.sortKeyNorthSouth);
 	}
-
 
 	/**
 	 * Attempts to merge the given quad into this one.
@@ -214,7 +208,6 @@ public final class BufferQuad
 		{
 			return false;
 		}
-
 
 		// get the position of each quad to compare against
 		short thisPerpendicularCompareStartPos; // edge perpendicular to the merge direction
@@ -305,8 +298,6 @@ public final class BufferQuad
 			otherParallelCompareWidth = quad.widthEastWest;
 		}
 
-
-
 		// quad width should only be limited when earth curvature is enabled
 		int maxQuadWidth = NORMAL_MAX_QUAD_WIDTH;
 		if (Config.Client.Advanced.Graphics.Experimental.earthCurveRatio.get() != 0)
@@ -325,7 +316,6 @@ public final class BufferQuad
 		{
 			return false;
 		}
-
 
 		// check if these quads are adjacent
 		if (thisPerpendicularCompareStartPos + thisPerpendicularCompareWidth < otherPerpendicularCompareStartPos ||
@@ -384,7 +374,4 @@ public final class BufferQuad
 		// merge successful
 		return true;
 	}
-
-
-
 }

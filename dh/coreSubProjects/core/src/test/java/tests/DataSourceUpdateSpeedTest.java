@@ -48,7 +48,6 @@ public class DataSourceUpdateSpeedTest
 	{
 		Random seededRandom = new Random(3);
 
-
 		//===================//
 		// parent datasource //
 		//===================//
@@ -99,9 +98,6 @@ public class DataSourceUpdateSpeedTest
 			parentDataSource = FullDataSourceV2.createWithData(parentPos, dataMapping, fullDataArray, columnGenStep, columnWorldCompressionMode);
 		}
 
-
-
-
 		//==================//
 		// child datasource //
 		//==================//
@@ -149,12 +145,8 @@ public class DataSourceUpdateSpeedTest
 			byte[] columnWorldCompressionMode = new byte[FullDataSourceV2.WIDTH * FullDataSourceV2.WIDTH];
 			Arrays.fill(columnWorldCompressionMode, EDhApiWorldCompressionMode.VISUALLY_EQUAL.value);
 
-
-
 			childDataSource = FullDataSourceV2.createWithData(childPos, dataMapping, fullDataArray, columnGenStep, columnWorldCompressionMode);
 		}
-
-
 
 		//=========================//
 		// (optional) loop forever //
@@ -198,7 +190,6 @@ public class DataSourceUpdateSpeedTest
 		}
 	}
 
-
 	//================//
 	// helper methods //
 	//================//
@@ -230,7 +221,4 @@ public class DataSourceUpdateSpeedTest
 			Assert.assertEquals(message + "value mismatch at index [" + i + "]", expectedNumb, actualNumb);
 		}
 	}
-
-
-
 }

@@ -22,13 +22,10 @@ public abstract class AbstractBlockTextureAtlas
 
 	protected static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("BlockTextureAtlas");
 
-
 	protected int allocatedTileCount = 0;
 	protected int uploadedTileCount = 0;
 
 	protected boolean atlasCreated = false;
-
-
 
 	//==================//
 	// abstract methods //
@@ -42,8 +39,6 @@ public abstract class AbstractBlockTextureAtlas
 		int destinationX, int destinationY,
 		int tileWidth, int tileHeight);
 
-
-
 	// optional //
 
 	/** can be implemented for pre-upload setup */
@@ -52,8 +47,6 @@ public abstract class AbstractBlockTextureAtlas
 	protected abstract void afterWriteToTexture();
 
 	//endregion
-
-
 
 	//===========//
 	// uploading //
@@ -73,8 +66,6 @@ public abstract class AbstractBlockTextureAtlas
 			this.atlasCreated = true;
 			this.growAtlas(1);
 		}
-
-
 
 		int totalTileCount = BlockTextureRegistry.INSTANCE.getTileCount();
 		if (totalTileCount == this.uploadedTileCount)
@@ -151,7 +142,4 @@ public abstract class AbstractBlockTextureAtlas
 	}
 
 	//endregion
-
-
-
 }

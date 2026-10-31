@@ -25,8 +25,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IRpleAccess
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 
-
-
 public class LightMapWrapper implements ILightMapWrapper
 {
 	private static final IRpleAccessor RPLE_ACCESSOR = ModAccessorInjector.INSTANCE.get(IRpleAccessor.class);
@@ -37,8 +35,6 @@ public class LightMapWrapper implements ILightMapWrapper
 	 */
 	public static final int GL_BOUND_INDEX = 0;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -47,8 +43,6 @@ public class LightMapWrapper implements ILightMapWrapper
 	public LightMapWrapper() { }
 
 	//endregion
-
-
 
 	//==============//
 	// lightmap use //
@@ -69,7 +63,4 @@ public class LightMapWrapper implements ILightMapWrapper
 	}
 
 	//endregion
-
-
-
 }

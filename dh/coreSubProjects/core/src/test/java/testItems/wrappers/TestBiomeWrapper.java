@@ -6,10 +6,8 @@ public class TestBiomeWrapper implements IBiomeWrapper
 {
 	private final String name;
 
-
 	public TestBiomeWrapper(String name)
 	{ this.name = name; }
-
 
 	@Override
 	public String getName()
@@ -21,7 +19,6 @@ public class TestBiomeWrapper implements IBiomeWrapper
 	@Override
 	public Object getWrappedMcObject()
 	{ return this; }
-
 
 	@Override
 	public int hashCode()
@@ -36,5 +33,4 @@ public class TestBiomeWrapper implements IBiomeWrapper
 
 		return this.name.equals(((TestBiomeWrapper) obj).name);
 	}
-
 }

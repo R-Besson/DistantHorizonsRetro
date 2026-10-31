@@ -46,8 +46,6 @@ public class DhServerLevel extends AbstractDhServerLevel
 		this.serverLevelWrapper.setDhLevel(this);
 	}
 
-
-
 	//=======//
 	// ticks //
 	//=======//
@@ -64,7 +62,6 @@ public class DhServerLevel extends AbstractDhServerLevel
 		}
 		return targetPos;
 	}
-
 
 	//=========//
 	// getters //
@@ -83,8 +80,6 @@ public class DhServerLevel extends AbstractDhServerLevel
 		return null;
 	}
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -95,8 +90,6 @@ public class DhServerLevel extends AbstractDhServerLevel
 		messageList.add("[" + this.serverLevelWrapper.getDhIdentifier() + "]");
 		super.addDebugMenuStringsToList(messageList);
 	}
-
-
 
 	//================//
 	// base overrides //
@@ -111,5 +104,4 @@ public class DhServerLevel extends AbstractDhServerLevel
 		super.close();
 		this.serverside.close();
 	}
-
 }

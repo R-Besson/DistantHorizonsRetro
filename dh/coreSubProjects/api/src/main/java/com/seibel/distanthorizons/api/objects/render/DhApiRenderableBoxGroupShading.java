@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.api.objects.render;
 
-
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiRenderableBoxGroup;
 
 /**
@@ -31,8 +30,6 @@ public class DhApiRenderableBoxGroupShading
 	/** negative Y */
 	public float bottom = 1.0f;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -50,8 +47,6 @@ public class DhApiRenderableBoxGroupShading
 		shading.setUnshaded();
 		return shading;
 	}
-
-
 
 	//=========//
 	// methods //
@@ -84,6 +79,5 @@ public class DhApiRenderableBoxGroupShading
 		this.top = 1.0f;
 		this.bottom = 1.0f;
 	}
-
 }
 

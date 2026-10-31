@@ -12,5 +12,4 @@ public enum EDhApiRenderingApi
 {
 	VULKAN,
 	OPEN_GL;
-
 }

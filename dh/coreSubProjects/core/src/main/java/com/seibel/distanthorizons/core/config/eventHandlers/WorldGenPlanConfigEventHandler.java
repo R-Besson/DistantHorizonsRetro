@@ -11,11 +11,8 @@ public class WorldGenPlanConfigEventHandler implements IConfigListener
 	public static WorldGenPlanConfigEventHandler INSTANCE = new WorldGenPlanConfigEventHandler();
 	public static IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 
-
 	/** private since we only ever need one handler at a time */
 	private WorldGenPlanConfigEventHandler() { }
-
-
 
 	@Override
 	public void onConfigValueSet()
@@ -47,9 +44,7 @@ public class WorldGenPlanConfigEventHandler implements IConfigListener
 			return true;
 		}
 
-
 		EDhApiGeneratorPlan genPlan = (EDhApiGeneratorPlan) enumValue;
 		return !genPlan.surfaceGenEnabled;
 	}
-
 }

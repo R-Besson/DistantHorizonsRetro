@@ -40,12 +40,10 @@ public abstract class DhApiBeforeRenderEvent implements IDhApiCancelableEvent<Dh
 	/** Fired before Distant Horizons renders LODs. */
 	public abstract void beforeRender(DhApiCancelableEventParam<DhApiRenderParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<DhApiRenderParam> input) { this.beforeRender(input); }
-
 }

@@ -35,8 +35,6 @@ public class FullDataSourceResponseMessage extends AbstractTrackableMessage
 	@Nullable
 	public FullDataPayload payload;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -49,8 +47,6 @@ public class FullDataSourceResponseMessage extends AbstractTrackableMessage
 			this.payload = payload;
 		}
 	}
-
-
 
 	//===============//
 	// serialization //
@@ -68,8 +64,6 @@ public class FullDataSourceResponseMessage extends AbstractTrackableMessage
 	@Override
 	public void decodeInternal(ByteBuf in) { this.payload = this.readOptional(in, () -> INetworkObject.decodeToInstance(new FullDataPayload(), in)); }
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -80,5 +74,4 @@ public class FullDataSourceResponseMessage extends AbstractTrackableMessage
 		return super.toStringHelper()
 			.add("payload", this.payload);
 	}
-
 }

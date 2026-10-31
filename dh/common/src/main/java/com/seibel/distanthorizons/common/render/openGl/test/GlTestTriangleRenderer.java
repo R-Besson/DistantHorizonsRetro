@@ -45,7 +45,6 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 {
 	public static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-
 	public static final GlTestTriangleRenderer INSTANCE = new GlTestTriangleRenderer();
 
 	// Render a square with uv color
@@ -57,14 +56,10 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 			0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
 		};
 
-
-
 	GlShaderProgram basicShader;
 	GLVertexBuffer vbo;
 	GlAbstractVertexAttribute va;
 	boolean init = false;
-
-
 
 	//=============//
 	// constructor //
@@ -112,8 +107,6 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -136,7 +129,4 @@ public class GlTestTriangleRenderer implements IDhTestTriangleRenderer
 	}
 
 	//endregion
-
-
-
 }

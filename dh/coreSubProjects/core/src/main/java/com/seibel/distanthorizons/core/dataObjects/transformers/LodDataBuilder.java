@@ -55,8 +55,6 @@ public class LodDataBuilder
 
 	private static boolean getTopErrorLogged = false;
 
-
-
 	//============//
 	// converters //
 	//============//
@@ -77,8 +75,6 @@ public class LodDataBuilder
 		dataSource.isEmpty = false; // this will be set to "true" if any blocks are found
 		// chunk updates always propagate up
 		dataSource.applyToParent = true;
-
-
 
 		// compute the chunk dataSource offset
 		// this offset is used to determine where in the dataSource this chunk's data should go
@@ -108,8 +104,6 @@ public class LodDataBuilder
 		// Convert from chunk coordinates to block coordinates
 		chunkOffsetX *= LodUtil.CHUNK_WIDTH;
 		chunkOffsetZ *= LodUtil.CHUNK_WIDTH;
-
-
 
 		//==========================//
 		// populate the data source //
@@ -218,7 +212,6 @@ public class LodDataBuilder
 									&& !currentBlockState.isLiquid()
 									&& currentBlockState.getOpacity() != LodUtil.BLOCK_FULLY_OPAQUE;
 
-
 							// check for API overrides
 							{
 								mutableChunkProcessedEventParam.updateForPosition(relBlockX, y, relBlockZ, newBlockState, newBiome);
@@ -239,7 +232,6 @@ public class LodDataBuilder
 								}
 							}
 
-
 							longs.add(FullDataPointUtil.encode(mappedId, lastY - y, y + 1 - inclusiveMinBuildHeight, blockLight, skyLight));
 							currentBiome = newBiome;
 							currentBlockState = newBlockState;
@@ -248,7 +240,6 @@ public class LodDataBuilder
 							blockLight = newBlockLight;
 							skyLight = newSkyLight;
 							lastY = y;
-
 
 							// mark the data source as non-empty if we find any non-air blocks
 							if (dataSource.isEmpty
@@ -276,8 +267,6 @@ public class LodDataBuilder
 
 		return dataSource;
 	}
-
-
 
 	/** @throws ClassCastException if an API user returns the wrong object type(s) */
 	public static FullDataSourceV2 createFromApiChunkData(DhApiChunk apiChunk, boolean runAdditionalValidation) throws ClassCastException, DataCorruptedException, IllegalArgumentException
@@ -334,8 +323,6 @@ public class LodDataBuilder
 		return dataSource;
 	}
 
-
-
 	//================//
 	// public helpers //
 	//================//
@@ -351,13 +338,10 @@ public class LodDataBuilder
 			return new LongArrayList(0);
 		}
 
-
-
 		// array to store data
 		int size = topDownColumnDataPoints.size();
 		LongArrayList packedDataPoints = new LongArrayList(size);
 		packedDataPoints.clear();
-
 
 		if (runAdditionalValidation)
 		{
@@ -377,7 +361,6 @@ public class LodDataBuilder
 			}
 		}
 
-
 		// go through data from top down
 		long lastDataPoint = FullDataPointUtil.EMPTY_DATA_POINT;
 		for (int i = 0; i < size; i++)
@@ -393,7 +376,6 @@ public class LodDataBuilder
 			int lastId = FullDataPointUtil.getId(lastDataPoint);
 			byte lastBlockLight = (byte) FullDataPointUtil.getBlockLight(lastDataPoint);
 			byte lastSkyLight = (byte) FullDataPointUtil.getSkyLight(lastDataPoint);
-
 
 			// if the ID and light are the same, merge the height
 			if (thisId == lastId
@@ -445,7 +427,6 @@ public class LodDataBuilder
 				// flip the array if it's in bottom-up order
 				Collections.reverse(dataPoints);
 			}
-
 		}
 	}
 
@@ -466,8 +447,6 @@ public class LodDataBuilder
 			{
 				throw new IllegalArgumentException("Datapoint: [" + i + "]-[" + dataPoint + "] has the wrong detail level [" + dataPoint.detailLevel + "], all data points must be block sized; IE their detail level must be [0].");
 			}
-
-
 
 			int bottomYPos = dataPoint.bottomYBlockPos;
 			int topYPos = dataPoint.topYBlockPos;
@@ -496,13 +475,9 @@ public class LodDataBuilder
 				throw new IllegalArgumentException("DhApiTerrainDataPoint [" + i + "]-[" + dataPoint + "] has a gap between it and index [" + (i - 1) + "]. Empty spaces should be filled by air, otherwise DH's downsampling won't calculate lighting correctly.");
 			}
 
-
 			lastBottomYPos = bottomYPos;
 		}
-
 	}
-
-
 
 	//==================//
 	// internal helpers //
@@ -516,7 +491,4 @@ public class LodDataBuilder
 		sectionPos = (sectionPos < 0) ? ((sectionPos + 1) / FullDataSourceV2.NUMB_OF_CHUNKS_WIDE) - 1 : (sectionPos / FullDataSourceV2.NUMB_OF_CHUNKS_WIDE);
 		return sectionPos;
 	}
-
-
-
 }

@@ -15,8 +15,6 @@ public class SupplierBasedRateAndConcurrencyLimiter<TFailObj>
 	private final SupplierBasedRateLimiter<TFailObj> rateLimiter;
 	private final SupplierBasedConcurrencyLimiter<TFailObj> concurrencyLimiter;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -26,8 +24,6 @@ public class SupplierBasedRateAndConcurrencyLimiter<TFailObj>
 		this.rateLimiter = new SupplierBasedRateLimiter<>(maxRateSupplier, onFailureConsumer);
 		this.concurrencyLimiter = new SupplierBasedConcurrencyLimiter<>(maxRateSupplier, onFailureConsumer);
 	}
-
-
 
 	//===============//
 	// lock handling //
@@ -51,5 +47,4 @@ public class SupplierBasedRateAndConcurrencyLimiter<TFailObj>
 	}
 
 	public void release() { this.concurrencyLimiter.release(); }
-
 }

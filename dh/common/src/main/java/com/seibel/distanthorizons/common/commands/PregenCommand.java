@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 
-
 public class PregenCommand extends AbstractDhCommand
 {
 	private PregenManager getPregenManager()
@@ -116,5 +115,4 @@ public class PregenCommand extends AbstractDhCommand
 				sendMessage(sender, "Unknown subcommand: " + args[1]);
 		}
 	}
-
 }

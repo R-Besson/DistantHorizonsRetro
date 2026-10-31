@@ -31,5 +31,4 @@ public class StubDebugWireframeRenderer extends AbstractDebugWireframeRenderer
 
 	@Override
 	public void clearRenderables() { }
-
 }

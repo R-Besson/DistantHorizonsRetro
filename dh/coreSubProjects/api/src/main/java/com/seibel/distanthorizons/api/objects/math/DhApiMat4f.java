@@ -57,8 +57,6 @@ public class DhApiMat4f implements IDhApiCopyable
 	public float m32;
 	public float m33;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -115,8 +113,6 @@ public class DhApiMat4f implements IDhApiCopyable
 
 	//endregion
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -157,7 +153,6 @@ public class DhApiMat4f implements IDhApiCopyable
 		array[14] = this.m32;
 		array[15] = this.m33;
 	}
-
 
 	/** @since API 7.0.0 */
 	public void set(DhApiMat4f mat)
@@ -348,8 +343,6 @@ public class DhApiMat4f implements IDhApiCopyable
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -423,7 +416,4 @@ public class DhApiMat4f implements IDhApiCopyable
 	public DhApiMat4f copy() { return new DhApiMat4f(this); }
 
 	//endregion
-
-
-
 }

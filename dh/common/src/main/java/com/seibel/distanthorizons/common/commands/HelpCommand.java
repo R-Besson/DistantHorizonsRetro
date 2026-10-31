@@ -4,7 +4,6 @@ import net.minecraft.command.ICommandSender;
 
 import static com.seibel.distanthorizons.core.network.messages.MessageRegistry.DEBUG_CODEC_CRASH_MESSAGE;
 
-
 public class HelpCommand extends AbstractDhCommand
 {
 	private static String getHelpString()
@@ -52,5 +51,4 @@ public class HelpCommand extends AbstractDhCommand
 	{
 		sendMessage(sender, getHelpString());
 	}
-
 }

@@ -107,7 +107,6 @@ public class ConfigTypeConverters
 		}
 	}
 
-
 	/**
 	 * The converter should extend this
 	 */
@@ -115,10 +114,7 @@ public class ConfigTypeConverters
 	{
 		public abstract String convertToString(Object value);
 		public abstract Object convertFromString(String value);
-
 	}
-
-
 
 	// Some number types are a bit wack with the config parser
 	// So we just store them as strings
@@ -126,38 +122,31 @@ public class ConfigTypeConverters
 	{
 		@Override public String convertToString(Object item) { return ((Short) item).toString(); }
 		@Override public Short convertFromString(String s) { return Short.valueOf(s); }
-
 	}
 
 	public static class LongConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return ((Long) item).toString(); }
 		@Override public Long convertFromString(String s) { return Long.valueOf(s); }
-
 	}
 
 	public static class FloatConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return item.toString(); }
 		@Override public Float convertFromString(String s) { return Float.valueOf(s); }
-
 	}
 
 	public static class DoubleConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return item.toString(); }
 		@Override public Double convertFromString(String s) { return Double.valueOf(s); }
-
 	}
 
 	public static class ByteConverter extends ConverterBase
 	{
 		@Override public String convertToString(Object item) { return ((Byte) item).toString(); }
 		@Override public Byte convertFromString(String s) { return Byte.valueOf(s); }
-
 	}
-
-
 
 	@SuppressWarnings("unchecked")
 	public static class MapConverter extends ConverterBase
@@ -193,7 +182,5 @@ public class ConfigTypeConverters
 
 			return jsonObject.valueMap();
 		}
-
 	}
-
 }

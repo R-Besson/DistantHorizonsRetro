@@ -36,8 +36,6 @@ public class DhApiFogConfig implements IDhApiFogConfig
 
 	private DhApiFogConfig() { }
 
-
-
 	//===============//
 	// inner configs //
 	//===============//
@@ -46,8 +44,6 @@ public class DhApiFogConfig implements IDhApiFogConfig
 	public IDhApiFarFogConfig farFog() { return DhApiFarFogConfig.INSTANCE; }
 	@Override
 	public IDhApiHeightFogConfig heightFog() { return DhApiHeightFogConfig.INSTANCE; }
-
-
 
 	//====================//
 	// basic fog settings //
@@ -72,7 +68,4 @@ public class DhApiFogConfig implements IDhApiFogConfig
 	@Override
 	public IDhApiConfigValue<Boolean> enableVanillaFog()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Graphics.Fog.enableVanillaFog); }
-
-
-
 }

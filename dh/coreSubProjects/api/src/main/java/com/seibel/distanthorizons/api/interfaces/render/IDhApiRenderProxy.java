@@ -26,7 +26,6 @@ import com.seibel.distanthorizons.api.enums.config.EDhApiRenderingEngine;
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiAfterDhInitEvent;
 import com.seibel.distanthorizons.api.objects.DhApiResult;
 
-
 /**
  * Used to interact with Distant Horizons' rendering system.
  *
@@ -103,8 +102,6 @@ public interface IDhApiRenderProxy
 	 */
 	EDhApiDepthDirection getDepthDirection() throws IllegalStateException;
 
-
-
 	//=======================//
 	// OpenGL object getters //
 	//=======================//
@@ -130,7 +127,6 @@ public interface IDhApiRenderProxy
 	 * @since API 7.1.0
 	 */
 	DhApiResult<IDhApiBlazeTextureWrapper> getDhDepthTextureBlazeWrapper();
-
 
 	/** @deprecated in favor of {@link IDhApiRenderProxy#getDhDepthTextureGlId} */
 	@Deprecated // don't remove, this method is needed by Iris
@@ -191,8 +187,6 @@ public interface IDhApiRenderProxy
 	 */
 	DhApiResult<IDhApiBlazeTextureWrapper> getDhBlockRatioAtlasTextureBlazeWrapper();
 
-
-
 	//======================//
 	// Shader compatibility //
 	//======================//
@@ -209,6 +203,4 @@ public interface IDhApiRenderProxy
 
 	/** This may change based on FOV, player speed, and other factors. */
 	float getNearClipPlaneDistanceInBlocks(float partialTicks);
-
-
 }

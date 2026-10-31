@@ -56,7 +56,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-
 /**
  * Allows interfacing with the terrain data Distant Horizons has stored.
  */
@@ -68,14 +67,11 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 
 	private static final DhApiTerrainDataCache DEBUG_DATA_CACHE = new DhApiTerrainDataCache();
 
-
 	// debugging values
 	private static volatile boolean debugThreadRunning = false;
 	private static long timeSinceLastDebugClear = 0L;
 	private static final boolean logFullColumnInDebug = false;
 	private static DhApiVec3i currentDebugVec3i = new DhVec3i();
-
-
 
 	//=============//
 	// constructor //
@@ -88,8 +84,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 	}
 
 	//endregion
-
-
 
 	//================//
 	// Getter Methods //
@@ -116,8 +110,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 	{ return getTerrainDataOverAreaForPositionDetailLevel(levelWrapper, DhSectionPos.encode(detailLevel, posX, posZ), dataCache); }
 
 	//endregion
-
-
 
 	// private getters //
 	//region
@@ -210,7 +202,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 		}
 		ILevelWrapper coreLevelWrapper = (ILevelWrapper) levelWrapper;
 
-
 		// require a data cache to prevent horrible performance (especially on ray-casts)
 		if (apiDataCache == null)
 		{
@@ -223,7 +214,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 			return DhApiResult.createFail("Unsupported [" + IDhApiTerrainDataCache.class.getSimpleName() + "] implementation, only the core class [" + DhApiTerrainDataCache.class.getSimpleName() + "] is a valid parameter.");
 		}
 		DhApiTerrainDataCache dataCache = (DhApiTerrainDataCache) apiDataCache;
-
 
 		IDhLevel level = currentWorld.getLevel(coreLevelWrapper);
 		if (level == null)
@@ -238,8 +228,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 		// get the positions for this request
 		long sectionPos = DhSectionPos.convertToDetailLevel(requestedColumnPos, sectionDetailLevel);
 		long relativePos = DhSectionPos.getDhSectionRelativePositionForDetailLevel(requestedColumnPos, DhSectionPos.getDetailLevel(requestedColumnPos));
-
-
 
 		//=====================//
 		// get the data source //
@@ -264,8 +252,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 				dataCache.add(sectionPos, dataSource);
 			}
 
-
-
 			//===============================//
 			// get LOD data from data source //
 			//===============================//
@@ -280,7 +266,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 
 				boolean getSpecificYCoordinate = nullableBlockYPos != null;
 				int levelMinimumHeight = levelWrapper.getMinHeight();
-
 
 				// search for a datapoint that contains the block y position
 				for (int i = 0; i < dataColumnIndexCount; i++)
@@ -337,8 +322,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 
 	//endregion
 
-
-
 	//====================//
 	// raycasting methods //
 	//====================//
@@ -377,8 +360,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 		int minLevelBlockHeight = levelWrapper.getMinHeight();
 		int maxLevelBlockHeight = levelWrapper.getMaxHeight();
 
-
-
 		// walk through the grid //
 
 		int currentLength = 0;
@@ -389,7 +370,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 		DhVec3i blockPos = new DhVec3i((int) Math.round(rayOrigin.x), (int) Math.round(rayOrigin.y), (int) Math.round(rayOrigin.z));
 
 		DhApiRaycastResult closetFoundDataPoint = null;
-
 
 		while (blockPos.y >= minLevelBlockHeight
 			&& blockPos.y < maxLevelBlockHeight
@@ -443,8 +423,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 				return DhApiResult.createSuccess(closetFoundDataPoint);
 			}
 
-
-
 			// take the next step in the ray //
 
 			exactPos.x += rayDirection.x;
@@ -490,8 +468,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 
 	//endregion
 
-
-
 	//================//
 	// setter methods //
 	//================//
@@ -516,18 +492,14 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 			return DhApiResult.createFail("No level exists for the given level wrapper. This either means the level hasn't been loaded yet, or was unloaded.");
 		}
 
-
 		// this will throw a cast exception if the chunk object array isn't correct
 		IChunkWrapper chunk = SingletonInjector.INSTANCE.get(IWrapperFactory.class).createChunkWrapper(chunkObjectArray);
 		SharedApi.INSTANCE.applyChunkUpdate(chunk, dhLevel.getLevelWrapper(), false);
-
 
 		return DhApiResult.createSuccess();
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// API helpers //
@@ -538,8 +510,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 	public IDhApiTerrainDataCache createSoftCache() { return new DhApiTerrainDataCache(); }
 
 	//endregion
-
-
 
 	//===============//
 	// debug methods //
@@ -569,13 +539,11 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 						DEBUG_DATA_CACHE.clear();
 					}
 
-
 					DhApiResult<DhApiTerrainDataPoint> single = getTerrainDataAtBlockYPos(levelWrapper, DhSectionPos.encode(LodUtil.BLOCK_DETAIL_LEVEL, blockPosX, blockPosZ), blockPosY, DEBUG_DATA_CACHE);
 					DhApiResult<DhApiTerrainDataPoint[]> column = getTerrainDataColumnArray(levelWrapper, DhSectionPos.encode(LodUtil.BLOCK_DETAIL_LEVEL, blockPosX, blockPosZ), null, DEBUG_DATA_CACHE);
 
 					long chunkPos = DhSectionPos.encodeContaining(LodUtil.CHUNK_DETAIL_LEVEL, new DhChunkPos(blockPosX, blockPosZ));
 					DhApiResult<DhApiTerrainDataPoint[][][]> area = getTerrainDataOverAreaForPositionDetailLevel(levelWrapper, chunkPos, DEBUG_DATA_CACHE);
-
 
 					IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 					DhApiResult<DhApiRaycastResult> rayCast = INSTANCE.raycastLodData(levelWrapper, MC_RENDER.getCameraExactPosition(), MC_RENDER.getLookAtVector(), 1000, DEBUG_DATA_CACHE);
@@ -648,7 +616,6 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 						}
 					}
 
-
 					int debugPoint = 0; // a place to put a debugger break point
 				}
 				catch (Exception e)
@@ -665,7 +632,4 @@ public class DhApiTerrainDataRepo implements IDhApiTerrainDataRepo
 	}
 
 	//endregion
-
-
-
 }

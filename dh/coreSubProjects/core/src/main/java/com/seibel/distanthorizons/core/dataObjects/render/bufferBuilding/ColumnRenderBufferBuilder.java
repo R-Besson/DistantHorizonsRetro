@@ -48,8 +48,6 @@ public class ColumnRenderBufferBuilder
 
 	public static final PhantomArrayListPool ARRAY_LIST_POOL = new PhantomArrayListPool("Column Buffer Builder");
 
-
-
 	//==============//
 	// vbo building //
 	//==============//
@@ -80,8 +78,6 @@ public class ColumnRenderBufferBuilder
 			}
 		}
 
-
-
 		//===================//
 		// build each column //
 		//===================//
@@ -100,7 +96,6 @@ public class ColumnRenderBufferBuilder
 			adjColumnViews[EDhDirection.EAST.compassIndex] = eastAdjView;
 			adjColumnViews[EDhDirection.WEST.compassIndex] = westAdjView;
 
-
 			byte thisDetailLevel = renderSource.getDataDetailLevel();
 			for (int relX = 0; relX < ColumnRenderSource.WIDTH; relX++)
 			{
@@ -115,7 +110,6 @@ public class ColumnRenderBufferBuilder
 					{
 						continue;
 					}
-
 
 					//=============//
 					// debug limit //
@@ -136,8 +130,6 @@ public class ColumnRenderBufferBuilder
 							continue;
 						}
 					}
-
-
 
 					//==================================//
 					// get adjacent render data columns //
@@ -161,8 +153,6 @@ public class ColumnRenderBufferBuilder
 
 							ColumnRenderSource adjRenderSource;
 							byte adjDetailLevel;
-
-
 
 							//=========================//
 							// get the adjacent render //
@@ -212,8 +202,6 @@ public class ColumnRenderBufferBuilder
 								}
 							}
 
-
-
 							//========================//
 							// get the adjacent views //
 							//========================//
@@ -232,8 +220,6 @@ public class ColumnRenderBufferBuilder
 							LOGGER.warn("Failed to get adj data for relative pos: [" + thisDetailLevel + ":" + relX + "," + relZ + "] at [" + direction + "], Error: [" + e.getMessage() + "].", e);
 						}
 					} // for adjacent directions
-
-
 
 					//==========================//
 					// build this render column //
@@ -320,8 +306,6 @@ public class ColumnRenderBufferBuilder
 		}
 
 		byte blockMaterialId = RenderDataPointUtil.getBlockMaterialId(renderData);
-
-
 
 		int color;
 		boolean fullBright = false;
@@ -434,5 +418,4 @@ public class ColumnRenderBufferBuilder
 			topRenderData, bottomRenderData, adjColumnViews, isSameDetailLevel,
 			faceTileIdsByDirectionOrdinal, sideRowTileIds);
 	}
-
 }

@@ -23,8 +23,6 @@ public class SupplierBasedRateLimiter<TFailObject>
 
 	private final RateLimiter rateLimiter = RateLimiter.create(/*permits per second*/Double.POSITIVE_INFINITY);
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -35,8 +33,6 @@ public class SupplierBasedRateLimiter<TFailObject>
 		this.maxRateSupplier = maxRateSupplier;
 		this.onFailureConsumer = onFailureConsumer;
 	}
-
-
 
 	//==================//
 	// lock acquisition //
@@ -73,5 +69,4 @@ public class SupplierBasedRateLimiter<TFailObject>
 		}
 		return acquiredCount;
 	}
-
 }

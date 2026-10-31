@@ -10,11 +10,7 @@ public final class LWJGLServiceProvider
 {
 	public static final ILWJGLService LWJGL = createInstance();
 
-
-
 	private LWJGLServiceProvider() { }
-
-
 
 	static ILWJGLService createInstance()
 	{
@@ -46,7 +42,4 @@ public final class LWJGLServiceProvider
 			throw new ExceptionInInitializerError(cause);
 		}
 	}
-
-
-
 }

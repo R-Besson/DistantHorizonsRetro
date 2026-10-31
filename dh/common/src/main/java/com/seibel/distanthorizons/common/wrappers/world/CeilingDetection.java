@@ -19,8 +19,6 @@ public class CeilingDetection
 	private static volatile ParsedCsv ceilingDimensions = new ParsedCsv("");
 	private static volatile ParsedCsv noCeilingDimensions = new ParsedCsv("");
 
-
-
 	public static boolean hasCeiling(WorldProvider provider)
 	{
 		int dimensionId = provider.dimensionId;
@@ -36,8 +34,6 @@ public class CeilingDetection
 		return provider.isHellWorld
 			|| (provider.hasNoSky && !(provider instanceof WorldProviderEnd));
 	}
-
-
 
 	//=========//
 	// parsing //
@@ -101,11 +97,7 @@ public class CeilingDetection
 				&& (this.entries.contains(Integer.toString(dimensionId))
 				|| this.entries.contains(LegacyDimensionInfo.fullName(dimensionId).toLowerCase(Locale.ROOT)));
 		}
-
 	}
 
 	//endregion
-
-
-
 }

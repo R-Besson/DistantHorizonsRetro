@@ -54,8 +54,6 @@ public class DhDataOutputStream extends DataOutputStream
 	/** {@link ByteArrayOutputStream}'s default */
 	private static final int DEFAULT_EXPECTED_SIZE_IN_BYTES = 32;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -126,8 +124,6 @@ public class DhDataOutputStream extends DataOutputStream
 		}
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -136,7 +132,6 @@ public class DhDataOutputStream extends DataOutputStream
 	public void close() throws IOException
 	{
 		super.close();
-
 
 		this.outputByteArray.clear();
 		if (this.compressionMode == EDhApiDataCompressionMode.Z_STD_BLOCK)
@@ -147,9 +142,5 @@ public class DhDataOutputStream extends DataOutputStream
 		{
 			this.wrappedByteStream.appendTo(this.outputByteArray);
 		}
-
 	}
-
-
-
 }

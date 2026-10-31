@@ -17,8 +17,6 @@ public class FullDataMinMaxPosUtil
 	private static final int MIN_Z_OFFSET = Short.SIZE * 2;
 	private static final int MAX_Z_OFFSET = Short.SIZE * 3;
 
-
-
 	/**
 	 * Encodes min/max X/Z relative {@link FullDataSourceV2#dataPoints}
 	 * positions. <br>
@@ -102,7 +100,4 @@ public class FullDataMinMaxPosUtil
 	{ return (int) ((encodedMinMaxPos >> MIN_Z_OFFSET) & ADJ_POS_MASK); }
 	public static int getAdjMaxZ(long encodedMinMaxPos)
 	{ return (int) ((encodedMinMaxPos >> MAX_Z_OFFSET) & ADJ_POS_MASK); }
-
-
-
 }

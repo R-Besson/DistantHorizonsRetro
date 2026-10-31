@@ -46,8 +46,6 @@ public enum EDhApiBlockMaterial
 	AIR(14),
 	ILLUMINATED(15); // Max value
 
-
-
 	public final byte index;
 
 	EDhApiBlockMaterial(int index) { this.index = (byte) index; }
@@ -64,5 +62,4 @@ public enum EDhApiBlockMaterial
 
 		return EDhApiBlockMaterial.UNKNOWN;
 	}
-
 }

@@ -40,8 +40,6 @@ public class DhChunkPos
 	/** cached to improve hashing speed */
 	public final int hashCode;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -59,8 +57,6 @@ public class DhChunkPos
 		// >> 4 is the Same as div 16
 		this(blockPos.x >> 4, blockPos.z >> 4);
 	}
-
-
 
 	//=========//
 	// methods //
@@ -86,8 +82,6 @@ public class DhChunkPos
 
 	public double squaredDistance(DhChunkPos other)
 	{ return Math.pow(this.x - other.x, 2) + Math.pow(this.z - other.z, 2); }
-
-
 
 	//================//
 	// base overrides //
@@ -116,5 +110,4 @@ public class DhChunkPos
 
 	@Override
 	public String toString() { return "C[" + this.x + "," + this.z + "]"; }
-
 }

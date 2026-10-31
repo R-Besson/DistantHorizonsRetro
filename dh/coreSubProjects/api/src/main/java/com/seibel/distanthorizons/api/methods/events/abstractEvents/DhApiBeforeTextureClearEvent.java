@@ -38,12 +38,10 @@ public abstract class DhApiBeforeTextureClearEvent implements IDhApiCancelableEv
 	/** Fired before Distant Horizons clears any textures. */
 	public abstract void beforeClear(DhApiCancelableEventParam<DhApiRenderParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiCancelableEventParam<DhApiRenderParam> input) { this.beforeClear(input); }
-
 }

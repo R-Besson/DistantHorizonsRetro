@@ -35,7 +35,4 @@ public class UnsafeValuesConfigListener implements IConfigListener
 	@Override
 	public void onConfigValueSet()
 	{ ConfigHandler.INSTANCE.runMinMaxValidation = !Config.Client.Advanced.Debugging.allowUnsafeValues.get(); }
-
-
-
 }

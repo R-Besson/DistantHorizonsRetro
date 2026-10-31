@@ -4,7 +4,6 @@ import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.dependencyInjection.SingletonInjector;
 import com.seibel.distanthorizons.core.wrapperInterfaces.minecraft.IMinecraftRenderWrapper;
 
-
 public class MixinVanillaFogCommon
 {
 	public static boolean cancelFog()
@@ -18,7 +17,4 @@ public class MixinVanillaFogCommon
 		return !SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class).isFogStateSpecial()
 			&& !Config.Client.Advanced.Graphics.Fog.enableVanillaFog.get();
 	}
-
-
-
 }

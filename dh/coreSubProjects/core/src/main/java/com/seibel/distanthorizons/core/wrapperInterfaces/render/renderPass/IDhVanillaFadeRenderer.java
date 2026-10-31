@@ -26,5 +26,4 @@ public interface IDhVanillaFadeRenderer extends IBindable
 {
 
 	void render(RenderParams renderParams);
-
 }

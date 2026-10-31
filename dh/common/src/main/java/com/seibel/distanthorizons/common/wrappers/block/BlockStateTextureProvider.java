@@ -36,8 +36,6 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 {
 	public static final BlockStateTextureProvider INSTANCE = new BlockStateTextureProvider();
 
-
-
 	@Nullable
 	@Override
 	public BlockFaceTexture getFaceTexture(IBlockStateWrapper blockState, EDhDirection direction)
@@ -107,5 +105,4 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 	{
 		ClientBlockStateTextureCache.clearCache();
 	}
-
 }

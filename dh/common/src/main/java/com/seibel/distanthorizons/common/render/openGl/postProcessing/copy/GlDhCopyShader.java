@@ -56,7 +56,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
 	// uniforms
 	public int uCopyTexture;
 	public int uDepthTexture;
@@ -67,8 +66,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 	public int uVanillaChunkMask;
 	public int uVanillaChunkMaskRadius;
 	public int uCameraPosInChunk;
-
-
 
 	//=======//
 	// setup //
@@ -97,12 +94,9 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		this.uVanillaChunkMask = this.shader.tryGetUniformLocation("uVanillaChunkMask");
 		this.uVanillaChunkMaskRadius = this.shader.tryGetUniformLocation("uVanillaChunkMaskRadius");
 		this.uCameraPosInChunk = this.shader.tryGetUniformLocation("uCameraPosInChunk");
-
 	}
 
 	//endregion
-
-
 
 	//==========//
 	// uniforms //
@@ -154,8 +148,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -183,7 +175,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 			return;
 		}
 
-
 		try (GLState state = new GLState())
 		{
 
@@ -206,7 +197,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		}
 		// everything's been restored, except at this point the MC framebuffer should now be used instead
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, targetFrameBuffer);
-
 	}
 	private void bindDepthAndChunkMask()
 	{
@@ -254,8 +244,6 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 			LWJGL.glUniform1i(this.uCopyTexture, 0);
 			this.bindDepthAndChunkMask();
 
-
-
 			LWJGL.glFramebufferTexture(GL30.GL_DRAW_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, targetColorTextureId, 0);
 
 			// Copy to MC's texture via MC's framebuffer
@@ -265,11 +253,7 @@ public class GlDhCopyShader extends GlAbstractShaderRenderer
 		}
 		// everything's been restored, except at this point the MC framebuffer should now be used instead
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, mcFrameBufferId);
-
 	}
 
 	//endregion
-
-
-
 }

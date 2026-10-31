@@ -115,7 +115,4 @@ public interface IDhApiLevelWrapper extends IDhApiUnsafeWrapper
 		IDhApiBiomeWrapper biomeWrapper,
 		int blockWorldPosX, int blockWorldPosY, int blockWorldPosZ,
 		IDhApiFullDataSource dataSource);
-
-
-
 }

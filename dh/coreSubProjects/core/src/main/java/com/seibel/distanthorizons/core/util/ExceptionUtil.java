@@ -29,7 +29,6 @@ public class ExceptionUtil
 			|| throwable instanceof ClosedByInterruptException;
 	}
 
-
 	public static boolean isInterruptOrReject(Throwable t)
 	{
 		Throwable unwrapped = ensureUnwrap(t);
@@ -39,7 +38,4 @@ public class ExceptionUtil
 	}
 	public static Throwable ensureUnwrap(Throwable t)
 	{ return t instanceof CompletionException ? ensureUnwrap(t.getCause()) : t; }
-
-
-
 }

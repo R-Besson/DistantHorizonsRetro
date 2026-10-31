@@ -44,5 +44,4 @@ public enum EDhApiLodShading
 
 	/** LODs will have no shading */
 	DISABLED;
-
 }

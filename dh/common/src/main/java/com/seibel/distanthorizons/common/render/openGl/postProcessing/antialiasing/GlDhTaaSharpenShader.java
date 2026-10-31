@@ -47,15 +47,12 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	// uniforms
 	public int uViewWidth;
 	public int uViewHeight;
 	public int uCasAmount;
 
 	public int uCurrentColorSampler;
-
-
 
 	//=============//
 	// constructor //
@@ -76,10 +73,7 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 		this.uCasAmount = this.shader.getUniformLocation("uCasAmount");
 
 		this.uCurrentColorSampler = this.shader.getUniformLocation("uCurrentColorSampler");
-
 	}
-
-
 
 	//=============//
 	// render prep //
@@ -97,10 +91,7 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 		GLMC.glActiveTexture(GL13.GL_TEXTURE0);
 		GLMC.glBindTexture(GlDhTaaShader.INSTANCE.outputColorTextureId);
 		LWJGL.glUniform1i(this.uCurrentColorSampler, 0);
-
 	}
-
-
 
 	//========//
 	// render //
@@ -118,7 +109,6 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
 
-
 		// apply the rendered AntiAliasing to DH's framebuffer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, GlDhTaaShader.INSTANCE.frameBuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, GlDhMetaRenderer.INSTANCE.getActiveFramebufferId());
@@ -127,5 +117,4 @@ public class GlDhTaaSharpenShader extends GlAbstractShaderRenderer
 
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, 0);
 	}
-
 }

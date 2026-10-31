@@ -47,11 +47,7 @@ public enum EDhApiVerticalQuality
 	/** represents how many LODs can be rendered in a single vertical slice */
 	public final int[] maxVerticalData;
 
-
-
 	EDhApiVerticalQuality(int[] maxVerticalData) { this.maxVerticalData = maxVerticalData; }
-
-
 
 	public int calculateMaxNumberOfVerticalSlicesAtDetailLevel(byte dataDetail)
 	{
@@ -59,5 +55,4 @@ public enum EDhApiVerticalQuality
 		int index = MathUtil.clamp(0, dataDetail, this.maxVerticalData.length - 1);
 		return this.maxVerticalData[index];
 	}
-
 }

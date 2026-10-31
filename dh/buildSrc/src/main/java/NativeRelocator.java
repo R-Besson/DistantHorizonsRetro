@@ -235,5 +235,4 @@ class NativeRelocator
 
 		return this.fixModifiedBinary(outputFilePath, content);
 	}
-
 }

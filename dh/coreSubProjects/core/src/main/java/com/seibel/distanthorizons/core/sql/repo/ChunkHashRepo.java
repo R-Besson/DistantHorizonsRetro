@@ -32,7 +32,6 @@ import java.sql.SQLException;
 public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 {
 
-
 	//=============//
 	// constructor //
 	//=============//
@@ -41,8 +40,6 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 	{
 		super(databaseType, databaseFile, ChunkHashDTO.class);
 	}
-
-
 
 	//===========//
 	// overrides //
@@ -61,8 +58,6 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 		statement.setInt(index, pos.getZ());
 	}
 
-
-
 	//=======================//
 	// repo required methods //
 	//=======================//
@@ -75,7 +70,6 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 		int posZ = resultSet.getInt("ChunkPosZ");
 
 		int chunkHash = resultSet.getInt("ChunkHash");
-
 
 		return new ChunkHashDTO(new DhChunkPos(posX, posZ), chunkHash);
 	}
@@ -102,7 +96,6 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 			return null;
 		}
 
-
 		int i = 1;
 		statement.setObject(i++, dto.pos.getX());
 		statement.setObject(i++, dto.pos.getZ());
@@ -114,7 +107,4 @@ public class ChunkHashRepo extends AbstractDhRepo<DhChunkPos, ChunkHashDTO>
 
 		return statement;
 	}
-
-
-
 }

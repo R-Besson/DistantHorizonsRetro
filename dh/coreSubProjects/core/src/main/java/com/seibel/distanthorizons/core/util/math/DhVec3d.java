@@ -51,8 +51,6 @@ public class DhVec3d extends DhApiVec3d
 		this.z = that.z;
 	}
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -85,5 +83,4 @@ public class DhVec3d extends DhApiVec3d
 		return Math.sqrt(Math.pow(a.x - b.x, 2)
 			+ Math.pow(a.z - b.z, 2));
 	}
-
 }

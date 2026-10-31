@@ -30,8 +30,6 @@ public final class GlVertexPointer
 	public final int byteSize;
 	public final boolean useInteger;
 
-
-
 	// basic constructors //
 
 	public GlVertexPointer(int elementCount, int glType, boolean normalized, int byteSize, boolean useInteger)
@@ -48,8 +46,6 @@ public final class GlVertexPointer
 	}
 	private static int _align(int bytes) { return MathUtil.ceilDiv(bytes, 4) * 4; }
 
-
-
 	// named constructors //
 
 	public static GlVertexPointer addVec2Pointer(boolean normalized) { return new GlVertexPointer(2, GL11.GL_FLOAT, normalized, Float.BYTES * 2); }
@@ -60,5 +56,4 @@ public final class GlVertexPointer
 	{ return new GlVertexPointer(elementCount, GL11.GL_UNSIGNED_BYTE, normalized, _align(elementCount), useInteger); }
 	public static GlVertexPointer addUnsignedShortsPointer(int elementCount, boolean normalized, boolean useInteger)
 	{ return new GlVertexPointer(elementCount, GL11.GL_UNSIGNED_SHORT, normalized, _align(elementCount * 2), useInteger); }
-
 }

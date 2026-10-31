@@ -41,14 +41,12 @@ public abstract class DhApiBlockStateWrapperCreatedEvent implements IDhApiEvent<
 {
 	public abstract void blockStateWrapperCreated(DhApiEventParam<EventParam> event);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> event) { this.blockStateWrapperCreated(event); }
-
 
 	//==================//
 	// parameter object //
@@ -69,15 +67,11 @@ public abstract class DhApiBlockStateWrapperCreatedEvent implements IDhApiEvent<
 		private Boolean allowApiColorOverride = null;
 		private Boolean allowApiTextureOverride = null;
 
-
-
 		//=============//
 		// constructor //
 		//=============//
 
 		public EventParam(IDhApiBlockStateWrapper blockStateWrapper) { this.blockStateWrapper = blockStateWrapper; }
-
-
 
 		//=================//
 		// getters/setters //
@@ -120,8 +114,6 @@ public abstract class DhApiBlockStateWrapperCreatedEvent implements IDhApiEvent<
 		/** If true then one or more options for this block were set to be changed */
 		public boolean getOverridesSet() { return this.overridesSet; }
 
-
-
 		/**
 		 * Returns the same instance of this event.
 		 * Copying this event isn't supported
@@ -134,7 +126,5 @@ public abstract class DhApiBlockStateWrapperCreatedEvent implements IDhApiEvent<
 
 		@Override
 		public boolean getCopyBeforeFire() { return false; }
-
 	}
-
 }

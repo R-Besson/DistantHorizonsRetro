@@ -43,8 +43,6 @@ public abstract class AbstractConfigBase<T>
 
 	protected EConfigEntryAppearance appearance;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -62,10 +60,7 @@ public abstract class AbstractConfigBase<T>
 
 		Class<?> defaultValueClass = defaultValue.getClass();
 		this.isFloatingPointNumber = (defaultValueClass == Double.class || defaultValueClass == Float.class);
-
 	}
-
-
 
 	//=========//
 	// methods //
@@ -78,11 +73,9 @@ public abstract class AbstractConfigBase<T>
 
 	public EConfigEntryAppearance getAppearance() { return this.appearance; }
 
-
 	public String getCategory() { return this.category; }
 	public String getName() { return this.name; }
 	public String getNameAndCategory() { return (this.category.isEmpty() ? "" : this.category + ".") + this.name; }
-
 
 	/** Gets the class of T */
 	public Class<?> getType() { return this.defaultValue.getClass(); }
@@ -92,7 +85,6 @@ public abstract class AbstractConfigBase<T>
 	{
 		protected EConfigEntryAppearance tmpAppearance = EConfigEntryAppearance.ALL;
 		protected T tmpValue;
-
 
 		// Put this into your own builder
 		@SuppressWarnings("unchecked")
@@ -107,7 +99,5 @@ public abstract class AbstractConfigBase<T>
 			this.tmpValue = newValue;
 			return (S) this;
 		}
-
 	}
-
 }

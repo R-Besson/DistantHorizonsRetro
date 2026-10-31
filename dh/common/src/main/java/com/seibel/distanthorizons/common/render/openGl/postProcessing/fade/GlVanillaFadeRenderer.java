@@ -52,7 +52,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	private boolean init = false;
 
 	private int width = -1;
@@ -60,8 +59,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 	private int fadeFramebuffer = -1;
 
 	private int fadeTexture = -1;
-
-
 
 	//=============//
 	// constructor //
@@ -90,7 +87,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 		this.fadeFramebuffer = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fadeFramebuffer);
 
-
 		// Applying the fade texture is only needed if MC is drawing to their own frame buffer,
 		// otherwise we can directly render to their texture
 		if (MC_RENDER.mcRendersToFrameBuffer())
@@ -116,8 +112,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 
 	//endregion
 
-
-
 	//========//
 	// render //
 	//========//
@@ -135,8 +129,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 			return;
 		}
 
-
-
 		IProfilerWrapper profiler = MC_CLIENT.getProfiler();
 		try (IProfilerWrapper.IProfileBlock profileBlock = profiler.push("DH-Vanilla Fade");
 			GLState state = new GLState())
@@ -152,7 +144,6 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 				this.height = height;
 				this.createFramebuffer(width, height);
 			}
-
 
 			GlDhVanillaFadeShader.INSTANCE.frameBuffer = this.fadeFramebuffer;
 			GlDhVanillaFadeShader.INSTANCE.setProjectionMatrix(renderParams);
@@ -176,7 +167,4 @@ public class GlVanillaFadeRenderer implements IDhVanillaFadeRenderer
 	}
 
 	//endregion
-
-
-
 }

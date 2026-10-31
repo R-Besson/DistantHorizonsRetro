@@ -41,8 +41,6 @@ public class RenderableBoxGroup
 
 	public static final AtomicInteger NEXT_ID_ATOMIC_INT = new AtomicInteger(0);
 
-
-
 	public final long id;
 
 	public final String resourceLocationNamespace;
@@ -52,7 +50,6 @@ public class RenderableBoxGroup
 	/** backup list which allows for uploading the boxes even it the main list is being modified on a different thread. */
 	private final List<DhApiRenderableBox> uploadBoxList;
 	private final DhApiVec3d originBlockPos;
-
 
 	public boolean active = true;
 	public boolean ssaoEnabled = true;
@@ -70,8 +67,6 @@ public class RenderableBoxGroup
 	public IDhGenericObjectVertexBufferContainer vertexBufferContainer = WRAPPER_FACTORY.createGenericObjectVboContainer();
 	/** double buffering for thread safety and to prevent locking the render thread during update */
 	private IDhGenericObjectVertexBufferContainer altVertexBufferContainer = WRAPPER_FACTORY.createGenericObjectVboContainer();
-
-
 
 	//=================//
 	// getters/setters //
@@ -96,7 +91,6 @@ public class RenderableBoxGroup
 
 	@Override
 	public DhApiVec3d getOriginBlockPos() { return new DhApiVec3d(this.originBlockPos.x, this.originBlockPos.y, this.originBlockPos.z); }
-
 
 	@Override
 	public void setSkyLight(int skyLight)
@@ -147,8 +141,6 @@ public class RenderableBoxGroup
 
 	//endregion
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -175,8 +167,6 @@ public class RenderableBoxGroup
 	}
 
 	//endregion
-
-
 
 	//=================//
 	// render building //
@@ -205,8 +195,6 @@ public class RenderableBoxGroup
 
 			return;
 		}
-
-
 
 		// executor should always be available, if not that probably means the level is being shut down
 		PriorityTaskPicker.Executor executor = ThreadPoolUtil.getRenderLoadingExecutor();
@@ -263,8 +251,6 @@ public class RenderableBoxGroup
 
 	//endregion
 
-
-
 	//===============//
 	// render events //
 	//===============//
@@ -294,8 +280,6 @@ public class RenderableBoxGroup
 	}
 
 	//endregion
-
-
 
 	//================//
 	// List Overrides //
@@ -331,8 +315,6 @@ public class RenderableBoxGroup
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -352,7 +334,4 @@ public class RenderableBoxGroup
 	}
 
 	//endregion
-
-
-
 }

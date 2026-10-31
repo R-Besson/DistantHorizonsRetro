@@ -24,7 +24,6 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.world.ILevelWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 
-
 /**
  * A helper class that is used to access the data from a long
  * formatted as a render data point. <br><br>
@@ -66,7 +65,6 @@ public class RenderDataPointUtil
 
 	public static final boolean RUN_VALIDATION = ModInfo.IS_DEV_BUILD;
 
-
 	public final static int EMPTY_DATA = 0;
 
 	// the maximum valid Y value is the maximum min y + world height.
@@ -79,7 +77,6 @@ public class RenderDataPointUtil
 	public final static int MAX_RENDER_Y_SIZE = 1024;
 
 	public final static int ALPHA_DOWNSIZE_SHIFT = 4;
-
 
 	public final static int IRIS_BLOCK_MATERIAL_ID_SHIFT = 60;
 
@@ -110,8 +107,6 @@ public class RenderDataPointUtil
 
 	public final static long MIN_Y_SHIFTED_MASK = MIN_Y_MASK << MIN_Y_SHIFT;
 
-
-
 	//========//
 	// shapes //
 	//========//
@@ -134,8 +129,6 @@ public class RenderDataPointUtil
 	 * they don't cover anything around them.
 	 */
 	public final static byte SHAPE_CROSS = 4;
-
-
 
 	//========================//
 	// datapoint manipulation //
@@ -199,13 +192,11 @@ public class RenderDataPointUtil
 				LodUtil.assertNotReach("Trying to create datapoint with blue [" + blue + "] out of range!");
 			}
 
-
 			if (minY > maxY)
 			{
 				LodUtil.assertNotReach("Trying to create datapoint with min Y [" + minY + "] greater than max Y [" + maxY + "]!");
 			}
 		}
-
 
 		return (long) (alpha >>> ALPHA_DOWNSIZE_SHIFT) << ALPHA_SHIFT
 			| (red & RED_MASK) << RED_SHIFT
@@ -237,7 +228,6 @@ public class RenderDataPointUtil
 
 	public static byte getShape(long dataPoint) { return (byte) ((dataPoint >>> SHAPE_SHIFT) & SHAPE_MASK); }
 	public static long setShape(long dataPoint, byte shape) { return (dataPoint & ~(SHAPE_MASK << SHAPE_SHIFT)) | ((shape & SHAPE_MASK) << SHAPE_SHIFT); }
-
 
 	public static boolean hasZeroHeight(long dataPoint) { return (((dataPoint >>> MIN_Y_SHIFT) & MIN_MAX_Y_MASK) == 0); }
 
@@ -272,7 +262,4 @@ public class RenderDataPointUtil
 				" SHAPE:" + getShape(dataPoint);
 		}
 	}
-
-
-
 }

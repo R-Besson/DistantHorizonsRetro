@@ -69,7 +69,6 @@ public interface IDhApiGenericObjectShaderProgram extends IDhApiOverrideable
 	/** Binds the given Vertex Buffer Object to this shader program for rendering. */
 	void bindVertexBuffer(int vbo);
 
-
 	/** sets up the necessary uniforms for rendering */
 	void fillIndirectUniformData(
 		DhApiRenderParam renderParameters,
@@ -85,6 +84,4 @@ public interface IDhApiGenericObjectShaderProgram extends IDhApiOverrideable
 		DhApiRenderParam renderParameters,
 		IDhApiRenderableBoxGroup boxGroup, DhApiRenderableBox box,
 		DhApiVec3d camPos);
-
-
 }

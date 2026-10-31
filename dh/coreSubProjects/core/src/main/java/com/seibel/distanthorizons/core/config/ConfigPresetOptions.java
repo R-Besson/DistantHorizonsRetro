@@ -30,8 +30,6 @@ public class ConfigPresetOptions<TQuickEnum, TConfig>
 
 	private final HashMap<TQuickEnum, TConfig> configOptionByQualityOption;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -41,8 +39,6 @@ public class ConfigPresetOptions<TQuickEnum, TConfig>
 		this.configEntry = configEntry;
 		this.configOptionByQualityOption = configOptionByQualityOption;
 	}
-
-
 
 	//=========//
 	// methods //
@@ -72,5 +68,4 @@ public class ConfigPresetOptions<TQuickEnum, TConfig>
 
 		return possibleQualities;
 	}
-
 }

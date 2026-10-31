@@ -49,8 +49,6 @@ import java.nio.IntBuffer;
 		this.vertexAttribIMode = vertexAttribIMode;
 	}
 
-
-
 	// ===================== CAPABILITIES =====================
 
 	@Override
@@ -161,8 +159,6 @@ import java.nio.IntBuffer;
 		}
 	}
 
-
-
 	// ===================== BUFFER OPERATIONS =====================
 
 	@Override
@@ -225,8 +221,6 @@ import java.nio.IntBuffer;
 		GL43C.glBindVertexBuffer(bindingindex, buffer, offset, stride);
 	}
 
-
-
 	private enum VAOMode
 	{
 		CORE
@@ -280,7 +274,6 @@ import java.nio.IntBuffer;
 	private enum VertexAttribIMode
 	{CORE, EXT, NONE}
 
-
 	// Cached function addresses for APPLE VAO extensions.
 	// Looked up in create() instead of during class init: lwjgl3ify sets OPENGL_EXPLICIT_INIT,
 	// so GL.getFunctionProvider() can be null until the GL context exists, and an exception
@@ -288,8 +281,6 @@ import java.nio.IntBuffer;
 	private static long glGenVertexArraysAPPLE = 0;
 	private static long glDeleteVertexArraysAPPLE = 0;
 	private static long glBindVertexArrayAPPLE = 0;
-
-
 
 	public static LWJGL3Service create()
 	{
@@ -344,8 +335,6 @@ import java.nio.IntBuffer;
 		glDeleteVertexArraysAPPLE = provider.getFunctionAddress("glDeleteVertexArraysAPPLE");
 		glBindVertexArrayAPPLE = provider.getFunctionAddress("glBindVertexArrayAPPLE");
 	}
-
-
 
 	@Override
 	public int glGenVertexArrays()
@@ -872,5 +861,4 @@ import java.nio.IntBuffer;
 	{
 		return Thread.currentThread() == RENDER_THREAD;
 	}
-
 }

@@ -47,5 +47,4 @@ public interface IDhApiUnsafeWrapper
 	 * when it is wrapping air.
 	 */
 	Object getWrappedMcObject();
-
 }

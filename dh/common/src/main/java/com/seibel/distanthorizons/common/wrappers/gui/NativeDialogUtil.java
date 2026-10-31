@@ -46,7 +46,6 @@ public class NativeDialogUtil
 		JOptionPane.showConfirmDialog(null, message, title, JOptionPane.DEFAULT_OPTION, messageType);
 	}
 
-
 	/**
 	 * if we're using Java Swing for our UI
 	 * dialogs then AWT needs to be set to "false"
@@ -56,7 +55,4 @@ public class NativeDialogUtil
 	{
 		return false;
 	}
-
-
-
 }

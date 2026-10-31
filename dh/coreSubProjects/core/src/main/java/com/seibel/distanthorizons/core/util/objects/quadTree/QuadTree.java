@@ -41,7 +41,6 @@ import java.util.function.LongConsumer;
 public class QuadTree<T>
 {
 
-
 	/**
 	 * The largest numerical detail level this tree supports. <br>
 	 * IE: the detail level used by the root nodes.
@@ -64,8 +63,6 @@ public class QuadTree<T>
 	 * before we check for out-of-bound nodes.
 	 */
 	private final int blockDistanceForNodeClearing;
-
-
 
 	//=============//
 	// constructor //
@@ -96,12 +93,9 @@ public class QuadTree<T>
 			BitShiftUtil.divideByPowerOfTwo(this.centerBlockPos.x, this.treeRootDetailLevel),
 			BitShiftUtil.divideByPowerOfTwo(this.centerBlockPos.z, this.treeRootDetailLevel));
 		this.topRingList = new MovableGridRingList<>(halfSizeInRootNodes, ringListCenterPos.getX(), ringListCenterPos.getY());
-
 	}
 
 	//endregion
-
-
 
 	//==================//
 	// property getters //
@@ -158,7 +152,6 @@ public class QuadTree<T>
 		return count;
 	}
 
-
 	/**
 	 * A tree will always have 9 root nodes,
 	 * this is because the tree will grow all the way up to the top where it is a 3x3 grid.
@@ -169,8 +162,6 @@ public class QuadTree<T>
 	public int diameterInBlocks() { return this.diameterInBlocks; }
 
 	//endregion
-
-
 
 	//==========================//
 	// node getters and setters //
@@ -192,7 +183,6 @@ public class QuadTree<T>
 	/** @return the node at the given section position, null if out of bounds */
 	@Nullable
 	public final QuadNode<T> tryGetNode(long pos) { return this.getOrSetNode(pos, false, null, false); }
-
 
 	/** @return the node at the given section position */
 	@Nullable
@@ -239,8 +229,6 @@ public class QuadTree<T>
 			}
 		}
 
-
-
 		long rootPos = DhSectionPos.convertToDetailLevel(pos, this.treeRootDetailLevel);
 		int ringListPosX = DhSectionPos.getX(rootPos);
 		int ringListPosZ = DhSectionPos.getZ(rootPos);
@@ -266,7 +254,6 @@ public class QuadTree<T>
 			LodUtil.assertNotReach("failed to get a root node that contains the input position: " + pos + " root node pos: " + rootQuadNode.sectionPos);
 		}
 
-
 		QuadNode<T> returnNode = rootQuadNode.getNode(pos);
 		if (setNewValue)
 		{
@@ -283,7 +270,6 @@ public class QuadTree<T>
 		{
 			return false;
 		}
-
 
 		// check if the testPos is within the X,Z boundary of the tree
 		DhBlockPos2D treeBlockCorner = this.centerBlockPos.add(new DhBlockPos2D(-this.diameterInBlocks / 2, -this.diameterInBlocks / 2));
@@ -318,8 +304,6 @@ public class QuadTree<T>
 
 	//endregion
 
-
-
 	//===========//
 	// iterators //
 	//===========//
@@ -334,8 +318,6 @@ public class QuadTree<T>
 	public Iterator<QuadNode<T>> leafNodeIterator() { return new QuadTreeNodeIterator(true, null); }
 
 	//endregion
-
-
 
 	//================//
 	// get/set center //
@@ -377,8 +359,6 @@ public class QuadTree<T>
 			// to re-calculate anything
 			return;
 		}
-
-
 
 		this.centerBlockPos = newCenterPos;
 
@@ -443,8 +423,6 @@ public class QuadTree<T>
 
 	//endregion
 
-
-
 	//==============//
 	// base methods //
 	//==============//
@@ -461,8 +439,6 @@ public class QuadTree<T>
 
 	//endregion
 
-
-
 	//==================//
 	// iterator classes //
 	//==================//
@@ -474,7 +450,6 @@ public class QuadTree<T>
 	{
 		/** if this function returns true then the iterator will stop walking down the tree */
 		boolean iteratorShouldStop(QuadNode<T> node);
-
 	}
 
 	private class QuadTreeRootPosIterator implements LongIterator
@@ -482,8 +457,6 @@ public class QuadTree<T>
 		private final LongArrayFIFOQueue iteratorPosQueue;
 		@Nullable
 		private final INodeIteratorStoppingFunc<T> stopIteratingFunc;
-
-
 
 		public QuadTreeRootPosIterator(boolean includeNullNodes, @Nullable INodeIteratorStoppingFunc<T> stopIteratingFunc)
 		{
@@ -510,8 +483,6 @@ public class QuadTree<T>
 			});
 		}// constructor
 
-
-
 		@Override
 		public boolean hasNext() { return !this.iteratorPosQueue.isEmpty(); }
 
@@ -523,10 +494,8 @@ public class QuadTree<T>
 				throw new NoSuchElementException();
 			}
 
-
 			return this.iteratorPosQueue.dequeueLong();
 		}
-
 
 		/** Unimplemented */
 		@Override
@@ -534,7 +503,6 @@ public class QuadTree<T>
 
 		@Override
 		public void forEachRemaining(LongConsumer action) { LongIterator.super.forEachRemaining(action); }
-
 	}
 
 	private class QuadTreeNodeIterator implements Iterator<QuadNode<T>>
@@ -548,8 +516,6 @@ public class QuadTree<T>
 		@Nullable
 		private final INodeIteratorStoppingFunc<T> stopIteratingFunc;
 
-
-
 		public QuadTreeNodeIterator(boolean onlyReturnLeaves, @Nullable INodeIteratorStoppingFunc<T> stopIteratingFunc)
 		{
 			this.rootNodePosIterator = new QuadTreeRootPosIterator(false, stopIteratingFunc);
@@ -557,8 +523,6 @@ public class QuadTree<T>
 
 			this.stopIteratingFunc = stopIteratingFunc;
 		}
-
-
 
 		@Override
 		public boolean hasNext()
@@ -569,7 +533,6 @@ public class QuadTree<T>
 			{
 				return false;
 			}
-
 
 			if (this.currentNodeIterator == null
 				|| !this.currentNodeIterator.hasNext())
@@ -588,7 +551,6 @@ public class QuadTree<T>
 			{
 				this.currentNodeIterator = this.getNextChildNodeIterator();
 			}
-
 
 			this.lastNode = this.currentNodeIterator.next();
 			return this.lastNode;
@@ -613,7 +575,6 @@ public class QuadTree<T>
 			return nodeIterator;
 		}
 
-
 		@Override
 		public void remove()
 		{
@@ -621,7 +582,6 @@ public class QuadTree<T>
 			{
 				throw new NoSuchElementException("No last node found.");
 			}
-
 
 			QuadNode<T> node = QuadTree.this.getOrSetNode(this.lastNode.sectionPos, true, null, false);
 			if (node != null)
@@ -632,10 +592,7 @@ public class QuadTree<T>
 
 		@Override
 		public void forEachRemaining(Consumer<? super QuadNode<T>> action) { Iterator.super.forEachRemaining(action); }
-
 	}
 
 	//endregion
-
-
 }

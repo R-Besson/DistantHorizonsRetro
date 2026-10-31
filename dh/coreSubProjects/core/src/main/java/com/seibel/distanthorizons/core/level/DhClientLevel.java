@@ -94,8 +94,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	@Nullable
 	private final SyncOnLoadRequestQueue syncOnLoadRequestQueue;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -205,7 +203,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 				return;
 			}
 
-
 			// Check this before decoding data to prevent errors if multiple client levels
 			// are receiving data at once.
 			boolean isSameLevel = message.isSameLevelAs(this.levelWrapper);
@@ -233,7 +230,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 					});
 				}
 
-
 				FullDataSourceV2 fullDataSource = dataSourceDto.createDataSource(this.levelWrapper, null);
 				this.updateDataSourcesAsync(fullDataSource)
 					.whenComplete((result, e) -> fullDataSource.close());
@@ -246,8 +242,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// tick methods //
@@ -303,8 +297,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 
 	//endregion
 
-
-
 	//===========//
 	// world gen //
 	//===========//
@@ -317,8 +309,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	}
 
 	//endregion
-
-
 
 	//=========//
 	// getters //
@@ -368,8 +358,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 
 	//endregion
 
-
-
 	//===========//
 	// debugging //
 	//===========//
@@ -383,7 +371,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		String r = MinecraftTextFormat.RED;
 		String cf = MinecraftTextFormat.CLEAR_FORMATTING;
 
-
 		String dimName = this.levelWrapper.getDhIdentifier();
 		boolean rendering =
 			this.clientside.isRendering()
@@ -391,9 +378,7 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 		String renderingString = rendering ? (g + "yes" + cf) : (r + "no" + cf);
 		messageList.add("[" + y + dimName + cf + "] rendering: " + renderingString);
 
-
 		this.remoteDataSourceProvider.addDebugMenuStringsToList(messageList);
-
 
 		// world gen
 		this.lodRequestModule.addDebugMenuStringsToList(messageList);
@@ -408,8 +393,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	}
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -453,8 +436,6 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -464,11 +445,7 @@ public class DhClientLevel extends AbstractDhLevel implements IDhClientLevel
 	{
 		LodRequestState(DhClientLevel clientLevel, ClientNetworkState networkState)
 		{ super(clientLevel, new RemoteWorldRetrievalQueue(networkState, clientLevel)); }
-
 	}
 
 	//endregion
-
-
-
 }

@@ -24,11 +24,8 @@ public class SessionConfig implements INetworkObject
 {
 	private static final LinkedHashMap<String, Entry> CONFIG_ENTRIES = new LinkedHashMap<>();
 
-
 	private final HashMap<String, Object> values = new HashMap<>();
 	public SessionConfig constrainingConfig;
-
-
 
 	//=============//
 	// constructor //
@@ -85,10 +82,7 @@ public class SessionConfig implements INetworkObject
 			);
 		});
 	}
-
 	public SessionConfig() { }
-
-
 
 	//===============//
 	// public values //
@@ -109,8 +103,6 @@ public class SessionConfig implements INetworkObject
 	public int getSyncOnLoginRateLimit() { return this.getValue(Config.Server.syncOnLoadRateLimit); }
 
 	public int getPlayerBandwidthLimit() { return this.getValue(Config.Server.playerBandwidthLimit); }
-
-
 
 	//====================//
 	// entry registration //
@@ -143,8 +135,6 @@ public class SessionConfig implements INetworkObject
 
 		CONFIG_ENTRIES.put(key, entry);
 	}
-
-
 
 	//==================//
 	// internal getters //
@@ -184,8 +174,6 @@ public class SessionConfig implements INetworkObject
 		));
 	}
 
-
-
 	//===============//
 	// serialization //
 	//===============//
@@ -203,8 +191,6 @@ public class SessionConfig implements INetworkObject
 			this.values.put(key, newValue);
 		}
 	}
-
-
 
 	//=========//
 	// logging //
@@ -234,8 +220,6 @@ public class SessionConfig implements INetworkObject
 		return stringBuilder.toString();
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -247,8 +231,6 @@ public class SessionConfig implements INetworkObject
 			.add("values", this.getValues())
 			.toString();
 	}
-
-
 
 	//================//
 	// helper classes //
@@ -267,7 +249,6 @@ public class SessionConfig implements INetworkObject
 			this.changeListenerFactory = changeListenerFactory;
 			this.valueConstrainer = (BinaryOperator<Object>) valueConstrainer;
 		}
-
 	}
 
 	/** fires if any config value was changed */
@@ -301,7 +282,5 @@ public class SessionConfig implements INetworkObject
 			}
 			this.changeListeners.clear();
 		}
-
 	}
-
 }

@@ -36,13 +36,10 @@ public abstract class AbstractDhApiTestEvent implements IDhApiEvent<Boolean>
 	/** just used for testing */
 	public abstract Boolean getTestValue();
 
-
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<Boolean> input) { this.onTestEvent(input); }
-
 }

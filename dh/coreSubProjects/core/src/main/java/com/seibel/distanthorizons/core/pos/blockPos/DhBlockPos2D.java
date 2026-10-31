@@ -26,8 +26,6 @@ public class DhBlockPos2D
 	public final int x;
 	public final int z;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -47,8 +45,6 @@ public class DhBlockPos2D
 
 	//endregion
 
-
-
 	//==========//
 	// mutators //
 	//==========//
@@ -57,8 +53,6 @@ public class DhBlockPos2D
 	public DhBlockPos2D add(DhBlockPos2D other) { return new DhBlockPos2D(this.x + other.x, this.z + other.z); }
 
 	//endregion
-
-
 
 	//==============//
 	// calculations //
@@ -77,8 +71,6 @@ public class DhBlockPos2D
 	public int manhattanDist(DhBlockPos2D other) { return Math.abs(this.x - other.x) + Math.abs(this.z - other.z); }
 
 	//endregion
-
-
 
 	//================//
 	// base overrides //
@@ -104,7 +96,4 @@ public class DhBlockPos2D
 	public int hashCode() { return Integer.hashCode(this.x) ^ Integer.hashCode(this.z); }
 
 	//endregion
-
-
-
 }

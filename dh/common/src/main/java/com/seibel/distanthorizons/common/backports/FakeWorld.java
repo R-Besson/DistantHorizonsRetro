@@ -41,8 +41,6 @@ public class FakeWorld implements IBlockAccess
 	private boolean readNeighborBlocks = false;
 	private int levelMinY = 0;
 
-
-
 	//========//
 	// update //
 	//========//
@@ -85,8 +83,6 @@ public class FakeWorld implements IBlockAccess
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// overrides //
@@ -188,8 +184,6 @@ public class FakeWorld implements IBlockAccess
 	public boolean isSideSolid(int x, int y, int z, ForgeDirection side, boolean _default) { throw new UnsupportedOperationException("isSideSolid() isn't implemented"); }
 
 	//endregion
-
-
 
 	//=========//
 	// helpers //
@@ -325,7 +319,4 @@ public class FakeWorld implements IBlockAccess
 	}
 
 	//endregion
-
-
-
 }

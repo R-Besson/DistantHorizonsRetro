@@ -49,13 +49,9 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
-
 	public int frameBuffer;
 	private DhMat4f inverseMvmProjMatrix;
 	private DhApiFogRenderParam fogRenderParams;
-
-
 
 	//==========//
 	// Uniforms //
@@ -101,8 +97,6 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 	public int uCameraBlockYPos;
 
 	//endregion
-
-
 
 	//=============//
 	// constructor //
@@ -156,12 +150,9 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 		this.uUseSphericalFog = this.shader.getUniformLocation("uUseSphericalFog");
 		this.uHeightFogMixingMode = this.shader.getUniformLocation("uHeightFogMixingMode");
 		this.uCameraBlockYPos = this.shader.getUniformLocation("uCameraBlockYPos");
-
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// render prep //
@@ -178,7 +169,6 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 		this.shader.setUniform(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 		this.shader.setUniform(this.uDepthIsZeroToPositiveOne, (RENDER_DEF.getDepthRange() == EDhApiDepthRange.ZERO_TO_POS_ONE) ? 1 : 0);
 
-
 		// Fog uniforms
 		this.shader.setUniform(this.uFogColor, this.fogRenderParams.getFogColor());
 		this.shader.setUniform(this.uFogScale, 1.f / lodDrawDistance);
@@ -186,14 +176,12 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 		this.shader.setUniform(this.uFogDebugMode, 0); // 0 = normal // 1 = render everything with fog color // 7 = use debug rendering
 		this.shader.setUniform(this.uFogFalloffType, this.fogRenderParams.getFarFogFalloff().value);
 
-
 		// fog config
 		this.shader.setUniform(this.uFarFogStart, this.fogRenderParams.getFarFogStartPercent());
 		this.shader.setUniform(this.uFarFogLength, this.fogRenderParams.getFarFogEndPercent() - this.fogRenderParams.getFarFogStartPercent());
 		this.shader.setUniform(this.uFarFogMin, this.fogRenderParams.getFarFogMinThickness());
 		this.shader.setUniform(this.uFarFogRange, this.fogRenderParams.getFarFogMaxThickness() - this.fogRenderParams.getFarFogMinThickness());
 		this.shader.setUniform(this.uFarFogDensity, this.fogRenderParams.getFarFogDensity());
-
 
 		// height config
 		EDhApiHeightFogMixMode heightFogMixingMode = this.fogRenderParams.getHeightFogMixingMode();
@@ -209,7 +197,6 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 		this.shader.setUniform(this.uHeightFogRange, this.fogRenderParams.getFarFogMaxThickness() - this.fogRenderParams.getFarFogMinThickness());
 		this.shader.setUniform(this.uHeightFogDensity, this.fogRenderParams.getFarFogDensity());
 
-
 		this.shader.setUniform(this.uHeightFogEnabled, heightFogEnabled);
 		this.shader.setUniform(this.uHeightFogFalloffType, this.fogRenderParams.getHeightFogFalloff().value);
 		this.shader.setUniform(this.uHeightFogBaseHeight, this.fogRenderParams.getHeightFogBaseHeight());
@@ -219,7 +206,6 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 		this.shader.setUniform(this.uUseSphericalFog, useSphericalFog);
 		this.shader.setUniform(this.uHeightFogMixingMode, heightFogMixingMode.value);
 		this.shader.setUniform(this.uCameraBlockYPos, (float) renderParams.exactCameraPosition.y);
-
 	}
 
 	public void prepUniformObjects(DhApiMat4f modelViewProjectionMatrix, DhApiFogRenderParam fogRenderParams)
@@ -231,8 +217,6 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 	}
 
 	//endregion
-
-
 
 	//========//
 	// render //
@@ -263,11 +247,8 @@ public class GlDhFogShader extends GlAbstractShaderRenderer
 			LWJGL.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 		}
 
-
 		GlScreenQuad.INSTANCE.render();
 	}
 
 	//endregion
-
-
 }

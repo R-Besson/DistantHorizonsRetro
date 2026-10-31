@@ -52,8 +52,6 @@ public class GlScreenQuad
 	private GlAbstractVertexAttribute va;
 	private boolean init = false;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -90,8 +88,6 @@ public class GlScreenQuad
 
 	//endregion
 
-
-
 	//===========//
 	// rendering //
 	//===========//
@@ -114,7 +110,4 @@ public class GlScreenQuad
 	}
 
 	//endregion
-
-
-
 }

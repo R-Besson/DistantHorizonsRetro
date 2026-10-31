@@ -19,8 +19,6 @@ public class MixinNetHandlerPlayClient
 	@Shadow
 	private WorldClient clientWorldController;
 
-
-
 	@Inject(method = "handleJoinGame", at = @At("RETURN"))
 	private void connect(S01PacketJoinGame packetIn, CallbackInfo ci)
 	{ ClientApi.INSTANCE.onClientOnlyConnected(); }
@@ -37,5 +35,4 @@ public class MixinNetHandlerPlayClient
 	@Inject(method = "handleMultiBlockChange", at = @At("RETURN"))
 	private void multiBlockChanged(S22PacketMultiBlockChange packet, CallbackInfo ci)
 	{ ForgeClientProxy.onClientBlocksChanged(this.clientWorldController, packet.func_148920_c().chunkXPos, packet.func_148920_c().chunkZPos); }
-
 }

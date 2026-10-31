@@ -17,8 +17,6 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 
 	private final ISaveDataSourceFunc onSaveTimeoutAsyncFunc;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -31,8 +29,6 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// overrides //
@@ -69,8 +65,6 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 
 	//endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -81,7 +75,6 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 	{
 		/** called after the timeout expires */
 		CompletableFuture<Void> saveAsync(@NotNull FullDataSourceV2 inputDataSource);
-
 	}
 
 	public static class DataSourceSaveObjContainer extends AbstractSaveObjContainer<FullDataSourceV2>
@@ -104,12 +97,7 @@ public class DelayedDataSourceSaveCache extends AbstractDelayedSaveCache<FullDat
 
 			this.dataSource.updateFromDataSource(newObj);
 		}
-
 	}
 
 	//endregion
-
-
-
-
 }

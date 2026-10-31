@@ -13,7 +13,4 @@ public class MixinTesselator
 	@Inject(method = "draw", at = @At(value = "HEAD"))
 	void drawMixin(CallbackInfoReturnable<Integer> cir)
 	{ RenderHelper.UnbindAfterTesselatorDraw(); }
-
-
-
 }

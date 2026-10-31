@@ -61,7 +61,6 @@ public enum EDhApiHeightFogMixMode
 	INVERSE_MULTIPLY_ADDITION(8),
 	AVERAGE(9);
 
-
 	/**
 	 * Stable version of {@link EDhApiFogFalloff#ordinal()}
 	 *
@@ -70,5 +69,4 @@ public enum EDhApiHeightFogMixMode
 	public final int value;
 
 	EDhApiHeightFogMixMode(int value) { this.value = value; }
-
 }

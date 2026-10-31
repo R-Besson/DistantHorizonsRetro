@@ -48,5 +48,4 @@ public class ApiFogDrawModeConverter implements IConverter<Boolean, EDhApiFogDra
 	@Override
 	public EDhApiFogDrawMode convertToApiType(Boolean renderingEnabled)
 	{ return renderingEnabled ? EDhApiFogDrawMode.FOG_ENABLED : EDhApiFogDrawMode.FOG_DISABLED; }
-
 }

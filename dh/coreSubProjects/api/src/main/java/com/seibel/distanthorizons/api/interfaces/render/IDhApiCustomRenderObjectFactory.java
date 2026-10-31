@@ -55,5 +55,4 @@ public interface IDhApiCustomRenderObjectFactory extends IBindable
 	 * @see IDhApiRenderableBoxGroup#getResourceLocationPath()
 	 */
 	IDhApiRenderableBoxGroup createAbsolutePositionedGroup(String resourceLocation, List<DhApiRenderableBox> cubeList);
-
 }

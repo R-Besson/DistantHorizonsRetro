@@ -35,9 +35,7 @@ public class DhRemoveAfterFireTestEventHandler extends AbstractDhApiRemoveAfterF
 	@Override
 	public void onTestEvent(DhApiEventParam<Boolean> input) { this.eventFiredValue = input.value; }
 
-
 	// test (non-standard) methods //
 	@Override
 	public Boolean getTestValue() { return this.eventFiredValue; }
-
 }

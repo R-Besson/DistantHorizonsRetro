@@ -25,12 +25,8 @@ public class GregTechAccessor implements IGregTechCommonAccessor
 	@Nullable
 	private static final Field ICON_CONTAINER_FIELD = getIconContainerField();
 
-
-
 	@Override
 	public String getModName() { return "GregTech"; }
-
-
 
 	@Override
 	@Nullable
@@ -87,7 +83,4 @@ public class GregTechAccessor implements IGregTechCommonAccessor
 			return null;
 		}
 	}
-
-
-
 }

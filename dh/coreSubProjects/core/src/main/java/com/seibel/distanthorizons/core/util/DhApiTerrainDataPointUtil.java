@@ -27,5 +27,4 @@ public class DhApiTerrainDataPointUtil
 			bottomY, topY,
 			blockState, biomeWrapper);
 	}
-
 }

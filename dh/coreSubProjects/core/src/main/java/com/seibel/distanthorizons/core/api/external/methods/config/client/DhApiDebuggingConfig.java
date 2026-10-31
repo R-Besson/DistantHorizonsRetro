@@ -31,8 +31,6 @@ public class DhApiDebuggingConfig implements IDhApiDebuggingConfig
 
 	private DhApiDebuggingConfig() { }
 
-
-
 	public IDhApiConfigValue<EDhApiDebugRendering> debugRendering()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.debugRenderingColors); }
 
@@ -47,5 +45,4 @@ public class DhApiDebuggingConfig implements IDhApiDebuggingConfig
 
 	public IDhApiConfigValue<Boolean> debugWireframeRendering()
 	{ return new DhApiConfigValue<>(Config.Client.Advanced.Debugging.DebugWireframe.enableRendering); }
-
 }

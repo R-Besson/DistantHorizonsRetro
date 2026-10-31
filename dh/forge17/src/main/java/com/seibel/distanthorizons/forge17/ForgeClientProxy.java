@@ -50,7 +50,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import org.lwjgl.input.Keyboard;
 
-
 /**
  * This handles all events sent to the client.
  */
@@ -64,7 +63,6 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 	private static final String KEY_CATEGORY = "distanthorizons.key.category";
 	private static final KeyBinding TOGGLE_RENDERING_KEY = new KeyBinding("distanthorizons.key.toggleRendering", Keyboard.KEY_NONE, KEY_CATEGORY);
 	private static final KeyBinding OPEN_CONFIG_KEY = new KeyBinding("distanthorizons.key.openConfig", Keyboard.KEY_NONE, KEY_CATEGORY);
-
 
 	//=======//
 	// setup //
@@ -100,8 +98,6 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 	}
 
 	//endregion
-
-
 
 	//==============//
 	// chunk events //
@@ -199,8 +195,6 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 
 	//endregion
 
-
-
 	//==============//
 	// key bindings //
 	//==============//
@@ -250,8 +244,6 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 
 	//endregion
 
-
-
 	//===========//
 	// rendering //
 	//===========//
@@ -299,7 +291,4 @@ public class ForgeClientProxy extends com.seibel.distanthorizons.forge.ForgeClie
 	}
 
 	//endregion
-
-
-
 }

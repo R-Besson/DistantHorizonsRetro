@@ -30,8 +30,6 @@ public class FullDataPayload implements INetworkObject
 
 	public List<BeaconBeamDTO> beaconBeams;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -60,8 +58,6 @@ public class FullDataPayload implements INetworkObject
 		this.beaconBeams = beaconBeams;
 	}
 
-
-
 	//===============//
 	// serialization //
 	//===============//
@@ -80,8 +76,6 @@ public class FullDataPayload implements INetworkObject
 		this.beaconBeams = this.readCollection(in, new ArrayList<>(), () -> new BeaconBeamDTO(null, null));
 	}
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -95,5 +89,4 @@ public class FullDataPayload implements INetworkObject
 			.add("beaconBeams", this.beaconBeams)
 			.toString();
 	}
-
 }

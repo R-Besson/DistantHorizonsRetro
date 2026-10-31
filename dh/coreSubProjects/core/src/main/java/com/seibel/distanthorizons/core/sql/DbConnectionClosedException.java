@@ -39,5 +39,4 @@ public class DbConnectionClosedException extends SQLException
 
 		return false;
 	}
-
 }

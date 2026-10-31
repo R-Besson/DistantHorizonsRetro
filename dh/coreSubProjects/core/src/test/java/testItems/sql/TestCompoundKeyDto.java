@@ -27,8 +27,6 @@ public class TestCompoundKeyDto implements IBaseDTO<DhChunkPos>
 	public DhChunkPos id;
 	public String value;
 
-
-
 	public TestCompoundKeyDto(DhChunkPos id, String value)
 	{
 		this.id = id;
@@ -37,7 +35,6 @@ public class TestCompoundKeyDto implements IBaseDTO<DhChunkPos>
 
 	@Override
 	public DhChunkPos getKey() { return this.id; }
-
 
 	@Override
 	public boolean equals(Object other)
@@ -64,7 +61,4 @@ public class TestCompoundKeyDto implements IBaseDTO<DhChunkPos>
 	@Override
 	public void close()
 	{ /* no closing needed */ }
-
-
-
 }

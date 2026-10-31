@@ -16,8 +16,6 @@ public enum EDhApiUpdateBranch
 	STABLE,
 	NIGHTLY;
 
-
-
 	/**
 	 * If the updateBranch value is {@link EDhApiUpdateBranch#AUTO}
 	 * this method will convert it either to {@link EDhApiUpdateBranch#STABLE} or {@link EDhApiUpdateBranch#NIGHTLY}
@@ -37,5 +35,4 @@ public enum EDhApiUpdateBranch
 			return ModInfo.IS_DEV_BUILD ? EDhApiUpdateBranch.NIGHTLY : EDhApiUpdateBranch.STABLE;
 		}
 	}
-
 }

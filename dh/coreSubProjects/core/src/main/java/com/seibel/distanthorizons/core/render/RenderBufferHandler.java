@@ -60,7 +60,6 @@ public class RenderBufferHandler implements AutoCloseable
 	private static final Matrix4f WORLD_VIEW_PROJ_JOML_MATRIX = new Matrix4f();
 	private static final DhMat4f FRUSTOM_DH_MATRIX = new DhMat4f();
 
-
 	/** contains all relevant data */
 	public final LodQuadTree lodQuadTree;
 
@@ -72,8 +71,6 @@ public class RenderBufferHandler implements AutoCloseable
 	private int culledBufferCount;
 	private int shadowVisibleBufferCount;
 	private int shadowCulledBufferCount;
-
-
 
 	//=============//
 	// constructor //
@@ -113,8 +110,6 @@ public class RenderBufferHandler implements AutoCloseable
 
 	//endregion
 
-
-
 	//=================//
 	// render building //
 	//=================//
@@ -137,8 +132,6 @@ public class RenderBufferHandler implements AutoCloseable
 		// clear the old list so we can start fresh
 		this.loadedNearToFarBuffers.clear();
 
-
-
 		//====================================//
 		// get and update the culling frustum //
 		//====================================//
@@ -157,7 +150,6 @@ public class RenderBufferHandler implements AutoCloseable
 			enableFrustumCulling = !Config.Client.Advanced.Graphics.Culling.disableFrustumCulling.get();
 			frustum = DhApi.overrides.get(IDhApiCullingFrustum.class);
 		}
-
 
 		// update the frustum if necessary
 		if (enableFrustumCulling)
@@ -182,8 +174,6 @@ public class RenderBufferHandler implements AutoCloseable
 			frustum.update(worldMinY, worldMinY + worldHeight, FRUSTOM_DH_MATRIX);
 		}
 
-
-
 		//=========================//
 		// Update the section list //
 		//=========================//
@@ -206,7 +196,6 @@ public class RenderBufferHandler implements AutoCloseable
 			{
 				continue;
 			}
-
 
 			try
 			{
@@ -236,7 +225,6 @@ public class RenderBufferHandler implements AutoCloseable
 				// don't cull if there was an unexpected issue
 				LOGGER.error("Unexpected issue during culling for node pos: [" + DhSectionPos.toString(renderSection.pos) + "], error: [" + e.getMessage() + "].", e);
 			}
-
 
 			try
 			{
@@ -271,8 +259,6 @@ public class RenderBufferHandler implements AutoCloseable
 
 	//endregion
 
-
-
 	//================//
 	// render methods //
 	//================//
@@ -281,8 +267,6 @@ public class RenderBufferHandler implements AutoCloseable
 	public SortedArraySet<LodBufferContainer> getColumnRenderBuffers() { return this.loadedNearToFarBuffers; }
 
 	//endregion
-
-
 
 	//=========//
 	// F3 menu //
@@ -316,8 +300,6 @@ public class RenderBufferHandler implements AutoCloseable
 
 	//endregion
 
-
-
 	//=========//
 	// cleanup //
 	//=========//
@@ -327,7 +309,4 @@ public class RenderBufferHandler implements AutoCloseable
 	public void close() { this.lodQuadTree.close(); }
 
 	//endregion
-
-
-
 }

@@ -38,14 +38,12 @@ public abstract class DhApiWorldLoadEvent implements IDhApiEvent<DhApiWorldLoadE
 	/** Fired after Distant Horizons loads a new world. */
 	public abstract void onWorldLoad(DhApiEventParam<EventParam> input);
 
-
 	//=========================//
 	// internal DH API methods //
 	//=========================//
 
 	@Override
 	public final void fireEvent(DhApiEventParam<EventParam> input) { this.onWorldLoad(input); }
-
 
 	//==================//
 	// parameter object //
@@ -55,10 +53,7 @@ public abstract class DhApiWorldLoadEvent implements IDhApiEvent<DhApiWorldLoadE
 	{
 		public EventParam() { }
 
-
 		@Override
 		public EventParam copy() { return new EventParam(); }
-
 	}
-
 }

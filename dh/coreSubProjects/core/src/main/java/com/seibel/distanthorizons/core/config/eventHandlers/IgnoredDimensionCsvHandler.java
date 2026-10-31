@@ -38,16 +38,12 @@ public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implement
 
 	private String[] dimensionNames = null;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
 
 	/** private since we only ever need one handler at a time */
 	private IgnoredDimensionCsvHandler() { }
-
-
 
 	//=================//
 	// config handling //
@@ -76,10 +72,7 @@ public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implement
 				this.dimensionNames = null;
 			}
 		}
-
 	}
-
-
 
 	//===================//
 	// external handling //
@@ -128,6 +121,4 @@ public class IgnoredDimensionCsvHandler extends DhApiBeforeRenderEvent implement
 
 		return false;
 	}
-
-
 }

@@ -22,5 +22,4 @@ public class MixinCameraUniforms
 	{
 		cir.setReturnValue(AngelicaAccessor.getShaderPackFarDistance());
 	}
-
 }

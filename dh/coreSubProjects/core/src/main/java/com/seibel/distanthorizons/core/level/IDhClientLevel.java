@@ -43,7 +43,4 @@ public interface IDhClientLevel extends IDhLevel
 	 * Designed for use for debugging and the {@link F3Screen}.
 	 */
 	boolean isRendering();
-
-
-
 }

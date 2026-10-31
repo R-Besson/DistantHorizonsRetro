@@ -8,11 +8,8 @@ public class TestBlockStateWrapper implements IBlockStateWrapper
 {
 	private final String name;
 
-
 	public TestBlockStateWrapper(String name)
 	{ this.name = name; }
-
-
 
 	@Override public boolean isAir() { return false; }
 	@Override public boolean isSolid() { return true; }
@@ -30,7 +27,6 @@ public class TestBlockStateWrapper implements IBlockStateWrapper
 
 	@Override public Object getWrappedMcObject() { return this; }
 
-
 	@Override
 	public int hashCode()
 	{ return this.name.hashCode(); }
@@ -44,5 +40,4 @@ public class TestBlockStateWrapper implements IBlockStateWrapper
 
 		return this.name.equals(((TestBlockStateWrapper) obj).name);
 	}
-
 }

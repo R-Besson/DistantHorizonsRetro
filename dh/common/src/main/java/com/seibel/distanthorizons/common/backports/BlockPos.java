@@ -9,5 +9,4 @@ public class BlockPos extends Vector3i
 	{
 		super();
 	}
-
 }

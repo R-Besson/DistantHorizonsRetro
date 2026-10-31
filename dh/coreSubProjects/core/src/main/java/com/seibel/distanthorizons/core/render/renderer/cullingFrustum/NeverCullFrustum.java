@@ -17,8 +17,6 @@ public class NeverCullFrustum implements IDhApiCullingFrustum, IDhApiShadowCulli
 
 	public NeverCullFrustum() { }
 
-
-
 	//=========//
 	// methods //
 	//=========//
@@ -29,13 +27,10 @@ public class NeverCullFrustum implements IDhApiCullingFrustum, IDhApiShadowCulli
 	@Override
 	public boolean intersects(int lodBlockPosMinX, int lodBlockPosMinZ, int lodBlockWidth, int lodDetailLevel) { return true; }
 
-
-
 	//=====================//
 	// overridable methods //
 	//=====================//
 
 	@Override
 	public int getPriority() { return IOverrideInjector.CORE_PRIORITY; }
-
 }

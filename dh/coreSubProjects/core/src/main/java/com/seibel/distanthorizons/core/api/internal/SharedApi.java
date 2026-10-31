@@ -64,12 +64,9 @@ public class SharedApi
 
 	public static final WorldChunkUpdateManager WORLD_CHUNK_UPDATE_MANAGER = WorldChunkUpdateManager.INSTANCE; // local fariable for quick access
 
-
 	@Nullable
 	private static AbstractDhWorld currentWorld;
 	private static final Object worldLockObject = new Object();
-
-
 
 	//=============//
 	// constructor //
@@ -79,8 +76,6 @@ public class SharedApi
 	private SharedApi() { }
 
 	//endregion
-
-
 
 	//===============//
 	// world methods //
@@ -150,8 +145,6 @@ public class SharedApi
 
 	//endregion
 
-
-
 	//==============//
 	// chunk update //
 	//==============//
@@ -182,8 +175,6 @@ public class SharedApi
 
 		return manager.contains(new DhChunkPos(chunkPosX, chunkPosZ));
 	}
-
-
 
 	public void applyChunkUpdate(IChunkWrapper chunkWrapper, ILevelWrapper levelWrapper, boolean waitForLoadedWorld)
 	{
@@ -216,7 +207,6 @@ public class SharedApi
 		{
 			return;
 		}
-
 
 		IDhLevel dhLevel;
 		if (waitForLoadedWorld)
@@ -274,7 +264,6 @@ public class SharedApi
 			return;
 		}
 
-
 		queueChunkUpdate(chunkManager, chunkWrapper, dhLevel);
 	}
 
@@ -287,8 +276,6 @@ public class SharedApi
 
 	//endregion
 
-
-
 	//=========//
 	// F3 Menu //
 	//=========//
@@ -297,7 +284,4 @@ public class SharedApi
 	public ArrayList<String> getDebugMenuString() { return WORLD_CHUNK_UPDATE_MANAGER.getDebugMenuString(); }
 
 	//endregion
-
-
-
 }

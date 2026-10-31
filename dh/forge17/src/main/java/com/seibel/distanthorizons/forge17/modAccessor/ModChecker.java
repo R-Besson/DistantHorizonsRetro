@@ -26,5 +26,4 @@ public class ModChecker implements IModChecker
 
 	@Override
 	public boolean isModLoaded(String modid) { return Loader.isModLoaded(modid); }
-
 }

@@ -31,5 +31,4 @@ public class ConfigGuiInfo implements IConfigGuiInfo
 
 	/** determines which options the button will show */
 	public AbstractMap.SimpleEntry<OnPressed, Function<Object, String>> buttonOptionMap;
-
 }

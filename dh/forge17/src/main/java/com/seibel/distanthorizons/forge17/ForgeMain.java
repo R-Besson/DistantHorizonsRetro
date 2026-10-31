@@ -83,8 +83,6 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 
 	//endregion
 
-
-
 	//=======//
 	// setup //
 	//=======//
@@ -192,8 +190,6 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 
 	//endregion
 
-
-
 	//=====================//
 	// server world events //
 	//=====================//
@@ -232,8 +228,6 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 
 	//endregion
 
-
-
 	//========================//
 	// AbstractModInitializer //
 	//========================//
@@ -270,7 +264,4 @@ public class ForgeMain extends AbstractModInitializer implements IForgeMain
 	protected void runDelayedSetup() { SingletonInjector.INSTANCE.runDelayedSetup(); }
 
 	//region
-
-
-
 }

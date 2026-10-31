@@ -48,7 +48,6 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 	private static final IMinecraftRenderWrapper MC_RENDER = SingletonInjector.INSTANCE.get(IMinecraftRenderWrapper.class);
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
 	private boolean init = false;
 
 	private int width = -1;
@@ -56,8 +55,6 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 	private int fadeFramebuffer = -1;
 
 	private int fadeTexture = -1;
-
-
 
 	//=============//
 	// constructor //
@@ -86,7 +83,6 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 		this.fadeFramebuffer = LWJGL.glGenFramebuffers();
 		GLMC.glBindFramebuffer(GL30.GL_FRAMEBUFFER, this.fadeFramebuffer);
 
-
 		if (this.fadeTexture != -1)
 		{
 			GLMC.glDeleteTextures(this.fadeTexture);
@@ -106,12 +102,9 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 		}
 
 		LWJGL.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, this.fadeTexture, 0);
-
 	}
 
 	//endregion
-
-
 
 	//========//
 	// render //
@@ -135,7 +128,6 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 				this.createFramebuffer(width, height);
 			}
 
-
 			GlDhFarFadeShader.INSTANCE.frameBuffer = this.fadeFramebuffer;
 			GlDhFarFadeShader.INSTANCE.setProjectionMatrix(renderParams);
 			GlDhFarFadeShader.INSTANCE.render(renderParams);
@@ -152,7 +144,4 @@ public class GlDhFarFadeRenderer implements IDhFarFadeRenderer
 	}
 
 	//emdregion
-
-
-
 }

@@ -29,8 +29,6 @@ public class AutoClosableTrackingWrapper implements InvocationHandler
 	@NotNull
 	public final Set<AutoClosableTrackingWrapper> parentTrackingSet;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -66,8 +64,6 @@ public class AutoClosableTrackingWrapper implements InvocationHandler
 		this.parentTrackingSet.add(this);
 	}
 
-
-
 	//============//
 	// reflection //
 	//============//
@@ -94,7 +90,4 @@ public class AutoClosableTrackingWrapper implements InvocationHandler
 			throw e.getTargetException();
 		}
 	}
-
-
-
 }

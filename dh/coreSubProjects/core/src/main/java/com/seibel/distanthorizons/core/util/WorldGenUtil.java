@@ -27,7 +27,6 @@ public class WorldGenUtil
 			return false;
 		}
 
-
 		DhBlockPos centerBlockPos = new DhChunkPos(centerChunkX, centerChunkZ).centerBlockPos();
 		int blockDistanceFromCenter = DhSectionPos.getChebyshevSignedBlockDistance(requestedPos, centerBlockPos);
 		int maxBlockRadius = maxChunkRadius * LodUtil.CHUNK_WIDTH;
@@ -72,7 +71,4 @@ public class WorldGenUtil
 		return !Config.Common.WorldGenerator.generatorPlan.get().surfaceGenEnabled
 			|| Config.Common.WorldGenerator.chunkGeneratorMode.get() != EDhApiDistantGeneratorMode.PRE_EXISTING_ONLY;
 	}
-
-
-
 }

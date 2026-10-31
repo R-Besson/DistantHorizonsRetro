@@ -39,18 +39,13 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
-
 	public int frameBuffer;
 	public int outputColorTextureId;
 	private int historyColorTextureId;
 
-
 	// Previous-frame state, captured at the END of render() for use NEXT frame.
 	private final DhMat4f previousDhProjMvmMatrix = new DhMat4f();
 	private final DhVec3d previousCameraPos = new DhVec3d(0, 0, 0);
-
-
 
 	//==========//
 	// Uniforms //
@@ -76,8 +71,6 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 	public int uHistoryColorSampler;
 
 	//endregion
-
-
 
 	//=============//
 	// constructor //
@@ -115,12 +108,9 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 		this.uCurrentDepthSampler = this.shader.getUniformLocation("uCurrentDepthSampler");
 
 		this.uHistoryColorSampler = this.shader.getUniformLocation("uHistoryColorSampler");
-
 	}
 
 	//endregion
-
-
 
 	//=============//
 	// render prep //
@@ -140,7 +130,6 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 		double cameraOffsetY = renderParams.exactCameraPosition.y - this.previousCameraPos.y;
 		double cameraOffsetZ = renderParams.exactCameraPosition.z - this.previousCameraPos.z;
 
-
 		// apply uniforms
 		{
 			this.shader.setUniform(this.uDhProjectionInverse, dhProjectionInverse);
@@ -151,7 +140,6 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 			this.shader.setUniform(this.uCameraOffsetX, (float) cameraOffsetX);
 			this.shader.setUniform(this.uCameraOffsetY, (float) cameraOffsetY);
 			this.shader.setUniform(this.uCameraOffsetZ, (float) cameraOffsetZ);
-
 
 			int width = MC_RENDER.getTargetFramebufferViewportWidth();
 			int height = MC_RENDER.getTargetFramebufferViewportHeight();
@@ -173,8 +161,6 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 	}
 
 	//endregion
-
-
 
 	//========//
 	// render //
@@ -214,6 +200,4 @@ public class GlDhTaaShader extends GlAbstractShaderRenderer
 	}
 
 	//endregion
-
-
 }

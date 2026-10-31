@@ -45,7 +45,6 @@ public enum EDhDirection
 	/** positive X */
 	EAST("east", EDhDirection.Axis.X, new DhVec3i(1, 0, 0), 3, 5);
 
-
 	/** Up, Down, West, East, North, South */
 	public static final EDhDirection[] ALL = new EDhDirection[]{
 		EDhDirection.UP,
@@ -64,8 +63,6 @@ public enum EDhDirection
 		EDhDirection.NORTH
 	};
 
-
-
 	public final String name;
 	public final EDhDirection.Axis axis;
 	public final DhVec3i normal;
@@ -73,8 +70,6 @@ public enum EDhDirection
 	public final int compassIndex;
 	/** used for textures and LOD geometry faces */
 	public final int faceIndex;
-
-
 
 	//=============//
 	// constructor //
@@ -88,8 +83,6 @@ public enum EDhDirection
 		this.compassIndex = compassIndex;
 		this.faceIndex = faceIndex;
 	}
-
-
 
 	//=========//
 	// methods //
@@ -166,8 +159,6 @@ public enum EDhDirection
 	@Override
 	public String toString() { return this.name; }
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -185,14 +176,11 @@ public enum EDhDirection
 
 		public final String name;
 
-
 		//=============//
 		// constructor //
 		//=============//
 
 		Axis(String name) { this.name = name; }
-
-
 
 		//=========//
 		// methods //
@@ -202,7 +190,5 @@ public enum EDhDirection
 
 		@Override
 		public String toString() { return this.name; }
-
 	}
-
 }

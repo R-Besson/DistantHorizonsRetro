@@ -66,7 +66,6 @@ public enum EDhApiGeneratorPlan
 	 */
 	DISABLED(false, false, false);
 
-
 	/** if true then some sort of generation will happen */
 	public final boolean generationEnabled;
 	public final boolean chunkGenEnabled;
@@ -80,6 +79,4 @@ public enum EDhApiGeneratorPlan
 		this.chunkGenEnabled = chunkGenEnabled;
 		this.surfaceGenEnabled = surfaceGenEnabled;
 	}
-
-
 }

@@ -26,5 +26,4 @@ public interface IDhFarFadeRenderer extends IBindable
 {
 
 	void render(RenderParams renderParams);
-
 }

@@ -26,5 +26,4 @@ public interface IDhSsaoRenderer extends IBindable
 {
 
 	void render(RenderParams renderParams);
-
 }

@@ -22,8 +22,6 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 
-
-
 	public int chunkPos = 0;
 	public int subChunkPos = 0;
 	public int scale = 0;
@@ -44,8 +42,6 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 	@Override
 	public void setState(EState state) { this.state = state; }
 
-
-
 	//===========================//
 	// render building/uploading //
 	//===========================//
@@ -54,7 +50,6 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 	public void updateVertexData(List<DhApiRenderableBox> uploadBoxList)
 	{
 		int boxCount = uploadBoxList.size();
-
 
 		// recreate the data arrays if their size is different
 		if (this.uploadedBoxCount != boxCount)
@@ -68,7 +63,6 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 			this.colorData = new float[boxCount * 4]; // 4 elements, RGBA
 			this.materialData = new int[boxCount];
 		}
-
 
 		// transformation / scaling //
 		for (int i = 0; i < boxCount; i++)
@@ -89,7 +83,6 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 			this.scalingData[dataIndex + 1] = (float) (box.maxPos.y - box.minPos.y);
 			this.scalingData[dataIndex + 2] = (float) (box.maxPos.z - box.minPos.z);
 		}
-
 
 		// colors/materials //
 		for (int i = 0; i < boxCount; i++)
@@ -142,8 +135,6 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 
 	//endregion
 
-
-
 	//================//
 	// base overrides //
 	//================//
@@ -168,9 +159,4 @@ public class GlGenericObjectVertexContainer implements IDhGenericObjectVertexBuf
 	}
 
 	//endregion
-
-
-
-
-
 }

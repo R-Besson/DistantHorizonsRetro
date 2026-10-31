@@ -48,7 +48,6 @@ public class MathUtil
 	public static byte min(byte a, byte b) { return a < b ? a : b; }
 	public static byte max(byte a, byte b) { return a > b ? a : b; }
 
-
 	/** This is copied from Minecraft's MathHelper class */
 	public static float fastInvSqrt(float numb)
 	{
@@ -70,5 +69,4 @@ public class MathUtil
 		// properties of logs allow us to use the base Log_e() method
 		return (int) (Math.log(numb) / Math.log(2));
 	}
-
 }

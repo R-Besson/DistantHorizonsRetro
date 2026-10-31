@@ -53,7 +53,6 @@ public class PriorityTaskPicker
 	private final AtomicReference<ScheduledFuture<?>> scheduledFutureRef = new AtomicReference<>();
 	private final Runnable startNextTaskBlockingRunnable = () -> this.startNextTask(true);
 
-
 	/** the list of currently registered executors */
 	private final ArrayList<Executor> executors = new ArrayList<>();
 
@@ -63,8 +62,6 @@ public class PriorityTaskPicker
 	private final AtomicInteger occupiedThreadsRef = new AtomicInteger(0);
 
 	private final AtomicBoolean isShutDownRef = new AtomicBoolean(false);
-
-
 
 	//==========//
 	// executor //
@@ -104,7 +101,6 @@ public class PriorityTaskPicker
 				return;
 			}
 		}
-
 
 		try
 		{
@@ -161,7 +157,6 @@ public class PriorityTaskPicker
 					}
 				}
 			}
-
 
 			// if an executor is paused then we'll
 			// need to check on it again sometime in the future
@@ -244,8 +239,6 @@ public class PriorityTaskPicker
 
 	///endregion
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -284,8 +277,6 @@ public class PriorityTaskPicker
 		/** holds the threads this {@link Executor} can run */
 		private RateLimitedThreadPoolExecutor threadPoolExecutor;
 
-
-
 		//=============//
 		// constructor //
 		//=============//
@@ -314,8 +305,6 @@ public class PriorityTaskPicker
 
 		///endregion
 
-
-
 		//=================//
 		// config handling //
 		//=================//
@@ -337,8 +326,6 @@ public class PriorityTaskPicker
 
 		///endregion
 
-
-
 		//=====================//
 		// task queue handling //
 		//=====================//
@@ -352,7 +339,6 @@ public class PriorityTaskPicker
 			{
 				throw new RejectedExecutionException("Thread pool [" + this.name + "] shutdown.");
 			}
-
 
 			this.taskQueue.add(new TrackedRunnable(this.parentTaskPicker, this, command));
 			this.queuedTasksRef.getAndIncrement();
@@ -392,9 +378,7 @@ public class PriorityTaskPicker
 			this.queuedTasksRef.getAndIncrement();
 		}
 
-
 		public void runTask(@NotNull Runnable command) { this.threadPoolExecutor.execute(command); }
-
 
 		/** clamped since a task added while {@link #clearQueue()} runs can make the count briefly negative */
 		public int getQueueSize() { return Math.max(0, this.queuedTasksRef.get()); }
@@ -422,10 +406,7 @@ public class PriorityTaskPicker
 			return this.canRunFunc.canRun();
 		}
 
-
 		//endregion
-
-
 
 		//==========//
 		// shutdown //
@@ -449,8 +430,6 @@ public class PriorityTaskPicker
 
 		///endregion
 
-
-
 		//===========//
 		// debugging //
 		//===========//
@@ -463,8 +442,6 @@ public class PriorityTaskPicker
 			String b = MinecraftTextFormat.DARK_BLUE;
 			String y = MinecraftTextFormat.YELLOW;
 			String cf = MinecraftTextFormat.CLEAR_FORMATTING;
-
-
 
 			NumberFormat numberFormat = F3Screen.NUMBER_FORMAT;
 
@@ -499,13 +476,10 @@ public class PriorityTaskPicker
 				message += ", Avg: " + b + runTimeAvgStr + "ms" + cf;
 			}
 
-
 			return message;
 		}
 
 		///endregion
-
-
 
 		//================//
 		// base overrides //
@@ -528,8 +502,6 @@ public class PriorityTaskPicker
 		/** the runnable passed into {@link PriorityTaskPicker.Executor#execute(Runnable)} */
 		public final Runnable command;
 
-
-
 		//=============//
 		// constructor //
 		//=============//
@@ -540,8 +512,6 @@ public class PriorityTaskPicker
 			this.executor = executor;
 			this.command = command;
 		}
-
-
 
 		//=========//
 		// running //
@@ -571,7 +541,6 @@ public class PriorityTaskPicker
 				this.parentTaskPicker.tryStartNextTask();
 			}
 		}
-
 	}
 
 	/**
@@ -582,11 +551,8 @@ public class PriorityTaskPicker
 	public interface IExecutorCanRunFunc
 	{
 		boolean canRun();
-
 	}
 
 	///endregion
-
-
 
 }

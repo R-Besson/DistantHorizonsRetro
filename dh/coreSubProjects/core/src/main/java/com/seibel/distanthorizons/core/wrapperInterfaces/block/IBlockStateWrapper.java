@@ -91,5 +91,4 @@ public interface IBlockStateWrapper extends IDhApiBlockStateWrapper
 	boolean isIceBlock();
 
 	Color getBeaconTintColor();
-
 }

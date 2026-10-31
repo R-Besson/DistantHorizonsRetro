@@ -17,8 +17,6 @@ public interface ILWJGLService
 
 	//endregion
 
-
-
 	// ===================== BUFFER OPERATIONS =====================
 	//region
 
@@ -34,8 +32,6 @@ public interface ILWJGLService
 	void glBindVertexBuffer(int bindingindex, int buffer, int offset, int stride);
 
 	//endregion
-
-
 
 	// ===================== VAO OPERATIONS =====================
 	//region
@@ -53,8 +49,6 @@ public interface ILWJGLService
 	void glVertexAttribBinding(int attribindex, int bindingindex);
 
 	//endregion
-
-
 
 	// ===================== SHADER OPERATIONS =====================
 	//region
@@ -88,8 +82,6 @@ public interface ILWJGLService
 
 	//endregion
 
-
-
 	// ===================== UNIFORM OPERATIONS =====================
 	//region
 
@@ -104,8 +96,6 @@ public interface ILWJGLService
 
 	//endregion
 
-
-
 	// ===================== DRAW OPERATIONS =====================
 	//region
 
@@ -115,16 +105,12 @@ public interface ILWJGLService
 
 	//endregion
 
-
-
 	// ===================== SYNC OPERATIONS =====================
 	//region
 
 	void glFlush();
 
 	//endregion
-
-
 
 	// ===================== TEXTURE OPERATIONS =====================
 	//region
@@ -143,8 +129,6 @@ public interface ILWJGLService
 
 	//endregion
 
-
-
 	// ===================== FRAMEBUFFER OPERATIONS =====================
 	//region
 
@@ -157,8 +141,6 @@ public interface ILWJGLService
 	int glGetFramebufferAttachmentParameteri(int target, int attachment, int pname);
 
 	//endregion
-
-
 
 	// ===================== STATE OPERATIONS =====================
 	//region
@@ -184,16 +166,12 @@ public interface ILWJGLService
 
 	//endregion
 
-
-
 	// ===================== Fog =========================
 	//region
 
 	void glFogf(int pname, float params);
 
 	//endregion
-
-
 
 	// ===================== MISC GL =====================
 	//region
@@ -205,8 +183,6 @@ public interface ILWJGLService
 	String glGetString(int pname);
 
 	//endregion
-
-
 
 	// ===================== MEMORY STACK =====================
 	//region
@@ -221,6 +197,4 @@ public interface ILWJGLService
 	boolean isRunningOnRenderThread();
 
 	//endregion
-
-
 }

@@ -19,8 +19,6 @@
 
 package com.seibel.distanthorizons.common.wrappers.gui;
 
-
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -49,8 +47,6 @@ public class TexturedButtonWidget
 
 	private final ResourceLocation textureResourceLocation;
 
-
-
 	//==============//
 	// constructors //
 	//==============//
@@ -76,8 +72,6 @@ public class TexturedButtonWidget
 	}
 
 	//endregion
-
-
 
 	//===========//
 	// rendering //
@@ -127,9 +121,5 @@ public class TexturedButtonWidget
 		return 0;
 	}
 
-
 	//endregion
-
-
-
 }

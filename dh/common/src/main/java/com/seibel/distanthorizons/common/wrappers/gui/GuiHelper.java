@@ -7,7 +7,6 @@ import net.minecraft.util.StatCollector;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * Helper static methods for building GUIs
  */
@@ -55,7 +54,4 @@ public class GuiHelper
 	{
 		widget.yPosition = y;
 	}
-
-
-
 }

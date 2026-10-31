@@ -15,7 +15,4 @@ public class MixinChunk
 		byte[] data, int hasStorageBits, int hasMsbStorageBits,
 		boolean hasSkyLight, CallbackInfo ci)
 	{ ForgeClientProxy.onClientChunkFilled((Chunk) (Object) this); }
-
-
-
 }

@@ -27,5 +27,4 @@ public interface IDhFogRenderer extends IBindable
 {
 
 	void render(RenderParams renderParams, DhApiFogRenderParam fogRenderParams);
-
 }

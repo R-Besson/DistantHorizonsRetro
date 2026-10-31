@@ -30,7 +30,4 @@ public interface IDhGenericRenderer extends IDhApiCustomRenderRegister, AutoClos
 	String getVboRenderDebugMenuString();
 
 	@Override void close(); // override to remove "throws exception"
-
-
-
 }

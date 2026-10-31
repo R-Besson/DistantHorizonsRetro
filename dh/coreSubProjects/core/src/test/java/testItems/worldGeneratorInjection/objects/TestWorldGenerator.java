@@ -38,7 +38,6 @@ public class TestWorldGenerator implements IDhApiWorldGenerator
 {
 	public static final byte SMALLEST_DETAIL_LEVEL = 1;
 
-
 	// testable methods //
 
 	@Override
@@ -46,9 +45,6 @@ public class TestWorldGenerator implements IDhApiWorldGenerator
 
 	@Override
 	public byte getSmallestDataDetailLevel() { return SMALLEST_DETAIL_LEVEL; }
-
-
-
 
 	// not used when unit testing //
 
@@ -58,8 +54,6 @@ public class TestWorldGenerator implements IDhApiWorldGenerator
 
 	@Override
 	public byte getLargestDataDetailLevel() { return LodUtil.BLOCK_DETAIL_LEVEL; }
-
-
 
 	//===================//
 	// generator methods //
@@ -73,7 +67,5 @@ public class TestWorldGenerator implements IDhApiWorldGenerator
 
 	@Override
 	public void preGeneratorTaskStart() { }
-
-
 }
 

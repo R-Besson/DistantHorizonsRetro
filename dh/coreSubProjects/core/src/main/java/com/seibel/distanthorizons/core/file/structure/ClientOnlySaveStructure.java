@@ -51,18 +51,13 @@ public class ClientOnlySaveStructure implements ISaveStructure
 	private static final IMinecraftClientWrapper MC_CLIENT = SingletonInjector.INSTANCE.get(IMinecraftClientWrapper.class);
 	private static final IMinecraftSharedWrapper MC_SHARED = SingletonInjector.INSTANCE.get(IMinecraftSharedWrapper.class);
 
-
 	private final ConcurrentHashMap<ILevelWrapper, File> levelWrapperToFileMap = new ConcurrentHashMap<>();
-
-
 
 	//=============//
 	// constructor //
 	//=============//
 
 	public ClientOnlySaveStructure() { }
-
-
 
 	//================//
 	// folder methods //
@@ -128,8 +123,6 @@ public class ClientOnlySaveStructure implements ISaveStructure
 		return getSaveFolderByLevelId(getServerFolderName(), levelWrapper.getDimensionType().getName());
 	}
 
-
-
 	//================//
 	// helper methods //
 	//================//
@@ -154,18 +147,15 @@ public class ClientOnlySaveStructure implements ISaveStructure
 			return REPLAY_SERVER_FOLDER_NAME;
 		}
 
-
 		// parse the current server's IP
 		ParsedIp parsedIp = new ParsedIp(MC_CLIENT.getCurrentServerIp());
 		String serverIpCleaned = parsedIp.ip.replaceAll(INVALID_FILE_CHARACTERS_REGEX, "");
 		String serverPortCleaned = parsedIp.port != null ? parsedIp.port.replaceAll(INVALID_FILE_CHARACTERS_REGEX, "") : "";
 
-
 		// determine the auto folder name format
 		EDhApiServerFolderNameMode folderNameMode = Config.Client.Advanced.Multiplayer.serverFolderNameMode.get();
 		String serverName = MC_CLIENT.getCurrentServerName().replaceAll(INVALID_FILE_CHARACTERS_REGEX, "");
 		String serverMcVersion = MC_CLIENT.getCurrentServerVersion().replaceAll(INVALID_FILE_CHARACTERS_REGEX, "");
-
 
 		// generate the folder name
 		String folderName;
@@ -197,8 +187,6 @@ public class ClientOnlySaveStructure implements ISaveStructure
 		return new PercentEscaper("", true).escape(folderName);
 	}
 
-
-
 	//==================//
 	// override methods //
 	//==================//
@@ -208,5 +196,4 @@ public class ClientOnlySaveStructure implements ISaveStructure
 
 	@Override
 	public String toString() { return "[" + this.getClass().getSimpleName() + "@(" + StringUtil.join(";", this.levelWrapperToFileMap.values()) + ")]"; }
-
 }

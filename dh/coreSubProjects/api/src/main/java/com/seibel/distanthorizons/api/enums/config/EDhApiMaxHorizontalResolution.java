@@ -53,8 +53,6 @@ public enum EDhApiMaxHorizontalResolution
 	/** render 1 LOD for each chunk */
 	CHUNK(1, 4);
 
-
-
 	/**
 	 * How many DataPoints should
 	 * be drawn per side, per LodChunk
@@ -75,16 +73,12 @@ public enum EDhApiMaxHorizontalResolution
 	public final int[] endX;
 	public final int[] endZ;
 
-
 	/**
 	 * 1st dimension: LodDetail.detailLevel <br>
 	 * 2nd dimension: An array of all LodDetails that are less than or <br>
 	 * equal to that detailLevel
 	 */
 	private static EDhApiMaxHorizontalResolution[][] lowerDetailArrays;
-
-
-
 
 	EDhApiMaxHorizontalResolution(int newLengthCount, int newDetailLevel)
 	{
@@ -97,7 +91,6 @@ public enum EDhApiMaxHorizontalResolution
 
 		this.startZ = new int[this.dataPointLengthCount * this.dataPointLengthCount];
 		this.endZ = new int[this.dataPointLengthCount * this.dataPointLengthCount];
-
 
 		int index = 0;
 		for (int x = 0; x < newLengthCount; x++)
@@ -113,10 +106,7 @@ public enum EDhApiMaxHorizontalResolution
 				index++;
 			}
 		}
-
 	}// constructor
-
-
 
 	//================//
 	// static methods //
@@ -167,5 +157,4 @@ public enum EDhApiMaxHorizontalResolution
 
 		return lowerDetails[index];
 	}
-
 }

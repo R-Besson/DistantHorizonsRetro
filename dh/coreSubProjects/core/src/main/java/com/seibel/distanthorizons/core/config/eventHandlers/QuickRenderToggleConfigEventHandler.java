@@ -27,8 +27,6 @@ public class QuickRenderToggleConfigEventHandler
 {
 	public static QuickRenderToggleConfigEventHandler INSTANCE = new QuickRenderToggleConfigEventHandler();
 
-
-
 	/**
 	 * private since we only ever need one handler at a time <br>
 	 * the listeners register themselves with their config entries
@@ -53,5 +51,4 @@ public class QuickRenderToggleConfigEventHandler
 		boolean enableRendering = Config.Client.Advanced.Debugging.rendererMode.get() != EDhApiRendererMode.DISABLED;
 		Config.Client.quickEnableRendering.set(enableRendering);
 	}
-
 }

@@ -49,15 +49,12 @@ public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 	private static final MinecraftGLWrapper GLMC = MinecraftGLWrapper.INSTANCE;
 	private static final AbstractDhRenderApiDefinition RENDER_DEF = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
 
-
 	public int fogTexture;
 
 	// uniforms
 	public int colorTextureUniform;
 	public int depthTextureUniform;
 	public int uIsReverseZDepth;
-
-
 
 	//=============//
 	// constructor //
@@ -76,10 +73,7 @@ public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 		this.colorTextureUniform = this.shader.getUniformLocation("uColorTexture");
 		this.depthTextureUniform = this.shader.getUniformLocation("uDepthTexture");
 		this.uIsReverseZDepth = this.shader.getUniformLocation("uIsReverseZDepth");
-
 	}
-
-
 
 	//=============//
 	// render prep //
@@ -99,8 +93,6 @@ public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 		LWJGL.glUniform1i(this.uIsReverseZDepth, (RENDER_DEF.getDepthDirection() == EDhApiDepthDirection.REVERSE_Z) ? 1 : 0);
 	}
 
-
-
 	//========//
 	// render //
 	//========//
@@ -117,7 +109,6 @@ public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 		// it should be automatically restored after rendering is complete.
 		GLMC.disableDepthTest();
 
-
 		// apply the rendered Fog to DH's framebuffer
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, GlDhFogShader.INSTANCE.frameBuffer);
 		GLMC.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, GlDhMetaRenderer.INSTANCE.getActiveFramebufferId());
@@ -126,5 +117,4 @@ public class GlDhFogApplyShader extends GlAbstractShaderRenderer
 
 		GLMC.glBindFramebuffer(GL30.GL_READ_FRAMEBUFFER, 0);
 	}
-
 }

@@ -16,8 +16,6 @@ public interface IDhGenericObjectVertexBufferContainer extends AutoCloseable
 	@Override
 	void close();
 
-
-
 	//================//
 	// helper classes //
 	//================//
@@ -34,7 +32,4 @@ public interface IDhGenericObjectVertexBufferContainer extends AutoCloseable
 	}
 
 	//endregion
-
-
-
 }

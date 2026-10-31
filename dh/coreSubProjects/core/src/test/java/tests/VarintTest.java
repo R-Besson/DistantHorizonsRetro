@@ -37,7 +37,6 @@ public class VarintTest
 	{
 		Assert.assertEquals(0x80, 128);
 
-
 		// zig zag encoding is needed for varint handling, so test it first
 		for (int i = -256; i < 256; i++)
 		{
@@ -72,7 +71,6 @@ public class VarintTest
 			Assert.fail("Fail writing varint [" + value + "], error: [" + e.getMessage() + "]");
 		}
 
-
 		// read stream
 		try (DhDataInputStream inputStream = DhDataInputStream.create(byteArrayList, EDhApiDataCompressionMode.UNCOMPRESSED, null /*no checkout needed for uncompressed*/))
 		{
@@ -86,5 +84,4 @@ public class VarintTest
 			Assert.fail("Fail reading varint [" + value + "], error: [" + e.getMessage() + "]");
 		}
 	}
-
 }

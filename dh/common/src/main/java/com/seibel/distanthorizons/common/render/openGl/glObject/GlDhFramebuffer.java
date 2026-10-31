@@ -13,8 +13,6 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 
 	private int id;
 
-
-
 	//=============//
 	// constructor //
 	//=============//
@@ -23,8 +21,6 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 	public GlDhFramebuffer() { this.id = LWJGL.glGenFramebuffers(); }
 
 	//endregion
-
-
 
 	//=========//
 	// methods //
@@ -77,8 +73,6 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 
 	//endregion
 
-
-
 	//=============//
 	// API methods //
 	//=============//
@@ -87,7 +81,4 @@ public class GlDhFramebuffer implements IDhApiFramebuffer
 	public boolean overrideThisFrame() { return true; }
 
 	//endregion
-
-
-
 }
