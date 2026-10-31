@@ -7,7 +7,6 @@ import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.api.interfaces.render.IDhApiCustomRenderRegister;
 import com.seibel.distanthorizons.api.objects.DhApiResult;
 import com.seibel.distanthorizons.api.objects.data.IDhApiFullDataSource;
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateColorCache;
@@ -78,11 +77,11 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 
 
 	private final WorldClient level;
-	private final ConcurrentHashMap<IBlockState, ClientBlockStateColorCache> blockColorCacheByBlockState = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<BlockStateWrapper, ClientBlockStateColorCache> blockColorCacheByBlockState = new ConcurrentHashMap<>();
 
 
 	/** cached method reference to reduce GC overhead */
-	private final Function<IBlockState, ClientBlockStateColorCache> createCachedBlockColorCacheFunc
+	private final Function<BlockStateWrapper, ClientBlockStateColorCache> createCachedBlockColorCacheFunc
 		= (blockState) -> new ClientBlockStateColorCache(blockState, this);
 
 
@@ -304,11 +303,11 @@ public class ClientLevelWrapper implements IClientLevelWrapper
 		DhBlockPos blockWorldPos, IBiomeWrapper biome, FullDataSourceV2 fullDataSource, IBlockStateWrapper blockWrapper,
 		boolean allowApiOverride)
 	{
-		ClientBlockStateColorCache blockColorCache = this.blockColorCacheByBlockState.get(((BlockStateWrapper) blockWrapper).blockState);
+		ClientBlockStateColorCache blockColorCache = this.blockColorCacheByBlockState.get((BlockStateWrapper) blockWrapper);
 		if (blockColorCache == null)
 		{
 			blockColorCache = this.blockColorCacheByBlockState.computeIfAbsent(
-				((BlockStateWrapper) blockWrapper).blockState,
+				(BlockStateWrapper) blockWrapper,
 				this.createCachedBlockColorCacheFunc);
 		}
 

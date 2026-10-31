@@ -1,6 +1,5 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -35,11 +34,8 @@ public class GregTechAccessor implements IGregTechCommonAccessor
 
 	@Override
 	@Nullable
-	public IIcon resolveIcon(IBlockState blockState)
+	public IIcon resolveIcon(Block block, int meta)
 	{
-		Block block = blockState.getBlock();
-		int meta = blockState.getMeta();
-
 		if (!(block instanceof IBlockWithTextures))
 		{
 			return null;

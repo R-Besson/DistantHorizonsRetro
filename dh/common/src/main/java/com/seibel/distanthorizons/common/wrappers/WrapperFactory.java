@@ -24,8 +24,6 @@ import com.seibel.distanthorizons.api.interfaces.block.IDhApiBlockStateWrapper;
 import com.seibel.distanthorizons.api.interfaces.factories.IDhApiWrapperFactory;
 import com.seibel.distanthorizons.api.interfaces.override.worldGenerator.IDhApiWorldGenerator;
 import com.seibel.distanthorizons.api.interfaces.world.IDhApiLevelWrapper;
-import com.seibel.distanthorizons.common.backports.FakeBlockState;
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
@@ -324,40 +322,18 @@ public class WrapperFactory implements IWrapperFactory
 
 
 
-		if (objectArray.length != 3
-			&& objectArray.length != 1)
-		{
-			throw new ClassCastException(createBlockStateWrapperErrorMessage(objectArray));
-		}
-
-		boolean blockClassCorrect =
-			(
-				(objectArray[0] instanceof Block)
-					&& (objectArray[1] instanceof Integer)
-					&& (objectArray[2] instanceof Integer)
-			)
-				||
-				(objectArray[0] instanceof IBlockState);
+		// [block, meta] is what IDhApiBlockStateWrapper.getWrappedMcObject() returns,
+		// the old [block, meta, blockId] is still accepted, the ID comes from the block
+		boolean blockClassCorrect = (objectArray.length == 2 || objectArray.length == 3)
+			&& (objectArray[0] instanceof Block)
+			&& (objectArray[1] instanceof Integer)
+			&& (objectArray.length == 2 || objectArray[2] instanceof Integer);
 		if (!blockClassCorrect)
 		{
 			throw new ClassCastException(createBlockStateWrapperErrorMessage(objectArray));
 		}
 
-		IBlockState fakeBlockState;
-		if (objectArray[0] instanceof IBlockState)
-		{
-			fakeBlockState = (IBlockState) objectArray[0];
-		}
-		else
-		{
-			fakeBlockState = new FakeBlockState(
-				(Block) objectArray[0], // block
-				(Integer) objectArray[1], // meta
-				(Integer) objectArray[2] // blockId
-			);
-		}
-
-		return BlockStateWrapper.fromBlockState(fakeBlockState);
+		return BlockStateWrapper.fromBlockState((Block) objectArray[0], (Integer) objectArray[1]);
 	}
 	/**
 	 * Note: when this is updated,
@@ -365,7 +341,7 @@ public class WrapperFactory implements IWrapperFactory
 	 */
 	private static String createBlockStateWrapperErrorMessage(Object[] objectArray)
 	{
-		String[] expectedClassNames = new String[]{IBlockState.class.getName()};
+		String[] expectedClassNames = new String[]{Block.class.getName(), Integer.class.getName()};
 
 		return createWrapperErrorMessage("BlockState wrapper", expectedClassNames, objectArray);
 	}

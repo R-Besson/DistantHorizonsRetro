@@ -82,24 +82,24 @@ public class BlockStateTextureProvider implements IBlockStateFaceTextureProvider
 		{
 			return null;
 		}
-		return ClientBlockStateTextureCache.getPositionedAppearance((BlockStateWrapper) blockState, levelWrapper, fullDataSource, blockX, topY, blockZ);
+		return PositionedBlockTextureCache.getPositionedAppearance((BlockStateWrapper) blockState, levelWrapper, fullDataSource, blockX, topY, blockZ);
 	}
 
 	@Nullable
 	@Override
 	public BlockFaceTexture getPositionedFaceTexture(Object appearance, EDhDirection direction)
 	{
-		return ClientBlockStateTextureCache.getPositionedFaceTexture(appearance, direction);
+		return PositionedBlockTextureCache.getPositionedFaceTexture(appearance, direction);
 	}
 
 	@Override
-	public int getPositionedSideRowCount(Object appearance) { return ClientBlockStateTextureCache.getPositionedSideRowCount(appearance); }
+	public int getPositionedSideRowCount(Object appearance) { return PositionedBlockTextureCache.getPositionedSideRowCount(appearance); }
 
 	@Nullable
 	@Override
 	public BlockFaceTexture getPositionedSideRowTexture(Object appearance, EDhDirection direction, int row)
 	{
-		return ClientBlockStateTextureCache.getPositionedSideRowTexture(appearance, direction, row);
+		return PositionedBlockTextureCache.getPositionedSideRowTexture(appearance, direction, row);
 	}
 
 	@Override

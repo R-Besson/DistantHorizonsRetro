@@ -20,9 +20,7 @@
 package com.seibel.distanthorizons.common.wrappers.block;
 
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBlockColorOverrideEvent;
-import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import com.seibel.distanthorizons.common.backports.FakeWorld;
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.core.dataObjects.fullData.sources.FullDataSourceV2;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -60,7 +58,7 @@ public class ClientBlockStateColorCache
 {
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
-	private static final HashSet<IBlockState> BROKEN_BLOCK_STATES = new HashSet<>();
+	private static final HashSet<BlockStateWrapper> BROKEN_BLOCK_STATES = new HashSet<>();
 
 	/** Mod icon lookups aren't guaranteed to be thread safe, so color resolving is done in this lock. */
 	private static final ReentrantLock RESOLVE_LOCK = new ReentrantLock();
@@ -91,7 +89,6 @@ public class ClientBlockStateColorCache
 	private static final ThreadLocal<FakeWorld> FAKE_WORLD_REF = ThreadLocal.withInitial(FakeWorld::new);
 
 	private final IClientLevelWrapper clientLevelWrapper;
-	private final IBlockState blockState;
 	private final BlockStateWrapper blockStateWrapper;
 
 	private boolean isColorResolved = false;
@@ -178,10 +175,9 @@ public class ClientBlockStateColorCache
 	//=============//
 	//region
 
-	public ClientBlockStateColorCache(IBlockState blockState, IClientLevelWrapper clientLevelWrapper)
+	public ClientBlockStateColorCache(BlockStateWrapper blockStateWrapper, IClientLevelWrapper clientLevelWrapper)
 	{
-		this.blockState = blockState;
-		this.blockStateWrapper = BlockStateWrapper.fromBlockState(blockState);
+		this.blockStateWrapper = blockStateWrapper;
 		this.clientLevelWrapper = clientLevelWrapper;
 
 		this.resolveColors();
@@ -206,7 +202,7 @@ public class ClientBlockStateColorCache
 		try
 		{
 			RESOLVE_LOCK.lock();
-			FakeBlockState blockState = (FakeBlockState) this.blockState;
+			BlockStateWrapper blockState = this.blockStateWrapper;
 
 			// user overrides are final colors, so they skip tinting
 			Integer overrideColor = BlockColorOverrides.get(blockState.block, blockState.meta);
@@ -277,7 +273,7 @@ public class ClientBlockStateColorCache
 	 * The block's LOD color before biome tinting, the same as {@link #resolveColors()} calculates. <br>
 	 * Used as the reference textured LODs are relative to.
 	 */
-	public static int calculateUntintedColor(FakeBlockState blockState)
+	public static int calculateUntintedColor(BlockStateWrapper blockState)
 	{
 		Integer overrideColor = BlockColorOverrides.get(blockState.block, blockState.meta);
 		if (overrideColor != null)
@@ -304,7 +300,7 @@ public class ClientBlockStateColorCache
 	 * @return null if no face has an atlas sprite
 	 */
 	@Nullable
-	private static Integer calculateColorFromFaces(FakeBlockState blockState)
+	private static Integer calculateColorFromFaces(BlockStateWrapper blockState)
 	{
 		EColorMode colorMode = EColorMode.getColorMode(blockState.block);
 		Integer transparentColor = null;
@@ -312,7 +308,7 @@ public class ClientBlockStateColorCache
 		ForgeDirection[] faceSampleOrder = (blockState.block instanceof BlockRotatedPillar) ? PILLAR_FACE_SAMPLE_ORDER : FACE_SAMPLE_ORDER;
 		for (ForgeDirection face : faceSampleOrder)
 		{
-			TextureAtlasSprite sprite = TextureAtlasSpriteWrapper.resolveFaceSprite(blockState, face.ordinal());
+			TextureAtlasSprite sprite = TextureAtlasSpriteWrapper.resolveFaceSprite(blockState.block, blockState.meta, face.ordinal());
 			if (sprite == null || sprite == lastSprite)
 			{
 				// GregTech and most blocks use one sprite for every face, no need to average it again
@@ -465,7 +461,7 @@ public class ClientBlockStateColorCache
 		// use what MC draws at this position
 		int baseColor = this.baseColor;
 		Integer positionedColor = (fullDataSource != null)
-			? ClientBlockStateTextureCache.getPositionedColor(this.blockStateWrapper, this.clientLevelWrapper, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ())
+			? PositionedBlockTextureCache.getPositionedColor(this.blockStateWrapper, this.clientLevelWrapper, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ())
 			: null;
 		if (positionedColor != null)
 		{
@@ -478,7 +474,7 @@ public class ClientBlockStateColorCache
 		if (this.needPostTinting)
 		{
 			// don't try tinting blocks that don't support our method of tint getting
-			if (BROKEN_BLOCK_STATES.contains(this.blockState))
+			if (BROKEN_BLOCK_STATES.contains(this.blockStateWrapper))
 			{
 				return baseColor;
 			}
@@ -490,20 +486,19 @@ public class ClientBlockStateColorCache
 				// route through FakeWorld + Block.colorMultiplier so block-tint logic
 				// (grass/foliage/water/etc.) gets a usable IBlockAccess + biome lookup
 				IBlockAccess realLevel = (IBlockAccess) this.clientLevelWrapper.getWrappedMcObject();
-				FakeBlockState fakeBlockState = (FakeBlockState) this.blockState;
 
 				FakeWorld fakeWorld = FAKE_WORLD_REF.get();
-				fakeWorld.update(realLevel, biomeWrapper.biome, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ(), fakeBlockState);
+				fakeWorld.update(realLevel, biomeWrapper.biome, fullDataSource, blockPos.getX(), blockPos.getY(), blockPos.getZ(), this.blockStateWrapper);
 
-				tintColor = fakeBlockState.block.colorMultiplier(fakeWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ());
+				tintColor = this.blockStateWrapper.block.colorMultiplier(fakeWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ());
 			}
 			catch (Exception e)
 			{
 				// only display the error once per block/biome type to reduce log spam
-				if (!BROKEN_BLOCK_STATES.contains(this.blockState))
+				if (!BROKEN_BLOCK_STATES.contains(this.blockStateWrapper))
 				{
-					LOGGER.warn("Failed to get block color for block: [" + this.blockState + "] and biome: [" + biomeWrapper + "] at pos: " + blockPos + ". Error: [" + e.getMessage() + "]. Note: future errors for this block/biome will be ignored.", e);
-					BROKEN_BLOCK_STATES.add(this.blockState);
+					LOGGER.warn("Failed to get block color for block: [" + this.blockStateWrapper + "] and biome: [" + biomeWrapper + "] at pos: " + blockPos + ". Error: [" + e.getMessage() + "]. Note: future errors for this block/biome will be ignored.", e);
+					BROKEN_BLOCK_STATES.add(this.blockStateWrapper);
 				}
 			}
 		}

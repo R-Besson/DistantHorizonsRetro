@@ -19,8 +19,8 @@
 
 package com.seibel.distanthorizons.common.wrappers.modAccessor;
 
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modAccessor.IGregTechAccessor;
+import net.minecraft.block.Block;
 import net.minecraft.util.IIcon;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +33,6 @@ public interface IGregTechCommonAccessor extends IGregTechAccessor
 {
 
 	@Nullable
-	IIcon resolveIcon(IBlockState blockState);
+	IIcon resolveIcon(Block block, int meta);
 
 }

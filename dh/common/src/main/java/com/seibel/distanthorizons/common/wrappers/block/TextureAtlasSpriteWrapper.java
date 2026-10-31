@@ -19,7 +19,6 @@
 
 package com.seibel.distanthorizons.common.wrappers.block;
 
-import com.seibel.distanthorizons.common.backports.IBlockState;
 import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinTextureAtlasSprite;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IGregTechCommonAccessor;
 import com.seibel.distanthorizons.core.dependencyInjection.ModAccessorInjector;
@@ -173,20 +172,20 @@ public class TextureAtlasSpriteWrapper
 	 * @return the resolved sprite, or null if none could be found
 	 */
 	@Nullable
-	public static TextureAtlasSprite resolveFaceSprite(IBlockState blockstate, int sideOrdinal)
+	public static TextureAtlasSprite resolveFaceSprite(Block block, int meta, int sideOrdinal)
 	{
 		try
 		{
-			return tryResolveFaceSprite(blockstate, sideOrdinal);
+			return tryResolveFaceSprite(block, meta, sideOrdinal);
 		}
 		catch (Exception | LinkageError e)
 		{
 			// Some mods' getIcon() throws for metas they don't expect (IE out of bounds icon arrays),
 			// that would fail the whole LOD section every time it's built.
 			// The block gets its fallback color instead.
-			if (ICON_ERROR_LOGGED_BLOCKS.add(blockstate.getBlock()))
+			if (ICON_ERROR_LOGGED_BLOCKS.add(block))
 			{
-				LOGGER.warn("Unable to get the icon for block [" + GameData.getBlockRegistry().getNameForObject(blockstate.getBlock()) + "] meta [" + blockstate.getMeta() + "], error: [" + e + "].");
+				LOGGER.warn("Unable to get the icon for block [" + GameData.getBlockRegistry().getNameForObject(block) + "] meta [" + meta + "], error: [" + e + "].");
 			}
 			return null;
 		}
@@ -194,16 +193,16 @@ public class TextureAtlasSpriteWrapper
 	private static final Set<Block> ICON_ERROR_LOGGED_BLOCKS = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 	@Nullable
-	private static TextureAtlasSprite tryResolveFaceSprite(IBlockState blockstate, int sideOrdinal)
+	private static TextureAtlasSprite tryResolveFaceSprite(Block block, int meta, int sideOrdinal)
 	{
 		// The top half of a double plant only knows it's a top, the type is stored in the bottom half
 		// and without the world getIcon() returns the sunflower's bottom.
 		// LODs give tops their type as 8 + the bottom's meta (see BlockStateWrapper.getPlantTopWithBottom),
 		// a plain top (meta 8) is assumed to be tall grass, the most common one.
-		if (blockstate.getBlock() instanceof BlockDoublePlant
-			&& (blockstate.getMeta() & DOUBLE_PLANT_TOP_BIT) != 0)
+		if (block instanceof BlockDoublePlant
+			&& (meta & DOUBLE_PLANT_TOP_BIT) != 0)
 		{
-			int type = getDoublePlantTopType(blockstate.getMeta());
+			int type = getDoublePlantTopType(meta);
 			TextureAtlasSprite topSprite = findBlockAtlasSprite("double_plant_" + DOUBLE_PLANT_NAMES[type] + "_top");
 			if (topSprite != null)
 			{
@@ -217,11 +216,11 @@ public class TextureAtlasSpriteWrapper
 		if (GREG_TECH_ACCESSOR != null)
 		{
 			// GregTech icons are resolved per block/meta, not per face
-			icon = GREG_TECH_ACCESSOR.resolveIcon(blockstate);
+			icon = GREG_TECH_ACCESSOR.resolveIcon(block, meta);
 		}
 		if (icon == null)
 		{
-			icon = blockstate.getBlock().getIcon(sideOrdinal, blockstate.getMeta());
+			icon = block.getIcon(sideOrdinal, meta);
 		}
 
 		if (icon instanceof IconFlipped)

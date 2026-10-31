@@ -33,7 +33,7 @@ public class FakeWorld implements IBlockAccess
 	private int blockY;
 	private int blockZ;
 
-	private FakeBlockState blockState;
+	private BlockStateWrapper blockState;
 	/** neighboring biomes are read from here, null if unknown */
 	@Nullable
 	private FullDataSourceV2 fullDataSource;
@@ -51,7 +51,7 @@ public class FakeWorld implements IBlockAccess
 	public void update(
 		IBlockAccess realWorld, BiomeGenBase biome, @Nullable FullDataSourceV2 fullDataSource,
 		int blockX, int blockY, int blockZ,
-		FakeBlockState blockState)
+		BlockStateWrapper blockState)
 	{
 		this.readNeighborBlocks = false;
 		this.realWorld = realWorld;
@@ -77,7 +77,7 @@ public class FakeWorld implements IBlockAccess
 	public void updateWithNeighbors(
 		IBlockAccess realWorld, FullDataSourceV2 fullDataSource, int levelMinY,
 		int blockX, int blockY, int blockZ,
-		FakeBlockState blockState)
+		BlockStateWrapper blockState)
 	{
 		this.update(realWorld, null, fullDataSource, blockX, blockY, blockZ, blockState);
 		this.readNeighborBlocks = true;
@@ -103,7 +103,7 @@ public class FakeWorld implements IBlockAccess
 			return this.blockState.block;
 		}
 
-		FakeBlockState neighbor = this.getNeighborBlockState(x, y, z);
+		BlockStateWrapper neighbor = this.getNeighborBlockState(x, y, z);
 		return (neighbor != null) ? neighbor.block : Blocks.air;
 	}
 
@@ -136,7 +136,7 @@ public class FakeWorld implements IBlockAccess
 			return TextureAtlasSpriteWrapper.getDoublePlantTopType(this.blockState.meta);
 		}
 
-		FakeBlockState neighbor = this.getNeighborBlockState(x, y, z);
+		BlockStateWrapper neighbor = this.getNeighborBlockState(x, y, z);
 		return (neighbor != null) ? neighbor.meta : 0;
 	}
 
@@ -208,7 +208,7 @@ public class FakeWorld implements IBlockAccess
 		int y = topY;
 		while (y > bottomY)
 		{
-			FakeBlockState below = this.getNeighborBlockState(x, y - 1, z);
+			BlockStateWrapper below = this.getNeighborBlockState(x, y - 1, z);
 			if (below == null
 				|| below.block != this.blockState.block
 				|| below.meta != this.blockState.meta)
@@ -227,7 +227,7 @@ public class FakeWorld implements IBlockAccess
 	 * @return null if neighbors aren't read, the block is outside the LOD or unknown
 	 */
 	@Nullable
-	private FakeBlockState getNeighborBlockState(int x, int y, int z)
+	private BlockStateWrapper getNeighborBlockState(int x, int y, int z)
 	{
 		LongArrayList column = this.readNeighborBlocks ? this.getColumn(x, z) : null;
 		if (column == null)
@@ -250,9 +250,7 @@ public class FakeWorld implements IBlockAccess
 		}
 
 		IBlockStateWrapper wrapper = this.getBlockStateWrapper(dataPoint);
-		return (wrapper instanceof BlockStateWrapper && ((BlockStateWrapper) wrapper).blockState instanceof FakeBlockState)
-			? (FakeBlockState) ((BlockStateWrapper) wrapper).blockState
-			: null;
+		return (wrapper instanceof BlockStateWrapper && !wrapper.isAir()) ? (BlockStateWrapper) wrapper : null;
 	}
 
 	/** the same check FullDataOcclusionCuller uses to find hidden blocks */

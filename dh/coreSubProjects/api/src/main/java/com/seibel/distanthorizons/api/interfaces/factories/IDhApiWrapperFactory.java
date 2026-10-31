@@ -52,7 +52,8 @@ public interface IDhApiWrapperFactory
 	 * Constructs a {@link IDhApiBlockStateWrapper} for use by other DhApi methods.
 	 *
 	 * @param objectArray Expects the following Minecraft objects (in order): <br>
-	 * - [{@code net.minecraft.block.Block} block, {@code Integer} metadata, {@code Integer} blockId]<br>
+	 * - [{@code net.minecraft.block.Block} block, {@code Integer} metadata]<br>
+	 * An optional third {@code Integer} (the block ID) is accepted and ignored.<br>
 	 * @param levelWrapper Expects a {@link IDhApiBlockStateWrapper} returned by one of DH's {@link DhApi.Delayed#worldProxy} methods. <br>
 	 * A custom implementation of {@link IDhApiBlockStateWrapper} will not be accepted.
 	 * @throws ClassCastException if any of the given parameters is of the wrong type.

@@ -20,7 +20,6 @@
 package com.seibel.distanthorizons.common.wrappers.chunk;
 
 import com.seibel.distanthorizons.api.DhApi;
-import com.seibel.distanthorizons.common.backports.FakeBlockState;
 import com.seibel.distanthorizons.common.wrappers.block.BiomeWrapper;
 import com.seibel.distanthorizons.common.wrappers.block.BlockStateWrapper;
 import com.seibel.distanthorizons.common.wrappers.misc.MutableBlockPosWrapper;
@@ -604,7 +603,7 @@ public class ChunkWrapper implements IChunkWrapper
 					{
 						for (int y = 0; y < 16; y++)
 						{
-							int lightValue = FakeBlockState.getLightEmission(section.getBlockByExtId(x, y, z), section.getExtBlockMetadata(x, y, z));
+							int lightValue = BlockStateWrapper.getLightEmission(section.getBlockByExtId(x, y, z), section.getExtBlockMetadata(x, y, z));
 							if (lightValue > 0)
 							{
 								this.blockLightPosList.add(new DhBlockPos(this.chunkPos.getMinBlockX() + x, baseY + y, this.chunkPos.getMinBlockZ() + z));
