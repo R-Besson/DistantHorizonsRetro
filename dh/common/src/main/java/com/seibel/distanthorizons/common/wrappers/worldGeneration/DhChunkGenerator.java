@@ -37,7 +37,12 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.worldGeneration.IChunkG
 import com.seibel.distanthorizons.coreapi.ModInfo;
 
 import java.util.Iterator;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public final class DhChunkGenerator implements IChunkGenerator
