@@ -6,7 +6,6 @@
   Hyper Optimized Unofficial 1.7.10 fork of <a href="https://gitlab.com/distant-horizons-team/distant-horizons">Distant Horizons</a>, focused on visuals, performance, and new features.
 </p>
 
-
 <p align="center">
   <a href="https://github.com/R-Besson/DistantHorizonsRetro/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/github_vector.svg" alt="Available on GitHub"></a>
   <a href="https://github.com/R-Besson/DistantHorizonsRetro/releases"><img src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/forge_vector.svg" alt="Supports Forge"></a>
@@ -144,7 +143,7 @@ The dev client comes with [Angelica](https://github.com/GTNewHorizons/Angelica),
 # Credits
 
 - [Distant Horizons][dh] by James Seibel and the Distant Horizons team
-- [GTNH/DistantHorizons][gtnh] by DarkShadow44, the original 1.7.10 port
+- [GTNH Distant Horizons][gtnh] by DarkShadow44, the original 1.7.10 port
 - Logo based on the Distant Horizons logo by Pankakes
 
 # License
