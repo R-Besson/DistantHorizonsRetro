@@ -197,21 +197,20 @@ public class ShaderPackLodTextures
 		// See-through leaves cut out their gaps like DH's own shader (see frag.frag), they're marked with 254 alpha.
 		// Only that mark counts, leaf-like blocks that aren't leaves (IE cactus) have other see-through texels.
 		// Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
-		// Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
-		// fading to solid leaves in the distance
+		// Further away several texels fall in a pixel, like MC's mipmapped leaves the pixel is only cut out
+		// when all of it is gap, so leaves fill in with distance
 		+ "        if (dhr_NormalIndex >= 8u) {\n"
 		+ "            vec2 dhr_texelPos = dhr_blockFaceUv() * 16.0;\n"
 		+ "            vec2 dhr_texelDx = dFdx(dhr_blockFaceUvUnwrapped() * 16.0);\n"
 		+ "            vec2 dhr_texelDy = dFdy(dhr_blockFaceUvUnwrapped() * 16.0);\n"
-		+ "            float dhr_gapFade = 1.0 - smoothstep(4.0, 8.0, max(length(dhr_texelDx), length(dhr_texelDy)));\n"
-		+ "            if (dhr_gapFade > 0.0) {\n"
+		+ "            if (max(length(dhr_texelDx), length(dhr_texelDy)) < 8.0) {\n"
 		+ "                float dhr_gaps = 0.0;\n"
 		+ "                for (int dhr_i = 0; dhr_i < 4; dhr_i++) {\n"
 		+ "                    vec2 dhr_offset = vec2((dhr_i & 1) == 0 ? -0.25 : 0.25, (dhr_i & 2) == 0 ? -0.25 : 0.25);\n"
 		+ "                    vec2 dhr_texel = mod(floor(dhr_texelPos + dhr_texelDx * dhr_offset.x + dhr_texelDy * dhr_offset.y), 16.0);\n"
 		+ "                    dhr_gaps += (abs(texelFetch(" + ATLAS_UNIFORM + ", ivec2(tileOrigin + dhr_texel), 0).a - 254.0 / 255.0) < 0.002) ? 0.25 : 0.0;\n"
 		+ "                }\n"
-		+ "                if (dhr_gaps * dhr_gapFade > dhr_bayer4x4(gl_FragCoord.xy) + 0.001) discard;\n"
+		+ "                if (dhr_gaps > 0.999) discard;\n"
 		+ "            }\n"
 		+ "        }\n"
 		// 128 gray is the LOD's own color.

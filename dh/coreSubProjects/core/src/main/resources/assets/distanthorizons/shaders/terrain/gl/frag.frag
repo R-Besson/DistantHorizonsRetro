@@ -159,16 +159,16 @@ void main()
         // Only that mark counts, other see-through texels are drawn in the LOD's color
         // since leaf-like blocks that aren't leaves (IE cactus, whose sides have see-through edges) use this too.
         // Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
-        // Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
-        // fading to solid leaves in the distance
+        // Further away several texels fall in a pixel, like MC's mipmapped leaves the pixel is only cut out
+        // when all of it is gap, so leaves fill in with distance instead of staying as see-through as up close
+        // (which showed the trunks inside trees)
         if (vNormalIndex >= 8u)
         {
             vec2 texelPos = blockFaceUv() * 16.0;
             vec2 texelDx = dFdx(blockFaceUvUnwrapped() * 16.0);
             vec2 texelDy = dFdy(blockFaceUvUnwrapped() * 16.0);
             float texelsPerPixel = max(length(texelDx), length(texelDy));
-            float fade = 1.0 - smoothstep(4.0, 8.0, texelsPerPixel);
-            if (fade > 0.0)
+            if (texelsPerPixel < 8.0)
             {
                 float gaps = 0.0;
                 for (int i = 0; i < 4; i++)
@@ -177,7 +177,7 @@ void main()
                     vec2 texel = mod(floor(texelPos + texelDx * offset.x + texelDy * offset.y), 16.0);
                     gaps += (abs(texelFetch(uBlockAtlas, ivec2(tileOrigin + texel), 0).a - 254.0 / 255.0) < 0.002) ? 0.25 : 0.0;
                 }
-                if (gaps * fade > bayerMatrix4x4(gl_FragCoord.xy) + 0.001)
+                if (gaps > 0.999)
                 {
                     discard;
                 }
