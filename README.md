@@ -142,6 +142,7 @@ The dev client comes with [Angelica](https://github.com/GTNewHorizons/Angelica),
 
 # Credits
 
+- Distant Horizons Retro by R-Besson
 - [Distant Horizons][dh] by James Seibel and the Distant Horizons team
 - [GTNH Distant Horizons][gtnh] by DarkShadow44, the original 1.7.10 port
 - Logo based on the Distant Horizons logo by Pankakes

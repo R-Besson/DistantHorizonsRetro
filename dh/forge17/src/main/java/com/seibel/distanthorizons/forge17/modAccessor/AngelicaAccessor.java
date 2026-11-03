@@ -1,8 +1,6 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
 import com.gtnewhorizons.angelica.config.AngelicaConfig;
-import com.gtnewhorizons.angelica.glsm.GLSMFog;
-import com.gtnewhorizons.angelica.glsm.GLSMPrograms;
 import com.gtnewhorizons.angelica.rendering.celeritas.CeleritasWorldRenderer;
 import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
@@ -34,8 +32,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 	private static final DhLogger LOGGER = new DhLoggerBuilder().build();
 
 	public static final String ANGELICA_MOD_ID = "angelica";
-	/** 2.2.40 split GLStateManager into GLSMPrograms, GLSMTextures, GLSMFog etc. */
-	public static final String MINIMUM_ANGELICA_VERSION = "2.2.40";
+	public static final String MINIMUM_ANGELICA_VERSION = "2.1.5";
 	public static final VersionRange SUPPORTED_ANGELICA_RANGE = VersionParser
 		.parseRange("[" + MINIMUM_ANGELICA_VERSION + ",)");
 
@@ -165,7 +162,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 
 		try
 		{
-			int program = GLSMPrograms.getActiveProgram();
+			int program = AngelicaGLStateCompat.getActiveProgram();
 			if (program == 0)
 			{
 				return;
@@ -279,7 +276,7 @@ public class AngelicaAccessor implements IAngelicaAccessor
 		// rewrite the descriptor in this class too and fail with a NoSuchMethodError against
 		// Angelica's un-relocated JOML. Angelica keeps this buffer in sync with the vector.
 		// Layout is (red, green, blue, alpha); the fog alpha isn't used here.
-		FloatBuffer fogColor = GLSMFog.getFogState().getFogColorBuffer();
+		FloatBuffer fogColor = AngelicaGLStateCompat.getFogState().getFogColorBuffer();
 		return new Color(
 			Math.max(0.0f, Math.min(1.0f, fogColor.get(0))),
 			Math.max(0.0f, Math.min(1.0f, fogColor.get(1))),

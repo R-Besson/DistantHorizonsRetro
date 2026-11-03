@@ -129,7 +129,6 @@ if (isNotCommonProject) {
             attributes(
                 'Implementation-Title': rootProject.mod_name,
                 'Implementation-Version': rootProject.mod_version,
-                'Multi-Release': true,
                 'Main-Class': 'com.seibel.distanthorizons.core.jar.JarMain',
                 'FMLCorePlugin': 'com.seibel.distanthorizons.DistantHorizonsTweaker',
                 'FMLCorePluginContainsFMLMod': true,
@@ -438,6 +437,12 @@ if (isNotCommonProject) {
         exclude "org/sqlite/native/FreeBSD/x86/**"
         exclude "org/sqlite/native/FreeBSD/aarch64/**"
         exclude "org/sqlite/native/Windows/armv7/**"
+
+        // The libraries' Java 9+ variants of classes they also have for Java 8 (XZ, NightConfig, SQLite's GraalVM hook).
+        // Not a multi-release jar so old bytecode readers (IE FML's mod discovery and some coremods)
+        // don't trip over Java 17 class files
+        exclude "META-INF/versions/**"
+        addMultiReleaseAttribute = false
 
         // Only the fastutil classes DH uses are bundled, the full library is over 16 MB.
         // Nothing else is trimmed: SQLite, zstd and LZ4 are reached from native code and service files,
