@@ -395,7 +395,7 @@ public class ClientBlockStateTextureCache
 	 * The 254 alpha marks them as gaps, DH's shader draws them as is,
 	 * shader packs show the lit leaves behind them like MC does (see ShaderPackLodTextures).
 	 */
-	private static final int LEAVES_GAP_COLOR = ColorUtil.argbToInt(254, 44, 44, 44);
+	static final int LEAVES_GAP_COLOR = ColorUtil.argbToInt(254, 44, 44, 44);
 
 	/**
 	 * Makes each face's texture relative to the color its LOD face is drawn with,

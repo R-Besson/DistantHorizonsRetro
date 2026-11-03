@@ -235,7 +235,9 @@ public class ClientBlockStateColorCache
 
 			if (blockState.block instanceof BlockGrass
 				|| blockState.block instanceof BlockLeavesBase
-				|| blockState.block instanceof BlockBush)
+				|| blockState.block instanceof BlockBush
+				// blocks tinted by the biome with a white block color, IE sugar cane
+				|| overridesColorMultiplier(blockState.block.getClass()))
 			{
 				this.needPostTinting = true;
 			}
@@ -259,6 +261,25 @@ public class ClientBlockStateColorCache
 			RESOLVE_LOCK.unlock();
 		}
 	}
+
+	/** colorMultiplier is a vanilla method, so it has its MCP name in dev and its SRG name outside of it */
+	private static boolean overridesColorMultiplier(Class<?> blockClass)
+	{
+		return OVERRIDES_COLOR_MULTIPLIER_BY_CLASS.computeIfAbsent(blockClass, (clazz) ->
+		{
+			for (String methodName : COLOR_MULTIPLIER_METHOD_NAMES)
+			{
+				try
+				{
+					return clazz.getMethod(methodName, IBlockAccess.class, int.class, int.class, int.class).getDeclaringClass() != Block.class;
+				}
+				catch (NoSuchMethodException ignored) { }
+			}
+			return false;
+		});
+	}
+	private static final String[] COLOR_MULTIPLIER_METHOD_NAMES = {"colorMultiplier", "func_149720_d"};
+	private static final ConcurrentHashMap<Class<?>, Boolean> OVERRIDES_COLOR_MULTIPLIER_BY_CLASS = new ConcurrentHashMap<>();
 
 	/**
 	 * The block's LOD color before biome tinting, the same as {@link #resolveColors()} calculates. <br>

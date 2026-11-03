@@ -195,6 +195,7 @@ public class ShaderPackLodTextures
 		// plants are cut out like MC's
 		+ "        if (dhr_NormalIndex >= 6u && dhr_NormalIndex < 8u && tile.a < 0.5) discard;\n"
 		// See-through leaves cut out their gaps like DH's own shader (see frag.frag), they're marked with 254 alpha.
+		// Only that mark counts, leaf-like blocks that aren't leaves (IE cactus) have other see-through texels.
 		// Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
 		// Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
 		// fading to solid leaves in the distance
@@ -208,7 +209,7 @@ public class ShaderPackLodTextures
 		+ "                for (int dhr_i = 0; dhr_i < 4; dhr_i++) {\n"
 		+ "                    vec2 dhr_offset = vec2((dhr_i & 1) == 0 ? -0.25 : 0.25, (dhr_i & 2) == 0 ? -0.25 : 0.25);\n"
 		+ "                    vec2 dhr_texel = mod(floor(dhr_texelPos + dhr_texelDx * dhr_offset.x + dhr_texelDy * dhr_offset.y), 16.0);\n"
-		+ "                    dhr_gaps += (texelFetch(" + ATLAS_UNIFORM + ", ivec2(tileOrigin + dhr_texel), 0).a < 0.998) ? 0.25 : 0.0;\n"
+		+ "                    dhr_gaps += (abs(texelFetch(" + ATLAS_UNIFORM + ", ivec2(tileOrigin + dhr_texel), 0).a - 254.0 / 255.0) < 0.002) ? 0.25 : 0.0;\n"
 		+ "                }\n"
 		+ "                if (dhr_gaps * dhr_gapFade > dhr_bayer4x4(gl_FragCoord.xy) + 0.001) discard;\n"
 		+ "            }\n"

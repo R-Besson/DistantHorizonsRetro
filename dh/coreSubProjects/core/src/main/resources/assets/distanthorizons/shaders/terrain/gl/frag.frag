@@ -156,6 +156,8 @@ void main()
             discard;
         }
         // See-through leaves also cut out their gaps, which are marked with 254 alpha (see ClientBlockStateTextureCache).
+        // Only that mark counts, other see-through texels are drawn in the LOD's color
+        // since leaf-like blocks that aren't leaves (IE cactus, whose sides have see-through edges) use this too.
         // Exact texels are checked since mipmaps blur the marks (and neighboring tiles) together.
         // Further away several texels fall in a pixel, so the share of gaps in it is dithered out,
         // fading to solid leaves in the distance
@@ -173,7 +175,7 @@ void main()
                 {
                     vec2 offset = vec2((i & 1) == 0 ? -0.25 : 0.25, (i & 2) == 0 ? -0.25 : 0.25);
                     vec2 texel = mod(floor(texelPos + texelDx * offset.x + texelDy * offset.y), 16.0);
-                    gaps += (texelFetch(uBlockAtlas, ivec2(tileOrigin + texel), 0).a < 0.998) ? 0.25 : 0.0;
+                    gaps += (abs(texelFetch(uBlockAtlas, ivec2(tileOrigin + texel), 0).a - 254.0 / 255.0) < 0.002) ? 0.25 : 0.0;
                 }
                 if (gaps * fade > bayerMatrix4x4(gl_FragCoord.xy) + 0.001)
                 {

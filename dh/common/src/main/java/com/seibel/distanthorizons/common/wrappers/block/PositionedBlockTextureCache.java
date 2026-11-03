@@ -14,6 +14,7 @@ import com.seibel.distanthorizons.core.wrapperInterfaces.block.IBlockStateFaceTe
 import com.seibel.distanthorizons.core.wrapperInterfaces.world.IClientLevelWrapper;
 import com.seibel.distanthorizons.coreapi.util.ColorUtil;
 import com.seibel.distanthorizons.coreapi.util.TextureUtil;
+import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateTextureCache.BAKE_LOCK;
 import static com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateTextureCache.FACE_DIRECTIONS;
+import static com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateTextureCache.LEAVES_GAP_COLOR;
 import static com.seibel.distanthorizons.common.wrappers.block.ClientBlockStateTextureCache.TEXTURE_WIDTH_AND_HEIGHT;
 
 /**
@@ -205,12 +207,17 @@ public class PositionedBlockTextureCache
 
 				// A tile's alpha is how much of its color covers the LOD's, the LOD's own alpha makes glass see-through.
 				// Partly see-through pixels (IE stained-glass) are fully colored like MC's,
-				// fully see-through ones are cut out of see-through LODs
+				// fully see-through ones are cut out of see-through LODs, leaves mark them as gaps instead
+				boolean isLeaves = appearance.blockStateWrapper.block instanceof BlockLeavesBase;
 				for (int i = 0; i < faceTexture.argbPixels.length; i++)
 				{
 					if (ColorUtil.getAlpha(faceTexture.argbPixels[i]) != 0)
 					{
 						faceTexture.argbPixels[i] = ColorUtil.setAlpha(faceTexture.argbPixels[i], 255);
+					}
+					else if (isLeaves)
+					{
+						faceTexture.argbPixels[i] = LEAVES_GAP_COLOR;
 					}
 				}
 			}
