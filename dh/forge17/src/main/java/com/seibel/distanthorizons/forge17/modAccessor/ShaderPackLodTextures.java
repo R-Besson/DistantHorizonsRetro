@@ -1,5 +1,7 @@
 package com.seibel.distanthorizons.forge17.modAccessor;
 
+import com.gtnewhorizons.angelica.glsm.GLSMPrograms;
+import com.gtnewhorizons.angelica.glsm.GLSMTextures;
 import com.gtnewhorizons.angelica.glsm.GLStateManager;
 import com.seibel.distanthorizons.api.enums.rendering.EDhApiBlockMaterial;
 import com.seibel.distanthorizons.core.config.Config;
@@ -498,8 +500,8 @@ public class ShaderPackLodTextures
 	{
 		uploadMcProjectionInverse(programId);
 
-		int atlasUniform = GLStateManager.glGetUniformLocation(programId, ATLAS_UNIFORM);
-		int enabledUniform = GLStateManager.glGetUniformLocation(programId, ENABLED_UNIFORM);
+		int atlasUniform = GLSMPrograms.glGetUniformLocation(programId, ATLAS_UNIFORM);
+		int enabledUniform = GLSMPrograms.glGetUniformLocation(programId, ENABLED_UNIFORM);
 		if (atlasUniform == -1 || enabledUniform == -1)
 		{
 			// this program wasn't patched
@@ -509,7 +511,7 @@ public class ShaderPackLodTextures
 		int atlasTextureId = DhApiRenderProxy.getDhBlockRatioAtlasTextureGlId;
 		boolean enabled = Config.Client.Advanced.Graphics.Texture.enableTexturedLods.get()
 			&& atlasTextureId > 0;
-		GLStateManager.glUniform1i(enabledUniform, enabled ? 1 : 0);
+		GLSMPrograms.glUniform1i(enabledUniform, enabled ? 1 : 0);
 		if (!enabled)
 		{
 			return;
@@ -517,17 +519,17 @@ public class ShaderPackLodTextures
 
 		// the pack's samplers are given the lowest units, so the last one is free
 		int unit = GLStateManager.MAX_TEXTURE_UNITS - 1;
-		int previousUnit = GLStateManager.getActiveTextureUnit();
-		GLStateManager.glActiveTexture(GL13.GL_TEXTURE0 + unit);
-		GLStateManager.glBindTexture(GL11.GL_TEXTURE_2D, atlasTextureId);
-		GLStateManager.glActiveTexture(GL13.GL_TEXTURE0 + previousUnit);
-		GLStateManager.glUniform1i(atlasUniform, unit);
+		int previousUnit = GLSMTextures.getActiveTextureUnit();
+		GLSMTextures.glActiveTexture(GL13.GL_TEXTURE0 + unit);
+		GLSMTextures.glBindTexture(GL11.GL_TEXTURE_2D, atlasTextureId);
+		GLSMTextures.glActiveTexture(GL13.GL_TEXTURE0 + previousUnit);
+		GLSMPrograms.glUniform1i(atlasUniform, unit);
 	}
 
 	/** see VANILLA_SHOWN_FUNCTION */
 	private static void uploadMcProjectionInverse(int programId)
 	{
-		int uniform = GLStateManager.glGetUniformLocation(programId, MC_PROJECTION_INVERSE_UNIFORM);
+		int uniform = GLSMPrograms.glGetUniformLocation(programId, MC_PROJECTION_INVERSE_UNIFORM);
 		if (uniform == -1)
 		{
 			return;
