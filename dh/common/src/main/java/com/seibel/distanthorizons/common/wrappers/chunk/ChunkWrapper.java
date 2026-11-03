@@ -466,6 +466,8 @@ public class ChunkWrapper implements IChunkWrapper
 	@Override
 	public DhChunkPos getChunkPos() { return this.chunkPos; }
 
+	public Chunk getChunk() { return this.chunk; }
+
 	@Override
 	public int getMinBlockX() { return this.chunkPos.getMinBlockX(); }
 	@Override

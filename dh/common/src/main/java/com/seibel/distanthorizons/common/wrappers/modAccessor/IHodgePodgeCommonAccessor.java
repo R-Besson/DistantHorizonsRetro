@@ -26,4 +26,22 @@ public interface IHodgePodgeCommonAccessor extends IHodgePodgeAccessor
 {
 	void preventChunkSimulation(World world, int x, int z);
 	void allowChunkSimulation(World world, int x, int z);
+
+	/**
+	 * Hodgepodge's throttled chunk generation blocks generating chunks during the server tick,
+	 * outside of its own scheduler. Missing chunks are then replaced with an empty chunk,
+	 * so anything world gen places in them is lost (IE the half of a big tree reaching into the next chunk). <br>
+	 * DH's world gen runs during the tick, so it has to allow it while it generates.
+	 *
+	 * @return true if chunk generation was blocked, pass it to {@link #restoreChunkGeneration}
+	 */
+	boolean allowChunkGeneration();
+	/** @param wasBlocked the value {@link #allowChunkGeneration} returned */
+	void restoreChunkGeneration(boolean wasBlocked);
+
+	/**
+	 * Runs the given population like Hodgepodge's own,
+	 * chunks it generates on the way are left for Hodgepodge to populate instead of cascading further.
+	 */
+	void runAsPopulation(World world, Runnable populate);
 }

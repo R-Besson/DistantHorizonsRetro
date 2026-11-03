@@ -5,6 +5,7 @@ import com.seibel.distanthorizons.common.backports.ChunkPos;
 import com.seibel.distanthorizons.common.util.threading.ServerThreadTaskHandler;
 import com.seibel.distanthorizons.common.wrappers.McObjectConverter;
 import com.seibel.distanthorizons.common.wrappers.chunk.ChunkWrapper;
+import com.seibel.distanthorizons.common.wrappers.interfaces.IMixinChunk;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.CubicChunksCompat;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.ICubicChunksCommonAccessor;
 import com.seibel.distanthorizons.common.wrappers.modAccessor.IHodgePodgeCommonAccessor;
@@ -25,6 +26,7 @@ import com.seibel.distanthorizons.core.util.LodUtil;
 import com.seibel.distanthorizons.core.util.TimerUtil;
 import com.seibel.distanthorizons.core.wrapperInterfaces.chunk.IChunkWrapper;
 import com.seibel.distanthorizons.core.wrapperInterfaces.modLoader.IForgeMain;
+import com.seibel.distanthorizons.core.wrapperInterfaces.world.IServerLevelWrapper;
 import com.seibel.distanthorizons.coreapi.ModInfo;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.WorldServer;
@@ -86,6 +88,13 @@ public class DhInternalServerGenerator
 	 * This map tracks how many in-flight generation events currently need each chunk pos loaded.
 	 */
 	private final ConcurrentHashMap<DhChunkPos, Integer> generationChunkRefCountMap = new ConcurrentHashMap<>();
+	/**
+	 * The {@link IMixinChunk#distanthorizons$getBlockChangeCount()} of each held chunk when its LOD was built,
+	 * or when it was first held if it already had one (IE a neighbor of this generation event made earlier). <br>
+	 * Populating a neighbor can put big trees into a chunk that already has its LOD,
+	 * those changes are ignored while the chunk is held so they're applied when it's released.
+	 */
+	private final ConcurrentHashMap<DhChunkPos, Integer> lodBlockChangeCountByPos = new ConcurrentHashMap<>();
 
 	//=============//
 	// constructor //
@@ -119,6 +128,7 @@ public class DhInternalServerGenerator
 				}
 			}
 			this.generationChunkRefCountMap.clear();
+			this.lodBlockChangeCountByPos.clear();
 
 			ForgeChunkManager.releaseTicket(this.dhServerGenTicket);
 			return null;
@@ -254,9 +264,18 @@ public class DhInternalServerGenerator
 				ChunkWrapper chunkWrapper = getChunkFutureList.get(i).join();
 				if (chunkWrapper != null)
 				{
-					chunkWrapper.createDhHeightMaps();
 					chunkWrappers.add(chunkWrapper);
 				}
+			}
+
+			// only once every request is done, the later requests populate their neighbors,
+			// which can put trees into the chunks before them (IE a tree's top in a section that was empty)
+			for (int i = 0; i < chunkWrappers.size(); i++)
+			{
+				ChunkWrapper chunkWrapper = (ChunkWrapper) chunkWrappers.get(i);
+				// before the LOD reads the chunk, so changes made after that can be found when it's released
+				this.lodBlockChangeCountByPos.put(chunkWrapper.getChunkPos(), getBlockChangeCount(chunkWrapper.getChunk()));
+				chunkWrapper.createDhHeightMaps();
 			}
 
 			//==========================//
@@ -397,58 +416,101 @@ public class DhInternalServerGenerator
 
 		return ServerThreadTaskHandler.INSTANCE.queueTask(() ->
 		{
-			ChunkProviderServer provider = (ChunkProviderServer) level.getChunkProvider();
-
-			// load neighbors first so the target chunk can fully populate.
-			// adjacent generation events share these border chunks, so a reference count
-			// is used to only load each chunk once and to track who still needs it.
-			for (int dx = -1; dx <= 1; dx++)
+			// populating can place blocks in chunks that don't exist yet (IE big trees),
+			// those have to be generated or the blocks are lost
+			boolean chunkGenerationWasBlocked = (HODGE_PODGE_ACCESSOR != null) && HODGE_PODGE_ACCESSOR.allowChunkGeneration();
+			try
 			{
-				for (int dz = -1; dz <= 1; dz++)
+				return this.loadChunkWithNeighbors(level, chunkPos);
+			}
+			finally
+			{
+				if (HODGE_PODGE_ACCESSOR != null)
 				{
-					int neighborPosX = chunkPos.x + dx;
-					int neighborPosZ = chunkPos.z + dz;
-
-					if (!this.acquireChunkRef(new DhChunkPos(neighborPosX, neighborPosZ)))
-					{
-						// another generation event already has this chunk loaded
-						continue;
-					}
-
-					if (this.updateManager != null)
-					{
-						this.updateManager.addPosToIgnore(new DhChunkPos(neighborPosX, neighborPosZ));
-					}
-
-					if (HODGE_PODGE_ACCESSOR != null)
-					{
-						HODGE_PODGE_ACCESSOR.preventChunkSimulation(level, neighborPosX, neighborPosZ);
-					}
-
-					ForgeChunkManager.forceChunk(this.dhServerGenTicket, new ChunkCoordIntPair(neighborPosX, neighborPosZ));
-
-					// the target chunk itself is loaded below, at the requested generation step
-					if (dx == 0 && dz == 0)
-					{
-						continue;
-					}
-
-					if (!provider.chunkExists(neighborPosX, neighborPosZ))
-					{
-						provider.loadChunk(neighborPosX, neighborPosZ);
-					}
+					HODGE_PODGE_ACCESSOR.restoreChunkGeneration(chunkGenerationWasBlocked);
 				}
 			}
-
-			// load the target chunk itself.
-			// the wrapper is created here since it reads the chunk's biomes, which must happen on the server thread.
-			// Cubic Chunks only loads saved columns in loadChunk, without their cubes
-			ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(level);
-			Chunk chunk = (cubicChunks != null)
-				? cubicChunks.generateColumn(level, chunkPos.x, chunkPos.z)
-				: provider.loadChunk(chunkPos.x, chunkPos.z);
-			return (chunk != null) ? new ChunkWrapper(chunk, this.dhServerLevel.getLevelWrapper()) : null;
 		});
+	}
+	/** must be called from the server thread */
+	@Nullable
+	private ChunkWrapper loadChunkWithNeighbors(WorldServer level, ChunkPos chunkPos)
+	{
+		ChunkProviderServer provider = (ChunkProviderServer) level.getChunkProvider();
+
+		// load neighbors first so the target chunk can fully populate.
+		// adjacent generation events share these border chunks, so a reference count
+		// is used to only load each chunk once and to track who still needs it.
+		for (int dx = -1; dx <= 1; dx++)
+		{
+			for (int dz = -1; dz <= 1; dz++)
+			{
+				int neighborPosX = chunkPos.x + dx;
+				int neighborPosZ = chunkPos.z + dz;
+
+				if (!this.acquireChunkRef(new DhChunkPos(neighborPosX, neighborPosZ)))
+				{
+					// another generation event already has this chunk loaded
+					continue;
+				}
+
+				if (this.updateManager != null)
+				{
+					this.updateManager.addPosToIgnore(new DhChunkPos(neighborPosX, neighborPosZ));
+				}
+
+				if (HODGE_PODGE_ACCESSOR != null)
+				{
+					HODGE_PODGE_ACCESSOR.preventChunkSimulation(level, neighborPosX, neighborPosZ);
+				}
+
+				ForgeChunkManager.forceChunk(this.dhServerGenTicket, new ChunkCoordIntPair(neighborPosX, neighborPosZ));
+
+				// the target chunk itself is loaded below, at the requested generation step
+				if (dx == 0 && dz == 0)
+				{
+					continue;
+				}
+
+				Chunk neighborChunk = provider.chunkExists(neighborPosX, neighborPosZ)
+					? provider.provideChunk(neighborPosX, neighborPosZ)
+					: provider.loadChunk(neighborPosX, neighborPosZ);
+				if (ChunkWrapper.canSaveChunk(neighborChunk))
+				{
+					// it may already have its LOD, see lodBlockChangeCountByPos
+					this.lodBlockChangeCountByPos.put(new DhChunkPos(neighborPosX, neighborPosZ), getBlockChangeCount(neighborChunk));
+				}
+			}
+		}
+
+		// load the target chunk itself.
+		// the wrapper is created here since it reads the chunk's biomes, which must happen on the server thread.
+		// Cubic Chunks only loads saved columns in loadChunk, without their cubes
+		ICubicChunksCommonAccessor cubicChunks = CubicChunksCompat.getAccessor(level);
+		Chunk chunk = (cubicChunks != null)
+			? cubicChunks.generateColumn(level, chunkPos.x, chunkPos.z)
+			: provider.loadChunk(chunkPos.x, chunkPos.z);
+
+		if (cubicChunks == null
+			&& chunk != null)
+		{
+			// MC only populates when a chunk is loaded from disk or generated.
+			// Chunks generated while another one populated (IE for a big tree reaching into them) stay in memory unpopulated,
+			// Hodgepodge leaves those to its own scheduler which only populates them near players,
+			// so loading them again here wouldn't populate them and the LOD would miss their trees.
+			// This populates the target and the 3 chunks before it, which are everything that puts blocks into it
+			Runnable populate = () -> chunk.populateChunk(provider, provider, chunkPos.x, chunkPos.z);
+			if (HODGE_PODGE_ACCESSOR != null)
+			{
+				HODGE_PODGE_ACCESSOR.runAsPopulation(level, populate);
+			}
+			else
+			{
+				populate.run();
+			}
+		}
+
+		return (chunk != null) ? new ChunkWrapper(chunk, this.dhServerLevel.getLevelWrapper()) : null;
 	}
 	/**
 	 * mitigates out of memory issues in the vanilla chunk system. <br>
@@ -476,6 +538,12 @@ public class DhInternalServerGenerator
 						{
 							// another generation event still needs this chunk loaded
 							continue;
+						}
+
+						Integer lodBlockChangeCount = this.lodBlockChangeCountByPos.remove(neighborDhPos);
+						if (lodBlockChangeCount != null)
+						{
+							this.updateIfChangedSinceLod(provider, neighborDhPos, lodBlockChangeCount);
 						}
 
 						// the chunk is only queued for unload here, it's actually
@@ -506,4 +574,37 @@ public class DhInternalServerGenerator
 			return null;
 		});
 	}
+
+	/**
+	 * Must be called from the server thread, while the pos is still ignored. <br>
+	 * Its save when it's unloaded would be ignored, so the change would only show once a player loads the chunk.
+	 */
+	private void updateIfChangedSinceLod(ChunkProviderServer provider, DhChunkPos chunkPos, int lodBlockChangeCount)
+	{
+		if (!provider.chunkExists(chunkPos.getX(), chunkPos.getZ()))
+		{
+			return;
+		}
+
+		Chunk chunk = provider.provideChunk(chunkPos.getX(), chunkPos.getZ());
+		if (getBlockChangeCount(chunk) == lodBlockChangeCount
+			|| !ChunkWrapper.canSaveChunk(chunk))
+		{
+			return;
+		}
+
+		// only this update gets through, the pos stays ignored for the save when it's unloaded
+		IServerLevelWrapper levelWrapper = this.dhServerLevel.getServerLevelWrapper();
+		if (this.updateManager != null)
+		{
+			this.updateManager.removePosToIgnore(chunkPos);
+		}
+		SharedApi.INSTANCE.applyChunkUpdate(new ChunkWrapper(chunk, levelWrapper), levelWrapper, true);
+		if (this.updateManager != null)
+		{
+			this.updateManager.addPosToIgnore(chunkPos);
+		}
+	}
+
+	private static int getBlockChangeCount(Chunk chunk) { return ((IMixinChunk) chunk).distanthorizons$getBlockChangeCount(); }
 }
