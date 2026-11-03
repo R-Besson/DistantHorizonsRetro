@@ -25,10 +25,12 @@ import com.seibel.distanthorizons.core.logging.DhLogger;
 import com.seibel.distanthorizons.core.logging.DhLoggerBuilder;
 import com.seibel.distanthorizons.core.logging.f3.F3Screen;
 import com.seibel.distanthorizons.core.pos.blockPos.DhBlockPos2D;
+import com.seibel.distanthorizons.core.util.FormatUtil;
 import com.seibel.distanthorizons.core.util.ThreadUtil;
 import com.seibel.distanthorizons.core.world.DhApiWorldProxy;
 
 import java.io.Closeable;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicReference;
@@ -253,6 +255,13 @@ public class LodRequestModule implements Closeable
 		if (chunksPerSec > -1)
 		{
 			message += ", " + F3Screen.NUMBER_FORMAT.format(chunksPerSec) + " chunks/sec";
+		}
+		// the same estimate as the generation progress message
+		if (chunksPerSec > 0)
+		{
+			long remainingChunkCount = worldGenState.retrievalQueue.getRetrievalEstimatedRemainingChunkCount()
+				+ worldGenState.retrievalQueue.getQueuedChunkCount();
+			message += ", ETA " + FormatUtil.formatEta(Duration.ofSeconds((long) (remainingChunkCount / chunksPerSec)));
 		}
 
 		messageList.add(message);

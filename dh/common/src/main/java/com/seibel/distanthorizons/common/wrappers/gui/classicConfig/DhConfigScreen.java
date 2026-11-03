@@ -1,11 +1,13 @@
 package com.seibel.distanthorizons.common.wrappers.gui.classicConfig;
 
 import com.seibel.distanthorizons.api.enums.config.DisallowSelectingViaConfigGui;
+import com.seibel.distanthorizons.common.wrappers.gui.DhIntSlider;
 import com.seibel.distanthorizons.common.wrappers.gui.DhScreen;
 import com.seibel.distanthorizons.common.wrappers.gui.DhScreenUtil;
 import com.seibel.distanthorizons.common.wrappers.gui.GuiHelper;
 import com.seibel.distanthorizons.common.wrappers.gui.OnPressed;
 import com.seibel.distanthorizons.common.wrappers.gui.config.ConfigGuiInfo;
+import com.seibel.distanthorizons.core.config.Config;
 import com.seibel.distanthorizons.core.config.ConfigHandler;
 import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
 import com.seibel.distanthorizons.core.config.types.ConfigCategory;
@@ -28,15 +30,19 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.util.EnumChatFormatting;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.input.Keyboard;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.MakeBtn;
@@ -58,7 +64,17 @@ class DhConfigScreen extends DhScreen
 	private boolean reload = false;
 
 	private GuiButton doneButton;
-	private final Map<GuiTextField, Predicate<String>> textFieldProcessors = new HashMap<>();
+	/** validates a text box's text, the boolean applies it */
+	private final Map<GuiTextField, BiPredicate<String, Boolean>> textFieldProcessors = new HashMap<>();
+	/** text boxes that had focus last tick, losing focus applies their value */
+	private final Set<GuiTextField> focusedTextFields = new HashSet<>();
+
+	// layout, set in initGui //
+
+	/** width of the widest option label on this page */
+	private int labelWidth;
+	/** where a row (label, option and reset button) starts so the rows are centered */
+	private int rowLeft;
 
 	//=============//
 	// constructor //
@@ -67,14 +83,24 @@ class DhConfigScreen extends DhScreen
 
 	protected DhConfigScreen(GuiScreen parent, String category)
 	{
-		super(Translatable(
-			LANG_WRAPPER.langExists(ModInfo.ID + ".config" + (category.isEmpty() ? "." + category : "") + ".title") ?
-				ModInfo.ID + ".config.title" :
-				ModInfo.ID + ".config" + (category.isEmpty() ? "" : "." + category) + ".title")
-		);
+		super(createTitle(category));
 		this.parent = parent;
 		this.category = category;
 	}
+	/** IE "Distant Horizons Retro Settings - World Generator", the main page ("client") only has the mod's title */
+	private static String createTitle(String category)
+	{
+		String title = Translatable(ModInfo.ID + ".config.title");
+		String categoryKey = TRANSLATION_PREFIX + category;
+		if (!category.isEmpty()
+			&& !category.equals(MAIN_PAGE_CATEGORY)
+			&& LANG_WRAPPER.langExists(categoryKey))
+		{
+			title += " - " + Translatable(categoryKey);
+		}
+		return title;
+	}
+	private static final String MAIN_PAGE_CATEGORY = "client";
 
 	//endregion
 
@@ -91,8 +117,106 @@ class DhConfigScreen extends DhScreen
 		for (GuiTextField field : this.textFieldProcessors.keySet())
 		{
 			field.updateCursorCounter();
+
+			// apply the value once the box loses focus
+			if (field.isFocused())
+			{
+				this.focusedTextFields.add(field);
+			}
+			else if (this.focusedTextFields.remove(field))
+			{
+				this.commitTextField(field);
+			}
 		}
 	}
+
+	/** applies the text box's value if it's valid, otherwise it goes back to the current value */
+	private void commitTextField(GuiTextField field)
+	{
+		BiPredicate<String, Boolean> processor = this.textFieldProcessors.get(field);
+		if (processor == null)
+		{
+			return;
+		}
+
+		if (!processor.test(field.getText(), true))
+		{
+			AbstractConfigBase<?> configBase = this.configBaseByTextField.get(field);
+			if (configBase != null)
+			{
+				field.setText(String.valueOf(configBase.get()));
+				processor.test(field.getText(), false);
+				((ConfigGuiInfo) configBase.guiValue).errorMessage = null;
+			}
+		}
+	}
+	private final Map<GuiTextField, AbstractConfigBase<?>> configBaseByTextField = new HashMap<>();
+
+	/** applies any value still being typed, saves and goes back to the previous screen */
+	private void close()
+	{
+		for (GuiTextField field : this.textFieldProcessors.keySet())
+		{
+			this.commitTextField(field);
+		}
+		ConfigHandler.INSTANCE.configFileHandler.saveToFile();
+		DhScreenUtil.setScreen(this.parent);
+	}
+
+	//endregion
+
+	//========//
+	// layout //
+	//========//
+	//region
+
+	/**
+	 * The rows are as wide as this page's longest label plus the option and reset button,
+	 * centered on the screen. Category buttons and headers span the same width so everything lines up.
+	 */
+	private void calculateLayout()
+	{
+		int widestLabel = 0;
+		for (AbstractConfigBase<?> configBase : ConfigHandler.INSTANCE.configBaseList)
+		{
+			if (!configBase.getCategory().matches(this.category)
+				|| !configBase.getAppearance().showInGui)
+			{
+				continue;
+			}
+
+			AbstractConfigBase<?> shownConfig = (configBase instanceof ConfigUiLinkedEntry) ? ((ConfigUiLinkedEntry) configBase).get() : configBase;
+			if (shownConfig instanceof ConfigEntry)
+			{
+				widestLabel = Math.max(widestLabel, this.fontRendererObj.getStringWidth(this.GetTranslatableTextComponentForConfig(shownConfig)));
+			}
+		}
+
+		int controlsWidth = ClassicConfigGUI.ConfigScreenConfigs.SPACE_BETWEEN_TEXT_AND_OPTION_FIELD
+			+ ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH
+			+ ClassicConfigGUI.ConfigScreenConfigs.BUTTON_WIDTH_SPACING
+			+ ClassicConfigGUI.ConfigScreenConfigs.RESET_BUTTON_WIDTH;
+		// pages without options (IE only category buttons) still get a reasonable width
+		int minLabelWidth = ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH - controlsWidth;
+		int maxLabelWidth = this.width - (2 * ClassicConfigGUI.ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN) - controlsWidth;
+
+		this.labelWidth = Math.max(minLabelWidth, Math.min(widestLabel, maxLabelWidth));
+		this.rowLeft = (this.width - this.getRowWidth()) / 2;
+	}
+
+	public int getRowLeft() { return this.rowLeft; }
+	public int getRowWidth()
+	{
+		return this.labelWidth
+			+ ClassicConfigGUI.ConfigScreenConfigs.SPACE_BETWEEN_TEXT_AND_OPTION_FIELD
+			+ ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH
+			+ ClassicConfigGUI.ConfigScreenConfigs.BUTTON_WIDTH_SPACING
+			+ ClassicConfigGUI.ConfigScreenConfigs.RESET_BUTTON_WIDTH;
+	}
+	/** labels are right justified against this */
+	public int getLabelRightX() { return this.rowLeft + this.labelWidth; }
+	public int getOptionX() { return this.getLabelRightX() + ClassicConfigGUI.ConfigScreenConfigs.SPACE_BETWEEN_TEXT_AND_OPTION_FIELD; }
+	public int getResetX() { return this.getOptionX() + ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH + ClassicConfigGUI.ConfigScreenConfigs.BUTTON_WIDTH_SPACING; }
 
 	//endregion
 
@@ -111,26 +235,18 @@ class DhConfigScreen extends DhScreen
 			ConfigHandler.INSTANCE.configFileHandler.loadFromFile();
 		}
 
-		// back button
-		this.addBtn(MakeBtn(Translatable("distanthorizons.general.back"),
-			(this.width / 2) - 154, this.height - 28,
-			ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH, ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_HEIGHT,
-			(button) ->
-			{
-				ConfigHandler.INSTANCE.configFileHandler.loadFromFile();
-				DhScreenUtil.setScreen(this.parent);
-			}));
-
-		// done/close button
+		// changes apply as they're made, so there's only one button to leave (like MC's options),
+		// a separate back button would've done the same
 		this.doneButton = this.addBtn(
 			MakeBtn(Translatable("distanthorizons.general.done"),
-				(this.width / 2) + 4, this.height - 28,
-				ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH, ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_HEIGHT,
-				(button) ->
-				{
-					ConfigHandler.INSTANCE.configFileHandler.saveToFile();
-					DhScreenUtil.setScreen(this.parent);
-				}));
+				(this.width - ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH) / 2, this.height - 28,
+				ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH, ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_HEIGHT,
+				(button) -> this.close()));
+
+		this.textFieldProcessors.clear();
+		this.focusedTextFields.clear();
+		this.configBaseByTextField.clear();
+		this.calculateLayout();
 
 		this.configListWidget = new ClassicConfigGUI.ConfigListWidget(this.mc, this.width * 2, this.height, 32, 32, 25);
 
@@ -221,13 +337,15 @@ class DhConfigScreen extends DhScreen
 
 		configGuiInfo.tooltipFunction =
 			(editBox, button) ->
-				(stringValue) ->
+				(stringValue, commit) ->
 				{
 					boolean isNumber = (pattern != null);
 
 					stringValue = stringValue.trim();
 					if (!(stringValue.isEmpty() || !isNumber || pattern.matcher(stringValue).matches()))
 					{
+						configGuiInfo.errorMessage = TextOrTranslatable("§cValue is invalid");
+						editBox.setTextColor(0xFFFF7777); // red
 						return false;
 					}
 
@@ -267,26 +385,30 @@ class DhConfigScreen extends DhScreen
 						}
 					}
 
-					editBox.setTextColor(((ConfigEntry<Number>) configMenuOption).getValidity(numberValue) == EConfigValidity.VALID ? 0xFFFFFFFF : 0xFFFF7777); // white and red
+					boolean isString = (configMenuOption.getType() == String.class || configMenuOption.getType() == List.class);
+					// an empty number box isn't a value yet
+					boolean valid = isString
+						|| (!stringValue.isEmpty()
+						&& !stringValue.equals("-")
+						&& !stringValue.equals(".")
+						&& ((ConfigEntry<Number>) configMenuOption).getValidity(numberValue) == EConfigValidity.VALID);
+					editBox.setTextColor(valid ? 0xFFFFFFFF : 0xFFFF7777); // white and red
 
-					if (configMenuOption.getType() == String.class
-						|| configMenuOption.getType() == List.class)
+					// values are only applied once they're done being typed,
+					// IE typing 1000 would otherwise apply 1, 10 and 100 first
+					if (commit && valid)
 					{
-						((ConfigEntry<String>) configMenuOption).uiSetWithoutSaving(stringValue);
-					}
-					else if (((ConfigEntry<Number>) configMenuOption).getValidity(numberValue) == EConfigValidity.VALID)
-					{
-						if (!cast)
+						Object newValue = isString ? stringValue
+							: !cast ? numberValue
+							: Integer.valueOf(numberValue != null ? numberValue.intValue() : 0);
+						// setting a value runs its listeners even when it's the same, which can reload things
+						if (!Objects.equals(newValue, configMenuOption.get()))
 						{
-							((ConfigEntry<Number>) configMenuOption).uiSetWithoutSaving(numberValue);
-						}
-						else
-						{
-							((ConfigEntry<Number>) configMenuOption).uiSetWithoutSaving(numberValue != null ? numberValue.intValue() : 0);
+							((ConfigEntry<Object>) configMenuOption).uiSetWithoutSaving(newValue);
 						}
 					}
 
-					return true;
+					return valid;
 				};
 	}
 	private static void setupBooleanMenuOption(ConfigEntry<Boolean> booleanConfigEntry)
@@ -410,9 +532,7 @@ class DhConfigScreen extends DhScreen
 				DhScreenUtil.setScreen(this);
 			};
 
-			int resetButtonPosX = this.width
-				- ClassicConfigGUI.ConfigScreenConfigs.RESET_BUTTON_WIDTH
-				- ClassicConfigGUI.ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN;
+			int resetButtonPosX = this.getResetX();
 			int resetButtonPosZ = 0;
 
 			GuiButton resetButton = MakeBtn(
@@ -446,11 +566,7 @@ class DhConfigScreen extends DhScreen
 
 			String textComponent = this.GetTranslatableTextComponentForConfig(configEntry);
 
-			int optionFieldPosX = this.width
-				- ClassicConfigGUI.ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN
-				- ClassicConfigGUI.ConfigScreenConfigs.RESET_BUTTON_WIDTH
-				- ClassicConfigGUI.ConfigScreenConfigs.BUTTON_WIDTH_SPACING
-				- ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH;
+			int optionFieldPosX = this.getOptionX();
 			int optionFieldPosZ = 0;
 
 			if (configGuiInfo.buttonOptionMap != null)
@@ -470,11 +586,13 @@ class DhConfigScreen extends DhScreen
 					widget.getKey());
 
 				// deactivate the button if the API is overriding it
-				// or the MC version doesn't support it
+				// or the MC version doesn't support it.
+				// The value is grayed out too, otherwise colored values (IE green "True") look selectable
 				if (configEntry.mcVersionOverridePresent()
 					|| configEntry.apiIsOverriding())
 				{
 					button.enabled = false;
+					button.displayString = EnumChatFormatting.DARK_GRAY + EnumChatFormatting.getTextWithoutFormattingCodes(button.displayString);
 				}
 
 				this.configListWidget.addButton(this, configEntry,
@@ -483,19 +601,32 @@ class DhConfigScreen extends DhScreen
 					null,
 					textComponent);
 			}
+			else if (configEntry == Config.Client.Advanced.Graphics.Quality.lodChunkRenderDistanceRadius)
+			{
+				this.createRenderDistanceInput((ConfigEntry<Integer>) configEntry, resetButton, textComponent);
+			}
 			else
 			{
-				// text box input
+				// text box input,
+				// a text box's border is drawn around it, so it's 1 pixel inset to line up with the buttons
 				GuiTextField widget = new GuiTextField(this.fontRendererObj,
-					optionFieldPosX, optionFieldPosZ,
-					ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH - 4, ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT);
+					optionFieldPosX + 1, optionFieldPosZ,
+					ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH - 2, ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT - 2);
 				widget.setMaxStringLength(3_000_000); // hopefully 3 million characters should be enough for any normal use-case, lol
 				widget.setText(String.valueOf(configEntry.get()));
 
-				Predicate<String> processor = configGuiInfo.tooltipFunction.apply(widget, this.doneButton);
+				BiPredicate<String, Boolean> processor = configGuiInfo.tooltipFunction.apply(widget, this.doneButton);
 				this.textFieldProcessors.put(widget, processor);
+				this.configBaseByTextField.put(widget, configEntry);
 
-				this.configListWidget.addButton(this, configEntry, widget, resetButton, null, textComponent);
+				ClassicConfigGUI.DhButtonEntry entry = this.configListWidget.addButton(this, configEntry, widget, resetButton, null, textComponent);
+
+				// -1 is a special value for these, which a number doesn't explain
+				String negativeValueHintKey = NEGATIVE_VALUE_HINT_KEY_BY_CONFIG.get(configEntry);
+				if (negativeValueHintKey != null)
+				{
+					entry.valueHint = () -> (((Number) configEntry.get()).doubleValue() < 0) ? Translatable(negativeValueHintKey) : null;
+				}
 			}
 			return true;
 
@@ -510,17 +641,21 @@ class DhConfigScreen extends DhScreen
 		{
 			ConfigCategory configCategory = (ConfigCategory) configType;
 
-			String textComponent = this.GetTranslatableTextComponentForConfig(configCategory);
+			// "..." like MC's buttons that open another screen (IE "Video Settings...")
+			String textComponent = this.GetTranslatableTextComponentForConfig(configCategory) + "...";
 
-			int categoryPosX = this.width - ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH - ClassicConfigGUI.ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN;
 			int categoryPosZ = this.height - ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT; // Note: the posZ value here seems to be ignored
 
 			GuiButton widget = MakeBtn(
 				textComponent,
-				categoryPosX, categoryPosZ,
-				ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH, ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT,
+				this.getRowLeft(), categoryPosZ,
+				this.getRowWidth(), ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT,
 				((button) ->
 				{
+					for (GuiTextField field : this.textFieldProcessors.keySet())
+					{
+						this.commitTextField(field);
+					}
 					ConfigHandler.INSTANCE.configFileHandler.saveToFile();
 					DhScreenUtil.setScreen(ClassicConfigGUI.getScreen(this, configCategory.getDestination()));
 				}));
@@ -539,12 +674,10 @@ class DhConfigScreen extends DhScreen
 
 			String textComponent = this.GetTranslatableTextComponentForConfig(configUiButton);
 
-			int buttonPosX = this.width - ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH - ClassicConfigGUI.ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN;
-
 			GuiButton widget = MakeBtn(
 				textComponent,
-				buttonPosX, this.height - 28,
-				ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH, ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT,
+				this.getRowLeft(), this.height - 28,
+				this.getRowWidth(), ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT,
 				(button) -> ((ConfigUIButton) configType).runAction());
 			this.configListWidget.addButton(this, configType, widget, null, null, null);
 
@@ -600,6 +733,72 @@ class DhConfigScreen extends DhScreen
 		}
 
 		return false;
+	}
+
+	/**
+	 * A slider with a box next to it for typing the exact number of chunks. <br>
+	 * Changing the render distance reloads the LODs, so it's only applied
+	 * when the slider is let go or the typed number is done (enter or clicking away).
+	 */
+	private void createRenderDistanceInput(ConfigEntry<Integer> configEntry, GuiButton resetButton, String textComponent)
+	{
+		int textFieldWidth = RENDER_DISTANCE_TEXT_FIELD_WIDTH;
+		int sliderWidth = ClassicConfigGUI.ConfigScreenConfigs.OPTION_FIELD_WIDTH - textFieldWidth - ClassicConfigGUI.ConfigScreenConfigs.BUTTON_WIDTH_SPACING;
+		int height = ClassicConfigGUI.ConfigScreenConfigs.CATEGORY_BUTTON_HEIGHT;
+
+		GuiTextField textField = new GuiTextField(this.fontRendererObj,
+			this.getOptionX() + sliderWidth + ClassicConfigGUI.ConfigScreenConfigs.BUTTON_WIDTH_SPACING + 1, 0,
+			textFieldWidth - 2, height - 2);
+		textField.setMaxStringLength(6);
+		textField.setText(String.valueOf(configEntry.get()));
+
+		// the slider shows the blocks, the box the chunks
+		DhIntSlider slider = new DhIntSlider(GuiHelper.HANDLER_BY_BUTTON.size(),
+			this.getOptionX(), 0, sliderWidth, height,
+			configEntry, RENDER_DISTANCE_SLIDER_STEP,
+			(chunks) -> Translatable("distanthorizons.general.blocks", chunks * 16),
+			(chunks) -> textField.setText(String.valueOf(chunks)));
+
+		BiPredicate<String, Boolean> processor = (text, commit) ->
+		{
+			Integer chunks;
+			try
+			{
+				chunks = Integer.parseInt(text.trim());
+			}
+			catch (NumberFormatException e)
+			{
+				chunks = null;
+			}
+
+			ConfigGuiInfo configGuiInfo = (ConfigGuiInfo) configEntry.guiValue;
+			boolean valid = (chunks != null && configEntry.getValidity(chunks) == EConfigValidity.VALID);
+			configGuiInfo.errorMessage = valid ? null
+				: TextOrTranslatable("§c" + Translatable("distanthorizons.general.chunkRange", configEntry.getMin(), configEntry.getMax()));
+			textField.setTextColor(valid ? 0xFFFFFFFF : 0xFFFF7777); // white and red
+
+			if (commit && valid && !chunks.equals(configEntry.get()))
+			{
+				configEntry.uiSetWithoutSaving(chunks);
+			}
+			return valid;
+		};
+		this.textFieldProcessors.put(textField, processor);
+		this.configBaseByTextField.put(textField, configEntry);
+
+		ClassicConfigGUI.DhButtonEntry entry = this.configListWidget.addButton(this, configEntry, slider, resetButton, null, textComponent);
+		entry.valueTextField = textField;
+	}
+	private static final int RENDER_DISTANCE_SLIDER_STEP = 8;
+	/** fits "4096" */
+	private static final int RENDER_DISTANCE_TEXT_FIELD_WIDTH = 40;
+
+	/** text shown in the text box when the value is negative */
+	private static final Map<AbstractConfigBase<?>, String> NEGATIVE_VALUE_HINT_KEY_BY_CONFIG = new HashMap<>();
+	static
+	{
+		NEGATIVE_VALUE_HINT_KEY_BY_CONFIG.put(Config.Client.Advanced.Graphics.Culling.overdrawPrevention, "distanthorizons.general.auto");
+		NEGATIVE_VALUE_HINT_KEY_BY_CONFIG.put(Config.Common.WorldGenerator.surfaceRegenMaxDistancePercent, "distanthorizons.general.noLimit");
 	}
 
 	private String GetTranslatableTextComponentForConfig(AbstractConfigBase<?> configType)
@@ -707,6 +906,25 @@ class DhConfigScreen extends DhScreen
 		}
 	}
 
+	/** sliders stop following the mouse once it's let go */
+	@Override
+	protected void mouseReleased(int mouseX, int mouseY, int state)
+	{
+		super.mouseReleased(mouseX, mouseY, state);
+
+		// -1 means the mouse moved, anything else is a released button
+		if (state != -1)
+		{
+			for (ClassicConfigGUI.DhButtonEntry entry : this.configListWidget.children)
+			{
+				if (entry.button instanceof DhIntSlider)
+				{
+					((DhIntSlider) entry.button).mouseReleased(mouseX, mouseY);
+				}
+			}
+		}
+	}
+
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton)
 	{
@@ -740,6 +958,12 @@ class DhConfigScreen extends DhScreen
 					field.mouseClicked(mouseX, mouseY, mouseButton);
 				}
 
+				if (entry.valueTextField != null
+					&& entry.valueTextField.getVisible())
+				{
+					entry.valueTextField.mouseClicked(mouseX, mouseY, mouseButton);
+				}
+
 				if (entry.resetButton instanceof GuiButton
 					&& ((GuiButton) entry.resetButton).visible)
 				{
@@ -763,21 +987,33 @@ class DhConfigScreen extends DhScreen
 	@Override
 	protected void keyTyped(char typedChar, int keyCode)
 	{
-		super.keyTyped(typedChar, keyCode);
-		for (ClassicConfigGUI.DhButtonEntry entry : this.configListWidget.children)
+		// escape goes back a page like the done button instead of closing every screen
+		if (keyCode == Keyboard.KEY_ESCAPE)
 		{
-			if (entry.button instanceof GuiTextField)
+			this.close();
+			return;
+		}
+
+		for (GuiTextField field : this.textFieldProcessors.keySet())
+		{
+			if (!field.isFocused())
 			{
-				GuiTextField field = (GuiTextField) entry.button;
-
-				field.textboxKeyTyped(typedChar, keyCode);
-
-				Predicate<String> processor = this.textFieldProcessors.get(field);
-				if (processor != null)
-				{
-					processor.test(field.getText());
-				}
+				continue;
 			}
+
+			// enter applies the typed value
+			if (keyCode == Keyboard.KEY_RETURN
+				|| keyCode == Keyboard.KEY_NUMPADENTER)
+			{
+				field.setFocused(false);
+				this.focusedTextFields.remove(field);
+				this.commitTextField(field);
+				continue;
+			}
+
+			field.textboxKeyTyped(typedChar, keyCode);
+			// only validated while typing, it's applied once it's done
+			this.textFieldProcessors.get(field).test(field.getText(), false);
 		}
 	}
 
@@ -791,6 +1027,11 @@ class DhConfigScreen extends DhScreen
 	@Override
 	public void onGuiClosed()
 	{
+		// IE a value still being typed when another screen opens
+		for (GuiTextField field : this.textFieldProcessors.keySet())
+		{
+			this.commitTextField(field);
+		}
 		ConfigHandler.INSTANCE.configFileHandler.saveToFile();
 		// Handled by button to avoid recursive loop
 		ClassicConfigGUI.CONFIG_CORE_INTERFACE.onScreenChangeListenerList.forEach(Runnable::run);

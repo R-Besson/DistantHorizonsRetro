@@ -121,12 +121,15 @@ public class F3Screen
 				int posX = DhSectionPos.getX(sectionPos);
 				int posZ = DhSectionPos.getZ(sectionPos);
 				messageList.add("LOD Pos: " + y + detailLevel + "*" + posX + "," + posZ + cf);
-
-				AbstractDhRenderApiDefinition renderApiDef = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
-				messageList.add("Rendering API: " + a + renderApiDef.getEngineName() + cf);
 			}
-			messageList.add("");
 		}
+
+		AbstractDhRenderApiDefinition renderApiDef = SingletonInjector.INSTANCE.get(AbstractDhRenderApiDefinition.class);
+		if (renderApiDef != null)
+		{
+			messageList.add("Rendering API: " + a + renderApiDef.getEngineName() + cf);
+		}
+		messageList.add("");
 
 		// thread pools
 		if (Config.Client.Advanced.Debugging.F3Screen.showThreadPools.get())

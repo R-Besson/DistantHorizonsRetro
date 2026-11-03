@@ -9,8 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 /**
  * holds information needed by the config GUI for rendering.
@@ -27,7 +27,11 @@ public class ConfigGuiInfo implements IConfigGuiInfo
 	@Nullable
 	public String errorMessage;
 
-	public BiFunction<GuiTextField, GuiButton, Predicate<String>> tooltipFunction;
+	/**
+	 * Validates a text box's text and colors it, if the boolean is true the value is also applied. <br>
+	 * Returns true if the text is valid
+	 */
+	public BiFunction<GuiTextField, GuiButton, BiPredicate<String, Boolean>> tooltipFunction;
 
 	/** determines which options the button will show */
 	public AbstractMap.SimpleEntry<OnPressed, Function<Object, String>> buttonOptionMap;

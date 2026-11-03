@@ -1,6 +1,7 @@
 package com.seibel.distanthorizons.common.wrappers.gui.classicConfig;
 
 import com.seibel.distanthorizons.core.config.types.AbstractConfigBase;
+import com.seibel.distanthorizons.core.config.types.ConfigEntry;
 import com.seibel.distanthorizons.core.config.types.ConfigUIComment;
 import com.seibel.distanthorizons.core.config.types.enums.EConfigCommentTextPosition;
 import com.seibel.distanthorizons.core.logging.DhLogger;
@@ -14,16 +15,21 @@ import net.minecraft.client.gui.GuiListExtended;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.SetY;
+import static com.seibel.distanthorizons.common.wrappers.gui.GuiHelper.Translatable;
 
 /*
  * Based upon TinyConfig but is highly modified
@@ -116,9 +122,11 @@ public class ClassicConfigGUI
 			super.drawContainerBackground(tessellator);
 		}
 
-		public void addButton(DhConfigScreen gui, AbstractConfigBase<?> dhConfigType, Gui button, GuiButton resetButton, GuiButton indexButton, String text)
+		public DhButtonEntry addButton(DhConfigScreen gui, AbstractConfigBase<?> dhConfigType, Gui button, GuiButton resetButton, GuiButton indexButton, String text)
 		{
-			this.children.add(new DhButtonEntry(gui, dhConfigType, button, text, resetButton, indexButton));
+			DhButtonEntry entry = new DhButtonEntry(gui, dhConfigType, button, text, resetButton, indexButton);
+			this.children.add(entry);
+			return entry;
 		}
 
 		@Override
@@ -129,49 +137,56 @@ public class ClassicConfigGUI
 		{
 			for (DhButtonEntry buttonEntry : this.children)
 			{
-				Gui gui = buttonEntry.button;
-				if (gui == null) continue;
-
-				double minX, minY, maxX, maxY;
-
-				if (gui instanceof GuiButton)
+				if (isHovered(buttonEntry.button, mouseX, mouseY)
+					|| isHovered(buttonEntry.valueTextField, mouseX, mouseY))
 				{
-					GuiButton button = (GuiButton) gui;
-					if (!button.visible)
-					{
-						continue;
-					}
-
-					minX = button.xPosition;
-					minY = button.yPosition;
-					maxX = minX + button.width;
-					maxY = minY + button.height;
+					return buttonEntry.button;
 				}
-				else if (gui instanceof GuiTextField)
+				// the lock label explains why the option can't be changed
+				if (buttonEntry.isLocked()
+					&& isHovered(buttonEntry.resetButton, mouseX, mouseY))
 				{
-					GuiTextField field = (GuiTextField) gui;
-					if (!field.getVisible())
-					{
-						continue;
-					}
-
-					minX = field.xPosition;
-					minY = field.yPosition;
-					maxX = minX + field.width;
-					maxY = minY + field.height;
-				}
-				else
-				{
-					continue;
-				}
-
-				if (mouseX >= minX && mouseX < maxX && mouseY >= minY && mouseY < maxY)
-				{
-					return gui;
+					return buttonEntry.button;
 				}
 			}
 
 			return null;
+		}
+		private static boolean isHovered(Gui gui, double mouseX, double mouseY)
+		{
+			double minX, minY, maxX, maxY;
+			if (gui instanceof GuiButton)
+			{
+				GuiButton button = (GuiButton) gui;
+				if (!button.visible)
+				{
+					return false;
+				}
+
+				minX = button.xPosition;
+				minY = button.yPosition;
+				maxX = minX + button.width;
+				maxY = minY + button.height;
+			}
+			else if (gui instanceof GuiTextField)
+			{
+				GuiTextField field = (GuiTextField) gui;
+				if (!field.getVisible())
+				{
+					return false;
+				}
+
+				minX = field.xPosition;
+				minY = field.yPosition;
+				maxX = minX + field.width;
+				maxY = minY + field.height;
+			}
+			else
+			{
+				return false;
+			}
+
+			return mouseX >= minX && mouseX < maxX && mouseY >= minY && mouseY < maxY;
 		}
 	}
 
@@ -185,6 +200,15 @@ public class ClassicConfigGUI
 		public final Gui indexButton;
 
 		private final String text;
+		/**
+		 * Gray text shown at the right of a text box, null when nothing is shown.
+		 * IE "No Limit" for values where -1 means there's no limit
+		 */
+		@Nullable
+		public Supplier<String> valueHint = null;
+		/** a text box next to the main widget, IE for typing the exact value of a slider */
+		@Nullable
+		public GuiTextField valueTextField = null;
 
 		@NotNull
 		private final EConfigCommentTextPosition textPosition;
@@ -262,13 +286,30 @@ public class ClassicConfigGUI
 					if (this.button instanceof GuiTextField)
 					{
 						GuiTextField guiTextField = (GuiTextField) this.button;
-						SetY(guiTextField, y);
+						// the border is drawn around the box, so it's inset to line up with the buttons
+						SetY(guiTextField, y + 1);
 						guiTextField.drawTextBox();
+
+						String hint = (this.valueHint != null) ? this.valueHint.get() : null;
+						if (hint != null)
+						{
+							textRenderer.drawString(hint,
+								guiTextField.xPosition + guiTextField.width - textRenderer.getStringWidth(hint) - 4,
+								guiTextField.yPosition + (guiTextField.height - 8) / 2,
+								0x808080);
+						}
 					}
+				}
+
+				if (this.valueTextField != null)
+				{
+					SetY(this.valueTextField, y + 1);
+					this.valueTextField.drawTextBox();
 				}
 
 				if (this.resetButton != null)
 				{
+					this.updateResetButton((GuiButton) this.resetButton);
 					SetY((GuiButton) this.resetButton, y);
 
 					((GuiButton) this.resetButton).drawButton(Minecraft.getMinecraft(), mouseX, mouseY);
@@ -289,21 +330,14 @@ public class ClassicConfigGUI
 					if (this.textPosition == EConfigCommentTextPosition.RIGHT_JUSTIFIED)
 					{
 						// text right justified aligned against the buttons
-						textXPos = this.gui.width
-							- translatedLength
-							- ConfigScreenConfigs.SPACE_BETWEEN_TEXT_AND_OPTION_FIELD
-							- ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN
-							- ConfigScreenConfigs.OPTION_FIELD_WIDTH
-							- ConfigScreenConfigs.BUTTON_WIDTH_SPACING
-							- ConfigScreenConfigs.RESET_BUTTON_WIDTH;
+						textXPos = this.gui.getLabelRightX() - translatedLength;
 					}
 					else if (this.textPosition == EConfigCommentTextPosition.CENTERED_OVER_BUTTONS)
 					{
-						// have button centered relative to a category button
-						textXPos = this.gui.width
-							- (translatedLength / 2)
-							- (ConfigScreenConfigs.CATEGORY_BUTTON_WIDTH / 2)
-							- ConfigScreenConfigs.SPACE_FROM_RIGHT_SCREEN;
+						// centered over the rows, like the category buttons
+						textXPos = this.gui.getRowLeft()
+							+ (this.gui.getRowWidth() / 2)
+							- (translatedLength / 2);
 					}
 					else if (this.textPosition == EConfigCommentTextPosition.CENTER_OF_SCREEN)
 					{
@@ -327,6 +361,35 @@ public class ClassicConfigGUI
 				// should prevent crashing the game if there's an issue
 				RATE_LIMITED_LOGGER.error("Unexpected gui rendering issue: [" + e.getMessage() + "]", e);
 			}
+		}
+
+		/** true if this MC version or another mod (via the API) decides the value */
+		public boolean isLocked()
+		{
+			if (!(this.dhConfigType instanceof ConfigEntry))
+			{
+				return false;
+			}
+			ConfigEntry<?> configEntry = (ConfigEntry<?>) this.dhConfigType;
+			return configEntry.mcVersionOverridePresent() || configEntry.apiIsOverriding();
+		}
+
+		/**
+		 * Reset is only clickable (and red) when the value isn't its default,
+		 * so the changed options stand out. Locked options keep their lock text.
+		 */
+		private void updateResetButton(GuiButton resetButton)
+		{
+			if (!(this.dhConfigType instanceof ConfigEntry)
+				|| this.isLocked())
+			{
+				return;
+			}
+
+			ConfigEntry<?> configEntry = (ConfigEntry<?>) this.dhConfigType;
+			boolean isDefault = Objects.equals(configEntry.get(), configEntry.getDefaultValue());
+			resetButton.enabled = !isDefault;
+			resetButton.displayString = (isDefault ? EnumChatFormatting.DARK_GRAY : EnumChatFormatting.RED) + Translatable("distanthorizons.general.reset");
 		}
 
 		@Override

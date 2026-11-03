@@ -63,7 +63,17 @@ public abstract class AbstractDhWorld implements IDhWorld, Closeable
 			readOnlyStr += " - ReadOnly";
 		}
 
-		String message = environment + " World with " + levelCountStr + " levels" + readOnlyStr;
+		String message = getEnvironmentDisplayName(environment) + ", " + levelCountStr + " dimensions loaded" + readOnlyStr;
 		messageList.add(message);
+	}
+	private static String getEnvironmentDisplayName(EWorldEnvironment environment)
+	{
+		switch (environment)
+		{
+			case CLIENT_SERVER: return "Singleplayer";
+			case CLIENT_ONLY: return "Multiplayer";
+			case SERVER_ONLY: return "Server";
+			default: return environment.toString();
+		}
 	}
 }

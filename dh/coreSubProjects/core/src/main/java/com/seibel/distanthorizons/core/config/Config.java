@@ -113,9 +113,11 @@ public class Config
 
 		public static ConfigUiLinkedEntry quickWorldGeneratorPlan = new ConfigUiLinkedEntry(Common.WorldGenerator.generatorPlan);
 
-		public static ConfigUiLinkedEntry quickShowWorldGenProgress = new ConfigUiLinkedEntry(Common.WorldGenerator.showGenerationProgress);
+		// the generation progress and cloud options are in the world generator and generic rendering pages,
+		// textures change the LODs' look the most so they're here
+		public static ConfigUiLinkedEntry quickEnableTexturedLods = new ConfigUiLinkedEntry(Advanced.Graphics.Texture.enableTexturedLods);
 
-		public static ConfigUiLinkedEntry quickLodCloudRendering = new ConfigUiLinkedEntry(Advanced.Graphics.GenericRendering.enableCloudRendering);
+		public static ConfigUiLinkedEntry quickSeeThroughLeaves = new ConfigUiLinkedEntry(Advanced.Graphics.Texture.seeThroughLeaves);
 
 		public static ConfigEntry<Boolean> showDhOptionsButtonInMinecraftUi = new ConfigEntry.Builder<Boolean>()
 			.set(true)
@@ -1308,8 +1310,9 @@ public class Config
 				{
 					public static ConfigUIComment f3ScreenHeader = new ConfigUIComment.Builder().setParentConfigClass(F3Screen.class).build();
 
+					// the internal debug info is off by default, F3 is already long with other mods
 					public static ConfigEntry<Boolean> showPlayerPos = new ConfigEntry.Builder<Boolean>()
-						.set(true)
+						.set(false)
 						.comment("Shows the player's LOD position.")
 						.build();
 					public static ConfigEntry<Integer> playerPosSectionDetailLevel = new ConfigEntry.Builder<Integer>()
@@ -1321,7 +1324,7 @@ public class Config
 						.build();
 
 					public static ConfigEntry<Boolean> showThreadPools = new ConfigEntry.Builder<Boolean>()
-						.set(true)
+						.set(false)
 						.comment("Shows info about each thread pool.")
 						.build();
 
@@ -1340,7 +1343,7 @@ public class Config
 						.build();
 
 					public static ConfigEntry<Boolean> showQueuedChunkUpdateCount = new ConfigEntry.Builder<Boolean>()
-						.set(true)
+						.set(false)
 						.comment("Shows how many chunks are queued for processing and the max count that can be queued.")
 						.build();
 
@@ -1510,6 +1513,7 @@ public class Config
 				.build();
 
 			public static ConfigUISpacer genLimitingSpacer = new ConfigUISpacer.Builder().build();
+			public static ConfigUIComment genLimitingHeader = new ConfigUIComment.Builder().build();
 
 			public static final ConfigEntry<Boolean> limitIfServerUnhealthy = new ConfigEntry.Builder<Boolean>()
 				.set(true)
@@ -1546,6 +1550,7 @@ public class Config
 				.build();
 
 			public static ConfigUISpacer genProgressSpacer = new ConfigUISpacer.Builder().build();
+			public static ConfigUIComment genProgressHeader = new ConfigUIComment.Builder().build();
 
 			public static ConfigEntry<EDhApiDistantGeneratorProgressDisplayLocation> showGenerationProgress = new ConfigEntry.Builder<EDhApiDistantGeneratorProgressDisplayLocation>()
 				.set(EDhApiDistantGeneratorProgressDisplayLocation.DISABLED)
