@@ -42,12 +42,12 @@ repositories {
 
 // ==================== Dependencies ====================
 
-def angelicaVersion = "2.2.35"
-def gtnhlibVersion = "0.11.54"
-def hodgepodgeVersion = "2.7.218"
+def angelicaVersion = "2.2.44"
+def gtnhlibVersion = "0.11.56"
+def hodgepodgeVersion = "2.7.222"
 def twilightforestVersion = "2.7.45"
 def chiselVersion = "2.17.34-GTNH"
-def cubicChunksVersion = "v0.1.27-alpha-pre"
+def cubicChunksVersion = "v0.1.29-alpha-pre"
 
 dependencies {
     modCompileOnly "com.github.GTNewHorizons:Hodgepodge:${hodgepodgeVersion}:dev"

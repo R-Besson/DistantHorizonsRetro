@@ -10,6 +10,12 @@ public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 {
 	/** older Hodgepodge versions don't throttle chunk generation */
 	private static final boolean HAS_CHUNK_GEN_SCHEDULER = hasChunkGenScheduler();
+	/**
+	 * Since Hodgepodge#1040 (after 2.7.222) Hodgepodge allows generating chunks for a running population
+	 * and counts the population depth in ChunkProviderServer.populate itself.
+	 * Counting it here too would make it skip the population as a nested one.
+	 */
+	private static final boolean HODGEPODGE_HANDLES_POPULATION = HAS_CHUNK_GEN_SCHEDULER && hasAdmitPopulationLoad();
 
 	@Override
 	public String getModName() { return "HodgePodge"; }
@@ -26,6 +32,7 @@ public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 	public boolean allowChunkGeneration()
 	{
 		if (!HAS_CHUNK_GEN_SCHEDULER
+			|| HODGEPODGE_HANDLES_POPULATION
 			|| !ChunkGenScheduler.isBlocked())
 		{
 			return false;
@@ -47,7 +54,8 @@ public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 	@Override
 	public void runAsPopulation(World world, Runnable populate)
 	{
-		if (!HAS_CHUNK_GEN_SCHEDULER)
+		if (!HAS_CHUNK_GEN_SCHEDULER
+			|| HODGEPODGE_HANDLES_POPULATION)
 		{
 			populate.run();
 			return;
@@ -73,6 +81,19 @@ public class HodgePodgeAccessor implements IHodgePodgeCommonAccessor
 			return true;
 		}
 		catch (ClassNotFoundException | LinkageError e)
+		{
+			return false;
+		}
+	}
+
+	private static boolean hasAdmitPopulationLoad()
+	{
+		try
+		{
+			ChunkGenScheduler.class.getMethod("admitPopulationLoad", World.class);
+			return true;
+		}
+		catch (NoSuchMethodException | LinkageError e)
 		{
 			return false;
 		}
