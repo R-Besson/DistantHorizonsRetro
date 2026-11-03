@@ -1,7 +1,5 @@
 package com.seibel.distanthorizons.common.backports;
 
-import com.seibel.distanthorizons.core.api.internal.ClientApi;
-import com.seibel.distanthorizons.core.util.math.DhMat4f;
 import com.seibel.distanthorizons.core.util.math.DhVec3d;
 import net.minecraft.entity.EntityLivingBase;
 
@@ -18,19 +16,30 @@ public class Camera
 
 	private final Vector3d pos = new Vector3d();
 
+	/** the camera's offset from the camera entity, IE third person */
+	private final Vector4f offset = new Vector4f(0, 0, 0, 1);
+
 	/**
-	 * The camera position is requested many times per frame (IE once per cloud),
-	 * the offset only depends on the model view matrix, which is replaced with a new object every frame,
-	 * so the matrix inversion is only done when the matrix changes.
+	 * Called with MC's model view matrix every frame. <br>
+	 * On 1.7.10 that matrix also moves the camera away from the camera entity (IE third person),
+	 * the offset is taken out of it here. DH renders relative to the camera itself,
+	 * so it gets the matrix without that translation, otherwise the offset would be applied twice.
+	 * The inversion is only done once a frame since the position is requested many times (IE once per cloud).
 	 */
-	private DhMat4f offsetModelViewMatrix = null;
-	private final Vector4f offset = new Vector4f(); // third person offset
+	public synchronized void setModelViewMatrix(Matrix4f fullModelViewMatrix)
+	{
+		this.offset.set(0, 0, 0, 1);
+		new Matrix4f(fullModelViewMatrix).invert().transform(this.offset);
+	}
 
 	/**
 	 * Synchronized and fills the given vector since this is called from both the
 	 * render thread and DH's beacon culling thread.
 	 * If there's no camera entity (IE while leaving a world) the last position is returned.
 	 */
+	/** fills the given vector with the camera's offset from the camera entity, IE third person */
+	public synchronized void getOffsetFromEntity(DhVec3d output) { output.set(this.offset.x, this.offset.y, this.offset.z); }
+
 	public synchronized void getUpdatedPos(EntityLivingBase entity, float partialTicks, DhVec3d output)
 	{
 		if (entity != null)
@@ -42,16 +51,6 @@ public class Camera
 
 	private void update(EntityLivingBase entity, float partialTicks)
 	{
-		DhMat4f modelViewMatrix = ClientApi.RENDER_STATE.mcModelViewMatrix;
-		if (modelViewMatrix != this.offsetModelViewMatrix)
-		{
-			this.offsetModelViewMatrix = modelViewMatrix;
-			this.offset.set(0, 0, 0, 1);
-			Matrix4f inverseModelView = modelViewMatrix
-				.createJomlMatrix()
-				.invert();
-			inverseModelView.transform(this.offset);
-		}
 		Vector4f offset = this.offset;
 
 		final double camX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks + offset.x;

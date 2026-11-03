@@ -1,5 +1,6 @@
 package com.seibel.distanthorizons.forge17;
 
+import com.seibel.distanthorizons.common.backports.Camera;
 import com.seibel.distanthorizons.common.commonMixins.MixinVanillaFogCommon;
 import com.seibel.distanthorizons.common.wrappers.McObjectConverter;
 import com.seibel.distanthorizons.common.wrappers.minecraft.MinecraftRenderWrapper;
@@ -33,8 +34,17 @@ public class RenderHelper
 	public static DhMat4f getModelViewMatrix() { return new DhMat4f(modelViewMatrix); }
 	public static DhMat4f getProjectionMatrix() { return new DhMat4f(projectionMatrix); }
 
+	/**
+	 * MC's model view matrix moves the camera away from the camera entity (IE third person),
+	 * DH places LODs relative to the camera's actual position instead (see Camera),
+	 * so it only gets the rotation, otherwise LODs would be offset twice in third person.
+	 */
 	public static void setModelViewMatrixFromBuffer(FloatBuffer modelviewBuffer)
-	{ modelViewMatrix = McObjectConverter.convert(new Matrix4f(modelviewBuffer)); }
+	{
+		Matrix4f fullModelViewMatrix = new Matrix4f(modelviewBuffer);
+		Camera.INSTANCE.setModelViewMatrix(fullModelViewMatrix);
+		modelViewMatrix = McObjectConverter.convert(new Matrix4f(fullModelViewMatrix).setTranslation(0, 0, 0));
+	}
 	public static void setProjectionMatrixFromBuffer(FloatBuffer projectionBuffer)
 	{ projectionMatrix = McObjectConverter.convert(new Matrix4f(projectionBuffer)); }
 

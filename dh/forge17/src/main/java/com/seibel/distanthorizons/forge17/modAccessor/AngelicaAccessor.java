@@ -13,7 +13,10 @@ import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.common.versioning.VersionRange;
+import net.coderbot.iris.Iris;
 import net.coderbot.iris.compat.dh.DHCompat;
+import net.coderbot.iris.compat.dh.DHCompatInternal;
+import net.coderbot.iris.pipeline.WorldRenderingPipeline;
 import net.coderbot.iris.rendertarget.IRenderTargetExt;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraft.client.Minecraft;
@@ -82,6 +85,35 @@ public class AngelicaAccessor implements IAngelicaAccessor
 
 	@Override
 	public boolean canDoFadeShader() { return AngelicaConfig.enableIris; }
+
+	/** the same check Angelica does before swapping its LOD program in (LodRendererEvents) */
+	@Override
+	public boolean isShaderPackDrawingLods()
+	{
+		if (!AngelicaConfig.enableIris
+			|| this.dhCompatUnavailable
+			|| !IrisApi.getInstance().isShaderPackInUse())
+		{
+			return false;
+		}
+
+		try
+		{
+			DHCompatInternal dhCompat = Iris.getPipelineManager().getPipeline()
+				.map(WorldRenderingPipeline::getDHCompat)
+				.map(DHCompat::getInstance)
+				.orElse(null);
+			return dhCompat != null && dhCompat.shouldOverride;
+		}
+		catch (LinkageError e)
+		{
+			// older Angelica versions
+			this.dhCompatUnavailable = true;
+			LOGGER.warn("Unable to check if the shader pack draws the LODs, LODs may be offset in third person with shaders. Error: [" + e.getMessage() + "].");
+			return false;
+		}
+	}
+	private boolean dhCompatUnavailable = false;
 
 	/** set if Angelica's renderer classes changed, so the failure is only paid for once */
 	private boolean chunkBuiltCheckUnsupported = false;

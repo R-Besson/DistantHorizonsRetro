@@ -5,6 +5,7 @@ import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeB
 import com.seibel.distanthorizons.api.methods.events.abstractEvents.DhApiBeforeRenderPassEvent;
 import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiRenderParam;
 import com.seibel.distanthorizons.api.objects.math.DhApiVec3f;
+import com.seibel.distanthorizons.common.backports.Camera;
 import com.seibel.distanthorizons.common.render.openGl.GlDhMetaRenderer;
 import com.seibel.distanthorizons.common.render.openGl.glObject.GLProxy;
 import com.seibel.distanthorizons.common.render.openGl.glObject.buffer.GLVertexBuffer;
@@ -50,6 +51,8 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	private static final IAngelicaAccessor ANGELICA_ACCESSOR = ModAccessorInjector.INSTANCE.get(IAngelicaAccessor.class);
 
 	private static final DhVec3f MODEL_POS = new DhVec3f();
+	private static final DhVec3d CAMERA_OFFSET = new DhVec3d();
+	private static final DhVec3d ENTITY_RELATIVE_CAMERA_POS = new DhVec3d();
 	/** single event object used to reduce GC pressure */
 	private static final DhApiBeforeBufferRenderEvent.EventParam BEFORE_BUFFER_RENDER_EVENT_PARAM = new DhApiBeforeBufferRenderEvent.EventParam();
 
@@ -402,6 +405,20 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 	private void renderBuffers(RenderParams renderEventParam, boolean opaquePass, SortedArraySet<LodBufferContainer> bufferContainers)
 	{
 		boolean missingUniformsUploaded = false;
+
+		// DH's own program uses DH's view matrix, which is relative to the camera.
+		// A shader pack's (Angelica swaps it in for each buffer) uses MC's model view matrix instead,
+		// which on 1.7.10 also moves the camera away from the camera entity (IE third person),
+		// so its LODs have to be relative to the entity or they'd be offset twice
+		DhVec3d camPos = renderEventParam.exactCameraPosition;
+		if (ANGELICA_ACCESSOR != null
+			&& ANGELICA_ACCESSOR.isShaderPackDrawingLods())
+		{
+			Camera.INSTANCE.getOffsetFromEntity(CAMERA_OFFSET);
+			ENTITY_RELATIVE_CAMERA_POS.set(camPos.x - CAMERA_OFFSET.x, camPos.y - CAMERA_OFFSET.y, camPos.z - CAMERA_OFFSET.z);
+			camPos = ENTITY_RELATIVE_CAMERA_POS;
+		}
+
 		if (bufferContainers != null)
 		{
 			for (int lodIndex = 0; lodIndex < bufferContainers.size(); lodIndex++)
@@ -416,7 +433,6 @@ public class GlDhTerrainShaderProgram extends GlShaderProgram implements IDhApiS
 
 				// set uniforms and fire events
 				{
-					DhVec3d camPos = renderEventParam.exactCameraPosition;
 					MODEL_POS.set(
 						(float) (bufferContainer.minCornerBlockPos.getX() - camPos.x),
 						(float) (bufferContainer.minCornerBlockPos.getY() - camPos.y),

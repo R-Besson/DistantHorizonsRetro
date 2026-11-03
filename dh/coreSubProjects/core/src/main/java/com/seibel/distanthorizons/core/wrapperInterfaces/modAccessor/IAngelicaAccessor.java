@@ -53,4 +53,11 @@ public interface IAngelicaAccessor extends IModAccessor
 	 * showing the LODs past it, -1 if no shader pack is in use or it doesn't
 	 */
 	float getShaderPackVanillaTerrainDistance();
+
+	/**
+	 * @return true if the shader pack draws the LODs with its own program. <br>
+	 * Angelica swaps it in for each LOD buffer (DhApiBeforeBufferRenderEvent)
+	 * and draws it with MC's model view matrix instead of DH's.
+	 */
+	boolean isShaderPackDrawingLods();
 }
